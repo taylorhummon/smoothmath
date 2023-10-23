@@ -21,7 +21,11 @@ class Expression:
         return Divide(self, other)
 
     def __pow__(self, other):
-        return Power(self, other)
+        # !!! what if other isnt a Constant but evaluates to a constant?
+        if isinstance(other, Constant) and isinstance(other.value, int):
+            return PowerWithIntegralExponent(self, other)
+        else:
+            return Power(self, other)
 
     def evaluate(self):
         if self.value is None:
