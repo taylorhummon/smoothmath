@@ -1,5 +1,7 @@
 from expression import Constant, Variable
 
+print("Forward Accumulation Method")
+
 # Example: Finding the partials of z = x * (x + y) + 5 * y * y at (x, y) = (2, 3)
 x = Variable(2)
 y = Variable(3)
