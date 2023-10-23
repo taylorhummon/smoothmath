@@ -39,7 +39,7 @@ class Expression:
 
     # the _evaluate method should compute the value for an expression and set it as self.value
     def _evaluate(self):
-        raise Exception("the evaluate() method should be overridden")
+        raise Exception("the _evaluate() method should be overridden")
 
     def _derive(self, computedPartials, seed):
         raise Exception("the _derive() method should be overridden")
