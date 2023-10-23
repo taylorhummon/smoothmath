@@ -1,14 +1,5 @@
 import math
-
-class ComputedPartials:
-    def __init__(self):
-        self._dict = {}
-
-    def partialWithRespectTo(self, variable):
-        return self._dict.get(variable, 0)
-
-    def addSeed(self, variable, seed):
-        self._dict[variable] = seed + self._dict.get(variable, 0)
+from computed_partials import ComputedPartials
 
 class Expression:
     def __init__(self, value):
@@ -265,13 +256,3 @@ class Power(BinaryExpression):
             computedPartials,
             seed * math.log(self.expressionA.value) * (self.expressionA.value ** self.expressionB.value)
         )
-
-# Example: Finding the partials of z = x * (x + y) + 5 *  y * y at (x, y) = (2, 3)
-x = Variable(2)
-y = Variable(3)
-c = Constant(5)
-z = x * (x + y) + c * y * y
-computedPartials = z.derive()
-print("z =", z.value)                            # Output: z = 55
-print("∂z/∂x =", computedPartials.partialWithRespectTo(x)) # Output: ∂z/∂x = 7
-print("∂z/∂y =", computedPartials.partialWithRespectTo(y)) # Output: ∂z/∂y = 32
