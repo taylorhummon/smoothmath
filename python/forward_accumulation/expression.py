@@ -1,16 +1,9 @@
 import math
+from value_and_partial import ValueAndPartial
 
 # !!! how do I want to handle compound constant expressions?
 # !!! how hard would this be to change from calculating partials to calculating the differential?
 # !!! can we do this work iteratively instead of recursively?
-
-class ValueAndPartial:
-    def __init__(self, value, partial):
-        self.value = value
-        self.partial = partial
-
-    def toList(self):
-        return [self.value, self.partial]
 
 class Expression:
     def __neg__(self):
@@ -211,13 +204,3 @@ class Power(Expression):
             math.log(valueA) * (valueA ** valueB) * partialB
         )
         return ValueAndPartial(value, partial)
-
-# Example: Finding the partials of z = x * (x + y) + 5 * y * y at (x, y) = (2, 3)
-x = Variable(2)
-y = Variable(3)
-c = Constant(5)
-z = x * (x + y) + c * y * y
-xPartial = z.evaluateAndDerive(x).partial
-yPartial = z.evaluateAndDerive(y).partial
-print("∂z/∂x =", xPartial) # Output: ∂z/∂x = 7
-print("∂z/∂y =", yPartial) # Output: ∂z/∂y = 32
