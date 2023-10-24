@@ -12,3 +12,11 @@ To get a shell that has the appropriate dependencies available, run:
 ```
 pipenv shell
 ```
+
+
+### Testing ###
+
+We use [pytest](https://docs.pytest.org) for testing. To execute tests, run:
+```
+pytest
+```
