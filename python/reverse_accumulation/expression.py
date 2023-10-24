@@ -106,7 +106,7 @@ class Reciprocal(UnaryExpression):
         self.expressionA._derive(computedPartials, - seed * (self.value ** 2))
         pass
 
-class NaturalExp(UnaryExpression):
+class NaturalExponential(UnaryExpression):
     def __init__(self, expressionA):
         super().__init__(expressionA)
 
@@ -118,7 +118,7 @@ class NaturalExp(UnaryExpression):
         # d(e ** v) = e ** v * dv
         self.expressionA._derive(computedPartials, seed * self.value)
 
-class NaturalLog(UnaryExpression):
+class NaturalLogarithm(UnaryExpression):
     def __init__(self, expressionA):
         super().__init__(expressionA)
 

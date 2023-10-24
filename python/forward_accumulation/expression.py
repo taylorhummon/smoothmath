@@ -67,7 +67,7 @@ class Reciprocal(Expression):
         partial = - partialA * (value ** 2)
         return ValueAndPartial(value, partial)
 
-class NaturalExp(Expression):
+class NaturalExponential(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
@@ -78,7 +78,7 @@ class NaturalExp(Expression):
         partial = value * partialA
         return ValueAndPartial(value, partial)
 
-class NaturalLog(Expression):
+class NaturalLogarithm(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
