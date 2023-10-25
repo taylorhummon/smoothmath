@@ -1,8 +1,8 @@
+from abc import ABC, abstractmethod
 import math
 from src.reverse_accumulation.computed_partials import ComputedPartials
 
-# !!! consider making Expression an abstract base class
-class Expression:
+class Expression(ABC):
     def __init__(self, value):
         self.value = value
 
@@ -39,11 +39,13 @@ class Expression:
         return computedPartials
 
     # the _evaluate method should compute the value for an expression and set it as self.value
+    @abstractmethod
     def _evaluate(self):
-        raise Exception("the _evaluate() method should be overridden")
+        pass
 
+    @abstractmethod
     def _derive(self, computedPartials, seed):
-        raise Exception("the _derive() method should be overridden")
+        pass
 
 class NullaryExpression(Expression):
     def __init__(self, value):
