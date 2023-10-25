@@ -1,11 +1,12 @@
 import math
-from value_and_partial import ValueAndPartial
+from src.forward_accumulation.value_and_partial import ValueAndPartial
 
 # !!! how do I want to handle compound constant expressions?
 # !!! how hard would this be to change from calculating partials to calculating the differential?
 # !!! should I be worried about expressions like y / (x - x) ?
 # !!! can we do this work iteratively instead of recursively?
 # !!! do i want to add type annotations?
+# !!! consider checking that the expression we're differentiation against is actually a variable
 
 class Expression:
     def __neg__(self):

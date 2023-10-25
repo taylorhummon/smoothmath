@@ -1,6 +1,7 @@
 import math
-from computed_partials import ComputedPartials
+from src.reverse_accumulation.computed_partials import ComputedPartials
 
+# !!! consider making Expression an abstract base class
 class Expression:
     def __init__(self, value):
         self.value = value

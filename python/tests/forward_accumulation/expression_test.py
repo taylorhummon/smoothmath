@@ -1,6 +1,6 @@
 from pytest import approx, raises
 import math
-from expression import *
+from src.forward_accumulation.expression import *
 
 ### Constant
 
@@ -341,3 +341,10 @@ def testExpressionReuse():
     valueAndPartial = z.evaluateAndDerive(x)
     assert valueAndPartial.value == approx(1.25)
     assert valueAndPartial.partial == approx(-0.25)
+
+def testDeriveByNonVariable():
+    x = Variable(2)
+    u = Constant(3) * x
+    z = x ** 2
+    with raises(Exception):
+        z.evaluateAndDerive(u)
