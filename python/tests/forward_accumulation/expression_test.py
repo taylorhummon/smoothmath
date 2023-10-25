@@ -266,9 +266,9 @@ def testPowerWithNegativeExponent():
     valueAndPartialForX = z.evaluateAndDerive(x)
     assert valueAndPartialForX.value == approx(0.0641500299)
     assert valueAndPartialForX.partial == approx(-0.0534583582)
-    valueAndPartialForY = z.evaluateAndDerive(x)
+    valueAndPartialForY = z.evaluateAndDerive(y)
     assert valueAndPartialForY.value == approx(0.0641500299)
-    assert valueAndPartialForY.partial == approx(-0.0534583582)
+    assert valueAndPartialForY.partial == approx(0.0704760111)
 
 def testPowerWithZeroExponent():
     x = Variable(3.0)
