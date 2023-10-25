@@ -1,14 +1,24 @@
 import math
+from abc import ABC, abstractmethod
 from src.forward_accumulation.value_and_partial import ValueAndPartial
 
+# !!! should I be worried about expressions like y / (x - x) ?
+# !!! do i want to add type annotations?
 # !!! how do I want to handle compound constant expressions?
 # !!! how hard would this be to change from calculating partials to calculating the differential?
-# !!! should I be worried about expressions like y / (x - x) ?
 # !!! can we do this work iteratively instead of recursively?
-# !!! do i want to add type annotations?
-# !!! consider checking that the expression we're differentiation against is actually a variable
 
-class Expression:
+class Expression(ABC):
+    def evaluateAndDerive(self, variable):
+        if isinstance(variable, Variable):
+            return self._evaluateAndDerive(variable)
+        else:
+            raise Exception("can only differentiate with respect to a Variable")
+
+    @abstractmethod
+    def _evaluateAndDerive(self, variable):
+        raise Exception("concrete classes derived from Expression must implement _evaluateAndDerive()")
+
     def __neg__(self):
         return Negation(self)
 
@@ -35,14 +45,14 @@ class Constant(Expression):
     def __init__(self, value):
         self.value = value
 
-    def evaluateAndDerive(self, _):
+    def _evaluateAndDerive(self, variable):
         return ValueAndPartial(self.value, 0)
 
 class Variable(Expression):
     def __init__(self, value):
         self.value = value
 
-    def evaluateAndDerive(self, variable):
+    def _evaluateAndDerive(self, variable):
         partial = 1 if self == variable else 0
         return ValueAndPartial(self.value, partial)
 
@@ -50,8 +60,8 @@ class Negation(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
         # d(-u) = -du
         return ValueAndPartial(-valueA, -partialA)
 
@@ -59,8 +69,8 @@ class Reciprocal(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
         if valueA == 0:
             raise Exception("cannot divide by zero")
         value = 1 / valueA
@@ -72,8 +82,8 @@ class NaturalExponential(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
         value = math.e ** valueA
         # d(e ** v) = e ** v * dv
         partial = value * partialA
@@ -83,8 +93,8 @@ class NaturalLogarithm(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
         if valueA <= 0:
             raise Exception("can only take the log of a positive number")
         # d(ln(u)) = (1 / u) * du
@@ -97,8 +107,8 @@ class Sine(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
         # d(sin(u)) = cos(u) * du
         return ValueAndPartial(
             math.sin(valueA),
@@ -109,8 +119,8 @@ class Cosine(Expression):
     def __init__(self, expressionA):
         self.expressionA = expressionA
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
         # d(cos(u)) = - sin(u) * du
         return ValueAndPartial(
             math.cos(valueA),
@@ -122,9 +132,9 @@ class Plus(Expression):
         self.expressionA = expressionA
         self.expressionB = expressionB
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
-        valueB, partialB = self.expressionB.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
+        valueB, partialB = self.expressionB._evaluateAndDerive(variable).toList()
         # d(u + v) = du + dv
         return ValueAndPartial(
             valueA + valueB,
@@ -136,9 +146,9 @@ class Minus(Expression):
         self.expressionA = expressionA
         self.expressionB = expressionB
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
-        valueB, partialB = self.expressionB.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
+        valueB, partialB = self.expressionB._evaluateAndDerive(variable).toList()
         # d(u - v) = du - dv
         return ValueAndPartial(
             valueA - valueB,
@@ -150,9 +160,9 @@ class Multiply(Expression):
         self.expressionA = expressionA
         self.expressionB = expressionB
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
-        valueB, partialB = self.expressionB.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
+        valueB, partialB = self.expressionB._evaluateAndDerive(variable).toList()
         value = valueA * valueB
         # d(u * v) = v * du + u * dv
         partial = valueB * partialA + valueA * partialB
@@ -163,9 +173,9 @@ class Divide(Expression):
         self.expressionA = expressionA
         self.expressionB = expressionB
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
-        valueB, partialB = self.expressionB.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
+        valueB, partialB = self.expressionB._evaluateAndDerive(variable).toList()
         if valueB == 0:
             raise Exception("cannot divide by zero")
         value = valueA / valueB
@@ -180,8 +190,8 @@ class PowerWithIntegralExponent(Expression):
         self.expressionA = expressionA
         self.expressionB = expressionB
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
         valueB = self.expressionB.value
         if valueA == 0 and valueB <= 0:
             raise Exception("cannot have a base of zero unless the exponent is positive")
@@ -195,9 +205,9 @@ class Power(Expression):
         self.expressionA = expressionA
         self.expressionB = expressionB
 
-    def evaluateAndDerive(self, variable):
-        valueA, partialA = self.expressionA.evaluateAndDerive(variable).toList()
-        valueB, partialB = self.expressionB.evaluateAndDerive(variable).toList()
+    def _evaluateAndDerive(self, variable):
+        valueA, partialA = self.expressionA._evaluateAndDerive(variable).toList()
+        valueB, partialB = self.expressionB._evaluateAndDerive(variable).toList()
         if valueA <= 0:
             raise Exception("must have a positive base for non-integral exponents")
         value = valueA ** valueB

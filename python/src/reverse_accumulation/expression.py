@@ -6,6 +6,25 @@ class Expression(ABC):
     def __init__(self, value):
         self.value = value
 
+    def evaluate(self):
+        if self.value is None:
+            self._evaluate()
+
+    # the _evaluate method should compute the value for an expression and set it as self.value
+    @abstractmethod
+    def _evaluate(self):
+        raise Exception("concrete classes derived from Expression must implement _evaluate()")
+
+    def derive(self):
+        self.evaluate()
+        computedPartials = ComputedPartials()
+        self._derive(computedPartials, 1)
+        return computedPartials
+
+    @abstractmethod
+    def _derive(self, computedPartials, seed):
+        raise Exception("concrete classes derived from Expression must implement _derive()")
+
     def __neg__(self):
         return Negation(self)
 
@@ -27,25 +46,6 @@ class Expression(ABC):
             return PowerWithIntegralExponent(self, other)
         else:
             return Power(self, other)
-
-    def evaluate(self):
-        if self.value is None:
-            self._evaluate()
-
-    def derive(self):
-        self.evaluate()
-        computedPartials = ComputedPartials()
-        self._derive(computedPartials, 1)
-        return computedPartials
-
-    # the _evaluate method should compute the value for an expression and set it as self.value
-    @abstractmethod
-    def _evaluate(self):
-        pass
-
-    @abstractmethod
-    def _derive(self, computedPartials, seed):
-        pass
 
 class NullaryExpression(Expression):
     def __init__(self, value):
