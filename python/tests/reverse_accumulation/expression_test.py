@@ -6,7 +6,7 @@ from src.reverse_accumulation.expression import *
 
 def testConstant():
     c = Constant(7)
-    assert c.value == 7
+    assert c.evaluate() == 7
     computedPartials = c.derive()
     x = Variable(2)
     assert computedPartials.partialWithRespectTo(x) == 0
@@ -15,7 +15,7 @@ def testConstant():
 
 def testVariable():
     x = Variable(2)
-    assert x.value == 2
+    assert x.evaluate() == 2
     computedPartials = x.derive()
     assert computedPartials.partialWithRespectTo(x) == 1
     y = Variable(3)
@@ -27,7 +27,7 @@ def testNegation():
     x = Variable(2)
     z = Negation(x)
     computedPartials = z.derive()
-    assert z.value == -2
+    assert z.evaluate() == -2
     assert computedPartials.partialWithRespectTo(x) == -1
 
 # ### Reciprocal
@@ -36,7 +36,7 @@ def testReciprocal():
     x = Variable(2)
     z = Reciprocal(x)
     computedPartials = z.derive()
-    assert z.value == approx(0.5)
+    assert z.evaluate() == approx(0.5)
     assert computedPartials.partialWithRespectTo(x) == approx(-0.25)
 
 def testReciprocalAtZero():
@@ -51,14 +51,14 @@ def testNaturalExponentialAtZero():
     x = Variable(0)
     z = NaturalExponential(x)
     computedPartials = z.derive()
-    assert z.value == approx(1.0)
+    assert z.evaluate() == approx(1.0)
     assert computedPartials.partialWithRespectTo(x) == approx(1.0)
 
 def testNaturalExponentialAtOne():
     x = Variable(1)
     z = NaturalExponential(x)
     computedPartials = z.derive()
-    assert z.value == approx(math.e)
+    assert z.evaluate() == approx(math.e)
     assert computedPartials.partialWithRespectTo(x) == approx(math.e)
 
 ### Natural Logarithm
@@ -67,14 +67,14 @@ def testNaturalLogarithmAtOne():
     x = Variable(1)
     z = NaturalLogarithm(x)
     computedPartials = z.derive()
-    assert z.value == approx(0.0)
+    assert z.evaluate() == approx(0.0)
     assert computedPartials.partialWithRespectTo(x) == approx(1.0)
 
 def testNaturalLogarithmAtE():
     x = Variable(math.e)
     z = NaturalLogarithm(x)
     computedPartials = z.derive()
-    assert z.value == approx(1.0)
+    assert z.evaluate() == approx(1.0)
     assert computedPartials.partialWithRespectTo(x) == approx(1.0 / math.e)
 
 def testNaturalLogarithmAt0():
@@ -95,14 +95,14 @@ def testSineAt0():
     theta = Variable(0.0)
     z = Sine(theta)
     computedPartials = z.derive()
-    assert z.value == approx(0.0)
+    assert z.evaluate() == approx(0.0)
     assert computedPartials.partialWithRespectTo(theta) == approx(1.0)
 
 def testSineAtOneQuarterTurn():
     theta = Variable(math.pi / 2)
     z = Sine(theta)
     computedPartials = z.derive()
-    assert z.value == approx(1.0)
+    assert z.evaluate() == approx(1.0)
     assert computedPartials.partialWithRespectTo(theta) == approx(0.0)
 
 ### Cosine
@@ -111,14 +111,14 @@ def testCosineAt0():
     theta = Variable(0.0)
     z = Cosine(theta)
     computedPartials = z.derive()
-    assert z.value == approx(1.0)
+    assert z.evaluate() == approx(1.0)
     assert computedPartials.partialWithRespectTo(theta) == approx(0.0)
 
 def testCosineAtOneQuarterTurn():
     theta = Variable(math.pi / 2)
     z = Cosine(theta)
     computedPartials = z.derive()
-    assert z.value == approx(0.0)
+    assert z.evaluate() == approx(0.0)
     assert computedPartials.partialWithRespectTo(theta) == approx(-1.0)
 
 ### Plus
@@ -128,7 +128,7 @@ def testPlus():
     y = Variable(3)
     z = Plus(x, y)
     computedPartials = z.derive()
-    assert z.value == approx(5.0)
+    assert z.evaluate() == approx(5.0)
     assert computedPartials.partialWithRespectTo(x) == approx(1.0)
     assert computedPartials.partialWithRespectTo(y) == approx(1.0)
 
@@ -139,7 +139,7 @@ def testMinus():
     y = Variable(3)
     z = Minus(x, y)
     computedPartials = z.derive()
-    assert z.value == approx(-1.0)
+    assert z.evaluate() == approx(-1.0)
     assert computedPartials.partialWithRespectTo(x) == approx(1.0)
     assert computedPartials.partialWithRespectTo(y) == approx(-1.0)
 
@@ -150,7 +150,7 @@ def testMultiply():
     y = Variable(3)
     z = Multiply(x, y)
     computedPartials = z.derive()
-    assert z.value == approx(6.0)
+    assert z.evaluate() == approx(6.0)
     assert computedPartials.partialWithRespectTo(x) == approx(3.0)
     assert computedPartials.partialWithRespectTo(y) == approx(2.0)
 
@@ -161,7 +161,7 @@ def testDivide():
     y = Variable(2)
     z = Divide(x, y)
     computedPartials = z.derive()
-    assert z.value == approx(2.5)
+    assert z.evaluate() == approx(2.5)
     assert computedPartials.partialWithRespectTo(x) == approx(0.5)
     assert computedPartials.partialWithRespectTo(y) == approx(-1.25)
 
@@ -172,7 +172,7 @@ def testPowerWithIntegralExponent():
     c = Constant(2)
     z = PowerWithIntegralExponent(x, c)
     computedPartials = z.derive()
-    assert z.value == approx(9.0)
+    assert z.evaluate() == approx(9.0)
     assert computedPartials.partialWithRespectTo(x) == approx(6.0)
 
 def testPowerWithIntegralExponentAndNegativeBase():
@@ -180,7 +180,7 @@ def testPowerWithIntegralExponentAndNegativeBase():
     c = Constant(2)
     z = PowerWithIntegralExponent(x, c)
     computedPartials = z.derive()
-    assert z.value == approx(25.0)
+    assert z.evaluate() == approx(25.0)
     assert computedPartials.partialWithRespectTo(x) == approx(-10.0)
 
 def testPowerWithIntegralExponentAndZeroBase():
@@ -188,7 +188,7 @@ def testPowerWithIntegralExponentAndZeroBase():
     c = Constant(2)
     z = PowerWithIntegralExponent(x, c)
     computedPartials = z.derive()
-    assert z.value == approx(0.0)
+    assert z.evaluate() == approx(0.0)
     assert computedPartials.partialWithRespectTo(x) == approx(0.0)
 
 def testPowerWithNegativeIntegralExponent():
@@ -196,7 +196,7 @@ def testPowerWithNegativeIntegralExponent():
     c = Constant(-2)
     z = PowerWithIntegralExponent(x, c)
     computedPartials = z.derive()
-    assert z.value == approx(0.25)
+    assert z.evaluate() == approx(0.25)
     assert computedPartials.partialWithRespectTo(x) == approx(-0.25)
 
 def testPowerWithNegativeIntegralExponentAndNegativeBase():
@@ -204,7 +204,7 @@ def testPowerWithNegativeIntegralExponentAndNegativeBase():
     c = Constant(-2)
     z = PowerWithIntegralExponent(x, c)
     computedPartials = z.derive()
-    assert z.value == approx(0.25)
+    assert z.evaluate() == approx(0.25)
     assert computedPartials.partialWithRespectTo(x) == approx(0.25)
 
 def testPowerWithNegativeIntegralExponentAndZeroBase():
@@ -221,7 +221,7 @@ def testPower():
     y = Variable(2.5)
     z = Power(x, y)
     computedPartials = z.derive()
-    assert z.value == approx(15.588457268)
+    assert z.evaluate() == approx(15.588457268)
     assert computedPartials.partialWithRespectTo(x) == approx(12.990381056)
     assert computedPartials.partialWithRespectTo(y) == approx(17.125670716)
 
@@ -244,7 +244,7 @@ def testPowerWithNegativeExponent():
     y = Variable(-2.5)
     z = Power(x, y)
     computedPartials = z.derive()
-    assert z.value == approx(0.0641500299)
+    assert z.evaluate() == approx(0.0641500299)
     assert computedPartials.partialWithRespectTo(x) == approx(-0.0534583582)
     assert computedPartials.partialWithRespectTo(y) == approx(0.0704760111)
 
@@ -253,7 +253,7 @@ def testPowerWithZeroExponent():
     y = Variable(0.0)
     z = Power(x, y)
     computedPartials = z.derive()
-    assert z.value == approx(1.0)
+    assert z.evaluate() == approx(1.0)
     assert computedPartials.partialWithRespectTo(x) == approx(0.0)
     assert computedPartials.partialWithRespectTo(y) == approx(1.0986122886)
 
@@ -270,7 +270,7 @@ def testPolynomialOfOneVariable():
     x = Variable(2)
     z = x * x - Constant(6) * x + Constant(4)
     computedPartials = z.derive()
-    assert z.value == -4
+    assert z.evaluate() == -4
     assert computedPartials.partialWithRespectTo(x) == -2
 
 def testPolynomialOfTwoVariables():
@@ -278,7 +278,7 @@ def testPolynomialOfTwoVariables():
     y = Variable(3)
     z = x * (x + y) - Constant(5) * y * y
     computedPartials = z.derive()
-    assert z.value == -35
+    assert z.evaluate() == -35
     assert computedPartials.partialWithRespectTo(x) == 7
     assert computedPartials.partialWithRespectTo(y) == -28
 
@@ -288,7 +288,7 @@ def testPolynomialOfThreeVariables():
     y = Variable(4)
     z = w * w + Constant(5) * w * x * x - w * x * y
     computedPartials = z.derive()
-    assert z.value == 70
+    assert z.evaluate() == 70
     assert computedPartials.partialWithRespectTo(w) == 37
     assert computedPartials.partialWithRespectTo(x) == 52
     assert computedPartials.partialWithRespectTo(y) == -6
@@ -299,7 +299,7 @@ def testCompositeFunction():
     x = Variable(2)
     z = NaturalExponential(x ** Constant(2))
     computedPartials = z.derive()
-    assert z.value == approx(54.598150033)
+    assert z.evaluate() == approx(54.598150033)
     assert computedPartials.partialWithRespectTo(x) == approx(218.392600132)
 
 def testExpressionReuse():
@@ -307,5 +307,7 @@ def testExpressionReuse():
     w = x ** Constant(2)
     z = (w + Constant(1)) / w
     computedPartials = z.derive()
-    assert z.value == approx(1.25)
+    assert z.evaluate() == approx(1.25)
     assert computedPartials.partialWithRespectTo(x) == approx(-0.25)
+
+ # !!! write a test where we don't call evaluate before derive()
