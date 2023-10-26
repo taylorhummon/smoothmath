@@ -6,14 +6,12 @@ from src.forward_accumulation.value_and_partial import ValueAndPartial
 
 # !!! should I be worried about expressions like y / (x - x) ?
 # !!! how do I want to handle compound constant expressions?
-# !!! how hard would this be to change from calculating partials to calculating the differential?
-# !!! can we do this work iteratively instead of recursively?
 
 class Expression(ABC):
     @abstractmethod
     def evaluateAndDerive(
         self: Expression,
-        variable: Variable # the variable with which we are differentiation with respect to
+        variable: Variable     # the variable with which we are differentiating with respect to
     ) -> ValueAndPartial:
         raise Exception("concrete classes derived from Expression must implement evaluateAndDerive()")
 
