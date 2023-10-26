@@ -83,7 +83,7 @@ def testNaturalLogarithmAtE():
     assert valueAndPartial.value == approx(1.0)
     assert valueAndPartial.partial == approx(1.0 / math.e)
 
-def testNaturalLogarithmAt0():
+def testNaturalLogarithmAtZero():
     x = Variable(0.0)
     z = NaturalLogarithm(x)
     with raises(Exception):
@@ -97,7 +97,7 @@ def testNaturalLogarithmAtNegative():
 
 ### Sine
 
-def testSineAt0():
+def testSineAtZero():
     theta = Variable(0.0)
     z = Sine(theta)
     valueAndPartial = z.evaluateAndDerive(theta)
@@ -113,7 +113,7 @@ def testSineAtOneQuarterTurn():
 
 ### Cosine
 
-def testCosineAt0():
+def testCosineAtZero():
     theta = Variable(0.0)
     z = Cosine(theta)
     valueAndPartial = z.evaluateAndDerive(theta)
