@@ -2,7 +2,7 @@ from src.reverse_accumulation.expression import Constant, Variable
 
 print("Reverse Accumulation Method")
 
-# Example: Finding the partials of z = x * (x + y) + 5 *  y * y at (x, y) = (2, 3)
+# Example: Finding the partials of z = x * (x + y) + 5 * y * y at (x, y) = (2, 3)
 x = Variable(2)
 y = Variable(3)
 c = Constant(5)
