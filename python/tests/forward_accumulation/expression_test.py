@@ -1,5 +1,6 @@
 from pytest import approx, raises
 import math
+from src.forward_accumulation.custom_exceptions import ArithmeticException
 from src.forward_accumulation.expression import *
 
 ### Constant
@@ -48,7 +49,7 @@ def testReciprocal():
 def testReciprocalAtZero():
     x = Variable(0)
     z = Reciprocal(x)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(x)
 
 ### Natural Exponential
@@ -86,13 +87,13 @@ def testNaturalLogarithmAtE():
 def testNaturalLogarithmAtZero():
     x = Variable(0.0)
     z = NaturalLogarithm(x)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(x)
 
 def testNaturalLogarithmAtNegative():
     x = Variable(-3.0)
     z = NaturalLogarithm(x)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(x)
 
 ### Sine
@@ -225,7 +226,7 @@ def testPowerWithNegativeIntegralExponentAndZeroBase():
     x = Variable(0)
     c = Constant(-2)
     z = PowerWithIntegralExponent(x, c)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(x)
 
 ### Power
@@ -245,18 +246,18 @@ def testPowerWithNegativeBase():
     x = Variable(-3.0)
     y = Variable(2.5)
     z = Power(x, y)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(x)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(y)
 
 def testPowerWithZeroBase():
     x = Variable(0.0)
     y = Variable(2.5)
     z = Power(x, y)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(x)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(y)
 
 def testPowerWithNegativeExponent():
@@ -285,9 +286,9 @@ def testPowerWithZeroBaseAndZeroExponent():
     x = Variable(0.0)
     y = Variable(0.0)
     z = Power(x, y)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(x)
-    with raises(Exception):
+    with raises(ArithmeticException):
         z.evaluateAndDerive(y)
 
 ### Polynomials

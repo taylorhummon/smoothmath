@@ -2,9 +2,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
 from src.forward_accumulation.custom_types import numeric
+from src.forward_accumulation.custom_exceptions import ArithmeticException
 from src.forward_accumulation.value_and_partial import ValueAndPartial
 
-# !!! should I be worried about expressions like y / (x - x) ?
 # !!! how do I want to handle compound constant expressions?
 
 class Expression(ABC):
@@ -111,7 +111,7 @@ class Reciprocal(Expression):
     ) -> ValueAndPartial:
         aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
         if aValue == 0:
-            raise Exception("cannot divide by zero")
+            raise ArithmeticException("cannot divide by zero")
         resultValue = 1 / aValue
         # d(1 / u) = (-1 / u ** 2) * du
         resultPartial = - aPartial * (resultValue ** 2)
@@ -147,7 +147,7 @@ class NaturalLogarithm(Expression):
     ) -> ValueAndPartial:
         aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
         if aValue <= 0:
-            raise Exception("can only take the log of a positive number")
+            raise ArithmeticException("can only take the log of a positive number")
         # d(ln(u)) = (1 / u) * du
         return ValueAndPartial(
             math.log(aValue),
@@ -269,7 +269,7 @@ class Divide(Expression):
         aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
         bValue, bPartial = self.b.evaluateAndDerive(variable).toPair()
         if bValue == 0:
-            raise Exception("cannot divide by zero")
+            raise ArithmeticException("cannot divide by zero")
         # d(u / v) = (1 / v) * du - (u / v ** 2) * dv
         return ValueAndPartial(
             aValue / bValue,
@@ -294,7 +294,7 @@ class PowerWithIntegralExponent(Expression):
         aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
         bValue = self.b.value
         if aValue == 0 and bValue <= 0:
-            raise Exception("cannot have a base of zero unless the exponent is positive")
+            raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
         resultValue = aValue ** bValue
         # d(u ** c) = c * u ** (c - 1) * du
         resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
@@ -316,7 +316,7 @@ class Power(Expression):
         aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
         bValue, bPartial = self.b.evaluateAndDerive(variable).toPair()
         if aValue <= 0:
-            raise Exception("must have a positive base for non-integral exponents")
+            raise ArithmeticException("must have a positive base for non-integral exponents")
         resultValue = aValue ** bValue
         # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
         resultPartial = (

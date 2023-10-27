@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
 from src.reverse_accumulation.custom_types import numeric
+from src.reverse_accumulation.custom_exceptions import ArithmeticException
 from src.reverse_accumulation.computed_partials import ComputedPartials
 
 class Expression(ABC):
@@ -175,7 +176,7 @@ class Reciprocal(UnaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         if aValue == 0:
-            raise Exception("cannot divide by zero")
+            raise ArithmeticException("cannot divide by zero")
         return 1 / aValue
 
     def _derive(
@@ -221,7 +222,7 @@ class NaturalLogarithm(UnaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         if aValue <= 0:
-            raise Exception("can only take the log of a positive number")
+            raise ArithmeticException("can only take the log of a positive number")
         return math.log(aValue)
 
     def _derive(
@@ -231,7 +232,7 @@ class NaturalLogarithm(UnaryExpression):
     ) -> None:
         aValue = self.a.evaluate()
         if aValue <= 0:
-            raise Exception("can only take the log of a positive number")
+            raise ArithmeticException("can only take the log of a positive number")
         # d(ln(u)) = (1 / u) * du
         self.a._derive(computedPartials, seed / aValue)
 
@@ -379,7 +380,7 @@ class Divide(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if bValue == 0:
-            raise Exception("cannot divide by zero")
+            raise ArithmeticException("cannot divide by zero")
         return aValue / bValue
 
     def _derive(
@@ -390,7 +391,7 @@ class Divide(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if bValue == 0:
-            raise Exception("cannot divide by zero")
+            raise ArithmeticException("cannot divide by zero")
         # d(u / v) = (1 / v) * du - (u / v ^ 2) * dv
         self.a._derive(computedPartials, seed / bValue)
         self.b._derive(computedPartials, - seed * aValue / (bValue ** 2))
@@ -410,7 +411,7 @@ class PowerWithIntegralExponent(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if aValue == 0 and bValue <= 0:
-            raise Exception("cannot have a base of zero unless the exponent is positive")
+            raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
         return aValue ** bValue
 
     def _derive(
@@ -421,7 +422,7 @@ class PowerWithIntegralExponent(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if aValue == 0 and bValue <= 0:
-            raise Exception("cannot have a base of zero unless the exponent is positive")
+            raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
         # d(u ** c) = c * u ** (c - 1) * du
         self.a._derive(computedPartials, seed * bValue * (aValue ** (bValue - 1)))
 
@@ -439,7 +440,7 @@ class Power(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if aValue <= 0:
-            raise Exception("must have a positive base for non-integral exponents")
+            raise ArithmeticException("must have a positive base for non-integral exponents")
         return aValue ** bValue
 
     def _derive(
