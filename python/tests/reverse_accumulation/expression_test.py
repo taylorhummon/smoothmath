@@ -344,6 +344,20 @@ def testPowerWithNegativeIntegralExponentAndZeroBaseDerivation():
     with raises(ArithmeticException):
         z.derive()
 
+def testIllFormedPowerWithIntegralExponentEvaluation():
+    x = Variable(-2)
+    c = Constant(3.5) # we're only supposed to put integers in the exponent
+    z = PowerWithIntegralExponent(x, c)
+    with raises(Exception):
+        z.evaluate()
+
+def testIllFormedPowerWithIntegralExponentDeriation():
+    x = Variable(-2)
+    c = Constant(3.5) # we're only supposed to put integers in the exponent
+    z = PowerWithIntegralExponent(x, c)
+    with raises(Exception):
+        z.evaluate()
+
 ### Power
 
 def testPowerEvaluation():

@@ -7,10 +7,13 @@ from src.reverse_accumulation.computed_partials import ComputedPartials
 
 class Expression(ABC):
     def __init__(
-        self: Expression
+        self: Expression,
+        lacksVariables: bool
     ) -> None:
         self._value : numeric | None
         self._value = None
+        self.lacksVariables : bool
+        self.lacksVariables = lacksVariables
 
     ## Evaluation ##
 
@@ -79,8 +82,7 @@ class Expression(ABC):
         self: Expression,
         other: Expression
     ) -> PowerWithIntegralExponent | Power:
-        # !!! what if other isnt a Constant but evaluates to a constant?
-        if isinstance(other, Constant) and isinstance(other.evaluate(), int):
+        if other.lacksVariables and isinstance(other.evaluate(), int):
             return PowerWithIntegralExponent(self, other)
         else:
             return Power(self, other)
@@ -89,16 +91,17 @@ class Expression(ABC):
 
 class NullaryExpression(Expression):
     def __init__(
-        self: NullaryExpression
+        self: NullaryExpression,
+        lacksVariables: bool
     ) -> None:
-        super().__init__()
+        super().__init__(lacksVariables)
 
 class Constant(NullaryExpression):
     def __init__(
         self: Constant,
         value: numeric
     ) -> None:
-        super().__init__()
+        super().__init__(lacksVariables = True)
         self._valueFromInit = value
 
     def _evaluate(
@@ -118,7 +121,7 @@ class Variable(NullaryExpression):
         self: Variable,
         value: numeric
     ) -> None:
-        super().__init__()
+        super().__init__(lacksVariables = False)
         self._valueFromInit = value
 
     def _evaluate(
@@ -140,7 +143,7 @@ class UnaryExpression(Expression):
         self: UnaryExpression,
         a: Expression
     ) -> None:
-        super().__init__()
+        super().__init__(lacksVariables = a.lacksVariables)
         self.a = a
 
 class Negation(UnaryExpression):
@@ -286,9 +289,9 @@ class BinaryExpression(Expression):
     def __init__(
         self: BinaryExpression,
         a: Expression,
-        b: Expression
+        b: Expression,
     ) -> None:
-        super().__init__()
+        super().__init__(lacksVariables = a.lacksVariables and b.lacksVariables)
         self.a = a
         self.b = b
 
@@ -410,6 +413,8 @@ class PowerWithIntegralExponent(BinaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
+        if not isinstance(bValue, int):
+            raise Exception("the exponent in a PowerWithIntegralExponent must evaluate to an integer")
         if aValue == 0 and bValue <= 0:
             raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
         return aValue ** bValue
@@ -421,6 +426,8 @@ class PowerWithIntegralExponent(BinaryExpression):
     ) -> None:
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
+        if not isinstance(bValue, int):
+            raise Exception("the exponent in a PowerWithIntegralExponent must evaluate to an integer")
         if aValue == 0 and bValue <= 0:
             raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
         # d(u ** c) = c * u ** (c - 1) * du
