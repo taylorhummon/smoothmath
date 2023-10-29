@@ -5,6 +5,8 @@ from src.reverse_accumulation.custom_types import numeric
 from src.reverse_accumulation.custom_exceptions import ArithmeticException
 from src.reverse_accumulation.computed_partials import ComputedPartials
 
+# !!! Use the new exceptions
+
 class Expression(ABC):
     def __init__(
         self: Expression,
@@ -187,6 +189,32 @@ class Reciprocal(UnaryExpression):
         selfValue = self.evaluate()
         # d(1 / u) = (-1 / u ** 2) * du
         self.a._derive(computedPartials, - seed * (selfValue ** 2))
+
+class SquareRoot(UnaryExpression):
+    def __init__(
+        self: SquareRoot,
+        a: Expression
+    ) -> None:
+        super().__init__(a)
+
+    def _evaluate(
+        self: SquareRoot
+    ) -> numeric:
+        aValue = self.a.evaluate()
+        if aValue == 0:
+            raise ArithmeticException("sqrt(0)") # we don't allow 0 ** non-integer
+        elif aValue < 0:
+            raise ArithmeticException("sqrt(negative)")
+        return math.sqrt(aValue)
+
+    def _derive(
+        self: SquareRoot,
+        computedPartials: ComputedPartials,
+        seed: numeric
+    ) -> None:
+        selfValue = self.evaluate()
+        # d(sqrt(v)) = (1 / (2 sqrt(v))) * dv
+        self.a._derive(computedPartials, (1 / (2 * selfValue)) * seed)
 
 class NaturalExponential(UnaryExpression):
     def __init__(

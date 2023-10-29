@@ -5,7 +5,6 @@ from src.forward_accumulation.custom_types import numeric
 from src.forward_accumulation.custom_exceptions import ValueUndefinedException, IndeterminateFormException
 from src.forward_accumulation.result import Result
 
-# !!! square root
 # !!! consider providing a VariableValues dict instead of providing Variables values on creation
 # !!! improve test coverage
 # !!! how big a problem are indeterminate forms?
@@ -117,6 +116,28 @@ class Reciprocal(Expression):
         # d(1 / u) = (-1 / u ** 2) * du
         resultPartial = - aPartial * (resultValue ** 2)
         return Result(resultValue, resultPartial, aDependsOn)
+
+class SquareRoot(Expression):
+    def __init__(
+        self: SquareRoot,
+        a: Expression
+    ) -> None:
+        self.a = a
+
+    def derive(
+        self: SquareRoot,
+        variable: Variable
+    ) -> Result:
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        if aValue == 0:
+            raise ValueUndefinedException("sqrt(0)") # we don't allow 0 ** non-integer
+        elif aValue < 0:
+            raise ValueUndefinedException("sqrt(negative)")
+        resultValue = math.sqrt(aValue)
+        # d(sqrt(v)) = (1 / (2 sqrt(v))) * dv
+        resultPartial = (1 / (2 * resultValue)) * aPartial
+        return Result(resultValue, resultPartial, aDependsOn)
+
 
 class NaturalExponential(Expression):
     def __init__(
