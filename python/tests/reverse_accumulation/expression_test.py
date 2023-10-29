@@ -41,9 +41,9 @@ def testNegationDerivation():
     computedPartials = z.derive()
     assert computedPartials.partialWithRespectTo(x) == -1
 
-# ### Reciprocal
+### Reciprocal
 
-def testReciprocalEvalutaion():
+def testReciprocalEvaluation():
     x = Variable(2)
     z = Reciprocal(x)
     assert z.evaluate() == approx(0.5)
@@ -63,6 +63,31 @@ def testReciprocalEvaluationAtZero():
 def testReciprocalDerivationAtZero():
     x = Variable(0)
     z = Reciprocal(x)
+    with raises(ArithmeticException):
+        z.derive()
+
+### Square Root
+
+def testSquareRootEvaluation():
+    x = Variable(4)
+    z = SquareRoot(x)
+    assert z.evaluate() == approx(2.0)
+
+def testSquareRootDerivation():
+    x = Variable(4)
+    z = SquareRoot(x)
+    computedPartials = z.derive()
+    assert computedPartials.partialWithRespectTo(x) == approx(0.25)
+
+def testSquareRootEvaluationAtZero():
+    x = Variable(0)
+    z = SquareRoot(x)
+    with raises(ArithmeticException):
+        z.evaluate()
+
+def testSquareRootDerivationAtZero():
+    x = Variable(0)
+    z = SquareRoot(x)
     with raises(ArithmeticException):
         z.derive()
 

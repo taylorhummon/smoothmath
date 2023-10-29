@@ -4,7 +4,6 @@ from src.forward_accumulation.custom_exceptions import ArithmeticException
 from src.forward_accumulation.expression import *
 
 # !!! test 3.0 vs 3
-# !!! test square root
 # !!! clean up Power tests
 
 ### Constant
@@ -49,6 +48,17 @@ def testReciprocal():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.5)
     assert result.partial == approx(-0.25)
+    with raises(ArithmeticException):
+        z.derive({ x: 0 }, x)
+
+### Square Root
+
+def testSquareRoot():
+    x = Variable()
+    z = SquareRoot(x)
+    result = z.derive({ x: 4.0 }, x)
+    assert result.value == approx(2.0)
+    assert result.partial == approx(0.25)
     with raises(ArithmeticException):
         z.derive({ x: 0 }, x)
 
