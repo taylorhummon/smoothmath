@@ -5,6 +5,8 @@ from src.reverse_accumulation.custom_types import numeric
 from src.reverse_accumulation.custom_exceptions import ArithmeticException
 from src.reverse_accumulation.computed_partials import ComputedPartials
 
+# !!! use only one Power class
+
 class Expression(ABC):
     def __init__(
         self: Expression,
@@ -399,6 +401,7 @@ class Divide(BinaryExpression):
         self.a._derive(computedPartials, seed / bValue)
         self.b._derive(computedPartials, - seed * aValue / (bValue ** 2))
 
+# !!! consider removing this in favor of just having Power
 # When we have an integer in the exponent, we can support negative bases
 class PowerWithIntegralExponent(BinaryExpression):
     def __init__(

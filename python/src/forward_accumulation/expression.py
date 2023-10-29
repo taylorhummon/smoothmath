@@ -2,18 +2,24 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
 from src.forward_accumulation.custom_types import numeric
-from src.forward_accumulation.custom_exceptions import ArithmeticException
-from src.forward_accumulation.value_and_partial import ValueAndPartial
+from src.forward_accumulation.custom_exceptions import ValueUndefinedException, IndeterminateFormException
+from src.forward_accumulation.result import Result
 
-# !!! how do I want to handle compound constant expressions?
+# !!! use only one Power class
+# !!! use a dependsOn set instead of lacksVariables bool
+# !!! improve test coverage
+# !!! square root
+# !!! how big a problem are indeterminate forms?
+# !!! do we want a lhopital or anything?
+# !!! how badly do things go due to floating point imprecision?
 
 class Expression(ABC):
     @abstractmethod
-    def evaluateAndDerive(
+    def derive(
         self: Expression,
         variable: Variable     # the variable with which we are differentiating with respect to
-    ) -> ValueAndPartial:
-        raise Exception("concrete classes derived from Expression must implement evaluateAndDerive()")
+    ) -> Result:
+        raise Exception("concrete classes derived from Expression must implement derive()")
 
     ## Operations ##
 
@@ -49,12 +55,8 @@ class Expression(ABC):
     def __pow__(
         self: Expression,
         other: Expression
-    ) -> PowerWithIntegralExponent | Power:
-        # !!! what if other isnt a Constant but evaluates to a constant?
-        if isinstance(other, Constant) and isinstance(other.value, int):
-            return PowerWithIntegralExponent(self, other)
-        else:
-            return Power(self, other)
+    ) -> Power:
+        return Power(self, other)
 
 class Constant(Expression):
     def __init__(
@@ -63,11 +65,11 @@ class Constant(Expression):
     ) -> None:
         self.value = value
 
-    def evaluateAndDerive(
+    def derive(
         self: Constant,
         variable: Variable
-    ) -> ValueAndPartial:
-        return ValueAndPartial(self.value, 0)
+    ) -> Result:
+        return Result(self.value, 0, True)
 
 class Variable(Expression):
     def __init__(
@@ -76,12 +78,12 @@ class Variable(Expression):
     ) -> None:
         self.value = value
 
-    def evaluateAndDerive(
+    def derive(
         self: Variable,
         variable: Variable
-    ) -> ValueAndPartial:
+    ) -> Result:
         partial = 1 if self == variable else 0
-        return ValueAndPartial(self.value, partial)
+        return Result(self.value, partial, False)
 
 class Negation(Expression):
     def __init__(
@@ -90,13 +92,13 @@ class Negation(Expression):
     ) -> None:
         self.a = a
 
-    def evaluateAndDerive(
+    def derive(
         self: Negation,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
         # d(-u) = -du
-        return ValueAndPartial(-aValue, -aPartial)
+        return Result(-aValue, -aPartial, aLacksVariables)
 
 class Reciprocal(Expression):
     def __init__(
@@ -105,17 +107,17 @@ class Reciprocal(Expression):
     ) -> None:
         self.a = a
 
-    def evaluateAndDerive(
+    def derive(
         self: Reciprocal,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
         if aValue == 0:
-            raise ArithmeticException("cannot divide by zero")
+            raise ValueUndefinedException("1 / 0")
         resultValue = 1 / aValue
         # d(1 / u) = (-1 / u ** 2) * du
         resultPartial = - aPartial * (resultValue ** 2)
-        return ValueAndPartial(resultValue, resultPartial)
+        return Result(resultValue, resultPartial, aLacksVariables)
 
 class NaturalExponential(Expression):
     def __init__(
@@ -124,15 +126,15 @@ class NaturalExponential(Expression):
     ) -> None:
         self.a = a
 
-    def evaluateAndDerive(
+    def derive(
         self: NaturalExponential,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
         resultValue = math.e ** aValue
         # d(e ** v) = e ** v * dv
         resultPartial = resultValue * aPartial
-        return ValueAndPartial(resultValue, resultPartial)
+        return Result(resultValue, resultPartial, aLacksVariables)
 
 class NaturalLogarithm(Expression):
     def __init__(
@@ -141,17 +143,20 @@ class NaturalLogarithm(Expression):
     ) -> None:
         self.a = a
 
-    def evaluateAndDerive(
+    def derive(
         self: NaturalLogarithm,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
-        if aValue <= 0:
-            raise ArithmeticException("can only take the log of a positive number")
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        if aValue == 0:
+            raise ValueUndefinedException("ln(0)")
+        elif aValue < 0:
+            raise ValueUndefinedException("ln(negative)")
         # d(ln(u)) = (1 / u) * du
-        return ValueAndPartial(
+        return Result(
             math.log(aValue),
-            aPartial / aValue
+            aPartial / aValue,
+            aLacksVariables
         )
 
 class Sine(Expression):
@@ -161,15 +166,16 @@ class Sine(Expression):
     ) -> None:
         self.a = a
 
-    def evaluateAndDerive(
+    def derive(
         self: Sine,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
         # d(sin(u)) = cos(u) * du
-        return ValueAndPartial(
+        return Result(
             math.sin(aValue),
-            math.cos(aValue) * aPartial
+            math.cos(aValue) * aPartial,
+            aLacksVariables
         )
 
 class Cosine(Expression):
@@ -179,15 +185,16 @@ class Cosine(Expression):
     ) -> None:
         self.a = a
 
-    def evaluateAndDerive(
+    def derive(
         self: Cosine,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
         # d(cos(u)) = - sin(u) * du
-        return ValueAndPartial(
+        return Result(
             math.cos(aValue),
-            - math.sin(aValue) * aPartial
+            - math.sin(aValue) * aPartial,
+            aLacksVariables
         )
 
 class Plus(Expression):
@@ -199,16 +206,17 @@ class Plus(Expression):
         self.a = a
         self.b = b
 
-    def evaluateAndDerive(
+    def derive(
         self: Plus,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
-        bValue, bPartial = self.b.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
         # d(u + v) = du + dv
-        return ValueAndPartial(
+        return Result(
             aValue + bValue,
-            aPartial + bPartial
+            aPartial + bPartial,
+            aLacksVariables and bLacksVariables
         )
 
 class Minus(Expression):
@@ -220,16 +228,17 @@ class Minus(Expression):
         self.a = a
         self.b = b
 
-    def evaluateAndDerive(
+    def derive(
         self: Minus,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
-        bValue, bPartial = self.b.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
         # d(u - v) = du - dv
-        return ValueAndPartial(
+        return Result(
             aValue - bValue,
-            aPartial - bPartial
+            aPartial - bPartial,
+            aLacksVariables and bLacksVariables
         )
 
 class Multiply(Expression):
@@ -241,16 +250,17 @@ class Multiply(Expression):
         self.a = a
         self.b = b
 
-    def evaluateAndDerive(
+    def derive(
         self: Multiply,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
-        bValue, bPartial = self.b.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
         # d(u * v) = v * du + u * dv
-        return ValueAndPartial(
+        return Result(
             aValue * bValue,
-            bValue * aPartial + aValue * bPartial
+            bValue * aPartial + aValue * bPartial,
+            aLacksVariables and bLacksVariables
         )
 
 class Divide(Expression):
@@ -262,43 +272,23 @@ class Divide(Expression):
         self.a = a
         self.b = b
 
-    def evaluateAndDerive(
+    def derive(
         self: Divide,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
-        bValue, bPartial = self.b.evaluateAndDerive(variable).toPair()
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
         if bValue == 0:
-            raise ArithmeticException("cannot divide by zero")
+            if aValue == 0:
+                raise IndeterminateFormException("0 / 0")
+            else:
+                raise ValueUndefinedException("non-zero / 0")
         # d(u / v) = (1 / v) * du - (u / v ** 2) * dv
-        return ValueAndPartial(
+        return Result(
             aValue / bValue,
-            (bValue * aPartial - aValue * bPartial) / bValue ** 2
+            (bValue * aPartial - aValue * bPartial) / bValue ** 2,
+            aLacksVariables and bLacksVariables
         )
-
-# When we have an integer in the exponent, we can support negative bases
-class PowerWithIntegralExponent(Expression):
-    def __init__(
-        self: PowerWithIntegralExponent,
-        a: Expression,
-        b: Constant
-    ) -> None:
-        # !!! we expect b to be a integral Constant
-        self.a = a
-        self.b = b
-
-    def evaluateAndDerive(
-        self: PowerWithIntegralExponent,
-        variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
-        bValue = self.b.value
-        if aValue == 0 and bValue <= 0:
-            raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
-        resultValue = aValue ** bValue
-        # d(u ** c) = c * u ** (c - 1) * du
-        resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
-        return ValueAndPartial(resultValue, resultPartial)
 
 class Power(Expression):
     def __init__(
@@ -309,18 +299,115 @@ class Power(Expression):
         self.a = a
         self.b = b
 
-    def evaluateAndDerive(
+    # For a power a ** b, there are two over-arching cases we work with:
+    # (I) the exponent, b, can be determined to be a constant integer
+    #     e.g. a ** 2, a ** 3, or a ** (-1)
+    # (II) otherwise
+    #     e.g. e ** b, or 3 ** b, a ** b,
+    # In case (I), we support negative bases. In case (II), we do not support negative bases.
+    def derive(
         self: Power,
         variable: Variable
-    ) -> ValueAndPartial:
-        aValue, aPartial = self.a.evaluateAndDerive(variable).toPair()
-        bValue, bPartial = self.b.evaluateAndDerive(variable).toPair()
-        if aValue <= 0:
-            raise ArithmeticException("must have a positive base for non-integral exponents")
-        resultValue = aValue ** bValue
-        # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
-        resultPartial = (
-            (bValue * resultValue / aValue) * aPartial +
-            math.log(aValue) * resultValue * bPartial
-        )
-        return ValueAndPartial(resultValue, resultPartial)
+    ) -> Result:
+        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
+        resultLacksVariables = aLacksVariables and bLacksVariables
+        # !!! consider a more flexible check for bValue being an integer
+        if bLacksVariables and isinstance(bValue, int): # CASE I: has constant integral exponent
+            if bValue >= 2:
+                if aValue == 0:
+                    resultValue = 0
+                    resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
+                    return Result(resultValue, resultPartial, resultLacksVariables)
+                else: # aValue != 0
+                    resultValue = aValue ** bValue
+                    resultPartial = (bValue * resultValue / aValue) * aPartial
+                    return Result(resultValue, resultPartial, resultLacksVariables)
+            elif bValue == 1:
+                resultValue = aValue
+                resultPartial = aPartial
+                return Result(resultValue, resultPartial, resultLacksVariables)
+            elif bValue == 0:
+                if aValue == 0:
+                    raise IndeterminateFormException("0 ** 0") # !!! think through this once more
+                else: # aValue != 0
+                    resultValue = 1
+                    resultPartial = 0
+                    return Result(resultValue, resultPartial, resultLacksVariables)
+            else: # bValue <= -1:
+                if aValue == 0:
+                    raise ValueUndefinedException("0 ** negative")
+                else: # aValue != 0
+                    resultValue = aValue ** bValue
+                    resultPartial = (bValue * resultValue / aValue) * aPartial
+                    return Result(resultValue, resultPartial, resultLacksVariables)
+        else: # CASE II: does not have an integral exponent
+            if aValue > 0:
+                resultValue = aValue ** bValue
+                resultPartial = (
+                    (bValue * resultValue / aValue) * aPartial +
+                    math.log(aValue) * resultValue * bPartial
+                )
+                return Result(resultValue, resultPartial, resultLacksVariables)
+            elif aValue == 0:
+                if bValue > 0:
+                    raise IndeterminateFormException("ln(0) * 0")
+                elif bValue == 0:
+                    raise IndeterminateFormException("ln(0) * (0 ** 0)")
+                else: # bValue < 0
+                    raise ValueUndefinedException("0 ** negative")
+            else: # aValue < 0:
+                raise ValueUndefinedException("negative ** non-integer")
+
+# !!!
+# bValue * (aValue ** (bValue - 1)) * aPartial +
+# math.log(aValue) * (aValue ** bValue) * bPartial
+
+# !!! kill the below comments when I'm done with them
+
+# u ** v is well defined if
+# (uValue > 0) or (uValue = 0 and vValue > 0) or (uValue < 0 and v is a constant integer)
+
+# If i'm going to evaluate u ** v and v * u ** (v - 1) * du + ln(u) * u ** v * dv
+# I'll need uValue > 0 because of the log. But that alone (uValue > 0) is enough to guarantee
+# u ** v is well defined.
+
+# To get the log term to die, it suffices to have v be constant.
+# Alternatively, it might be enough if u evaluates to 0.
+
+
+##### CASE v is constant #####
+
+# Then we're working with the formula,
+# d(u ** v) = v * u ** (v - 1) * du
+
+# For this to make sense we need both of the following:
+# (A) (uValue > 0) or (uValue = 0 and vValue > 0) or (uValue < 0 and v is a constant integer)
+# (B) (uValue > 0) or (uValue = 0 and vValue > 1) or (uValue < 0 and v is a constant integer)
+
+# Putting these together,
+# (uValue > 0) or (uValue = 0 and vValue > 1) or (uValue < 0 and v is a constant integer)
+
+
+##### SUBCASE v is the constant, zero #####
+
+# u ** 0 = 1 for all u != 0
+# d(u ** 0) = d(1) = 0 * du
+
+
+##### CASE u is the constant, zero #####
+
+# 0 ** v = 0 for all v > 0.
+# d(0 ** v) = d(0) = 0 * dv
+
+# So for u = 0, vValue > 0, we have partial = 0
+
+
+##### CASE u evaluates to 0 #####
+
+# v * u ** (v - 1) * du + ln(u) * u ** v * dv
+
+# we'll want v > 1 for the first part
+# what's lim u->0 (ln(u) * u**2)?
+# Use l'hopital!
+# 2u / (- 1 / (ln(u) ** 2)) = - 2u * ( (ln(u)) ** 2 )
