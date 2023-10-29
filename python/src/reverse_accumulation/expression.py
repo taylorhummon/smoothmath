@@ -5,8 +5,6 @@ from src.reverse_accumulation.custom_types import numeric
 from src.reverse_accumulation.custom_exceptions import ArithmeticException
 from src.reverse_accumulation.computed_partials import ComputedPartials
 
-# !!! use only one Power class
-
 class Expression(ABC):
     def __init__(
         self: Expression,
@@ -83,11 +81,8 @@ class Expression(ABC):
     def __pow__(
         self: Expression,
         other: Expression
-    ) -> PowerWithIntegralExponent | Power:
-        if other.lacksVariables and isinstance(other.evaluate(), int):
-            return PowerWithIntegralExponent(self, other)
-        else:
-            return Power(self, other)
+    ) -> Power:
+        return Power(self, other)
 
 ### Nullary Expressions ###
 
@@ -401,41 +396,6 @@ class Divide(BinaryExpression):
         self.a._derive(computedPartials, seed / bValue)
         self.b._derive(computedPartials, - seed * aValue / (bValue ** 2))
 
-# !!! consider removing this in favor of just having Power
-# When we have an integer in the exponent, we can support negative bases
-class PowerWithIntegralExponent(BinaryExpression):
-    def __init__(
-        self: PowerWithIntegralExponent,
-        a: Expression,
-        b: Expression
-    ) -> None:
-        super().__init__(a, b)
-
-    def _evaluate(
-        self: PowerWithIntegralExponent
-    ) -> numeric:
-        aValue = self.a.evaluate()
-        bValue = self.b.evaluate()
-        if not isinstance(bValue, int):
-            raise Exception("the exponent in a PowerWithIntegralExponent must evaluate to an integer")
-        if aValue == 0 and bValue <= 0:
-            raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
-        return aValue ** bValue
-
-    def _derive(
-        self: PowerWithIntegralExponent,
-        computedPartials: ComputedPartials,
-        seed: numeric
-    ) -> None:
-        aValue = self.a.evaluate()
-        bValue = self.b.evaluate()
-        if not isinstance(bValue, int):
-            raise Exception("the exponent in a PowerWithIntegralExponent must evaluate to an integer")
-        if aValue == 0 and bValue <= 0:
-            raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
-        # d(u ** c) = c * u ** (c - 1) * du
-        self.a._derive(computedPartials, seed * bValue * (aValue ** (bValue - 1)))
-
 class Power(BinaryExpression):
     def __init__(
         self: Power,
@@ -449,9 +409,14 @@ class Power(BinaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
-        if aValue <= 0:
-            raise ArithmeticException("must have a positive base for non-integral exponents")
-        return aValue ** bValue
+        if bValue.is_integer():
+            if aValue == 0 and bValue <= 0:
+                raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
+            return aValue ** bValue
+        else: # bValue is not an integer
+            if aValue <= 0:
+                raise ArithmeticException("must have a positive base for non-integral exponents")
+            return aValue ** bValue
 
     def _derive(
         self: Power,
@@ -461,6 +426,12 @@ class Power(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         selfValue = self.evaluate()
-        # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
-        self.a._derive(computedPartials, seed * bValue * (aValue ** (bValue - 1)))
-        self.b._derive(computedPartials, seed * math.log(aValue) * selfValue)
+        if self.b.lacksVariables and bValue.is_integer():
+            if aValue == 0 and bValue <= 0:
+                raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
+            # d(u ** c) = c * u ** (c - 1) * du
+            self.a._derive(computedPartials, seed * bValue * (aValue ** (bValue - 1)))
+        else: # bValue is not an integer
+            # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
+            self.a._derive(computedPartials, seed * bValue * (aValue ** (bValue - 1)))
+            self.b._derive(computedPartials, seed * math.log(aValue) * selfValue)

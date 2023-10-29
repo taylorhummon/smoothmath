@@ -5,9 +5,9 @@ from src.forward_accumulation.custom_types import numeric
 from src.forward_accumulation.custom_exceptions import ValueUndefinedException, IndeterminateFormException
 from src.forward_accumulation.result import Result
 
-# !!! improve test coverage
 # !!! square root
 # !!! consider providing a VariableValues dict instead of providing Variables values on creation
+# !!! improve test coverage
 # !!! how big a problem are indeterminate forms?
 # !!! do we want a lhopital or anything?
 # !!! how badly do things go due to floating point imprecision?

@@ -268,93 +268,93 @@ def testDivideDerivationAtZero():
 def testPowerWithIntegralExponentEvaluation():
     x = Variable(3)
     c = Constant(2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     assert z.evaluate() == approx(9.0)
 
 def testPowerWithIntegralExponentDerivation():
     x = Variable(3)
     c = Constant(2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     computedPartials = z.derive()
     assert computedPartials.partialWithRespectTo(x) == approx(6.0)
 
 def testPowerWithIntegralExponentAndNegativeBaseEvaluation():
     x = Variable(-5)
     c = Constant(2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     assert z.evaluate() == approx(25.0)
 
 def testPowerWithIntegralExponentAndNegativeBaseDerivation():
     x = Variable(-5)
     c = Constant(2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     computedPartials = z.derive()
     assert computedPartials.partialWithRespectTo(x) == approx(-10.0)
 
 def testPowerWithIntegralExponentAndZeroBaseEvaluation():
     x = Variable(0)
     c = Constant(2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     assert z.evaluate() == approx(0.0)
 
 def testPowerWithIntegralExponentAndZeroBaseDerivation():
     x = Variable(0)
     c = Constant(2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     computedPartials = z.derive()
     assert computedPartials.partialWithRespectTo(x) == approx(0.0)
 
 def testPowerWithNegativeIntegralExponentEvaluation():
     x = Variable(2)
     c = Constant(-2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     assert z.evaluate() == approx(0.25)
 
 def testPowerWithNegativeIntegralExponentDerivation():
     x = Variable(2)
     c = Constant(-2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     computedPartials = z.derive()
     assert computedPartials.partialWithRespectTo(x) == approx(-0.25)
 
 def testPowerWithNegativeIntegralExponentAndNegativeBaseEvaluation():
     x = Variable(-2)
     c = Constant(-2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     assert z.evaluate() == approx(0.25)
 
 def testPowerWithNegativeIntegralExponentAndNegativeBaseDerivation():
     x = Variable(-2)
     c = Constant(-2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     computedPartials = z.derive()
     assert computedPartials.partialWithRespectTo(x) == approx(0.25)
 
 def testPowerWithNegativeIntegralExponentAndZeroBaseEvaluation():
     x = Variable(0)
     c = Constant(-2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     with raises(ArithmeticException):
         z.evaluate()
 
 def testPowerWithNegativeIntegralExponentAndZeroBaseDerivation():
     x = Variable(0)
     c = Constant(-2)
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     with raises(ArithmeticException):
         z.derive()
 
 def testIllFormedPowerWithIntegralExponentEvaluation():
     x = Variable(-2)
     c = Constant(3.5) # we're only supposed to put integers in the exponent
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     with raises(Exception):
         z.evaluate()
 
 def testIllFormedPowerWithIntegralExponentDeriation():
     x = Variable(-2)
     c = Constant(3.5) # we're only supposed to put integers in the exponent
-    z = PowerWithIntegralExponent(x, c)
+    z = Power(x, c)
     with raises(Exception):
         z.evaluate()
 
