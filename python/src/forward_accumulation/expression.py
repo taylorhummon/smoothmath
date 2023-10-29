@@ -1,11 +1,10 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
-from src.forward_accumulation.custom_types import numeric
+from src.forward_accumulation.custom_types import numeric, VariableValues
 from src.forward_accumulation.custom_exceptions import ValueUndefinedException, IndeterminateFormException
 from src.forward_accumulation.result import Result
 
-# !!! consider providing a VariableValues dict instead of providing Variables values on creation
 # !!! improve test coverage
 # !!! how big a problem are indeterminate forms?
 # !!! do we want a lhopital or anything?
@@ -15,7 +14,8 @@ class Expression(ABC):
     @abstractmethod
     def derive(
         self: Expression,
-        variable: Variable     # the variable with which we are differentiating with respect to
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
         raise Exception("concrete classes derived from Expression must implement derive()")
 
@@ -65,23 +65,27 @@ class Constant(Expression):
 
     def derive(
         self: Constant,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
         return Result(self.value, 0, set())
 
 class Variable(Expression):
     def __init__(
-        self: Variable,
-        value: numeric
+        self: Variable
     ) -> None:
-        self.value = value
+        pass
 
     def derive(
         self: Variable,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        partial = 1 if self == variable else 0
-        return Result(self.value, partial, { self })
+        value = variableValues.get(self, None)
+        if value is None:
+            raise Exception("variableValues missing a value for a variable")
+        partial = 1 if self == withRespectTo else 0
+        return Result(value, partial, { self })
 
 class Negation(Expression):
     def __init__(
@@ -92,9 +96,10 @@ class Negation(Expression):
 
     def derive(
         self: Negation,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         # d(-u) = -du
         return Result(-aValue, -aPartial, aDependsOn)
 
@@ -107,9 +112,10 @@ class Reciprocal(Expression):
 
     def derive(
         self: Reciprocal,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise ValueUndefinedException("1 / 0")
         resultValue = 1 / aValue
@@ -126,9 +132,10 @@ class SquareRoot(Expression):
 
     def derive(
         self: SquareRoot,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise ValueUndefinedException("sqrt(0)") # we don't allow 0 ** non-integer
         elif aValue < 0:
@@ -148,9 +155,10 @@ class NaturalExponential(Expression):
 
     def derive(
         self: NaturalExponential,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         resultValue = math.e ** aValue
         # d(e ** v) = e ** v * dv
         resultPartial = resultValue * aPartial
@@ -165,9 +173,10 @@ class NaturalLogarithm(Expression):
 
     def derive(
         self: NaturalLogarithm,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise ValueUndefinedException("ln(0)")
         elif aValue < 0:
@@ -188,9 +197,10 @@ class Sine(Expression):
 
     def derive(
         self: Sine,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         # d(sin(u)) = cos(u) * du
         return Result(
             math.sin(aValue),
@@ -207,9 +217,10 @@ class Cosine(Expression):
 
     def derive(
         self: Cosine,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         # d(cos(u)) = - sin(u) * du
         return Result(
             math.cos(aValue),
@@ -228,10 +239,11 @@ class Plus(Expression):
 
     def derive(
         self: Plus,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         # d(u + v) = du + dv
         return Result(
             aValue + bValue,
@@ -250,10 +262,11 @@ class Minus(Expression):
 
     def derive(
         self: Minus,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         # d(u - v) = du - dv
         return Result(
             aValue - bValue,
@@ -272,10 +285,11 @@ class Multiply(Expression):
 
     def derive(
         self: Multiply,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         # d(u * v) = v * du + u * dv
         return Result(
             aValue * bValue,
@@ -294,10 +308,11 @@ class Divide(Expression):
 
     def derive(
         self: Divide,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         if bValue == 0:
             if aValue == 0:
                 raise IndeterminateFormException("0 / 0")
@@ -327,13 +342,14 @@ class Power(Expression):
     # In case (I), we support negative bases. In case (II), we do not support negative bases.
     def derive(
         self: Power,
-        variable: Variable
+        variableValues: VariableValues,
+        withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         resultDependsOn = aDependsOn | bDependsOn
         # !!! consider a more flexible check for bValue being an integer
-        if (variable not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integral exponent
+        if (withRespectTo not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integral exponent
             if bValue >= 2:
                 if aValue == 0:
                     resultValue = 0
