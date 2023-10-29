@@ -5,10 +5,9 @@ from src.forward_accumulation.custom_types import numeric
 from src.forward_accumulation.custom_exceptions import ValueUndefinedException, IndeterminateFormException
 from src.forward_accumulation.result import Result
 
-# !!! use only one Power class
-# !!! use a dependsOn set instead of lacksVariables bool
 # !!! improve test coverage
 # !!! square root
+# !!! consider providing a VariableValues dict instead of providing Variables values on creation
 # !!! how big a problem are indeterminate forms?
 # !!! do we want a lhopital or anything?
 # !!! how badly do things go due to floating point imprecision?
@@ -69,7 +68,7 @@ class Constant(Expression):
         self: Constant,
         variable: Variable
     ) -> Result:
-        return Result(self.value, 0, True)
+        return Result(self.value, 0, set())
 
 class Variable(Expression):
     def __init__(
@@ -83,7 +82,7 @@ class Variable(Expression):
         variable: Variable
     ) -> Result:
         partial = 1 if self == variable else 0
-        return Result(self.value, partial, False)
+        return Result(self.value, partial, { self })
 
 class Negation(Expression):
     def __init__(
@@ -96,9 +95,9 @@ class Negation(Expression):
         self: Negation,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
         # d(-u) = -du
-        return Result(-aValue, -aPartial, aLacksVariables)
+        return Result(-aValue, -aPartial, aDependsOn)
 
 class Reciprocal(Expression):
     def __init__(
@@ -111,13 +110,13 @@ class Reciprocal(Expression):
         self: Reciprocal,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
         if aValue == 0:
             raise ValueUndefinedException("1 / 0")
         resultValue = 1 / aValue
         # d(1 / u) = (-1 / u ** 2) * du
         resultPartial = - aPartial * (resultValue ** 2)
-        return Result(resultValue, resultPartial, aLacksVariables)
+        return Result(resultValue, resultPartial, aDependsOn)
 
 class NaturalExponential(Expression):
     def __init__(
@@ -130,11 +129,11 @@ class NaturalExponential(Expression):
         self: NaturalExponential,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
         resultValue = math.e ** aValue
         # d(e ** v) = e ** v * dv
         resultPartial = resultValue * aPartial
-        return Result(resultValue, resultPartial, aLacksVariables)
+        return Result(resultValue, resultPartial, aDependsOn)
 
 class NaturalLogarithm(Expression):
     def __init__(
@@ -147,7 +146,7 @@ class NaturalLogarithm(Expression):
         self: NaturalLogarithm,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
         if aValue == 0:
             raise ValueUndefinedException("ln(0)")
         elif aValue < 0:
@@ -156,7 +155,7 @@ class NaturalLogarithm(Expression):
         return Result(
             math.log(aValue),
             aPartial / aValue,
-            aLacksVariables
+            aDependsOn
         )
 
 class Sine(Expression):
@@ -170,12 +169,12 @@ class Sine(Expression):
         self: Sine,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
         # d(sin(u)) = cos(u) * du
         return Result(
             math.sin(aValue),
             math.cos(aValue) * aPartial,
-            aLacksVariables
+            aDependsOn
         )
 
 class Cosine(Expression):
@@ -189,12 +188,12 @@ class Cosine(Expression):
         self: Cosine,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
         # d(cos(u)) = - sin(u) * du
         return Result(
             math.cos(aValue),
             - math.sin(aValue) * aPartial,
-            aLacksVariables
+            aDependsOn
         )
 
 class Plus(Expression):
@@ -210,13 +209,13 @@ class Plus(Expression):
         self: Plus,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
-        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
         # d(u + v) = du + dv
         return Result(
             aValue + bValue,
             aPartial + bPartial,
-            aLacksVariables and bLacksVariables
+            aDependsOn | bDependsOn
         )
 
 class Minus(Expression):
@@ -232,13 +231,13 @@ class Minus(Expression):
         self: Minus,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
-        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
         # d(u - v) = du - dv
         return Result(
             aValue - bValue,
             aPartial - bPartial,
-            aLacksVariables and bLacksVariables
+            aDependsOn | bDependsOn
         )
 
 class Multiply(Expression):
@@ -254,13 +253,13 @@ class Multiply(Expression):
         self: Multiply,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
-        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
         # d(u * v) = v * du + u * dv
         return Result(
             aValue * bValue,
             bValue * aPartial + aValue * bPartial,
-            aLacksVariables and bLacksVariables
+            aDependsOn | bDependsOn
         )
 
 class Divide(Expression):
@@ -276,8 +275,8 @@ class Divide(Expression):
         self: Divide,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
-        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
         if bValue == 0:
             if aValue == 0:
                 raise IndeterminateFormException("0 / 0")
@@ -287,7 +286,7 @@ class Divide(Expression):
         return Result(
             aValue / bValue,
             (bValue * aPartial - aValue * bPartial) / bValue ** 2,
-            aLacksVariables and bLacksVariables
+            aDependsOn | bDependsOn
         )
 
 class Power(Expression):
@@ -309,38 +308,38 @@ class Power(Expression):
         self: Power,
         variable: Variable
     ) -> Result:
-        aValue, aPartial, aLacksVariables = self.a.derive(variable).toTriple()
-        bValue, bPartial, bLacksVariables = self.b.derive(variable).toTriple()
-        resultLacksVariables = aLacksVariables and bLacksVariables
+        aValue, aPartial, aDependsOn = self.a.derive(variable).toTriple()
+        bValue, bPartial, bDependsOn = self.b.derive(variable).toTriple()
+        resultDependsOn = aDependsOn | bDependsOn
         # !!! consider a more flexible check for bValue being an integer
-        if bLacksVariables and isinstance(bValue, int): # CASE I: has constant integral exponent
+        if (variable not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integral exponent
             if bValue >= 2:
                 if aValue == 0:
                     resultValue = 0
                     resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
-                    return Result(resultValue, resultPartial, resultLacksVariables)
+                    return Result(resultValue, resultPartial, resultDependsOn)
                 else: # aValue != 0
                     resultValue = aValue ** bValue
                     resultPartial = (bValue * resultValue / aValue) * aPartial
-                    return Result(resultValue, resultPartial, resultLacksVariables)
+                    return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 1:
                 resultValue = aValue
                 resultPartial = aPartial
-                return Result(resultValue, resultPartial, resultLacksVariables)
+                return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 0:
                 if aValue == 0:
                     raise IndeterminateFormException("0 ** 0") # !!! think through this once more
                 else: # aValue != 0
                     resultValue = 1
                     resultPartial = 0
-                    return Result(resultValue, resultPartial, resultLacksVariables)
+                    return Result(resultValue, resultPartial, resultDependsOn)
             else: # bValue <= -1:
                 if aValue == 0:
                     raise ValueUndefinedException("0 ** negative")
                 else: # aValue != 0
                     resultValue = aValue ** bValue
                     resultPartial = (bValue * resultValue / aValue) * aPartial
-                    return Result(resultValue, resultPartial, resultLacksVariables)
+                    return Result(resultValue, resultPartial, resultDependsOn)
         else: # CASE II: does not have an integral exponent
             if aValue > 0:
                 resultValue = aValue ** bValue
@@ -348,7 +347,7 @@ class Power(Expression):
                     (bValue * resultValue / aValue) * aPartial +
                     math.log(aValue) * resultValue * bPartial
                 )
-                return Result(resultValue, resultPartial, resultLacksVariables)
+                return Result(resultValue, resultPartial, resultDependsOn)
             elif aValue == 0:
                 if bValue > 0:
                     raise IndeterminateFormException("ln(0) * 0")
