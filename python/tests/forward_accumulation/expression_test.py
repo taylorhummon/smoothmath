@@ -5,6 +5,7 @@ from src.forward_accumulation.expression import *
 
 # !!! test 3.0 vs 3
 # !!! clean up Power tests
+# !!! use new exceptions in tests
 
 ### Constant
 
@@ -170,56 +171,74 @@ def testDivide():
     with raises(ArithmeticException):
         z.derive({ x: 3.0, y: 0.0 }, y)
 
-### PowerWithIntegralExponent
+### Power
 
-def testPowerWithIntegralExponent():
+def testPowerWithExponentTwo():
     x = Variable()
     c = Constant(2)
     z = Power(x, c)
     result = z.derive({ x: 3 }, x)
     assert result.value == approx(9.0)
     assert result.partial == approx(6.0)
-
-def testPowerWithIntegralExponentAndNegativeBase():
-    x = Variable()
-    c = Constant(2)
-    z = Power(x, c)
+    result = z.derive({ x: 0 }, x)
+    assert result.value == approx(0.0)
+    assert result.partial == approx(0.0)
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(25.0)
     assert result.partial == approx(-10.0)
 
-def testPowerWithIntegralExponentAndZeroBase():
+def testPowerWithExponentOne():
     x = Variable()
-    c = Constant(2)
+    c = Constant(1)
     z = Power(x, c)
+    result = z.derive({ x: 3 }, x)
+    assert result.value == approx(3.0)
+    assert result.partial == approx(1.0)
     result = z.derive({ x: 0 }, x)
     assert result.value == approx(0.0)
+    assert result.partial == approx(1.0)
+    result = z.derive({ x: -5 }, x)
+    assert result.value == approx(-5.0)
+    assert result.partial == approx(1.0)
+
+def testPowerWithExponentZero():
+    x = Variable()
+    c = Constant(0)
+    z = Power(x, c)
+    result = z.derive({ x: 3 }, x)
+    assert result.value == approx(1.0)
+    assert result.partial == approx(0.0)
+    with raises(IndeterminateFormException):
+        z.derive({ x: 0 }, x)
+    result = z.derive({ x: -5 }, x)
+    assert result.value == approx(1.0)
     assert result.partial == approx(0.0)
 
-def testPowerWithNegativeIntegralExponent():
+def testPowerWithExponentNegativeOne():
+    x = Variable()
+    c = Constant(-1)
+    z = Power(x, c)
+    result = z.derive({ x: 2 }, x)
+    assert result.value == approx(0.5)
+    assert result.partial == approx(-0.25)
+    with raises(ValueUndefinedException):
+        z.derive({ x: 0 }, x)
+    result = z.derive({ x: -5 }, x)
+    assert result.value == approx(-0.2)
+    assert result.partial == approx(-0.04)
+
+def testPowerWithExponentNegativeTwo():
     x = Variable()
     c = Constant(-2)
     z = Power(x, c)
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.25)
     assert result.partial == approx(-0.25)
-
-def testPowerWithNegativeIntegralExponentAndNegativeBase():
-    x = Variable()
-    c = Constant(-2)
-    z = Power(x, c)
-    result = z.derive({ x: -2 }, x)
-    assert result.value == approx(0.25)
-    assert result.partial == approx(0.25)
-
-def testPowerWithNegativeIntegralExponentAndZeroBase():
-    x = Variable()
-    c = Constant(-2)
-    z = Power(x, c)
-    with raises(ArithmeticException):
+    with raises(ValueUndefinedException):
         z.derive({ x: 0 }, x)
-
-### Power
+    result = z.derive({ x: -5 }, x)
+    assert result.value == approx(0.04)
+    assert result.partial == approx(0.016)
 
 def testPower():
     x = Variable()

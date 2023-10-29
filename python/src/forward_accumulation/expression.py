@@ -348,7 +348,6 @@ class Power(Expression):
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         resultDependsOn = aDependsOn | bDependsOn
-        # !!! consider a more flexible check for bValue being an integer
         if (withRespectTo not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integral exponent
             if bValue >= 2:
                 if aValue == 0:
