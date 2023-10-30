@@ -66,6 +66,17 @@ def testReciprocalDerivationAtZero():
     with raises(ArithmeticException):
         z.derive()
 
+def testReciprocalEvaluationAtNegativeOne():
+    x = Variable(-1)
+    z = Reciprocal(x)
+    assert z.evaluate() == approx(-1.0)
+
+def testReciprocalDerivationAtNegativeOne():
+    x = Variable(-1)
+    z = Reciprocal(x)
+    computedPartials = z.derive()
+    assert computedPartials.partialWithRespectTo(x) == approx(-1.0)
+
 ### Square Root
 
 def testSquareRootEvaluation():
@@ -87,6 +98,18 @@ def testSquareRootEvaluationAtZero():
 
 def testSquareRootDerivationAtZero():
     x = Variable(0)
+    z = SquareRoot(x)
+    with raises(ArithmeticException):
+        z.derive()
+
+def testSquareRootEvaluationAtNegative():
+    x = Variable(-1)
+    z = SquareRoot(x)
+    with raises(ArithmeticException):
+        z.evaluate()
+
+def testSquareRootDerivationAtNegative():
+    x = Variable(-1)
     z = SquareRoot(x)
     with raises(ArithmeticException):
         z.derive()
@@ -114,6 +137,17 @@ def testNaturalExponentialDerivationAtOne():
     z = NaturalExponential(x)
     computedPartials = z.derive()
     assert computedPartials.partialWithRespectTo(x) == approx(math.e)
+
+def testNaturalExponentialEvaluationAtNegativeOne():
+    x = Variable(-1)
+    z = NaturalExponential(x)
+    assert z.evaluate() == approx(1.0 / math.e)
+
+def testNaturalExponentialDerivationAtNegativeOne():
+    x = Variable(-1)
+    z = NaturalExponential(x)
+    computedPartials = z.derive()
+    assert computedPartials.partialWithRespectTo(x) == approx(1.0 / math.e)
 
 ### Natural Logarithm
 
@@ -152,13 +186,13 @@ def testNaturalLogarithmDerivationAtZero():
         z.derive()
 
 def testNaturalLogarithmEvaluationAtNegative():
-    x = Variable(-3.0)
+    x = Variable(-1.0)
     z = NaturalLogarithm(x)
     with raises(ArithmeticException):
         z.evaluate()
 
 def testNaturalLogarithmDerivationAtNegative():
-    x = Variable(-3.0)
+    x = Variable(-1.0)
     z = NaturalLogarithm(x)
     with raises(ArithmeticException):
         z.derive()
@@ -275,14 +309,14 @@ def testDivideDerivation():
     assert computedPartials.partialWithRespectTo(y) == approx(-1.25)
 
 def testDivideEvaluationAtZero():
-    x = Variable(5)
+    x = Variable(3.0)
     y = Variable(0)
     z = Divide(x, y)
     with raises(ArithmeticException):
         z.evaluate()
 
 def testDivideDerivationAtZero():
-    x = Variable(5)
+    x = Variable(3.0)
     y = Variable(0)
     z = Divide(x, y)
     with raises(ArithmeticException):
