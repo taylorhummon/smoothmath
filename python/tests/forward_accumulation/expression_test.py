@@ -1,6 +1,6 @@
 from pytest import approx, raises
 import math
-from src.forward_accumulation.custom_exceptions import ArithmeticException
+from src.forward_accumulation.custom_exceptions import MathException
 from src.forward_accumulation.expression import *
 
 # !!! test 3.0 vs 3
@@ -49,7 +49,7 @@ def testReciprocal():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.5)
     assert result.partial == approx(-0.25)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: 0 }, x)
     result = z.derive({ x: -1 }, x)
     assert result.value == approx(-1.0)
@@ -63,9 +63,9 @@ def testSquareRoot():
     result = z.derive({ x: 4.0 }, x)
     assert result.value == approx(2.0)
     assert result.partial == approx(0.25)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: 0 }, x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: -1 }, x)
 
 ### Natural Exponential
@@ -94,9 +94,9 @@ def testNaturalLogarithm():
     result = z.derive({ x: math.e }, x)
     assert result.value == approx(1.0)
     assert result.partial == approx(1.0 / math.e)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: 0.0 }, x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: -1.0 }, x)
 
 ### Sine
@@ -174,9 +174,9 @@ def testDivide():
     resultForY = z.derive({ x: 5, y: 2 }, y)
     assert resultForY.value == approx(2.5)
     assert resultForY.partial == approx(-1.25)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: 3.0, y: 0.0 }, x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: 3.0, y: 0.0 }, y)
 
 ### Power
@@ -203,21 +203,21 @@ def testPower():
     resultForY = z.derive({ x: 3.0, y: -2.5 }, y)
     assert resultForY.value == approx(0.0641500299)
     assert resultForY.partial == approx(0.0704760111)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: 0.0, y: 0.5 }, x)
-    with raises(ArithmeticException): # !!! arguably this should exist
+    with raises(MathException): # !!! arguably this should exist
         z.derive({ x: 0.0, y: 0.5 }, y)
-    with raises(ArithmeticException): # !!! arguably this should exist
+    with raises(MathException): # !!! arguably this should exist
         z.derive({ x: 0.0, y: 2.5 }, x)
-    with raises(ArithmeticException): # !!! arguably this should exist
+    with raises(MathException): # !!! arguably this should exist
         z.derive({ x: 0.0, y: 2.5 }, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: -3.0, y: 2.5 }, x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ x: -3.0, y: 2.5 }, y)
-    with raises(ArithmeticException): # !!! arguably this should exist
+    with raises(MathException): # !!! arguably this should exist
         z.derive({ x: 0.0, y: 0.0 }, x)
-    with raises(ArithmeticException): # !!! arguably this should exist
+    with raises(MathException): # !!! arguably this should exist
         z.derive({ x: 0.0, y: 0.0 }, y)
 
 def testPowerWithConstantBaseOne():
@@ -236,11 +236,11 @@ def testPowerWithConstantBaseOne():
 def testPowerWithConstantBaseZero():
     y = Variable()
     z = Power(Constant(0), y)
-    with raises(ArithmeticException): # !!! arguably this should exist
+    with raises(MathException): # !!! arguably this should exist
         z.derive({ y: 3 }, y)
-    with raises(ArithmeticException): # !!! arguably this partial should exist, though it's dubious
+    with raises(MathException): # !!! arguably this partial should exist, though it's dubious
         z.derive({ y: 0 }, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive({ y: -5 }, y)
 
 def testPowerWithConstantExponentTwo():
@@ -275,7 +275,7 @@ def testPowerWithConstantExponentZero():
     result = z.derive({ x: 3 }, x)
     assert result.value == approx(1.0)
     assert result.partial == approx(0.0)
-    with raises(IndeterminateFormException): # !!! arguably this should exist
+    with raises(MathException): # !!! arguably this should exist
         z.derive({ x: 0 }, x)
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(1.0)
@@ -287,7 +287,7 @@ def testPowerWithConstantExponentNegativeOne():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.5)
     assert result.partial == approx(-0.25)
-    with raises(ValueUndefinedException):
+    with raises(MathException):
         z.derive({ x: 0 }, x)
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(-0.2)
@@ -299,7 +299,7 @@ def testPowerWithConstantExponentNegativeTwo():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.25)
     assert result.partial == approx(-0.25)
-    with raises(ValueUndefinedException):
+    with raises(MathException):
         z.derive({ x: 0 }, x)
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(0.04)

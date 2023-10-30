@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
 from src.forward_accumulation.custom_types import numeric, VariableValues
-from src.forward_accumulation.custom_exceptions import ValueUndefinedException, IndeterminateFormException
+from src.forward_accumulation.custom_exceptions import MathException
 from src.forward_accumulation.result import Result
 
 # !!! improve test coverage
@@ -117,7 +117,7 @@ class Reciprocal(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
-            raise ValueUndefinedException("1 / 0")
+            raise MathException("1 / x at x = 0")
         resultValue = 1 / aValue
         # d(1 / u) = (-1 / u ** 2) * du
         resultPartial = - aPartial * (resultValue ** 2)
@@ -137,9 +137,9 @@ class SquareRoot(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
-            raise ValueUndefinedException("sqrt(0)") # we don't allow 0 ** non-integer
+            raise MathException("sqrt(x) at x = 0")
         elif aValue < 0:
-            raise ValueUndefinedException("sqrt(negative)")
+            raise MathException("sqrt(x) for x < 0")
         resultValue = math.sqrt(aValue)
         # d(sqrt(v)) = (1 / (2 sqrt(v))) * dv
         resultPartial = (1 / (2 * resultValue)) * aPartial
@@ -178,9 +178,9 @@ class NaturalLogarithm(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
-            raise ValueUndefinedException("ln(0)")
+            raise MathException("ln(x) at x = 0")
         elif aValue < 0:
-            raise ValueUndefinedException("ln(negative)")
+            raise MathException("ln(x) for x < 0")
         # d(ln(u)) = (1 / u) * du
         return Result(
             math.log(aValue),
@@ -315,9 +315,10 @@ class Divide(Expression):
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         if bValue == 0:
             if aValue == 0:
-                raise IndeterminateFormException("0 / 0")
+                raise MathException("x / y at (x, y) = (0, 0)")
             else:
-                raise ValueUndefinedException("non-zero / 0")
+                raise MathException("x / y with x != 0 and y = 0")
+
         # d(u / v) = (1 / v) * du - (u / v ** 2) * dv
         return Result(
             aValue / bValue,
@@ -339,7 +340,7 @@ class Power(Expression):
     #     e.g. a ** 2, a ** 3, or a ** (-1)
     # (II) otherwise
     #     e.g. e ** b, or 3 ** b, a ** b,
-    # In case (I), we support negative bases. In case (II), we do not support negative bases.
+    # In case (I), we support negative bases. In case (II), we only support positive bases.
     def derive(
         self: Power,
         variableValues: VariableValues,
@@ -348,7 +349,7 @@ class Power(Expression):
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         resultDependsOn = aDependsOn | bDependsOn
-        if (withRespectTo not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integral exponent
+        if (withRespectTo not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
                 if aValue == 0:
                     resultValue = 0
@@ -364,19 +365,19 @@ class Power(Expression):
                 return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 0:
                 if aValue == 0:
-                    raise IndeterminateFormException("0 ** 0") # !!! think through this once more
+                    raise MathException("x ** 0 at x = 0")
                 else: # aValue != 0
                     resultValue = 1
                     resultPartial = 0
                     return Result(resultValue, resultPartial, resultDependsOn)
             else: # bValue <= -1:
                 if aValue == 0:
-                    raise ValueUndefinedException("0 ** negative")
+                    raise MathException("x ** c (where c is a negative integer) at x = 0")
                 else: # aValue != 0
                     resultValue = aValue ** bValue
                     resultPartial = (bValue * resultValue / aValue) * aPartial
                     return Result(resultValue, resultPartial, resultDependsOn)
-        else: # CASE II: does not have an integral exponent
+        else: # CASE II: does not have a constant integer exponent
             if aValue > 0:
                 resultValue = aValue ** bValue
                 resultPartial = (
@@ -385,64 +386,6 @@ class Power(Expression):
                 )
                 return Result(resultValue, resultPartial, resultDependsOn)
             elif aValue == 0:
-                if bValue > 0:
-                    raise IndeterminateFormException("ln(0) * 0")
-                elif bValue == 0:
-                    raise IndeterminateFormException("ln(0) * (0 ** 0)")
-                else: # bValue < 0
-                    raise ValueUndefinedException("0 ** negative")
+                raise MathException("x ** y at x = 0")
             else: # aValue < 0:
-                raise ValueUndefinedException("negative ** non-integer")
-
-# !!!
-# bValue * (aValue ** (bValue - 1)) * aPartial +
-# math.log(aValue) * (aValue ** bValue) * bPartial
-
-# !!! kill the below comments when I'm done with them
-
-# u ** v is well defined if
-# (uValue > 0) or (uValue = 0 and vValue > 0) or (uValue < 0 and v is a constant integer)
-
-# If i'm going to evaluate u ** v and v * u ** (v - 1) * du + ln(u) * u ** v * dv
-# I'll need uValue > 0 because of the log. But that alone (uValue > 0) is enough to guarantee
-# u ** v is well defined.
-
-# To get the log term to die, it suffices to have v be constant.
-# Alternatively, it might be enough if u evaluates to 0.
-
-
-##### CASE v is constant #####
-
-# Then we're working with the formula,
-# d(u ** v) = v * u ** (v - 1) * du
-
-# For this to make sense we need both of the following:
-# (A) (uValue > 0) or (uValue = 0 and vValue > 0) or (uValue < 0 and v is a constant integer)
-# (B) (uValue > 0) or (uValue = 0 and vValue > 1) or (uValue < 0 and v is a constant integer)
-
-# Putting these together,
-# (uValue > 0) or (uValue = 0 and vValue > 1) or (uValue < 0 and v is a constant integer)
-
-
-##### SUBCASE v is the constant, zero #####
-
-# u ** 0 = 1 for all u != 0
-# d(u ** 0) = d(1) = 0 * du
-
-
-##### CASE u is the constant, zero #####
-
-# 0 ** v = 0 for all v > 0.
-# d(0 ** v) = d(0) = 0 * dv
-
-# So for u = 0, vValue > 0, we have partial = 0
-
-
-##### CASE u evaluates to 0 #####
-
-# v * u ** (v - 1) * du + ln(u) * u ** v * dv
-
-# we'll want v > 1 for the first part
-# what's lim u->0 (ln(u) * u**2)?
-# Use l'hopital!
-# 2u / (- 1 / (ln(u) ** 2)) = - 2u * ( (ln(u)) ** 2 )
+                raise MathException("x ** y at x < 0")
