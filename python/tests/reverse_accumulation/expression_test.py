@@ -1,6 +1,6 @@
 from pytest import approx, raises
 import math
-from src.reverse_accumulation.custom_exceptions import ArithmeticException
+from src.reverse_accumulation.custom_exceptions import MathException
 from src.reverse_accumulation.expression import *
 
 ### Constant
@@ -57,13 +57,13 @@ def testReciprocalDerivation():
 def testReciprocalEvaluationAtZero():
     x = Variable(0)
     z = Reciprocal(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testReciprocalDerivationAtZero():
     x = Variable(0)
     z = Reciprocal(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 def testReciprocalEvaluationAtNegativeOne():
@@ -93,25 +93,25 @@ def testSquareRootDerivation():
 def testSquareRootEvaluationAtZero():
     x = Variable(0)
     z = SquareRoot(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testSquareRootDerivationAtZero():
     x = Variable(0)
     z = SquareRoot(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 def testSquareRootEvaluationAtNegative():
     x = Variable(-1)
     z = SquareRoot(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testSquareRootDerivationAtNegative():
     x = Variable(-1)
     z = SquareRoot(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 ### Natural Exponential
@@ -176,25 +176,25 @@ def testNaturalLogarithmDerivationAtE():
 def testNaturalLogarithmEvaluationAtZero():
     x = Variable(0.0)
     z = NaturalLogarithm(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testNaturalLogarithmDerivationAtZero():
     x = Variable(0.0)
     z = NaturalLogarithm(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 def testNaturalLogarithmEvaluationAtNegative():
     x = Variable(-1.0)
     z = NaturalLogarithm(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testNaturalLogarithmDerivationAtNegative():
     x = Variable(-1.0)
     z = NaturalLogarithm(x)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 ### Sine
@@ -312,14 +312,14 @@ def testDivideEvaluationAtZero():
     x = Variable(3.0)
     y = Variable(0)
     z = Divide(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testDivideDerivationAtZero():
     x = Variable(3.0)
     y = Variable(0)
     z = Divide(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 ### PowerWithIntegralExponent
@@ -393,14 +393,14 @@ def testPowerWithNegativeIntegralExponentAndZeroBaseEvaluation():
     x = Variable(0)
     c = Constant(-2)
     z = Power(x, c)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testPowerWithNegativeIntegralExponentAndZeroBaseDerivation():
     x = Variable(0)
     c = Constant(-2)
     z = Power(x, c)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 def testIllFormedPowerWithIntegralExponentEvaluation():
@@ -437,28 +437,28 @@ def testPowerWithNegativeBaseEvaluation():
     x = Variable(-3.0)
     y = Variable(2.5)
     z = Power(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testPowerWithNegativeBaseDerivation():
     x = Variable(-3.0)
     y = Variable(2.5)
     z = Power(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 def testPowerWithZeroBaseEvaluation():
     x = Variable(0.0)
     y = Variable(2.5)
     z = Power(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testPowerWithZeroBaseDerivation():
     x = Variable(0.0)
     y = Variable(2.5)
     z = Power(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 def testPowerWithNegativeExponentEvaluation():
@@ -493,14 +493,14 @@ def testPowerWithZeroBaseAndZeroExponentEvaluation():
     x = Variable(0.0)
     y = Variable(0.0)
     z = Power(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.evaluate()
 
 def testPowerWithZeroBaseAndZeroExponentDerivation():
     x = Variable(0.0)
     y = Variable(0.0)
     z = Power(x, y)
-    with raises(ArithmeticException):
+    with raises(MathException):
         z.derive()
 
 ### Polynomials

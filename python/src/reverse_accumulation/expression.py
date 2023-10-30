@@ -2,10 +2,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
 from src.reverse_accumulation.custom_types import numeric
-from src.reverse_accumulation.custom_exceptions import ArithmeticException
+from src.reverse_accumulation.custom_exceptions import MathException
 from src.reverse_accumulation.computed_partials import ComputedPartials
 
-# !!! Use the new exceptions
+# !!! update exception messages
 
 class Expression(ABC):
     def __init__(
@@ -178,7 +178,7 @@ class Reciprocal(UnaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         if aValue == 0:
-            raise ArithmeticException("cannot divide by zero")
+            raise MathException("cannot divide by zero")
         return 1 / aValue
 
     def _derive(
@@ -202,9 +202,9 @@ class SquareRoot(UnaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         if aValue == 0:
-            raise ArithmeticException("sqrt(0)") # we don't allow 0 ** non-integer
+            raise MathException("sqrt(0)") # we don't allow 0 ** non-integer
         elif aValue < 0:
-            raise ArithmeticException("sqrt(negative)")
+            raise MathException("sqrt(negative)")
         return math.sqrt(aValue)
 
     def _derive(
@@ -250,7 +250,7 @@ class NaturalLogarithm(UnaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         if aValue <= 0:
-            raise ArithmeticException("can only take the log of a positive number")
+            raise MathException("can only take the log of a positive number")
         return math.log(aValue)
 
     def _derive(
@@ -260,7 +260,7 @@ class NaturalLogarithm(UnaryExpression):
     ) -> None:
         aValue = self.a.evaluate()
         if aValue <= 0:
-            raise ArithmeticException("can only take the log of a positive number")
+            raise MathException("can only take the log of a positive number")
         # d(ln(u)) = (1 / u) * du
         self.a._derive(computedPartials, seed / aValue)
 
@@ -408,7 +408,7 @@ class Divide(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if bValue == 0:
-            raise ArithmeticException("cannot divide by zero")
+            raise MathException("cannot divide by zero")
         return aValue / bValue
 
     def _derive(
@@ -419,7 +419,7 @@ class Divide(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if bValue == 0:
-            raise ArithmeticException("cannot divide by zero")
+            raise MathException("cannot divide by zero")
         # d(u / v) = (1 / v) * du - (u / v ^ 2) * dv
         self.a._derive(computedPartials, seed / bValue)
         self.b._derive(computedPartials, - seed * aValue / (bValue ** 2))
@@ -439,11 +439,11 @@ class Power(BinaryExpression):
         bValue = self.b.evaluate()
         if bValue.is_integer():
             if aValue == 0 and bValue <= 0:
-                raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
+                raise MathException("cannot have a base of zero unless the exponent is positive")
             return aValue ** bValue
         else: # bValue is not an integer
             if aValue <= 0:
-                raise ArithmeticException("must have a positive base for non-integral exponents")
+                raise MathException("must have a positive base for non-integral exponents")
             return aValue ** bValue
 
     def _derive(
@@ -456,7 +456,7 @@ class Power(BinaryExpression):
         selfValue = self.evaluate()
         if self.b.lacksVariables and bValue.is_integer():
             if aValue == 0 and bValue <= 0:
-                raise ArithmeticException("cannot have a base of zero unless the exponent is positive")
+                raise MathException("cannot have a base of zero unless the exponent is positive")
             # d(u ** c) = c * u ** (c - 1) * du
             self.a._derive(computedPartials, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer

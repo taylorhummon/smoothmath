@@ -1,2 +1,2 @@
-class ArithmeticException(Exception):
+class MathException(Exception):
     pass
