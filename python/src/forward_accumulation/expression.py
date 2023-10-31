@@ -145,7 +145,6 @@ class SquareRoot(Expression):
         resultPartial = (1 / (2 * resultValue)) * aPartial
         return Result(resultValue, resultPartial, aDependsOn)
 
-
 class NaturalExponential(Expression):
     def __init__(
         self: NaturalExponential,
