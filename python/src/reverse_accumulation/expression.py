@@ -24,11 +24,11 @@ class Expression(ABC):
         variableValues: VariableValues
     ) -> numeric:
         try:
-            return self._evaluateWithCache(variableValues)
+            return self._evaluateUsingCache(variableValues)
         finally:
             self._resetEvaluationCache()
 
-    def _evaluateWithCache(
+    def _evaluateUsingCache(
         self: Expression,
         variableValues: VariableValues
     ) -> numeric:
@@ -194,7 +194,7 @@ class Negation(UnaryExpression):
         self: Negation,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         return - aValue
 
     def _derive(
@@ -217,7 +217,7 @@ class Reciprocal(UnaryExpression):
         self: Reciprocal,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         if aValue == 0:
             raise MathException("1 / x at x = 0")
         return 1 / aValue
@@ -228,7 +228,7 @@ class Reciprocal(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        selfValue = self._evaluateWithCache(variableValues)
+        selfValue = self._evaluateUsingCache(variableValues)
         # d(1 / u) = (-1 / u ** 2) * du
         self.a._derive(variableValues, result, - seed * (selfValue ** 2))
 
@@ -243,7 +243,7 @@ class SquareRoot(UnaryExpression):
         self: SquareRoot,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         if aValue == 0:
             raise MathException("sqrt(x) at x = 0")
         elif aValue < 0:
@@ -256,7 +256,7 @@ class SquareRoot(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        selfValue = self._evaluateWithCache(variableValues)
+        selfValue = self._evaluateUsingCache(variableValues)
         # d(sqrt(v)) = (1 / (2 sqrt(v))) * dv
         self.a._derive(variableValues, result, (1 / (2 * selfValue)) * seed)
 
@@ -271,7 +271,7 @@ class NaturalExponential(UnaryExpression):
         self: NaturalExponential,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         return math.e ** aValue
 
     def _derive(
@@ -280,7 +280,7 @@ class NaturalExponential(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        selfValue = self._evaluateWithCache(variableValues)
+        selfValue = self._evaluateUsingCache(variableValues)
         # d(e ** v) = e ** v * dv
         self.a._derive(variableValues, result, seed * selfValue)
 
@@ -295,7 +295,7 @@ class NaturalLogarithm(UnaryExpression):
         self: NaturalLogarithm,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         if aValue == 0: #!!! consider DRYing
             raise MathException("ln(x) at x = 0")
         elif aValue < 0:
@@ -308,7 +308,7 @@ class NaturalLogarithm(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         if aValue == 0:
             raise MathException("ln(x) at x = 0")
         elif aValue < 0:
@@ -327,7 +327,7 @@ class Sine(UnaryExpression):
         self: Sine,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         return math.sin(aValue)
 
     def _derive(
@@ -336,7 +336,7 @@ class Sine(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         # d(sin(u)) = cos(u) * du
         self.a._derive(variableValues, result, math.cos(aValue) * seed)
 
@@ -351,7 +351,7 @@ class Cosine(UnaryExpression):
         self: Cosine,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         return math.cos(aValue)
 
     def _derive(
@@ -360,7 +360,7 @@ class Cosine(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        aValue = self.a._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
         # d(cos(u)) = - sin(u) * du
         self.a._derive(variableValues, result, - math.sin(aValue) * seed)
 
@@ -395,8 +395,8 @@ class Plus(BinaryExpression):
         self: Plus,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         return aValue + bValue
 
     def _derive(
@@ -421,8 +421,8 @@ class Minus(BinaryExpression):
         self: Minus,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         return aValue - bValue
 
     def _derive(
@@ -447,8 +447,8 @@ class Multiply(BinaryExpression):
         self: Multiply,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         return aValue * bValue
 
     def _derive(
@@ -457,8 +457,8 @@ class Multiply(BinaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         # d(u * v) = v * du + u * dv
         self.a._derive(variableValues, result, bValue * seed)
         self.b._derive(variableValues, result, aValue * seed)
@@ -475,8 +475,8 @@ class Divide(BinaryExpression):
         self: Divide,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
             return 0
@@ -494,8 +494,8 @@ class Divide(BinaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
             # !!! yes, we still need to continue here in case b does something horrific
@@ -529,8 +529,8 @@ class Power(BinaryExpression):
         self: Power,
         variableValues: VariableValues
     ) -> numeric:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         if self.b.lacksVariables and bValue.is_integer():
             if bValue >= 1:
                 return aValue ** bValue
@@ -555,8 +555,8 @@ class Power(BinaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        aValue = self.a._evaluateWithCache(variableValues)
-        bValue = self.b._evaluateWithCache(variableValues)
+        aValue = self.a._evaluateUsingCache(variableValues)
+        bValue = self.b._evaluateUsingCache(variableValues)
         if self.b.lacksVariables and bValue.is_integer():
             if bValue >= 2:
                 # d(u ** c) = c * u ** (c - 1) * du
@@ -575,7 +575,7 @@ class Power(BinaryExpression):
                 self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
             if aValue > 0:
-                selfValue = self._evaluateWithCache(variableValues)
+                selfValue = self._evaluateUsingCache(variableValues)
                 # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
                 self.a._derive(variableValues, result, seed * bValue * selfValue / aValue)
                 self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)
