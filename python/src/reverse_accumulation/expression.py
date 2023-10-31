@@ -178,7 +178,7 @@ class Reciprocal(UnaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         if aValue == 0:
-            raise MathException("cannot divide by zero")
+            raise MathException("1 / x at x = 0")
         return 1 / aValue
 
     def _derive(
@@ -202,9 +202,9 @@ class SquareRoot(UnaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         if aValue == 0:
-            raise MathException("sqrt(0)") # we don't allow 0 ** non-integer
+            raise MathException("sqrt(x) at x = 0")
         elif aValue < 0:
-            raise MathException("sqrt(negative)")
+            raise MathException("sqrt(x) for x < 0")
         return math.sqrt(aValue)
 
     def _derive(
@@ -249,8 +249,10 @@ class NaturalLogarithm(UnaryExpression):
         self: NaturalLogarithm
     ) -> numeric:
         aValue = self.a.evaluate()
-        if aValue <= 0:
-            raise MathException("can only take the log of a positive number")
+        if aValue == 0: #!!! consider DRYing
+            raise MathException("ln(x) at x = 0")
+        elif aValue < 0:
+            raise MathException("ln(x) for x < 0")
         return math.log(aValue)
 
     def _derive(
@@ -259,8 +261,10 @@ class NaturalLogarithm(UnaryExpression):
         seed: numeric
     ) -> None:
         aValue = self.a.evaluate()
-        if aValue <= 0:
-            raise MathException("can only take the log of a positive number")
+        if aValue == 0:
+            raise MathException("ln(x) at x = 0")
+        elif aValue < 0:
+            raise MathException("ln(x) for x < 0")
         # d(ln(u)) = (1 / u) * du
         self.a._derive(computedPartials, seed / aValue)
 
@@ -407,8 +411,11 @@ class Divide(BinaryExpression):
     ) -> numeric:
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
-        if bValue == 0:
-            raise MathException("cannot divide by zero")
+        if bValue == 0: # !!! consider DRYing
+            if aValue == 0:
+                raise MathException("x / y at (x, y) = (0, 0)")
+            else:
+                raise MathException("x / y with x != 0 and y = 0")
         return aValue / bValue
 
     def _derive(
@@ -419,7 +426,10 @@ class Divide(BinaryExpression):
         aValue = self.a.evaluate()
         bValue = self.b.evaluate()
         if bValue == 0:
-            raise MathException("cannot divide by zero")
+            if aValue == 0:
+                raise MathException("x / y at (x, y) = (0, 0)")
+            else:
+                raise MathException("x / y with x != 0 and y = 0")
         # d(u / v) = (1 / v) * du - (u / v ^ 2) * dv
         self.a._derive(computedPartials, seed / bValue)
         self.b._derive(computedPartials, - seed * aValue / (bValue ** 2))
