@@ -5,20 +5,20 @@ if TYPE_CHECKING:
 
 from src.reverse_accumulation.custom_types import numeric
 
-class ComputedPartials:
+class Result:
     def __init__(
-        self: ComputedPartials
+        self: Result
     ):
         self._dict = {}
 
     def partialWithRespectTo(
-        self: ComputedPartials,
+        self: Result,
         variable: Variable
     ):
         return self._dict.get(variable, 0)
 
     def addSeed(
-        self: ComputedPartials,
+        self: Result,
         variable: Variable,
         seed: numeric
     ):

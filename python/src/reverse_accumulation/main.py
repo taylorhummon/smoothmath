@@ -8,6 +8,6 @@ y = Variable(3)
 c = Constant(5)
 z = x * (x + y) + c * y * y
 print("z =", z.evaluate())                                 # Output: z = 55
-computedPartials = z.derive()
-print("∂z/∂x =", computedPartials.partialWithRespectTo(x)) # Output: ∂z/∂x = 7
-print("∂z/∂y =", computedPartials.partialWithRespectTo(y)) # Output: ∂z/∂y = 32
+result = z.derive()
+print("∂z/∂x =", result.partialWithRespectTo(x)) # Output: ∂z/∂x = 7
+print("∂z/∂y =", result.partialWithRespectTo(y)) # Output: ∂z/∂y = 32

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import math
 from src.reverse_accumulation.custom_types import numeric, VariableValues
 from src.reverse_accumulation.custom_exceptions import MathException
-from src.reverse_accumulation.computed_partials import ComputedPartials
+from src.reverse_accumulation.result import Result
 
 # !!! update exception messages
 
@@ -54,11 +54,11 @@ class Expression(ABC):
     def derive(
         self: Expression,
         variableValues: VariableValues
-    ) -> ComputedPartials:
+    ) -> Result:
         try:
-            computedPartials = ComputedPartials()
-            self._derive(variableValues, computedPartials, 1)
-            return computedPartials
+            result = Result()
+            self._derive(variableValues, result, 1)
+            return result
         finally:
             self._resetEvaluationCache()
 
@@ -66,7 +66,7 @@ class Expression(ABC):
     def _derive(
         self: Expression,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         raise Exception("concrete classes derived from Expression must implement _derive()")
@@ -139,7 +139,7 @@ class Constant(NullaryExpression):
     def _derive(
         self: Constant,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         pass
@@ -162,10 +162,10 @@ class Variable(NullaryExpression):
     def _derive(
         self: Variable,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
-        computedPartials.addSeed(self, seed)
+        result.addSeed(self, seed)
 
 ### Unary Expressions ###
 
@@ -200,11 +200,11 @@ class Negation(UnaryExpression):
     def _derive(
         self: Negation,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         # d(-u) = -du
-        self.a._derive(variableValues, computedPartials, -seed)
+        self.a._derive(variableValues, result, -seed)
 
 class Reciprocal(UnaryExpression):
     def __init__(
@@ -225,12 +225,12 @@ class Reciprocal(UnaryExpression):
     def _derive(
         self: Reciprocal,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         selfValue = self._evaluateWithCache(variableValues)
         # d(1 / u) = (-1 / u ** 2) * du
-        self.a._derive(variableValues, computedPartials, - seed * (selfValue ** 2))
+        self.a._derive(variableValues, result, - seed * (selfValue ** 2))
 
 class SquareRoot(UnaryExpression):
     def __init__(
@@ -253,12 +253,12 @@ class SquareRoot(UnaryExpression):
     def _derive(
         self: SquareRoot,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         selfValue = self._evaluateWithCache(variableValues)
         # d(sqrt(v)) = (1 / (2 sqrt(v))) * dv
-        self.a._derive(variableValues, computedPartials, (1 / (2 * selfValue)) * seed)
+        self.a._derive(variableValues, result, (1 / (2 * selfValue)) * seed)
 
 class NaturalExponential(UnaryExpression):
     def __init__(
@@ -277,12 +277,12 @@ class NaturalExponential(UnaryExpression):
     def _derive(
         self: NaturalExponential,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         selfValue = self._evaluateWithCache(variableValues)
         # d(e ** v) = e ** v * dv
-        self.a._derive(variableValues, computedPartials, seed * selfValue)
+        self.a._derive(variableValues, result, seed * selfValue)
 
 class NaturalLogarithm(UnaryExpression):
     def __init__(
@@ -305,7 +305,7 @@ class NaturalLogarithm(UnaryExpression):
     def _derive(
         self: NaturalLogarithm,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
@@ -314,7 +314,7 @@ class NaturalLogarithm(UnaryExpression):
         elif aValue < 0:
             raise MathException("ln(x) for x < 0")
         # d(ln(u)) = (1 / u) * du
-        self.a._derive(variableValues, computedPartials, seed / aValue)
+        self.a._derive(variableValues, result, seed / aValue)
 
 class Sine(UnaryExpression):
     def __init__(
@@ -333,12 +333,12 @@ class Sine(UnaryExpression):
     def _derive(
         self: Sine,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
         # d(sin(u)) = cos(u) * du
-        self.a._derive(variableValues, computedPartials, math.cos(aValue) * seed)
+        self.a._derive(variableValues, result, math.cos(aValue) * seed)
 
 class Cosine(UnaryExpression):
     def __init__(
@@ -357,12 +357,12 @@ class Cosine(UnaryExpression):
     def _derive(
         self: Cosine,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
         # d(cos(u)) = - sin(u) * du
-        self.a._derive(variableValues, computedPartials, - math.sin(aValue) * seed)
+        self.a._derive(variableValues, result, - math.sin(aValue) * seed)
 
 ### Binary Expressions ###
 
@@ -402,12 +402,12 @@ class Plus(BinaryExpression):
     def _derive(
         self: Plus,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         # d(u + v) = du + dv
-        self.a._derive(variableValues, computedPartials, seed)
-        self.b._derive(variableValues, computedPartials, seed)
+        self.a._derive(variableValues, result, seed)
+        self.b._derive(variableValues, result, seed)
 
 class Minus(BinaryExpression):
     def __init__(
@@ -428,12 +428,12 @@ class Minus(BinaryExpression):
     def _derive(
         self: Minus,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         # d(u - v) = du - dv
-        self.a._derive(variableValues, computedPartials, seed)
-        self.b._derive(variableValues, computedPartials, - seed)
+        self.a._derive(variableValues, result, seed)
+        self.b._derive(variableValues, result, - seed)
 
 class Multiply(BinaryExpression):
     def __init__(
@@ -454,14 +454,14 @@ class Multiply(BinaryExpression):
     def _derive(
         self: Multiply,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
         bValue = self.b._evaluateWithCache(variableValues)
         # d(u * v) = v * du + u * dv
-        self.a._derive(variableValues, computedPartials, bValue * seed)
-        self.b._derive(variableValues, computedPartials, aValue * seed)
+        self.a._derive(variableValues, result, bValue * seed)
+        self.b._derive(variableValues, result, aValue * seed)
 
 class Divide(BinaryExpression):
     def __init__(
@@ -487,7 +487,7 @@ class Divide(BinaryExpression):
     def _derive(
         self: Divide,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
@@ -498,8 +498,8 @@ class Divide(BinaryExpression):
             else:
                 raise MathException("x / y with x != 0 and y = 0")
         # d(u / v) = (1 / v) * du - (u / v ^ 2) * dv
-        self.a._derive(variableValues, computedPartials, seed / bValue)
-        self.b._derive(variableValues, computedPartials, - seed * aValue / (bValue ** 2))
+        self.a._derive(variableValues, result, seed / bValue)
+        self.b._derive(variableValues, result, - seed * aValue / (bValue ** 2))
 
 class Power(BinaryExpression):
     def __init__(
@@ -508,6 +508,13 @@ class Power(BinaryExpression):
         b: Expression
     ) -> None:
         super().__init__(a, b)
+
+    # For a power a ** b, there are two over-arching cases we work with:
+    # (I) the exponent, b, can be determined to be a constant integer
+    #     e.g. a ** 2, a ** 3, or a ** (-1)
+    # (II) otherwise
+    #     e.g. e ** b, or 3 ** b, a ** b,
+    # In case (I), we support negative bases. In case (II), we only support positive bases.
 
     def _evaluate(
         self: Power,
@@ -527,7 +534,7 @@ class Power(BinaryExpression):
     def _derive(
         self: Power,
         variableValues: VariableValues,
-        computedPartials: ComputedPartials,
+        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
@@ -537,8 +544,8 @@ class Power(BinaryExpression):
             if aValue == 0 and bValue <= 0:
                 raise MathException("cannot have a base of zero unless the exponent is positive")
             # d(u ** c) = c * u ** (c - 1) * du
-            self.a._derive(variableValues, computedPartials, seed * bValue * (aValue ** (bValue - 1)))
+            self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
             # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
-            self.a._derive(variableValues, computedPartials, seed * bValue * (aValue ** (bValue - 1)))
-            self.b._derive(variableValues, computedPartials, seed * math.log(aValue) * selfValue)
+            self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
+            self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)

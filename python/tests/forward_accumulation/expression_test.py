@@ -5,7 +5,6 @@ from src.forward_accumulation.expression import *
 
 # !!! test 3.0 vs 3
 # !!! clean up Power tests
-# !!! use new exceptions in tests
 
 ### Constant
 
