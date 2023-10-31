@@ -203,7 +203,7 @@ class Negation(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        # d(-u) = -du
+        # d(-a) = -da
         self.a._derive(variableValues, result, -seed)
 
 class Reciprocal(UnaryExpression):
@@ -229,7 +229,7 @@ class Reciprocal(UnaryExpression):
         seed: numeric
     ) -> None:
         selfValue = self._evaluateUsingCache(variableValues)
-        # d(1 / u) = (-1 / u ** 2) * du
+        # d(1 / a) = (-1 / a ** 2) * da
         self.a._derive(variableValues, result, - seed * (selfValue ** 2))
 
 class SquareRoot(UnaryExpression):
@@ -257,7 +257,7 @@ class SquareRoot(UnaryExpression):
         seed: numeric
     ) -> None:
         selfValue = self._evaluateUsingCache(variableValues)
-        # d(sqrt(v)) = (1 / (2 sqrt(v))) * dv
+        # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         self.a._derive(variableValues, result, (1 / (2 * selfValue)) * seed)
 
 class NaturalExponential(UnaryExpression):
@@ -281,7 +281,7 @@ class NaturalExponential(UnaryExpression):
         seed: numeric
     ) -> None:
         selfValue = self._evaluateUsingCache(variableValues)
-        # d(e ** v) = e ** v * dv
+        # d(e ** a) = e ** a * da
         self.a._derive(variableValues, result, seed * selfValue)
 
 class NaturalLogarithm(UnaryExpression):
@@ -313,7 +313,7 @@ class NaturalLogarithm(UnaryExpression):
             raise MathException("ln(x) at x = 0")
         elif aValue < 0:
             raise MathException("ln(x) for x < 0")
-        # d(ln(u)) = (1 / u) * du
+        # d(ln(a)) = (1 / a) * da
         self.a._derive(variableValues, result, seed / aValue)
 
 class Sine(UnaryExpression):
@@ -337,7 +337,7 @@ class Sine(UnaryExpression):
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
-        # d(sin(u)) = cos(u) * du
+        # d(sin(a)) = cos(a) * da
         self.a._derive(variableValues, result, math.cos(aValue) * seed)
 
 class Cosine(UnaryExpression):
@@ -361,7 +361,7 @@ class Cosine(UnaryExpression):
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
-        # d(cos(u)) = - sin(u) * du
+        # d(cos(a)) = - sin(a) * da
         self.a._derive(variableValues, result, - math.sin(aValue) * seed)
 
 ### Binary Expressions ###
@@ -405,7 +405,7 @@ class Plus(BinaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        # d(u + v) = du + dv
+        # d(a + b) = da + db
         self.a._derive(variableValues, result, seed)
         self.b._derive(variableValues, result, seed)
 
@@ -431,7 +431,7 @@ class Minus(BinaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
-        # d(u - v) = du - dv
+        # d(a - b) = da - db
         self.a._derive(variableValues, result, seed)
         self.b._derive(variableValues, result, - seed)
 
@@ -459,7 +459,7 @@ class Multiply(BinaryExpression):
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
-        # d(u * v) = v * du + u * dv
+        # d(a * b) = b * da + a * db
         self.a._derive(variableValues, result, bValue * seed)
         self.b._derive(variableValues, result, aValue * seed)
 
@@ -477,7 +477,7 @@ class Divide(BinaryExpression):
     ) -> numeric:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
-        # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
+        # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
             return 0
         elif bValue == 0: # !!! consider DRYing
@@ -496,7 +496,7 @@ class Divide(BinaryExpression):
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
-        # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
+        # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
             # !!! yes, we still need to continue here in case b does something horrific
             self.b._derive(variableValues, result, 0)
@@ -506,7 +506,7 @@ class Divide(BinaryExpression):
             else:
                 raise MathException("x / y with x != 0 and y = 0")
         else:
-            # d(u / v) = (1 / v) * du - (u / v ^ 2) * dv
+            # d(a / b) = (1 / b) * da - (a / b ** 2) * dv
             self.a._derive(variableValues, result, seed / bValue)
             self.b._derive(variableValues, result, - seed * aValue / (bValue ** 2))
 
@@ -559,24 +559,24 @@ class Power(BinaryExpression):
         bValue = self.b._evaluateUsingCache(variableValues)
         if self.b.lacksVariables and bValue.is_integer():
             if bValue >= 2:
-                # d(u ** c) = c * u ** (c - 1) * du
+                # d(a ** C) = C * a ** (C - 1) * da
                 self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
             elif bValue == 1:
-                # d(u ** 1) = du
+                # d(a ** 1) = da
                 self.a._derive(variableValues, result, seed)
             elif bValue == 0:
-                # Note: x ** 0 is smooth at x = 0 despite x ** y not being smooth at (0, 0)
-                # d(u ** 0) = 0 * du
+                # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
+                # d(a ** 0) = 0 * da
                 self.a._derive(variableValues, result, 0) # !!! we still need to propogate because a._derive() might raise
             else: # bValue <= -1
                 if aValue == 0:
                     raise MathException("x ** c at x = 0 and c is a negative integer")
-                # d(u ** c) = c * u ** (c - 1) * du
+                # d(a ** C) = C * a ** (C - 1) * da
                 self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
             if aValue > 0:
                 selfValue = self._evaluateUsingCache(variableValues)
-                # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
+                # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
                 self.a._derive(variableValues, result, seed * bValue * selfValue / aValue)
                 self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)
             elif aValue == 0:

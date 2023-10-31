@@ -101,7 +101,7 @@ class Negation(Expression):
         withRespectTo: Variable
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        # d(-u) = -du
+        # d(-a) = -da
         return Result(-aValue, -aPartial, aDependsOn)
 
 class Reciprocal(Expression):
@@ -120,7 +120,7 @@ class Reciprocal(Expression):
         if aValue == 0:
             raise MathException("1 / x at x = 0")
         resultValue = 1 / aValue
-        # d(1 / u) = (-1 / u ** 2) * du
+        # d(1 / a) = (-1 / a ** 2) * da
         resultPartial = - aPartial * (resultValue ** 2)
         return Result(resultValue, resultPartial, aDependsOn)
 
@@ -142,7 +142,7 @@ class SquareRoot(Expression):
         elif aValue < 0:
             raise MathException("sqrt(x) for x < 0")
         resultValue = math.sqrt(aValue)
-        # d(sqrt(v)) = (1 / (2 sqrt(v))) * dv
+        # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         resultPartial = (1 / (2 * resultValue)) * aPartial
         return Result(resultValue, resultPartial, aDependsOn)
 
@@ -160,7 +160,7 @@ class NaturalExponential(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         resultValue = math.e ** aValue
-        # d(e ** v) = e ** v * dv
+        # d(e ** a) = e ** a * da
         resultPartial = resultValue * aPartial
         return Result(resultValue, resultPartial, aDependsOn)
 
@@ -181,7 +181,7 @@ class NaturalLogarithm(Expression):
             raise MathException("ln(x) at x = 0")
         elif aValue < 0:
             raise MathException("ln(x) for x < 0")
-        # d(ln(u)) = (1 / u) * du
+        # d(ln(a)) = (1 / a) * da
         return Result(
             math.log(aValue),
             aPartial / aValue,
@@ -201,7 +201,7 @@ class Sine(Expression):
         withRespectTo: Variable
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        # d(sin(u)) = cos(u) * du
+        # d(sin(a)) = cos(a) * da
         return Result(
             math.sin(aValue),
             math.cos(aValue) * aPartial,
@@ -221,7 +221,7 @@ class Cosine(Expression):
         withRespectTo: Variable
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        # d(cos(u)) = - sin(u) * du
+        # d(cos(a)) = - sin(a) * da
         return Result(
             math.cos(aValue),
             - math.sin(aValue) * aPartial,
@@ -244,7 +244,7 @@ class Plus(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
-        # d(u + v) = du + dv
+        # d(a + b) = da + db
         return Result(
             aValue + bValue,
             aPartial + bPartial,
@@ -267,7 +267,7 @@ class Minus(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
-        # d(u - v) = du - dv
+        # d(a - b) = da - db
         return Result(
             aValue - bValue,
             aPartial - bPartial,
@@ -290,7 +290,7 @@ class Multiply(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
-        # d(u * v) = v * du + u * dv
+        # d(a * b) = b * da + a * db
         return Result(
             aValue * bValue,
             bValue * aPartial + aValue * bPartial,
@@ -322,7 +322,7 @@ class Divide(Expression):
                 raise MathException("x / y at (x, y) = (0, 0)")
             else:
                 raise MathException("x / y with x != 0 and y = 0")
-        # d(u / v) = (1 / v) * du - (u / v ** 2) * dv
+        # d(a / b) = (1 / b) * da - (a / b ** 2) * db
         return Result(
             aValue / bValue,
             (bValue * aPartial - aValue * bPartial) / bValue ** 2,
@@ -357,31 +357,31 @@ class Power(Expression):
         if bHasNoDependence and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
                 resultValue = aValue ** bValue
-                # d(u ** c) = c * u ** (c - 1) * du
+                # d(a ** c) = c * a ** (c - 1) * da
                 resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
                 return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 1:
                 resultValue = aValue
-                # d(u ** 1) = 1 * du
+                # d(a ** 1) = 1 * da
                 resultPartial = aPartial
                 return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 0:
                 # Note: x ** 0 is smooth at x = 0 despite x ** y not being smooth at (0, 0)
                 resultValue = 1
-                # d(u ** 0) = 0 * du
+                # d(a ** 0) = 0 * da
                 resultPartial = 0
                 return Result(resultValue, resultPartial, resultDependsOn)
             else: # bValue <= -1:
                 if aValue == 0:
-                    raise MathException("x ** c at x = 0 and c is a negative integer")
+                    raise MathException("x ** C at x = 0 and C is a negative integer")
                 resultValue = aValue ** bValue
-                # d(u ** c) = c * u ** (c - 1) * du
+                # d(a ** C) = C * a ** (C - 1) * da
                 resultPartial = (bValue * resultValue / aValue) * aPartial
                 return Result(resultValue, resultPartial, resultDependsOn)
         else: # CASE II: does not have a constant integer exponent
             if aValue > 0:
                 resultValue = aValue ** bValue
-                # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
+                # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
                 resultPartial = (
                     (bValue * resultValue / aValue) * aPartial +
                     math.log(aValue) * resultValue * bPartial
