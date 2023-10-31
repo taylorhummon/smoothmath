@@ -128,10 +128,11 @@ def testPlus():
     x = Variable()
     y = Variable()
     z = Plus(x, y)
-    resultForX = z.derive({ x: 2, y: 3 }, x)
+    variableValues = { x: 2, y: 3 }
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == approx(5.0)
     assert resultForX.partial == approx(1.0)
-    resultForY = z.derive({ x: 2, y: 3 }, y)
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(5.0)
     assert resultForY.partial == approx(1.0)
 
@@ -141,10 +142,11 @@ def testMinus():
     x = Variable()
     y = Variable()
     z = Minus(x, y)
-    resultForX = z.derive({ x: 2, y: 3 }, x)
+    variableValues = { x: 2, y: 3 }
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == approx(-1.0)
     assert resultForX.partial == approx(1.0)
-    resultForY = z.derive({ x: 2, y: 3 }, y)
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(-1.0)
     assert resultForY.partial == approx(-1.0)
 
@@ -154,10 +156,11 @@ def testMultiply():
     x = Variable()
     y = Variable()
     z = Multiply(x, y)
-    resultForX = z.derive({ x: 2, y: 3 }, x)
+    variableValues = { x: 2, y: 3 }
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == approx(6.0)
     assert resultForX.partial == approx(3.0)
-    resultForY = z.derive({ x: 2, y: 3 }, y)
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(6.0)
     assert resultForY.partial == approx(2.0)
 
@@ -167,16 +170,18 @@ def testDivide():
     x = Variable()
     y = Variable()
     z = Divide(x, y)
-    resultForX = z.derive({ x: 5, y: 2 }, x)
+    variableValues = { x: 5, y: 2 }
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == approx(2.5)
     assert resultForX.partial == approx(0.5)
-    resultForY = z.derive({ x: 5, y: 2 }, y)
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(2.5)
     assert resultForY.partial == approx(-1.25)
+    variableValues = { x: 3.0, y: 0.0 }
     with raises(MathException):
-        z.derive({ x: 3.0, y: 0.0 }, x)
+        z.derive(variableValues, x)
     with raises(MathException):
-        z.derive({ x: 3.0, y: 0.0 }, y)
+        z.derive(variableValues, y)
 
 ### Power
 
@@ -184,40 +189,47 @@ def testPower():
     x = Variable()
     y = Variable()
     z = Power(x, y)
-    resultForX = z.derive({ x: 3.0, y: 2.5 }, x)
+    variableValues = { x: 3.0, y: 2.5 }
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == approx(15.588457268)
     assert resultForX.partial == approx(12.990381056)
-    resultForY = z.derive({ x: 3.0, y: 2.5 }, y)
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(15.588457268)
     assert resultForY.partial == approx(17.125670716)
-    resultForX = z.derive({ x: 3.0, y: 0.0 }, x)
+    variableValues = { x: 3.0, y: 0.0 }
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == approx(1.0)
     assert resultForX.partial == approx(0.0)
-    resultForY = z.derive({ x: 3.0, y: 0.0 }, y)
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(1.0)
     assert resultForY.partial == approx(1.0986122886)
-    resultForX = z.derive({ x: 3.0, y: -2.5 }, x)
+    variableValues = { x: 3.0, y: -2.5 }
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == approx(0.0641500299)
     assert resultForX.partial == approx(-0.0534583582)
-    resultForY = z.derive({ x: 3.0, y: -2.5 }, y)
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(0.0641500299)
     assert resultForY.partial == approx(0.0704760111)
+    variableValues = { x: 0.0, y: 0.5 }
     with raises(MathException):
-        z.derive({ x: 0.0, y: 0.5 }, x)
+        z.derive(variableValues, x)
     with raises(MathException): # !!! arguably this should exist
-        z.derive({ x: 0.0, y: 0.5 }, y)
+        z.derive(variableValues, y)
+    variableValues = { x: 0.0, y: 2.5 }
     with raises(MathException): # !!! arguably this should exist
-        z.derive({ x: 0.0, y: 2.5 }, x)
+        z.derive(variableValues, x)
     with raises(MathException): # !!! arguably this should exist
-        z.derive({ x: 0.0, y: 2.5 }, y)
+        z.derive(variableValues, y)
+    variableValues = { x: -3.0, y: 0.5 }
     with raises(MathException):
-        z.derive({ x: -3.0, y: 2.5 }, x)
+        z.derive(variableValues, x)
     with raises(MathException):
-        z.derive({ x: -3.0, y: 2.5 }, y)
+        z.derive(variableValues, y)
+    variableValues = { x: 0.0, y: 0.0 }
     with raises(MathException): # !!! arguably this should exist
-        z.derive({ x: 0.0, y: 0.0 }, x)
+        z.derive(variableValues, x)
     with raises(MathException): # !!! arguably this should exist
-        z.derive({ x: 0.0, y: 0.0 }, y)
+        z.derive(variableValues, y)
 
 def testPowerWithConstantBaseOne():
     y = Variable()
@@ -344,8 +356,9 @@ def testPolynomialOfTwoVariables():
     x = Variable()
     y = Variable()
     z = x * (x + y) - Constant(5) * y * y
-    resultForX = z.derive({ x: 2, y: 3 }, x)
-    resultForY = z.derive({ x: 2, y: 3 }, y)
+    variableValues = { x: 2, y: 3 }
+    resultForX = z.derive(variableValues, x)
+    resultForY = z.derive(variableValues, y)
     assert resultForX.value == -35
     assert resultForX.partial == 7
     assert resultForY.value == -35
@@ -356,9 +369,10 @@ def testPolynomialOfThreeVariables():
     x = Variable()
     y = Variable()
     z = w * w + Constant(5) * w * x * x - w * x * y
-    resultForW = z.derive({ w: 2, x: 3, y: 4 }, w)
-    resultForX = z.derive({ w: 2, x: 3, y: 4 }, x)
-    resultForY = z.derive({ w: 2, x: 3, y: 4 }, y)
+    variableValues = { w: 2, x: 3, y: 4 }
+    resultForW = z.derive(variableValues, w)
+    resultForX = z.derive(variableValues, x)
+    resultForY = z.derive(variableValues, y)
     assert resultForW.value == 70
     assert resultForW.partial == 37
     assert resultForX.value == 70

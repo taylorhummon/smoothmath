@@ -340,6 +340,7 @@ class Power(Expression):
     # (II) otherwise
     #     e.g. e ** b, or 3 ** b, a ** b,
     # In case (I), we support negative bases. In case (II), we only support positive bases.
+
     def derive(
         self: Power,
         variableValues: VariableValues,
@@ -350,35 +351,33 @@ class Power(Expression):
         resultDependsOn = aDependsOn | bDependsOn
         if (withRespectTo not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
-                if aValue == 0:
-                    resultValue = 0
-                    resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
-                    return Result(resultValue, resultPartial, resultDependsOn)
-                else: # aValue != 0
-                    resultValue = aValue ** bValue
-                    resultPartial = (bValue * resultValue / aValue) * aPartial
-                    return Result(resultValue, resultPartial, resultDependsOn)
+                resultValue = aValue ** bValue
+                # d(u ** c) = c * u ** (c - 1) * du
+                resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
+                return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 1:
                 resultValue = aValue
+                # d(u ** 1) = 1 * du
                 resultPartial = aPartial
                 return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 0:
                 if aValue == 0:
                     raise MathException("x ** 0 at x = 0")
-                else: # aValue != 0
-                    resultValue = 1
-                    resultPartial = 0
-                    return Result(resultValue, resultPartial, resultDependsOn)
+                resultValue = 1
+                # d(u ** 0) = 0 * du
+                resultPartial = 0
+                return Result(resultValue, resultPartial, resultDependsOn)
             else: # bValue <= -1:
                 if aValue == 0:
-                    raise MathException("x ** c (where c is a negative integer) at x = 0")
-                else: # aValue != 0
-                    resultValue = aValue ** bValue
-                    resultPartial = (bValue * resultValue / aValue) * aPartial
-                    return Result(resultValue, resultPartial, resultDependsOn)
+                    raise MathException("x ** c at x = 0 and c is a negative integer")
+                resultValue = aValue ** bValue
+                # d(u ** c) = c * u ** (c - 1) * du
+                resultPartial = (bValue * resultValue / aValue) * aPartial
+                return Result(resultValue, resultPartial, resultDependsOn)
         else: # CASE II: does not have a constant integer exponent
             if aValue > 0:
                 resultValue = aValue ** bValue
+                # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
                 resultPartial = (
                     (bValue * resultValue / aValue) * aPartial +
                     math.log(aValue) * resultValue * bPartial

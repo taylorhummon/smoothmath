@@ -522,14 +522,24 @@ class Power(BinaryExpression):
     ) -> numeric:
         aValue = self.a._evaluateWithCache(variableValues)
         bValue = self.b._evaluateWithCache(variableValues)
-        if bValue.is_integer():
-            if aValue == 0 and bValue <= 0:
-                raise MathException("cannot have a base of zero unless the exponent is positive")
-            return aValue ** bValue
+        if self.b.lacksVariables and bValue.is_integer():
+            if bValue >= 1:
+                return aValue ** bValue
+            if bValue == 0:
+                if aValue == 0:
+                    raise MathException("x ** 0 at x = 0")
+                return 1
+            else: # bValue <= -1
+                if aValue == 0:
+                    raise MathException("x ** c at x = 0 and c is a negative integer")
+                return aValue ** bValue
         else: # bValue is not an integer
-            if aValue <= 0:
-                raise MathException("must have a positive base for non-integral exponents")
-            return aValue ** bValue
+            if aValue > 0:
+                return aValue ** bValue
+            elif aValue == 0:
+                raise MathException("x ** y at x = 0")
+            else:
+                raise MathException("x ** y at x < 0")
 
     def _derive(
         self: Power,
@@ -539,13 +549,30 @@ class Power(BinaryExpression):
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
         bValue = self.b._evaluateWithCache(variableValues)
-        selfValue = self._evaluateWithCache(variableValues)
         if self.b.lacksVariables and bValue.is_integer():
-            if aValue == 0 and bValue <= 0:
-                raise MathException("cannot have a base of zero unless the exponent is positive")
-            # d(u ** c) = c * u ** (c - 1) * du
-            self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
+            if bValue >= 2:
+                # d(u ** c) = c * u ** (c - 1) * du
+                self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
+            elif bValue == 1:
+                # d(u ** 1) = du
+                self.a._derive(variableValues, result, seed)
+            elif bValue == 0:
+                if aValue == 0:
+                    raise MathException("x ** 0 at x = 0")
+                # d(u ** 0) = 0 * du
+                self.a._derive(variableValues, result, 0) # still need to propogate because a._derive() might raise
+            else: # bValue <= -1
+                if aValue == 0:
+                    raise MathException("x ** c at x = 0 and c is a negative integer")
+                # d(u ** c) = c * u ** (c - 1) * du
+                self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
-            # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
-            self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
-            self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)
+            if aValue > 0:
+                selfValue = self._evaluateWithCache(variableValues)
+                # d(u ** v) = v * u ** (v - 1) * du + ln(u) * u ** v * dv
+                self.a._derive(variableValues, result, seed * bValue * selfValue / aValue)
+                self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)
+            elif aValue == 0:
+                raise MathException("x ** y at x = 0")
+            else: # aValue < 0
+                raise MathException("x ** y at x < 0")
