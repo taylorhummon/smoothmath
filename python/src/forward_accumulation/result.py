@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from src.forward_accumulation.expression import Variable
 from src.forward_accumulation.custom_types import numeric
 
+# !!! consider hiding depends on from Result exposed to outside world
 class Result:
     def __init__(
         self: Result,

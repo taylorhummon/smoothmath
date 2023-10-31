@@ -3,8 +3,9 @@ import math
 from src.forward_accumulation.custom_exceptions import MathException
 from src.forward_accumulation.expression import *
 
+# !!! consider stopping importing *
 # !!! test 3.0 vs 3
-# !!! clean up Power tests
+# !!! test composition much more carefully
 
 ### Constant
 
@@ -182,6 +183,39 @@ def testDivide():
         z.derive(variableValues, x)
     with raises(MathException):
         z.derive(variableValues, y)
+    variableValues = { x: 0.0, y: 0.0 }
+    with raises(MathException):
+        z.derive(variableValues, x)
+    with raises(MathException):
+        z.derive(variableValues, y)
+
+def testDivideWithConstantNumeratorZero():
+    y = Variable()
+    z = Divide(Constant(0), y)
+    result = z.derive({ y: 3.0 }, y)
+    assert result.value == approx(0.0)
+    assert result.partial == approx(0.0)
+    result = z.derive({ y: 0.0 }, y)
+    assert result.value == approx(0.0)
+    assert result.partial == approx(0.0)
+
+def testDivideWithConstantDenominatorOne():
+    x = Variable()
+    z = Divide(x, Constant(1))
+    result = z.derive({ x: 3.0 }, x)
+    assert result.value == approx(3.0)
+    assert result.partial == approx(1.0)
+    result = z.derive({ x: 0.0 }, x)
+    assert result.value == approx(0.0)
+    assert result.partial == approx(1.0)
+
+def testDivideWithConstantDenominatorZero():
+    x = Variable()
+    z = Divide(x, Constant(0))
+    with raises(MathException):
+        z.derive({ x: 3.0 }, x)
+    with raises(MathException):
+        z.derive({ x: 0.0 }, x)
 
 ### Power
 
@@ -210,25 +244,35 @@ def testPower():
     resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(0.0641500299)
     assert resultForY.partial == approx(0.0704760111)
-    variableValues = { x: 0.0, y: 0.5 }
-    with raises(MathException):
-        z.derive(variableValues, x)
-    with raises(MathException): # !!! arguably this should exist
-        z.derive(variableValues, y)
     variableValues = { x: 0.0, y: 2.5 }
-    with raises(MathException): # !!! arguably this should exist
-        z.derive(variableValues, x)
-    with raises(MathException): # !!! arguably this should exist
-        z.derive(variableValues, y)
-    variableValues = { x: -3.0, y: 0.5 }
     with raises(MathException):
         z.derive(variableValues, x)
     with raises(MathException):
         z.derive(variableValues, y)
     variableValues = { x: 0.0, y: 0.0 }
-    with raises(MathException): # !!! arguably this should exist
+    with raises(MathException):
         z.derive(variableValues, x)
-    with raises(MathException): # !!! arguably this should exist
+    with raises(MathException):
+        z.derive(variableValues, y)
+    variableValues = { x: 0.0, y: -2.5 }
+    with raises(MathException):
+        z.derive(variableValues, x)
+    with raises(MathException):
+        z.derive(variableValues, y)
+    variableValues = { x: -3.0, y: 2.5 }
+    with raises(MathException):
+        z.derive(variableValues, x)
+    with raises(MathException):
+        z.derive(variableValues, y)
+    variableValues = { x: -3.0, y: 0.0 }
+    with raises(MathException):
+        z.derive(variableValues, x)
+    with raises(MathException):
+        z.derive(variableValues, y)
+    variableValues = { x: -3.0, y: -2.5 }
+    with raises(MathException):
+        z.derive(variableValues, x)
+    with raises(MathException):
         z.derive(variableValues, y)
 
 def testPowerWithConstantBaseOne():
@@ -247,9 +291,19 @@ def testPowerWithConstantBaseOne():
 def testPowerWithConstantBaseZero():
     y = Variable()
     z = Power(Constant(0), y)
-    with raises(MathException): # !!! arguably this should exist
+    with raises(MathException):
         z.derive({ y: 3 }, y)
-    with raises(MathException): # !!! arguably this partial should exist, though it's dubious
+    with raises(MathException):
+        z.derive({ y: 0 }, y)
+    with raises(MathException):
+        z.derive({ y: -5 }, y)
+
+def testPowerWithConstantBaseNegativeOne():
+    y = Variable()
+    z = Power(Constant(-1), y)
+    with raises(MathException):
+        z.derive({ y: 3 }, y)
+    with raises(MathException):
         z.derive({ y: 0 }, y)
     with raises(MathException):
         z.derive({ y: -5 }, y)
@@ -286,8 +340,9 @@ def testPowerWithConstantExponentZero():
     result = z.derive({ x: 3 }, x)
     assert result.value == approx(1.0)
     assert result.partial == approx(0.0)
-    with raises(MathException): # !!! arguably this should exist
-        z.derive({ x: 0 }, x)
+    result = z.derive({ x: 0 }, x)
+    assert result.value == approx(1.0)
+    assert result.partial == approx(0.0)
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(1.0)
     assert result.partial == approx(0.0)
@@ -316,7 +371,7 @@ def testPowerWithConstantExponentNegativeTwo():
     assert result.value == approx(0.04)
     assert result.partial == approx(0.016)
 
-def testPowerWithConstantExponentTwoMadeFromAddingConstants():
+def testPowerWithExponentMadeFromAddingConstants():
     x = Variable()
     z = Power(x, Constant(1) + Constant(1))
     result = z.derive({ x: 3 }, x)
@@ -326,20 +381,6 @@ def testPowerWithConstantExponentTwoMadeFromAddingConstants():
     assert result.value == approx(0.0)
     assert result.partial == approx(0.0)
     result = z.derive({ x: -5 }, x)
-    assert result.value == approx(25.0)
-    assert result.partial == approx(-10.0)
-
-def testPowerWithConstantExponentTwoMadeFromAddingConstantAndVariable():
-    x = Variable()
-    y = Variable() # we're going to take x partials only, so y is effectively a constant
-    z = Power(x, y + Constant(1))
-    result = z.derive({ x: 3, y: 1 }, x)
-    assert result.value == approx(9.0)
-    assert result.partial == approx(6.0)
-    result = z.derive({ x: 0, y: 1 }, x)
-    assert result.value == approx(0.0)
-    assert result.partial == approx(0.0)
-    result = z.derive({ x: -5, y: 1 }, x)
     assert result.value == approx(25.0)
     assert result.partial == approx(-10.0)
 

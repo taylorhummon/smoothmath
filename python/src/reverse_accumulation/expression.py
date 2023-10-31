@@ -477,12 +477,16 @@ class Divide(BinaryExpression):
     ) -> numeric:
         aValue = self.a._evaluateWithCache(variableValues)
         bValue = self.b._evaluateWithCache(variableValues)
-        if bValue == 0: # !!! consider DRYing
+        # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
+        if self.a.lacksVariables and aValue == 0:
+            return 0
+        elif bValue == 0: # !!! consider DRYing
             if aValue == 0:
                 raise MathException("x / y at (x, y) = (0, 0)")
             else:
                 raise MathException("x / y with x != 0 and y = 0")
-        return aValue / bValue
+        else:
+            return aValue / bValue
 
     def _derive(
         self: Divide,
@@ -492,14 +496,19 @@ class Divide(BinaryExpression):
     ) -> None:
         aValue = self.a._evaluateWithCache(variableValues)
         bValue = self.b._evaluateWithCache(variableValues)
-        if bValue == 0:
+        # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
+        if self.a.lacksVariables and aValue == 0:
+            # !!! yes, we still need to continue here in case b does something horrific
+            self.b._derive(variableValues, result, 0)
+        elif bValue == 0:
             if aValue == 0:
                 raise MathException("x / y at (x, y) = (0, 0)")
             else:
                 raise MathException("x / y with x != 0 and y = 0")
-        # d(u / v) = (1 / v) * du - (u / v ^ 2) * dv
-        self.a._derive(variableValues, result, seed / bValue)
-        self.b._derive(variableValues, result, - seed * aValue / (bValue ** 2))
+        else:
+            # d(u / v) = (1 / v) * du - (u / v ^ 2) * dv
+            self.a._derive(variableValues, result, seed / bValue)
+            self.b._derive(variableValues, result, - seed * aValue / (bValue ** 2))
 
 class Power(BinaryExpression):
     def __init__(
@@ -526,8 +535,7 @@ class Power(BinaryExpression):
             if bValue >= 1:
                 return aValue ** bValue
             if bValue == 0:
-                if aValue == 0:
-                    raise MathException("x ** 0 at x = 0")
+                # Note: x ** 0 is smooth at x = 0 despite x ** y not being smooth at (0, 0)
                 return 1
             else: # bValue <= -1
                 if aValue == 0:
@@ -557,10 +565,9 @@ class Power(BinaryExpression):
                 # d(u ** 1) = du
                 self.a._derive(variableValues, result, seed)
             elif bValue == 0:
-                if aValue == 0:
-                    raise MathException("x ** 0 at x = 0")
+                # Note: x ** 0 is smooth at x = 0 despite x ** y not being smooth at (0, 0)
                 # d(u ** 0) = 0 * du
-                self.a._derive(variableValues, result, 0) # still need to propogate because a._derive() might raise
+                self.a._derive(variableValues, result, 0) # !!! we still need to propogate because a._derive() might raise
             else: # bValue <= -1
                 if aValue == 0:
                     raise MathException("x ** c at x = 0 and c is a negative integer")

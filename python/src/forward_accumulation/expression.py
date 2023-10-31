@@ -5,6 +5,7 @@ from src.forward_accumulation.custom_types import numeric, VariableValues
 from src.forward_accumulation.custom_exceptions import MathException
 from src.forward_accumulation.result import Result
 
+# !!! do we still want dependsOn
 # !!! improve test coverage
 # !!! how big a problem are indeterminate forms?
 # !!! do we want a lhopital or anything?
@@ -312,12 +313,15 @@ class Divide(Expression):
     ) -> Result:
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
+        # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
+        aHasNoDependence = not aDependsOn
+        if aHasNoDependence and aValue == 0:
+            return Result(0, 0, bDependsOn)
         if bValue == 0:
             if aValue == 0:
                 raise MathException("x / y at (x, y) = (0, 0)")
             else:
                 raise MathException("x / y with x != 0 and y = 0")
-
         # d(u / v) = (1 / v) * du - (u / v ** 2) * dv
         return Result(
             aValue / bValue,
@@ -349,7 +353,8 @@ class Power(Expression):
         aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
         bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
         resultDependsOn = aDependsOn | bDependsOn
-        if (withRespectTo not in bDependsOn) and bValue.is_integer(): # CASE I: has constant integer exponent
+        bHasNoDependence = not bDependsOn # !!! Arguably, this could be `withRespectTo not in bDependsOn`
+        if bHasNoDependence and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
                 resultValue = aValue ** bValue
                 # d(u ** c) = c * u ** (c - 1) * du
@@ -361,8 +366,7 @@ class Power(Expression):
                 resultPartial = aPartial
                 return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 0:
-                if aValue == 0:
-                    raise MathException("x ** 0 at x = 0")
+                # Note: x ** 0 is smooth at x = 0 despite x ** y not being smooth at (0, 0)
                 resultValue = 1
                 # d(u ** 0) = 0 * du
                 resultPartial = 0

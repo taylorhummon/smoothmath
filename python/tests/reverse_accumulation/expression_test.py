@@ -193,6 +193,49 @@ def testDivide():
         z.evaluate(variableValues)
     with raises(MathException):
         z.derive(variableValues)
+    variableValues = { x: 0.0, y: 0.0 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+
+def testDivideWithConstantNumeratorZero():
+    y = Variable()
+    z = Divide(Constant(0), y)
+    variableValues = { y: 3.0 }
+    assert z.evaluate(variableValues) == approx(0.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(y) == approx(0.0)
+    variableValues = { y: 0.0 }
+    assert z.evaluate(variableValues) == approx(0.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(y) == approx(0.0)
+
+def testDivideWithConstantDenominatorOne():
+    x = Variable()
+    z = Divide(x, Constant(1))
+    variableValues = { x: 3.0 }
+    assert z.evaluate(variableValues) == approx(3.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(1.0)
+    variableValues = { x: 0.0 }
+    assert z.evaluate(variableValues) == approx(0.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(1.0)
+
+def testDivideWithConstantDenominatorZero():
+    x = Variable()
+    z = Divide(x, Constant(0))
+    variableValues = { x: 3.0 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { x: 0.0 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
 
 ### Power
 
@@ -220,21 +263,89 @@ def testPower():
         z.evaluate(variableValues)
     with raises(MathException):
         z.derive(variableValues)
-    variableValues = { x: -3.0, y: 2.5 }
-    with raises(MathException):
-        z.evaluate(variableValues)
-    with raises(MathException):
-        z.derive(variableValues)
     variableValues = { x: 0.0, y: 0.0 }
     with raises(MathException):
         z.evaluate(variableValues)
     with raises(MathException):
         z.derive(variableValues)
+    variableValues = { x: 0.0, y: -2.5 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { x: -3.0, y: 2.5 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { x: -3.0, y: 0.0 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { x: -3.0, y: -2.5 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
 
-def testPowerWithIntegralExponent():
+def testPowerWithConstantBaseOne():
+    y = Variable()
+    z = Power(Constant(1), y)
+    variableValues = { y: 3 }
+    assert z.evaluate(variableValues) == approx(1.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(y) == approx(0.0)
+    variableValues = { y: 0 }
+    assert z.evaluate(variableValues) == approx(1.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(y) == approx(0.0)
+    variableValues = { y: -5 }
+    assert z.evaluate(variableValues) == approx(1.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(y) == approx(0.0)
+
+def testPowerWithConstantBaseZero():
+    y = Variable()
+    z = Power(Constant(0), y)
+    variableValues = { y: 3 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { y: 0 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { y: -5 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+
+def testPowerWithConstantBaseNegativeOne():
+    y = Variable()
+    z = Power(Constant(-1), y)
+    variableValues = { y: 3 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { y: 0 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { y: -5 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+
+def testPowerWithConstantExponentTwo():
     x = Variable()
-    c = Constant(2)
-    z = Power(x, c)
+    z = Power(x, Constant(2))
     variableValues = { x: 3 }
     assert z.evaluate(variableValues) == approx(9.0)
     result = z.derive(variableValues)
@@ -248,10 +359,58 @@ def testPowerWithIntegralExponent():
     result = z.derive(variableValues)
     assert result.partialWithRespectTo(x) == approx(-10.0)
 
-def testPowerWithNegativeIntegralExponent():
+def testPowerWithConstantExponentOne():
     x = Variable()
-    c = Constant(-2)
-    z = Power(x, c)
+    z = Power(x, Constant(1))
+    variableValues = { x: 3 }
+    assert z.evaluate(variableValues) == approx(3.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(1.0)
+    variableValues = { x: 0 }
+    assert z.evaluate(variableValues) == approx(0.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(1.0)
+    variableValues = { x: -5 }
+    assert z.evaluate(variableValues) == approx(-5.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(1.0)
+
+def testPowerWithConstantExponentZero():
+    x = Variable()
+    z = Power(x, Constant(0))
+    variableValues = { x: 3 }
+    assert z.evaluate(variableValues) == approx(1.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(0.0)
+    variableValues = { x: 0 }
+    assert z.evaluate(variableValues) == approx(1.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(0.0)
+    variableValues = { x: -5 }
+    assert z.evaluate(variableValues) == approx(1.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(0.0)
+
+def testPowerWithConstantExponentNegativeOne():
+    x = Variable()
+    z = Power(x, Constant(-1))
+    variableValues = { x: 2 }
+    assert z.evaluate(variableValues) == approx(0.5)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(-0.25)
+    variableValues = { x: 0 }
+    with raises(MathException):
+        z.evaluate(variableValues)
+    with raises(MathException):
+        z.derive(variableValues)
+    variableValues = { x: -5 }
+    assert z.evaluate(variableValues) == approx(-0.2)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(-0.04)
+
+def testPowerWithConstantExponentNegativeTwo():
+    x = Variable()
+    z = Power(x, Constant(-2))
     variableValues = { x: 2 }
     assert z.evaluate(variableValues) == approx(0.25)
     result = z.derive(variableValues)
@@ -261,20 +420,26 @@ def testPowerWithNegativeIntegralExponent():
         z.evaluate(variableValues)
     with raises(MathException):
         z.derive(variableValues)
-    variableValues = { x: -2 }
-    assert z.evaluate(variableValues) == approx(0.25)
+    variableValues = { x: -5 }
+    assert z.evaluate(variableValues) == approx(0.04)
     result = z.derive(variableValues)
-    assert result.partialWithRespectTo(x) == approx(0.25)
+    assert result.partialWithRespectTo(x) == approx(0.016)
 
-def testIllFormedPowerWithIntegralExponent():
+def testPowerWithExponentMadeFromAddingConstants():
     x = Variable()
-    c = Constant(3.5) # we're only supposed to put integers in the exponent
-    z = Power(x, c)
-    variableValues = { x: -2 }
-    with raises(Exception):
-        z.evaluate(variableValues)
-    with raises(Exception):
-        z.evaluate(variableValues)
+    z = Power(x, Constant(1) + Constant(1))
+    variableValues = { x: 3 }
+    assert z.evaluate(variableValues) == approx(9.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(6.0)
+    variableValues = { x: 0 }
+    assert z.evaluate(variableValues) == approx(0.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(0.0)
+    variableValues = { x: -5 }
+    assert z.evaluate(variableValues) == approx(25.0)
+    result = z.derive(variableValues)
+    assert result.partialWithRespectTo(x) == approx(-10.0)
 
 ### Polynomials
 
