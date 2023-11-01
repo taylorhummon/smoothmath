@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import math
 from src.reverse_accumulation.custom_types import numeric, VariableValues
 from src.reverse_accumulation.custom_exceptions import MathException
-from src.reverse_accumulation.result import Result
+from src.reverse_accumulation.result import Result, InternalResult
 
 class Expression(ABC):
     def __init__(
@@ -54,17 +54,17 @@ class Expression(ABC):
         variableValues: VariableValues
     ) -> Result:
         try:
-            result = Result()
-            self._derive(variableValues, result, 1)
-            return result
+            result = InternalResult()
+            self._derive(result, variableValues, 1)
+            return result.toResult()
         finally:
             self._resetEvaluationCache()
 
     @abstractmethod
     def _derive(
         self: Expression,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         raise Exception("concrete classes derived from Expression must implement _derive()")
@@ -136,8 +136,8 @@ class Constant(NullaryExpression):
 
     def _derive(
         self: Constant,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         pass
@@ -159,8 +159,8 @@ class Variable(NullaryExpression):
 
     def _derive(
         self: Variable,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         result.addSeed(self, seed)
@@ -197,12 +197,12 @@ class Negation(UnaryExpression):
 
     def _derive(
         self: Negation,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         # d(-a) = -da
-        self.a._derive(variableValues, result, -seed)
+        self.a._derive(result, variableValues, -seed)
 
 class Reciprocal(UnaryExpression):
     def __init__(
@@ -221,15 +221,15 @@ class Reciprocal(UnaryExpression):
 
     def _derive(
         self: Reciprocal,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluateUsingCache(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
-        self.a._derive(variableValues, result, - seed * (selfValue ** 2))
+        self.a._derive(result, variableValues, - seed * (selfValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Reciprocal,
@@ -255,15 +255,15 @@ class SquareRoot(UnaryExpression):
 
     def _derive(
         self: SquareRoot,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluateUsingCache(variableValues)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        self.a._derive(variableValues, result, seed / (2 * selfValue))
+        self.a._derive(result, variableValues, seed / (2 * selfValue))
 
     def _ensureValueIsInDomain(
         self: SquareRoot,
@@ -290,13 +290,13 @@ class NaturalExponential(UnaryExpression):
 
     def _derive(
         self: NaturalExponential,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         selfValue = self._evaluateUsingCache(variableValues)
         # d(e ** a) = e ** a * da
-        self.a._derive(variableValues, result, seed * selfValue)
+        self.a._derive(result, variableValues, seed * selfValue)
 
 class NaturalLogarithm(UnaryExpression):
     def __init__(
@@ -315,14 +315,14 @@ class NaturalLogarithm(UnaryExpression):
 
     def _derive(
         self: NaturalLogarithm,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
         # d(ln(a)) = (1 / a) * da
-        self.a._derive(variableValues, result, seed / aValue)
+        self.a._derive(result, variableValues, seed / aValue)
 
     def _ensureValueIsInDomain(
         self: NaturalLogarithm,
@@ -349,13 +349,13 @@ class Sine(UnaryExpression):
 
     def _derive(
         self: Sine,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         # d(sin(a)) = cos(a) * da
-        self.a._derive(variableValues, result, seed * math.cos(aValue))
+        self.a._derive(result, variableValues, seed * math.cos(aValue))
 
 class Cosine(UnaryExpression):
     def __init__(
@@ -373,13 +373,13 @@ class Cosine(UnaryExpression):
 
     def _derive(
         self: Cosine,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         # d(cos(a)) = - sin(a) * da
-        self.a._derive(variableValues, result, - seed * math.sin(aValue))
+        self.a._derive(result, variableValues, - seed * math.sin(aValue))
 
 ### Binary Expressions ###
 
@@ -418,13 +418,13 @@ class Plus(BinaryExpression):
 
     def _derive(
         self: Plus,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         # d(a + b) = da + db
-        self.a._derive(variableValues, result, seed)
-        self.b._derive(variableValues, result, seed)
+        self.a._derive(result, variableValues, seed)
+        self.b._derive(result, variableValues, seed)
 
 class Minus(BinaryExpression):
     def __init__(
@@ -444,13 +444,13 @@ class Minus(BinaryExpression):
 
     def _derive(
         self: Minus,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         # d(a - b) = da - db
-        self.a._derive(variableValues, result, seed)
-        self.b._derive(variableValues, result, - seed)
+        self.a._derive(result, variableValues, seed)
+        self.b._derive(result, variableValues, - seed)
 
 class Multiply(BinaryExpression):
     def __init__(
@@ -470,15 +470,15 @@ class Multiply(BinaryExpression):
 
     def _derive(
         self: Multiply,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         # d(a * b) = b * da + a * db
-        self.a._derive(variableValues, result, seed * bValue)
-        self.b._derive(variableValues, result, seed * aValue)
+        self.a._derive(result, variableValues, seed * bValue)
+        self.b._derive(result, variableValues, seed * aValue)
 
 class Divide(BinaryExpression):
     def __init__(
@@ -503,20 +503,20 @@ class Divide(BinaryExpression):
 
     def _derive(
         self: Divide,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
-            self.b._derive(variableValues, result, 0)
+            self.b._derive(result, variableValues, 0)
         else:
             self._ensureValueIsInDomain(aValue, bValue)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * dv
-            self.a._derive(variableValues, result, seed / bValue)
-            self.b._derive(variableValues, result, - seed * aValue / (bValue ** 2))
+            self.a._derive(result, variableValues, seed / bValue)
+            self.b._derive(result, variableValues, - seed * aValue / (bValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Divide,
@@ -565,8 +565,8 @@ class Power(BinaryExpression):
 
     def _derive(
         self: Power,
+        result: InternalResult,
         variableValues: VariableValues,
-        result: Result,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
@@ -574,24 +574,24 @@ class Power(BinaryExpression):
         if self.b.lacksVariables and bValue.is_integer():
             if bValue >= 2:
                 # d(a ** C) = C * a ** (C - 1) * da
-                self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
+                self.a._derive(result, variableValues, seed * bValue * (aValue ** (bValue - 1)))
             elif bValue == 1:
                 # d(a ** 1) = da
-                self.a._derive(variableValues, result, seed)
+                self.a._derive(result, variableValues, seed)
             elif bValue == 0:
                 # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
                 # d(a ** 0) = 0 * da
-                self.a._derive(variableValues, result, 0)
+                self.a._derive(result, variableValues, 0)
             else: # bValue <= -1
                 self._ensureValueIsInDomainCaseI(aValue, bValue)
                 # d(a ** C) = C * a ** (C - 1) * da
-                self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
+                self.a._derive(result, variableValues, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
             self._ensureValueIsInDomainCaseII(aValue)
             selfValue = self._evaluateUsingCache(variableValues)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
-            self.a._derive(variableValues, result, seed * bValue * selfValue / aValue)
-            self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)
+            self.a._derive(result, variableValues, seed * bValue * selfValue / aValue)
+            self.b._derive(result, variableValues, seed * math.log(aValue) * selfValue)
 
     def _ensureValueIsInDomainCaseI(
         self: Power,
