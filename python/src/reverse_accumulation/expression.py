@@ -15,16 +15,26 @@ class Expression(ABC):
         self._value : numeric | None
         self._value = None
 
-    ## Evaluation ##
-
-    def evaluate(
+    def derive(
         self: Expression,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Result:
         try:
-            return self._evaluateUsingCache(variableValues)
+            value = self._evaluateUsingCache(variableValues)
+            result = InternalResult(value)
+            self._derive(result, variableValues, 1)
+            return result.toResult()
         finally:
             self._resetEvaluationCache()
+
+    @abstractmethod
+    def _derive(
+        self: Expression,
+        result: InternalResult,
+        variableValues: VariableValues,
+        seed: numeric
+    ) -> None:
+        raise Exception("concrete classes derived from Expression must implement _derive()")
 
     def _evaluateUsingCache(
         self: Expression,
@@ -46,28 +56,6 @@ class Expression(ABC):
         self: Expression
     ) -> None:
         raise Exception("concrete classes derived from Expression must implement _resetEvaluationCache()")
-
-    ## Derivation ##
-
-    def derive(
-        self: Expression,
-        variableValues: VariableValues
-    ) -> Result:
-        try:
-            result = InternalResult()
-            self._derive(result, variableValues, 1)
-            return result.toResult()
-        finally:
-            self._resetEvaluationCache()
-
-    @abstractmethod
-    def _derive(
-        self: Expression,
-        result: InternalResult,
-        variableValues: VariableValues,
-        seed: numeric
-    ) -> None:
-        raise Exception("concrete classes derived from Expression must implement _derive()")
 
     ## Operations ##
 

@@ -8,8 +8,11 @@ from src.reverse_accumulation.custom_types import numeric
 class Result:
     def __init__(
         self: Result,
+        value: numeric,
         dictionary: dict[Variable, numeric] | None = None
     ) -> None:
+        self.value : numeric
+        self.value = value
         self._dict : dict[Variable, numeric]
         self._dict = dictionary or {}
 
@@ -22,9 +25,10 @@ class Result:
 class InternalResult(Result):
     def __init__(
         self: InternalResult,
+        value: numeric,
         dictionary: dict[Variable, numeric] | None = None
     ) -> None:
-        super().__init__(dictionary)
+        super().__init__(value, dictionary)
 
     def addSeed(
         self: InternalResult,
@@ -36,4 +40,4 @@ class InternalResult(Result):
     def toResult(
         self: InternalResult
     ) -> Result:
-        return Result(self._dict)
+        return Result(self.value, self._dict)
