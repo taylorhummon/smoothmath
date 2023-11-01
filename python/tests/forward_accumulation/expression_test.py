@@ -1,9 +1,12 @@
 from pytest import approx, raises
 import math
 from src.forward_accumulation.custom_exceptions import MathException
-from src.forward_accumulation.expression import *
+from src.forward_accumulation.expression import (
+    Constant, Variable,
+    Negation, Reciprocal, SquareRoot, NaturalExponential, NaturalLogarithm, Sine, Cosine,
+    Plus, Minus, Multiply, Divide, Power,
+)
 
-# !!! consider stopping importing *
 # !!! test 3.0 vs 3
 # !!! test composition much more carefully
 

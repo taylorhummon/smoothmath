@@ -1,7 +1,11 @@
 from pytest import approx, raises
 import math
 from src.reverse_accumulation.custom_exceptions import MathException
-from src.reverse_accumulation.expression import *
+from src.reverse_accumulation.expression import (
+    Constant, Variable,
+    Negation, Reciprocal, SquareRoot, NaturalExponential, NaturalLogarithm, Sine, Cosine,
+    Plus, Minus, Multiply, Divide, Power,
+)
 
 ### Constant
 
