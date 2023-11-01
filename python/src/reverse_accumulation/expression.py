@@ -5,8 +5,6 @@ from src.reverse_accumulation.custom_types import numeric, VariableValues
 from src.reverse_accumulation.custom_exceptions import MathException
 from src.reverse_accumulation.result import Result
 
-# !!! update exception messages
-
 class Expression(ABC):
     def __init__(
         self: Expression,
@@ -218,8 +216,7 @@ class Reciprocal(UnaryExpression):
         variableValues: VariableValues
     ) -> numeric:
         aValue = self.a._evaluateUsingCache(variableValues)
-        if aValue == 0:
-            raise MathException("1 / x at x = 0")
+        self._ensureValueIsInDomain(aValue)
         return 1 / aValue
 
     def _derive(
@@ -228,9 +225,18 @@ class Reciprocal(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
+        aValue = self.a._evaluateUsingCache(variableValues)
+        self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluateUsingCache(variableValues)
         # d(1 / a) = (-1 / a ** 2) * da
         self.a._derive(variableValues, result, - seed * (selfValue ** 2))
+
+    def _ensureValueIsInDomain(
+        self: Reciprocal,
+        aValue: numeric
+    ) -> None:
+        if aValue == 0:
+            raise MathException("1 / x at x = 0")
 
 class SquareRoot(UnaryExpression):
     def __init__(
@@ -244,10 +250,7 @@ class SquareRoot(UnaryExpression):
         variableValues: VariableValues
     ) -> numeric:
         aValue = self.a._evaluateUsingCache(variableValues)
-        if aValue == 0:
-            raise MathException("sqrt(x) at x = 0")
-        elif aValue < 0:
-            raise MathException("sqrt(x) for x < 0")
+        self._ensureValueIsInDomain(aValue)
         return math.sqrt(aValue)
 
     def _derive(
@@ -256,9 +259,20 @@ class SquareRoot(UnaryExpression):
         result: Result,
         seed: numeric
     ) -> None:
+        aValue = self.a._evaluateUsingCache(variableValues)
+        self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluateUsingCache(variableValues)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         self.a._derive(variableValues, result, (1 / (2 * selfValue)) * seed)
+
+    def _ensureValueIsInDomain(
+        self: SquareRoot,
+        aValue: numeric
+    ) -> None:
+        if aValue == 0:
+            raise MathException("sqrt(x) at x = 0")
+        elif aValue < 0:
+            raise MathException("sqrt(x) for x < 0")
 
 class NaturalExponential(UnaryExpression):
     def __init__(
@@ -296,10 +310,7 @@ class NaturalLogarithm(UnaryExpression):
         variableValues: VariableValues
     ) -> numeric:
         aValue = self.a._evaluateUsingCache(variableValues)
-        if aValue == 0: #!!! consider DRYing
-            raise MathException("ln(x) at x = 0")
-        elif aValue < 0:
-            raise MathException("ln(x) for x < 0")
+        self._ensureValueIsInDomain(aValue)
         return math.log(aValue)
 
     def _derive(
@@ -309,12 +320,18 @@ class NaturalLogarithm(UnaryExpression):
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
+        self._ensureValueIsInDomain(aValue)
+        # d(ln(a)) = (1 / a) * da
+        self.a._derive(variableValues, result, seed / aValue)
+
+    def _ensureValueIsInDomain(
+        self: NaturalLogarithm,
+        aValue: numeric
+    ) -> None:
         if aValue == 0:
             raise MathException("ln(x) at x = 0")
         elif aValue < 0:
             raise MathException("ln(x) for x < 0")
-        # d(ln(a)) = (1 / a) * da
-        self.a._derive(variableValues, result, seed / aValue)
 
 class Sine(UnaryExpression):
     def __init__(
@@ -480,12 +497,9 @@ class Divide(BinaryExpression):
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
             return 0
-        elif bValue == 0: # !!! consider DRYing
-            if aValue == 0:
-                raise MathException("x / y at (x, y) = (0, 0)")
-            else:
-                raise MathException("x / y with x != 0 and y = 0")
         else:
+            self._ensureValueIsInDomain(aValue, bValue)
+            # We can now assume b is non-zero
             return aValue / bValue
 
     def _derive(
@@ -498,17 +512,23 @@ class Divide(BinaryExpression):
         bValue = self.b._evaluateUsingCache(variableValues)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
-            # !!! yes, we still need to continue here in case b does something horrific
             self.b._derive(variableValues, result, 0)
-        elif bValue == 0:
-            if aValue == 0:
-                raise MathException("x / y at (x, y) = (0, 0)")
-            else:
-                raise MathException("x / y with x != 0 and y = 0")
         else:
+            self._ensureValueIsInDomain(aValue, bValue)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * dv
             self.a._derive(variableValues, result, seed / bValue)
             self.b._derive(variableValues, result, - seed * aValue / (bValue ** 2))
+
+    def _ensureValueIsInDomain(
+        self: Divide,
+        aValue: numeric,
+        bValue: numeric
+    ) -> None:
+        if bValue == 0:
+            if aValue == 0:
+                raise MathException("x / y at (x, y) = (0, 0)")
+            else: # aValue != 0
+                raise MathException("x / y with x != 0 and y = 0")
 
 class Power(BinaryExpression):
     def __init__(
@@ -534,20 +554,15 @@ class Power(BinaryExpression):
         if self.b.lacksVariables and bValue.is_integer():
             if bValue >= 1:
                 return aValue ** bValue
-            if bValue == 0:
+            elif bValue == 0:
                 # Note: x ** 0 is smooth at x = 0 despite x ** y not being smooth at (0, 0)
                 return 1
             else: # bValue <= -1
-                if aValue == 0:
-                    raise MathException("x ** c at x = 0 and c is a negative integer")
+                self._ensureValueIsInDomainCaseI(aValue, bValue)
                 return aValue ** bValue
         else: # bValue is not an integer
-            if aValue > 0:
-                return aValue ** bValue
-            elif aValue == 0:
-                raise MathException("x ** y at x = 0")
-            else:
-                raise MathException("x ** y at x < 0")
+            self._ensureValueIsInDomainCaseII(aValue)
+            return aValue ** bValue
 
     def _derive(
         self: Power,
@@ -567,19 +582,31 @@ class Power(BinaryExpression):
             elif bValue == 0:
                 # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
                 # d(a ** 0) = 0 * da
-                self.a._derive(variableValues, result, 0) # !!! we still need to propogate because a._derive() might raise
+                self.a._derive(variableValues, result, 0)
             else: # bValue <= -1
-                if aValue == 0:
-                    raise MathException("x ** c at x = 0 and c is a negative integer")
+                self._ensureValueIsInDomainCaseI(aValue, bValue)
                 # d(a ** C) = C * a ** (C - 1) * da
                 self.a._derive(variableValues, result, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
-            if aValue > 0:
-                selfValue = self._evaluateUsingCache(variableValues)
-                # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
-                self.a._derive(variableValues, result, seed * bValue * selfValue / aValue)
-                self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)
-            elif aValue == 0:
-                raise MathException("x ** y at x = 0")
-            else: # aValue < 0
-                raise MathException("x ** y at x < 0")
+            self._ensureValueIsInDomainCaseII(aValue)
+            selfValue = self._evaluateUsingCache(variableValues)
+            # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
+            self.a._derive(variableValues, result, seed * bValue * selfValue / aValue)
+            self.b._derive(variableValues, result, seed * math.log(aValue) * selfValue)
+
+    def _ensureValueIsInDomainCaseI(
+        self: Power,
+        aValue: numeric,
+        bValue: numeric
+    ) -> None:
+        if bValue <= -1 and aValue == 0:
+            raise MathException("x ** C at x = 0 and C is a negative integer")
+
+    def _ensureValueIsInDomainCaseII(
+        self: Power,
+        aValue: numeric
+    ) -> None:
+        if aValue == 0:
+            raise MathException("x ** y at x = 0")
+        elif aValue < 0:
+            raise MathException("x ** y at x < 0")

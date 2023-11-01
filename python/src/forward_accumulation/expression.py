@@ -6,10 +6,6 @@ from src.forward_accumulation.custom_exceptions import MathException
 from src.forward_accumulation.result import Result
 
 # !!! do we still want dependsOn
-# !!! improve test coverage
-# !!! how big a problem are indeterminate forms?
-# !!! do we want a lhopital or anything?
-# !!! how badly do things go due to floating point imprecision?
 
 class Expression(ABC):
     @abstractmethod
