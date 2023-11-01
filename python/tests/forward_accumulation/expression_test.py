@@ -1,6 +1,6 @@
 from pytest import approx, raises
 import math
-from src.forward_accumulation.custom_exceptions import MathException
+from src.forward_accumulation.custom_exceptions import DomainException
 from src.forward_accumulation.expression import (
     Constant, Variable,
     Negation, Reciprocal, SquareRoot, NaturalExponential, NaturalLogarithm, Sine, Cosine,
@@ -52,7 +52,7 @@ def testReciprocal():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.5)
     assert result.partial == approx(-0.25)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: 0 }, x)
     result = z.derive({ x: -1 }, x)
     assert result.value == approx(-1.0)
@@ -66,9 +66,9 @@ def testSquareRoot():
     result = z.derive({ x: 4.0 }, x)
     assert result.value == approx(2.0)
     assert result.partial == approx(0.25)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: 0 }, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: -1 }, x)
 
 ### Natural Exponential
@@ -97,9 +97,9 @@ def testNaturalLogarithm():
     result = z.derive({ x: math.e }, x)
     assert result.value == approx(1.0)
     assert result.partial == approx(1.0 / math.e)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: 0.0 }, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: -1.0 }, x)
 
 ### Sine
@@ -182,14 +182,14 @@ def testDivide():
     assert resultForY.value == approx(2.5)
     assert resultForY.partial == approx(-1.25)
     variableValues = { x: 3.0, y: 0.0 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
     variableValues = { x: 0.0, y: 0.0 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
 
 def testDivideWithConstantNumeratorZero():
@@ -215,9 +215,9 @@ def testDivideWithConstantDenominatorOne():
 def testDivideWithConstantDenominatorZero():
     x = Variable()
     z = Divide(x, Constant(0))
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: 3.0 }, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: 0.0 }, x)
 
 ### Power
@@ -248,34 +248,34 @@ def testPower():
     assert resultForY.value == approx(0.0641500299)
     assert resultForY.partial == approx(0.0704760111)
     variableValues = { x: 0.0, y: 2.5 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
     variableValues = { x: 0.0, y: 0.0 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
     variableValues = { x: 0.0, y: -2.5 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
     variableValues = { x: -3.0, y: 2.5 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
     variableValues = { x: -3.0, y: 0.0 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
     variableValues = { x: -3.0, y: -2.5 }
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, x)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive(variableValues, y)
 
 def testPowerWithConstantBaseOne():
@@ -294,21 +294,21 @@ def testPowerWithConstantBaseOne():
 def testPowerWithConstantBaseZero():
     y = Variable()
     z = Power(Constant(0), y)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ y: 3 }, y)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ y: 0 }, y)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ y: -5 }, y)
 
 def testPowerWithConstantBaseNegativeOne():
     y = Variable()
     z = Power(Constant(-1), y)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ y: 3 }, y)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ y: 0 }, y)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ y: -5 }, y)
 
 def testPowerWithConstantExponentTwo():
@@ -356,7 +356,7 @@ def testPowerWithConstantExponentNegativeOne():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.5)
     assert result.partial == approx(-0.25)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: 0 }, x)
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(-0.2)
@@ -368,7 +368,7 @@ def testPowerWithConstantExponentNegativeTwo():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(0.25)
     assert result.partial == approx(-0.25)
-    with raises(MathException):
+    with raises(DomainException):
         z.derive({ x: 0 }, x)
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(0.04)
@@ -432,6 +432,12 @@ def testCompositeFunction():
     result = z.derive({ x: 2 }, x)
     assert result.value == approx(54.598150033)
     assert result.partial == approx(218.392600132)
+
+def testIndeterminateForm():
+    t = Variable()
+    z = (Constant(2) * t) / t
+    with raises(DomainException):
+        z.derive({ t: 0 }, t)
 
 def testExpressionReuse():
     x = Variable()

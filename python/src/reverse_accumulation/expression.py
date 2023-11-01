@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
 from src.reverse_accumulation.custom_types import numeric, VariableValues
-from src.reverse_accumulation.custom_exceptions import MathException
+from src.reverse_accumulation.custom_exceptions import DomainException
 from src.reverse_accumulation.result import Result, InternalResult
 
 class Expression(ABC):
@@ -10,10 +10,10 @@ class Expression(ABC):
         self: Expression,
         lacksVariables: bool
     ) -> None:
-        self._value : numeric | None
-        self._value = None
         self.lacksVariables : bool
         self.lacksVariables = lacksVariables
+        self._value : numeric | None
+        self._value = None
 
     ## Evaluation ##
 
@@ -236,7 +236,7 @@ class Reciprocal(UnaryExpression):
         aValue: numeric
     ) -> None:
         if aValue == 0:
-            raise MathException("1 / x at x = 0")
+            raise DomainException("1 / x blows up around x = 0")
 
 class SquareRoot(UnaryExpression):
     def __init__(
@@ -270,9 +270,9 @@ class SquareRoot(UnaryExpression):
         aValue: numeric
     ) -> None:
         if aValue == 0:
-            raise MathException("sqrt(x) at x = 0")
+            raise DomainException("sqrt(x) is not smooth around x = 0")
         elif aValue < 0:
-            raise MathException("sqrt(x) for x < 0")
+            raise DomainException("sqrt(x) is undefined for x < 0")
 
 class NaturalExponential(UnaryExpression):
     def __init__(
@@ -329,9 +329,9 @@ class NaturalLogarithm(UnaryExpression):
         aValue: numeric
     ) -> None:
         if aValue == 0:
-            raise MathException("ln(x) at x = 0")
+            raise DomainException("ln(x) blows up around x = 0")
         elif aValue < 0:
-            raise MathException("ln(x) for x < 0")
+            raise DomainException("ln(x) is undefined for x < 0")
 
 class Sine(UnaryExpression):
     def __init__(
@@ -525,9 +525,9 @@ class Divide(BinaryExpression):
     ) -> None:
         if bValue == 0:
             if aValue == 0:
-                raise MathException("x / y with x = 0 and y = 0")
+                raise DomainException("x / y is not smooth around (x = 0, y = 0)")
             else: # aValue != 0
-                raise MathException("x / y with x != 0 and y = 0")
+                raise DomainException("x / y blows up around x != 0 and y = 0")
 
 class Power(BinaryExpression):
     def __init__(
@@ -560,7 +560,7 @@ class Power(BinaryExpression):
                 self._ensureValueIsInDomainCaseI(aValue, bValue)
                 return aValue ** bValue
         else: # bValue is not an integer
-            self._ensureValueIsInDomainCaseII(aValue)
+            self._ensureValueIsInDomainCaseII(aValue, bValue)
             return aValue ** bValue
 
     def _derive(
@@ -587,7 +587,7 @@ class Power(BinaryExpression):
                 # d(a ** C) = C * a ** (C - 1) * da
                 self.a._derive(result, variableValues, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
-            self._ensureValueIsInDomainCaseII(aValue)
+            self._ensureValueIsInDomainCaseII(aValue, bValue)
             selfValue = self._evaluateUsingCache(variableValues)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             self.a._derive(result, variableValues, seed * bValue * selfValue / aValue)
@@ -599,13 +599,19 @@ class Power(BinaryExpression):
         bValue: numeric
     ) -> None:
         if bValue <= -1 and aValue == 0:
-            raise MathException("x ** C at x = 0 and C is a negative integer")
+            raise DomainException("x ** C blows up around x = 0 when C is a negative integer")
 
     def _ensureValueIsInDomainCaseII(
         self: Power,
-        aValue: numeric
+        aValue: numeric,
+        bValue: numeric
     ) -> None:
         if aValue == 0:
-            raise MathException("x ** y at x = 0")
+            if bValue > 0:
+                raise DomainException("x ** y is not smooth around x = 0 for y > 0")
+            elif bValue == 0:
+                raise DomainException("x ** y is not smooth around (x = 0, y = 0)")
+            else: # bValue < 0
+                raise DomainException("x ** y blows up around x = 0 for y < 0")
         elif aValue < 0:
-            raise MathException("x ** y at x < 0")
+            raise DomainException("x ** y is undefined for x < 0")

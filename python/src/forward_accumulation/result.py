@@ -18,17 +18,17 @@ class Result:
 class InternalResult(Result):
     def __init__(
         self: InternalResult,
+        lacksVariables: bool,
         value: numeric,
-        partial: numeric,
-        lacksVariables: bool
+        partial: numeric
     ) -> None:
         super().__init__(value, partial)
         self.lacksVariables = lacksVariables
 
     def toTriple(
         self: InternalResult
-    ) -> tuple[numeric, numeric, bool]:
-        return (self.value, self.partial, self.lacksVariables)
+    ) -> tuple[bool, numeric, numeric]:
+        return (self.lacksVariables, self.value, self.partial)
 
     def toResult(
         self: InternalResult
