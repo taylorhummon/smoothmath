@@ -80,7 +80,7 @@ class Variable(Expression):
     ) -> Result:
         value = variableValues.get(self, None)
         if value is None:
-            raise Exception("variableValues missing a value for a variable")
+            raise Exception("variableValues is missing a value for a variable")
         partial = 1 if self == withRespectTo else 0
         return Result(value, partial, { self })
 
@@ -116,8 +116,8 @@ class Reciprocal(Expression):
         if aValue == 0:
             raise MathException("1 / x at x = 0")
         resultValue = 1 / aValue
-        # d(1 / a) = (-1 / a ** 2) * da
-        resultPartial = - aPartial * (resultValue ** 2)
+        # d(1 / a) = - (1 / a ** 2) * da
+        resultPartial = - (resultValue ** 2) * aPartial
         return Result(resultValue, resultPartial, aDependsOn)
 
 class SquareRoot(Expression):
@@ -339,7 +339,7 @@ class Power(Expression):
     #     e.g. a ** 2, a ** 3, or a ** (-1)
     # (II) otherwise
     #     e.g. e ** b, or 3 ** b, a ** b,
-    # In case (I), we support negative bases. In case (II), we only support positive bases.
+    # In case (I), we allow negative bases. In case (II), we only allow positive bases.
 
     def derive(
         self: Power,
@@ -353,7 +353,7 @@ class Power(Expression):
         if bHasNoDependence and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
                 resultValue = aValue ** bValue
-                # d(a ** c) = c * a ** (c - 1) * da
+                # d(a ** C) = C * a ** (C - 1) * da
                 resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
                 return Result(resultValue, resultPartial, resultDependsOn)
             elif bValue == 1:

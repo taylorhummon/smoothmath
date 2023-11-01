@@ -154,7 +154,7 @@ class Variable(NullaryExpression):
     ) -> numeric:
         value = variableValues.get(self, None)
         if value is None:
-            raise Exception("variableValues missing a value for a variable")
+            raise Exception("variableValues is missing a value for a variable")
         return value
 
     def _derive(
@@ -228,7 +228,7 @@ class Reciprocal(UnaryExpression):
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluateUsingCache(variableValues)
-        # d(1 / a) = (-1 / a ** 2) * da
+        # d(1 / a) = - (1 / a ** 2) * da
         self.a._derive(variableValues, result, - seed * (selfValue ** 2))
 
     def _ensureValueIsInDomain(
@@ -263,7 +263,7 @@ class SquareRoot(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluateUsingCache(variableValues)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        self.a._derive(variableValues, result, (1 / (2 * selfValue)) * seed)
+        self.a._derive(variableValues, result, seed / (2 * selfValue))
 
     def _ensureValueIsInDomain(
         self: SquareRoot,
@@ -355,7 +355,7 @@ class Sine(UnaryExpression):
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         # d(sin(a)) = cos(a) * da
-        self.a._derive(variableValues, result, math.cos(aValue) * seed)
+        self.a._derive(variableValues, result, seed * math.cos(aValue))
 
 class Cosine(UnaryExpression):
     def __init__(
@@ -379,7 +379,7 @@ class Cosine(UnaryExpression):
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         # d(cos(a)) = - sin(a) * da
-        self.a._derive(variableValues, result, - math.sin(aValue) * seed)
+        self.a._derive(variableValues, result, - seed * math.sin(aValue))
 
 ### Binary Expressions ###
 
@@ -477,8 +477,8 @@ class Multiply(BinaryExpression):
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         # d(a * b) = b * da + a * db
-        self.a._derive(variableValues, result, bValue * seed)
-        self.b._derive(variableValues, result, aValue * seed)
+        self.a._derive(variableValues, result, seed * bValue)
+        self.b._derive(variableValues, result, seed * aValue)
 
 class Divide(BinaryExpression):
     def __init__(
@@ -543,7 +543,7 @@ class Power(BinaryExpression):
     #     e.g. a ** 2, a ** 3, or a ** (-1)
     # (II) otherwise
     #     e.g. e ** b, or 3 ** b, a ** b,
-    # In case (I), we support negative bases. In case (II), we only support positive bases.
+    # In case (I), we allow negative bases. In case (II), we only allow positive bases.
 
     def _evaluate(
         self: Power,
