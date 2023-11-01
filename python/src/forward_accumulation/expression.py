@@ -5,8 +5,6 @@ from src.forward_accumulation.custom_types import numeric, VariableValues
 from src.forward_accumulation.custom_exceptions import MathException
 from src.forward_accumulation.result import Result
 
-# !!! do we still want dependsOn
-
 class Expression(ABC):
     @abstractmethod
     def derive(
@@ -65,7 +63,7 @@ class Constant(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        return Result(self.value, 0, set())
+        return Result(self.value, 0, True)
 
 class Variable(Expression):
     def __init__(
@@ -82,7 +80,7 @@ class Variable(Expression):
         if value is None:
             raise Exception("variableValues is missing a value for a variable")
         partial = 1 if self == withRespectTo else 0
-        return Result(value, partial, { self })
+        return Result(value, partial, False)
 
 class Negation(Expression):
     def __init__(
@@ -96,9 +94,9 @@ class Negation(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
         # d(-a) = -da
-        return Result(-aValue, -aPartial, aDependsOn)
+        return Result(-aValue, -aPartial, aLacksVariables)
 
 class Reciprocal(Expression):
     def __init__(
@@ -112,13 +110,13 @@ class Reciprocal(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise MathException("1 / x at x = 0")
         resultValue = 1 / aValue
         # d(1 / a) = - (1 / a ** 2) * da
         resultPartial = - (resultValue ** 2) * aPartial
-        return Result(resultValue, resultPartial, aDependsOn)
+        return Result(resultValue, resultPartial, aLacksVariables)
 
 class SquareRoot(Expression):
     def __init__(
@@ -132,7 +130,7 @@ class SquareRoot(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise MathException("sqrt(x) at x = 0")
         elif aValue < 0:
@@ -140,7 +138,7 @@ class SquareRoot(Expression):
         resultValue = math.sqrt(aValue)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         resultPartial = (1 / (2 * resultValue)) * aPartial
-        return Result(resultValue, resultPartial, aDependsOn)
+        return Result(resultValue, resultPartial, aLacksVariables)
 
 class NaturalExponential(Expression):
     def __init__(
@@ -154,11 +152,11 @@ class NaturalExponential(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
         resultValue = math.e ** aValue
         # d(e ** a) = e ** a * da
         resultPartial = resultValue * aPartial
-        return Result(resultValue, resultPartial, aDependsOn)
+        return Result(resultValue, resultPartial, aLacksVariables)
 
 class NaturalLogarithm(Expression):
     def __init__(
@@ -172,7 +170,7 @@ class NaturalLogarithm(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise MathException("ln(x) at x = 0")
         elif aValue < 0:
@@ -181,7 +179,7 @@ class NaturalLogarithm(Expression):
         return Result(
             math.log(aValue),
             aPartial / aValue,
-            aDependsOn
+            aLacksVariables
         )
 
 class Sine(Expression):
@@ -196,12 +194,12 @@ class Sine(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
         # d(sin(a)) = cos(a) * da
         return Result(
             math.sin(aValue),
             math.cos(aValue) * aPartial,
-            aDependsOn
+            aLacksVariables
         )
 
 class Cosine(Expression):
@@ -216,12 +214,12 @@ class Cosine(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
         # d(cos(a)) = - sin(a) * da
         return Result(
             math.cos(aValue),
             - math.sin(aValue) * aPartial,
-            aDependsOn
+            aLacksVariables
         )
 
 class Plus(Expression):
@@ -238,13 +236,13 @@ class Plus(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variableValues, withRespectTo).toTriple()
         # d(a + b) = da + db
         return Result(
             aValue + bValue,
             aPartial + bPartial,
-            aDependsOn | bDependsOn
+            aLacksVariables and bLacksVariables
         )
 
 class Minus(Expression):
@@ -261,13 +259,13 @@ class Minus(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variableValues, withRespectTo).toTriple()
         # d(a - b) = da - db
         return Result(
             aValue - bValue,
             aPartial - bPartial,
-            aDependsOn | bDependsOn
+            aLacksVariables and bLacksVariables
         )
 
 class Multiply(Expression):
@@ -284,13 +282,13 @@ class Multiply(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variableValues, withRespectTo).toTriple()
         # d(a * b) = b * da + a * db
         return Result(
             aValue * bValue,
             bValue * aPartial + aValue * bPartial,
-            aDependsOn | bDependsOn
+            aLacksVariables and bLacksVariables
         )
 
 class Divide(Expression):
@@ -307,22 +305,21 @@ class Divide(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variableValues, withRespectTo).toTriple()
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
-        aHasNoDependence = not aDependsOn
-        if aHasNoDependence and aValue == 0:
-            return Result(0, 0, bDependsOn)
+        if aLacksVariables and aValue == 0:
+            return Result(0, 0, bLacksVariables)
         if bValue == 0:
             if aValue == 0:
-                raise MathException("x / y at (x, y) = (0, 0)")
+                raise MathException("x / y with x = 0 and y = 0")
             else:
                 raise MathException("x / y with x != 0 and y = 0")
         # d(a / b) = (1 / b) * da - (a / b ** 2) * db
         return Result(
             aValue / bValue,
             (bValue * aPartial - aValue * bPartial) / bValue ** 2,
-            aDependsOn | bDependsOn
+            aLacksVariables and bLacksVariables
         )
 
 class Power(Expression):
@@ -346,11 +343,10 @@ class Power(Expression):
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> Result:
-        aValue, aPartial, aDependsOn = self.a.derive(variableValues, withRespectTo).toTriple()
-        bValue, bPartial, bDependsOn = self.b.derive(variableValues, withRespectTo).toTriple()
-        resultDependsOn = aDependsOn | bDependsOn
-        bHasNoDependence = not bDependsOn # !!! Arguably, this could be `withRespectTo not in bDependsOn`
-        if bHasNoDependence and bValue.is_integer(): # CASE I: has constant integer exponent
+        aValue, aPartial, aLacksVariables = self.a.derive(variableValues, withRespectTo).toTriple()
+        bValue, bPartial, bLacksVariables = self.b.derive(variableValues, withRespectTo).toTriple()
+        resultDependsOn = aLacksVariables and bLacksVariables
+        if bLacksVariables and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
                 resultValue = aValue ** bValue
                 # d(a ** C) = C * a ** (C - 1) * da

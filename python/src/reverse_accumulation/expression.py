@@ -499,7 +499,6 @@ class Divide(BinaryExpression):
             return 0
         else:
             self._ensureValueIsInDomain(aValue, bValue)
-            # We can now assume b is non-zero
             return aValue / bValue
 
     def _derive(
@@ -526,7 +525,7 @@ class Divide(BinaryExpression):
     ) -> None:
         if bValue == 0:
             if aValue == 0:
-                raise MathException("x / y at (x, y) = (0, 0)")
+                raise MathException("x / y with x = 0 and y = 0")
             else: # aValue != 0
                 raise MathException("x / y with x != 0 and y = 0")
 
