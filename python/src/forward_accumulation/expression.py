@@ -58,6 +58,8 @@ class Expression(ABC):
     ) -> Power:
         return Power(self, other)
 
+### Nullary Expressions ###
+
 class Constant(Expression):
     def __init__(
         self: Constant,
@@ -96,12 +98,23 @@ class Variable(Expression):
             partial = 1 if self == withRespectTo else 0
         )
 
-class Negation(Expression):
+### Unary Expressions ###
+
+class UnaryExpression(Expression):
+    def __init__(
+        self: UnaryExpression,
+        a: Expression
+    ) -> None:
+        if not isinstance(a, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {a}")
+        self.a = a
+
+class Negation(UnaryExpression):
     def __init__(
         self: Negation,
         a: Expression
     ) -> None:
-        self.a = a
+        super().__init__(a)
 
     def _derive(
         self: Negation,
@@ -116,12 +129,12 @@ class Negation(Expression):
             partial = -aPartial
         )
 
-class Reciprocal(Expression):
+class Reciprocal(UnaryExpression):
     def __init__(
         self: Reciprocal,
         a: Expression
     ) -> None:
-        self.a = a
+        super().__init__(a)
 
     def _derive(
         self: Reciprocal,
@@ -139,12 +152,12 @@ class Reciprocal(Expression):
             partial = - (resultValue ** 2) * aPartial
         )
 
-class SquareRoot(Expression):
+class SquareRoot(UnaryExpression):
     def __init__(
         self: SquareRoot,
         a: Expression
     ) -> None:
-        self.a = a
+        super().__init__(a)
 
     def _derive(
         self: SquareRoot,
@@ -164,12 +177,12 @@ class SquareRoot(Expression):
             partial = (1 / (2 * resultValue)) * aPartial
         )
 
-class NaturalExponential(Expression):
+class NaturalExponential(UnaryExpression):
     def __init__(
         self: NaturalExponential,
         a: Expression
     ) -> None:
-        self.a = a
+        super().__init__(a)
 
     def _derive(
         self: NaturalExponential,
@@ -185,12 +198,12 @@ class NaturalExponential(Expression):
             partial = resultValue * aPartial
         )
 
-class NaturalLogarithm(Expression):
+class NaturalLogarithm(UnaryExpression):
     def __init__(
         self: NaturalLogarithm,
         a: Expression
     ) -> None:
-        self.a = a
+        super().__init__(a)
 
     def _derive(
         self: NaturalLogarithm,
@@ -209,12 +222,12 @@ class NaturalLogarithm(Expression):
             partial = aPartial / aValue
         )
 
-class Sine(Expression):
+class Sine(UnaryExpression):
     def __init__(
         self: Sine,
         a: Expression
     ) -> None:
-        self.a = a
+        super().__init__(a)
 
     def _derive(
         self: Sine,
@@ -229,12 +242,12 @@ class Sine(Expression):
             partial = math.cos(aValue) * aPartial
         )
 
-class Cosine(Expression):
+class Cosine(UnaryExpression):
     def __init__(
         self: Cosine,
         a: Expression
     ) -> None:
-        self.a = a
+        super().__init__(a)
 
     def _derive(
         self: Cosine,
@@ -249,14 +262,28 @@ class Cosine(Expression):
             partial = - math.sin(aValue) * aPartial
         )
 
-class Plus(Expression):
+### Binary Expressions ###
+
+class BinaryExpression(Expression):
+    def __init__(
+        self: UnaryExpression,
+        a: Expression,
+        b: Expression
+    ) -> None:
+        if not isinstance(a, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {a}")
+        if not isinstance(b, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {b}")
+        self.a = a
+        self.b = b
+
+class Plus(BinaryExpression):
     def __init__(
         self: Plus,
         a: Expression,
         b: Expression
     ) -> None:
-        self.a = a
-        self.b = b
+        super().__init__(a, b)
 
     def _derive(
         self: Plus,
@@ -272,14 +299,13 @@ class Plus(Expression):
             partial = aPartial + bPartial
         )
 
-class Minus(Expression):
+class Minus(BinaryExpression):
     def __init__(
         self: Minus,
         a: Expression,
         b: Expression
     ) -> None:
-        self.a = a
-        self.b = b
+        super().__init__(a, b)
 
     def _derive(
         self: Minus,
@@ -295,14 +321,13 @@ class Minus(Expression):
             partial = aPartial - bPartial
         )
 
-class Multiply(Expression):
+class Multiply(BinaryExpression):
     def __init__(
         self: Multiply,
         a: Expression,
         b: Expression
     ) -> None:
-        self.a = a
-        self.b = b
+        super().__init__(a, b)
 
     def _derive(
         self: Multiply,
@@ -318,14 +343,13 @@ class Multiply(Expression):
             partial = bValue * aPartial + aValue * bPartial
         )
 
-class Divide(Expression):
+class Divide(BinaryExpression):
     def __init__(
         self: Divide,
         a: Expression,
         b: Expression
     ) -> None:
-        self.a = a
-        self.b = b
+        super().__init__(a, b)
 
     def _derive(
         self: Divide,
@@ -349,14 +373,13 @@ class Divide(Expression):
             partial = (bValue * aPartial - aValue * bPartial) / bValue ** 2
         )
 
-class Power(Expression):
+class Power(BinaryExpression):
     def __init__(
         self: Power,
         a: Expression,
         b: Expression
     ) -> None:
-        self.a = a
-        self.b = b
+        super().__init__(a, b)
 
     # For a power a ** b, there are two over-arching cases we work with:
     # (I) the exponent, b, can be determined to be a constant integer

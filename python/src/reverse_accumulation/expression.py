@@ -161,6 +161,8 @@ class UnaryExpression(Expression):
         a: Expression
     ) -> None:
         super().__init__(lacksVariables = a.lacksVariables)
+        if not isinstance(a, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {a}")
         self.a = a
 
     def _resetEvaluationCache(
@@ -378,6 +380,10 @@ class BinaryExpression(Expression):
         b: Expression,
     ) -> None:
         super().__init__(lacksVariables = a.lacksVariables and b.lacksVariables)
+        if not isinstance(a, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {a}")
+        if not isinstance(b, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {b}")
         self.a = a
         self.b = b
 
