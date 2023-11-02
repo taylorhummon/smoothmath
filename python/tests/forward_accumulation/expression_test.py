@@ -4,10 +4,8 @@ from src.forward_accumulation.custom_exceptions import DomainException
 from src.forward_accumulation.expression import (
     Constant, Variable,
     Negation, Reciprocal, SquareRoot, NaturalExponential, NaturalLogarithm, Sine, Cosine,
-    Plus, Minus, Multiply, Divide, Power,
+    Plus, Minus, Multiply, Divide, Power
 )
-
-# !!! test composition much more carefully
 
 ### Constant
 
@@ -27,13 +25,6 @@ def testVariable():
     assert result.value == 2
     assert result.partial == 1
 
-def testUnrelatedVariables():
-    x = Variable()
-    y = Variable()
-    result = y.derive({ x: 2, y: 3 }, x)
-    assert result.value == 3
-    assert result.partial == 0
-
 ### Negation
 
 def testNegation():
@@ -42,6 +33,13 @@ def testNegation():
     result = z.derive({ x: 2 }, x)
     assert result.value == -2
     assert result.partial == -1
+
+def testNegationComposition():
+    x = Variable()
+    z = Negation(Constant(2) * x + Constant(1))
+    result = z.derive({ x: 3 }, x)
+    assert result.value == -7
+    assert result.partial == -2
 
 ### Reciprocal
 
@@ -57,6 +55,13 @@ def testReciprocal():
     assert result.value == approx(-1)
     assert result.partial == approx(-1)
 
+def testReciprocalComposition():
+    x = Variable()
+    z = Reciprocal(Constant(2) * x - Constant(4))
+    result = z.derive({ x: 3 }, x)
+    assert result.value == approx(0.5)
+    assert result.partial == approx(-0.5)
+
 ### Square Root
 
 def testSquareRoot():
@@ -69,6 +74,13 @@ def testSquareRoot():
         z.derive({ x: 0 }, x)
     with raises(DomainException):
         z.derive({ x: -1 }, x)
+
+def testSquareRootComposition():
+    x = Variable()
+    z = SquareRoot(Constant(2) * x + Constant(7))
+    result = z.derive({ x: 1 }, x)
+    assert result.value == approx(3)
+    assert result.partial == approx(1 / 3)
 
 ### Natural Exponential
 
@@ -84,6 +96,13 @@ def testNaturalExponential():
     result = z.derive({ x: -1 }, x)
     assert result.value == approx(1 / math.e)
     assert result.partial == approx(1 / math.e)
+
+def testNaturalExponentialComposition():
+    x = Variable()
+    z = NaturalExponential(Constant(2) * x - Constant(6))
+    result = z.derive({ x: 3 }, x)
+    assert result.value == approx(1)
+    assert result.partial == approx(2)
 
 ### Natural Logarithm
 
@@ -101,6 +120,13 @@ def testNaturalLogarithm():
     with raises(DomainException):
         z.derive({ x: -1 }, x)
 
+def testNaturalLogarithmComposition():
+    x = Variable()
+    z = NaturalLogarithm(Constant(2) * x - Constant(3))
+    result = z.derive({ x: 2 }, x)
+    assert result.value == approx(0)
+    assert result.partial == approx(2)
+
 ### Sine
 
 def testSine():
@@ -113,6 +139,13 @@ def testSine():
     assert result.value == approx(1)
     assert result.partial == approx(0)
 
+def testSineComposition():
+    theta = Variable()
+    z = Sine(Constant(2) * theta)
+    result = z.derive({ theta: 0 }, theta)
+    assert result.value == approx(0)
+    assert result.partial == approx(2)
+
 ### Cosine
 
 def testCosine():
@@ -124,6 +157,13 @@ def testCosine():
     result = z.derive({ theta: math.pi / 2 }, theta)
     assert result.value == approx(0)
     assert result.partial == approx(-1)
+
+def testCosineComposition():
+    theta = Variable()
+    z = Cosine(Constant(2) * theta)
+    result = z.derive({ theta: math.pi / 4 }, theta)
+    assert result.value == approx(0)
+    assert result.partial == approx(-2)
 
 ### Plus
 
@@ -139,6 +179,18 @@ def testPlus():
     assert resultForY.value == approx(5)
     assert resultForY.partial == approx(1)
 
+def testPlusComposition():
+    x = Variable()
+    y = Variable()
+    z = Plus(Constant(5) * x, Constant(4) * y)
+    variableValues = { x: 2, y: 3 }
+    resultForX = z.derive(variableValues, x)
+    assert resultForX.value == approx(22)
+    assert resultForX.partial == approx(5)
+    resultForY = z.derive(variableValues, y)
+    assert resultForY.value == approx(22)
+    assert resultForY.partial == approx(4)
+
 ### Minus
 
 def testMinus():
@@ -153,6 +205,18 @@ def testMinus():
     assert resultForY.value == approx(-1)
     assert resultForY.partial == approx(-1)
 
+def testMinusComposition():
+    x = Variable()
+    y = Variable()
+    z = Minus(Constant(5) * x, Constant(4) * y)
+    variableValues = { x: 2, y: 3 }
+    resultForX = z.derive(variableValues, x)
+    assert resultForX.value == approx(-2)
+    assert resultForX.partial == approx(5)
+    resultForY = z.derive(variableValues, y)
+    assert resultForY.value == approx(-2)
+    assert resultForY.partial == approx(-4)
+
 ### Multiply
 
 def testMultiply():
@@ -166,6 +230,38 @@ def testMultiply():
     resultForY = z.derive(variableValues, y)
     assert resultForY.value == approx(6)
     assert resultForY.partial == approx(2)
+
+def testMultiplyComposition():
+    x = Variable()
+    y = Variable()
+    z = Multiply(Constant(5) * x, y - Constant(1))
+    variableValues = { x: 2, y: 3 }
+    resultForX = z.derive(variableValues, x)
+    assert resultForX.value == approx(20)
+    assert resultForX.partial == approx(10)
+    resultForY = z.derive(variableValues, y)
+    assert resultForY.value == approx(20)
+    assert resultForY.partial == approx(10)
+
+def testMultiplyByZero():
+    x = Variable()
+    z = Multiply(Constant(0), x)
+    result = z.derive({ x: 2 }, x)
+    assert result.value == approx(0)
+    assert result.partial == approx(0)
+
+def testMultiplyByZeroDoesntShortCircuit():
+    x = Variable()
+    z = Multiply(Constant(0), Power(Constant(-1), x))
+    with raises(DomainException):
+        z.derive({ x: 2 }, x)
+
+def testMultiplyByOne():
+    x = Variable()
+    z = Multiply(Constant(1), x)
+    result = z.derive({ x: 2 }, x)
+    assert result.value == approx(2)
+    assert result.partial == approx(1)
 
 ### Divide
 
@@ -191,6 +287,18 @@ def testDivide():
     with raises(DomainException):
         z.derive(variableValues, y)
 
+def testDivideComposition():
+    x = Variable()
+    y = Variable()
+    z = Divide(Constant(2) * x + Constant(4), Constant(5) * y)
+    variableValues = { x: 3, y: 1 }
+    resultForX = z.derive(variableValues, x)
+    assert resultForX.value == approx(2)
+    assert resultForX.partial == approx(0.4)
+    resultForY = z.derive(variableValues, y)
+    assert resultForY.value == approx(2)
+    assert resultForY.partial == approx(-2)
+
 def testDivideWithConstantNumeratorZero():
     y = Variable()
     z = Divide(Constant(0), y)
@@ -200,6 +308,19 @@ def testDivideWithConstantNumeratorZero():
     result = z.derive({ y: 0 }, y)
     assert result.value == approx(0)
     assert result.partial == approx(0)
+
+def testDivideWithConstantNumeratorZeroComposition():
+    y = Variable()
+    z = Divide(Constant(0), Constant(2) * y + Constant(4))
+    result = z.derive({ y: 3 }, y)
+    assert result.value == approx(0)
+    assert result.partial == approx(0)
+
+def testDivideWithConstantNumeratorZeroDoesntShortCircuit():
+    y = Variable()
+    z = Divide(Constant(0), NaturalLogarithm(y))
+    with raises(DomainException):
+        z.derive({ y: 0 }, y)
 
 def testDivideWithConstantDenominatorOne():
     x = Variable()
@@ -277,6 +398,18 @@ def testPower():
     with raises(DomainException):
         z.derive(variableValues, y)
 
+def testPowerComposition():
+    x = Variable()
+    y = Variable()
+    z = Power(Constant(2) * x, Constant(3) * y)
+    variableValues = { x: 1, y: 1 }
+    resultForX = z.derive(variableValues, x)
+    assert resultForX.value == approx(8)
+    assert resultForX.partial == approx(24)
+    resultForY = z.derive(variableValues, y)
+    assert resultForY.value == approx(8)
+    assert resultForY.partial == approx(16.63553233343)
+
 def testPowerWithConstantBaseOne():
     y = Variable()
     z = Power(Constant(1), y)
@@ -289,6 +422,12 @@ def testPowerWithConstantBaseOne():
     result = z.derive({ y: -5 }, y)
     assert result.value == approx(1)
     assert result.partial == approx(0)
+
+def testPowerWithConstantBaseOneDoesntShortCircuit():
+    x = Variable()
+    z = Power(Constant(1), SquareRoot(x))
+    with raises(DomainException):
+        z.derive({ x: -1 }, x)
 
 def testPowerWithConstantBaseZero():
     y = Variable()
@@ -323,6 +462,13 @@ def testPowerWithConstantExponentTwo():
     assert result.value == approx(25)
     assert result.partial == approx(-10)
 
+def testPowerWithConstantExponentTwoComposition():
+    x = Variable()
+    z = Power(Constant(3) * x - Constant(1), Constant(2))
+    result = z.derive({ x: 1 }, x)
+    assert result.value == approx(4)
+    assert result.partial == approx(12)
+
 def testPowerWithConstantExponentOne():
     x = Variable()
     z = Power(x, Constant(1))
@@ -335,6 +481,13 @@ def testPowerWithConstantExponentOne():
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(-5)
     assert result.partial == approx(1)
+
+def testPowerWithConstantExponentOneComposition():
+    x = Variable()
+    z = Power(Constant(3) * x - Constant(1), Constant(1))
+    result = z.derive({ x: 1 }, x)
+    assert result.value == approx(2)
+    assert result.partial == approx(3)
 
 def testPowerWithConstantExponentZero():
     x = Variable()
@@ -349,6 +502,19 @@ def testPowerWithConstantExponentZero():
     assert result.value == approx(1)
     assert result.partial == approx(0)
 
+def testPowerWithConstantExponentZeroComposition():
+    x = Variable()
+    z = Power(Constant(3) * x - Constant(1), Constant(0))
+    result = z.derive({ x: 1 }, x)
+    assert result.value == approx(1)
+    assert result.partial == approx(0)
+
+def testPowerWithConstantExponentZeroDoesntShortCircuit():
+    x = Variable()
+    z = Power(NaturalLogarithm(x), Constant(0))
+    with raises(DomainException):
+        z.derive({ x: 0 }, x)
+
 def testPowerWithConstantExponentNegativeOne():
     x = Variable()
     z = Power(x, Constant(-1))
@@ -361,6 +527,13 @@ def testPowerWithConstantExponentNegativeOne():
     assert result.value == approx(-0.2)
     assert result.partial == approx(-0.04)
 
+def testPowerWithConstantExponentNegativeOneComposition():
+    x = Variable()
+    z = Power(Constant(3) * x - Constant(1), Constant(-1))
+    result = z.derive({ x: 1 }, x)
+    assert result.value == approx(0.5)
+    assert result.partial == approx(-0.75)
+
 def testPowerWithConstantExponentNegativeTwo():
     x = Variable()
     z = Power(x, Constant(-2))
@@ -372,6 +545,13 @@ def testPowerWithConstantExponentNegativeTwo():
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(0.04)
     assert result.partial == approx(0.016)
+
+def testPowerWithConstantExponentNegativeTwoComposition():
+    x = Variable()
+    z = Power(Constant(3) * x - Constant(1), Constant(-2))
+    result = z.derive({ x: 1 }, x)
+    assert result.value == approx(0.25)
+    assert result.partial == approx(-0.75)
 
 def testPowerWithExponentMadeFromAddingConstants():
     x = Variable()
@@ -388,7 +568,7 @@ def testPowerWithExponentMadeFromAddingConstants():
 
 def testPowerWhereExponentIsAnIntegerRepresentedAsAFloat():
     x = Variable()
-    z = Power(x, Constant(2))
+    z = Power(x, Constant(2.0))
     result = z.derive({ x: -5 }, x)
     assert result.value == approx(25)
     assert result.partial == approx(-10)
@@ -408,9 +588,9 @@ def testPolynomialOfTwoVariables():
     z = x * (x + y) - Constant(5) * y * y
     variableValues = { x: 2, y: 3 }
     resultForX = z.derive(variableValues, x)
-    resultForY = z.derive(variableValues, y)
     assert resultForX.value == -35
     assert resultForX.partial == 7
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == -35
     assert resultForY.partial == -28
 
@@ -421,16 +601,24 @@ def testPolynomialOfThreeVariables():
     z = w * w + Constant(5) * w * x * x - w * x * y
     variableValues = { w: 2, x: 3, y: 4 }
     resultForW = z.derive(variableValues, w)
-    resultForX = z.derive(variableValues, x)
-    resultForY = z.derive(variableValues, y)
     assert resultForW.value == 70
     assert resultForW.partial == 37
+    resultForX = z.derive(variableValues, x)
     assert resultForX.value == 70
     assert resultForX.partial == 52
+    resultForY = z.derive(variableValues, y)
     assert resultForY.value == 70
     assert resultForY.partial == -6
 
 ### Other
+
+def testUnrelatedVariable():
+    x = Variable()
+    y = Variable()
+    z = x ** Constant(2)
+    result = z.derive({ x: 2 }, y)
+    assert result.value == 4
+    assert result.partial == 0
 
 def testCompositeFunction():
     x = Variable()
