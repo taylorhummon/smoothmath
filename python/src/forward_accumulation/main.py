@@ -1,10 +1,10 @@
-from src.forward_accumulation.expression import Constant, Variable
+from src.forward_accumulation.expression import Constant, Variable, Negation
 
 print("Forward Accumulation Method")
 
 # Example: Finding the partials of z = x * (x + y) + 5 * y * y at (x, y) = (2, 3)
-x = Variable()
-y = Variable()
+x = Variable("x")
+y = Variable("y")
 z = x * (x + y) + Constant(5) * y ** Constant(2)
 variableValues = { x: 2, y: 3 }
 resultWithXPartial = z.derive(variableValues, x)

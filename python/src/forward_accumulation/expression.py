@@ -21,6 +21,12 @@ class Expression(ABC):
     ) -> InternalResult:
         raise Exception("concrete classes derived from Expression must implement _derive()")
 
+    @abstractmethod
+    def __str__(
+        self: Expression,
+    ) -> InternalResult:
+        raise Exception("concrete classes derived from Expression must implement __str__()")
+
     ## Operations ##
 
     def __neg__(
@@ -78,11 +84,19 @@ class Constant(Expression):
             partial = 0
         )
 
+    def __str__(
+        self: Constant
+    ) -> str:
+        return self.value
+
 class Variable(Expression):
     def __init__(
-        self: Variable
+        self: Variable,
+        name: str
     ) -> None:
-        pass
+        if not name:
+            raise Exception("Variables must be given a non-blank name")
+        self.name = name
 
     def _derive(
         self: Variable,
@@ -97,6 +111,11 @@ class Variable(Expression):
             value = value,
             partial = 1 if self == withRespectTo else 0
         )
+
+    def __str__(
+        self: Variable
+    ) -> str:
+        return self.name
 
 ### Unary Expressions ###
 
@@ -129,6 +148,11 @@ class Negation(UnaryExpression):
             partial = -aPartial
         )
 
+    def __str__(
+        self: Negation
+    ) -> str:
+        return f"Negation({self.a})"
+
 class Reciprocal(UnaryExpression):
     def __init__(
         self: Reciprocal,
@@ -151,6 +175,11 @@ class Reciprocal(UnaryExpression):
             value = resultValue,
             partial = - (resultValue ** 2) * aPartial
         )
+
+    def __str__(
+        self: Reciprocal
+    ) -> str:
+        return f"Reciprocal({self.a})"
 
 class SquareRoot(UnaryExpression):
     def __init__(
@@ -177,6 +206,11 @@ class SquareRoot(UnaryExpression):
             partial = aPartial / (2 * resultValue)
         )
 
+    def __str__(
+        self: SquareRoot
+    ) -> str:
+        return f"SquareRoot({self.a})"
+
 class Exponential(UnaryExpression):
     def __init__(
         self: Exponential,
@@ -202,6 +236,14 @@ class Exponential(UnaryExpression):
             value = resultValue,
             partial = math.log(self.base) * resultValue * aPartial
         )
+
+    def __str__(
+        self: Exponential
+    ) -> str:
+        if self.base == math.e:
+            return f"Exponential({self.a})"
+        else:
+            return f"Exponential({self.a}, base = {self.base})"
 
 class Logarithm(UnaryExpression):
     def __init__(
@@ -234,6 +276,14 @@ class Logarithm(UnaryExpression):
             partial = aPartial / (math.log(self.base) * aValue)
         )
 
+    def __str__(
+        self: Logarithm
+    ) -> str:
+        if self.base == math.e:
+            return f"Logarithm({self.a})"
+        else:
+            return f"Logarithm({self.a}, base = {self.base})"
+
 class Sine(UnaryExpression):
     def __init__(
         self: Sine,
@@ -254,6 +304,11 @@ class Sine(UnaryExpression):
             partial = math.cos(aValue) * aPartial
         )
 
+    def __str__(
+        self: Sine
+    ) -> str:
+        return f"Sine({self.a})"
+
 class Cosine(UnaryExpression):
     def __init__(
         self: Cosine,
@@ -273,6 +328,11 @@ class Cosine(UnaryExpression):
             value = math.cos(aValue),
             partial = - math.sin(aValue) * aPartial
         )
+
+    def __str__(
+        self: Cosine
+    ) -> str:
+        return f"Cosine({self.a})"
 
 ### Binary Expressions ###
 
@@ -311,6 +371,11 @@ class Plus(BinaryExpression):
             partial = aPartial + bPartial
         )
 
+    def __str__(
+        self: Plus
+    ) -> str:
+        return f"Plus({self.a}, {self.b})"
+
 class Minus(BinaryExpression):
     def __init__(
         self: Minus,
@@ -333,6 +398,11 @@ class Minus(BinaryExpression):
             partial = aPartial - bPartial
         )
 
+    def __str__(
+        self: Minus
+    ) -> str:
+        return f"Minus({self.a}, {self.b})"
+
 class Multiply(BinaryExpression):
     def __init__(
         self: Multiply,
@@ -354,6 +424,11 @@ class Multiply(BinaryExpression):
             value = aValue * bValue,
             partial = bValue * aPartial + aValue * bPartial
         )
+
+    def __str__(
+        self: Multiply
+    ) -> str:
+        return f"Multiply({self.a}, {self.b})"
 
 class Divide(BinaryExpression):
     def __init__(
@@ -384,6 +459,11 @@ class Divide(BinaryExpression):
             value = aValue / bValue,
             partial = (bValue * aPartial - aValue * bPartial) / bValue ** 2
         )
+
+    def __str__(
+        self: Divide
+    ) -> str:
+        return f"Divide({self.a}, {self.b})"
 
 class Power(BinaryExpression):
     def __init__(
@@ -450,3 +530,8 @@ class Power(BinaryExpression):
                     raise DomainException("Power(x, y) blows up around x = 0 for y < 0")
             else: # aValue < 0
                 raise DomainException("Power(x, y) is undefined for x < 0")
+
+    def __str__(
+        self: Power
+    ) -> str:
+        return f"Power({self.a}, {self.b})"
