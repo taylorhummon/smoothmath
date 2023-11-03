@@ -3,7 +3,7 @@ import math
 from src.reverse_accumulation.custom_exceptions import DomainException
 from src.reverse_accumulation.expression import (
     Constant, Variable,
-    Negation, Reciprocal, SquareRoot, NaturalExponential, NaturalLogarithm, Sine, Cosine,
+    Negation, Reciprocal, SquareRoot, Exponential, Logarithm, Sine, Cosine,
     Plus, Minus, Multiply, Divide, Power
 )
 
@@ -83,11 +83,11 @@ def testSquareRootComposition():
     assert result.value == approx(3)
     assert result.partialWithRespectTo(x) == approx(1 / 3)
 
-### Natural Exponential
+###  Exponential
 
-def testNaturalExponential():
+def testExponential():
     x = Variable()
-    z = NaturalExponential(x)
+    z = Exponential(x)
     result = z.derive({ x: 0 })
     assert result.value == approx(1)
     assert result.partialWithRespectTo(x) == approx(1)
@@ -98,18 +98,38 @@ def testNaturalExponential():
     assert result.value == approx(1 / math.e)
     assert result.partialWithRespectTo(x) == approx(1 / math.e)
 
-def testNaturalExponentialComposition():
+def testExponentialComposition():
     x = Variable()
-    z = NaturalExponential(Constant(2) * x - Constant(6))
+    z = Exponential(Constant(2) * x - Constant(6))
     result = z.derive({ x: 3 })
     assert result.value == approx(1)
     assert result.partialWithRespectTo(x) == approx(2)
 
-### Natural Logarithm
-
-def testNaturalLogarithm():
+def testBaseTwoExponential():
     x = Variable()
-    z = NaturalLogarithm(x)
+    z = Exponential(x, 2)
+    result = z.derive({ x: 0 })
+    assert result.value == approx(1)
+    assert result.partialWithRespectTo(x) == approx(0.693147180559)
+    result = z.derive({ x: 1 })
+    assert result.value == approx(2)
+    assert result.partialWithRespectTo(x) == approx(1.386294361119)
+    result = z.derive({ x: -1 })
+    assert result.value == approx(0.5)
+    assert result.partialWithRespectTo(x) == approx(0.346573590279)
+
+def testBaseTwoExponentialComposition():
+    x = Variable()
+    z = Exponential(Constant(2) * x - Constant(5), 2)
+    result = z.derive({ x: 3 })
+    assert result.value == approx(2)
+    assert result.partialWithRespectTo(x) == approx(2.77258872223)
+
+###  Logarithm
+
+def testLogarithm():
+    x = Variable()
+    z = Logarithm(x)
     result = z.derive({ x: 1 })
     assert result.value == approx(0)
     assert result.partialWithRespectTo(x) == approx(1)
@@ -121,12 +141,33 @@ def testNaturalLogarithm():
     with raises(DomainException):
         z.derive({ x: -1 })
 
-def testNaturalLogarithmComposition():
+def testLogarithmComposition():
     x = Variable()
-    z = NaturalLogarithm(Constant(2) * x - Constant(3))
+    z = Logarithm(Constant(2) * x - Constant(3))
     result = z.derive({ x: 2 })
     assert result.value == approx(0)
     assert result.partialWithRespectTo(x) == approx(2)
+
+def testBaseTwoLogarithm():
+    x = Variable()
+    z = Logarithm(x, 2)
+    result = z.derive({ x: 1 })
+    assert result.value == approx(0)
+    assert result.partialWithRespectTo(x) == approx(1.442695040888)
+    result = z.derive({ x: 2 })
+    assert result.value == approx(1)
+    assert result.partialWithRespectTo(x) == approx(0.721347520444)
+    with raises(DomainException):
+        z.derive({ x: 0 })
+    with raises(DomainException):
+        z.derive({ x: -1 })
+
+def testBaseTwoLogarithmComposition():
+    x = Variable()
+    z = Logarithm(Constant(2) * x - Constant(6), 2)
+    result = z.derive({ x: 7 })
+    assert result.value == approx(3)
+    assert result.partialWithRespectTo(x) == approx(0.3606737602222)
 
 ### Sine
 
@@ -289,7 +330,7 @@ def testDivideWithConstantNumeratorZeroComposition():
 
 def testDivideWithConstantNumeratorZeroDoesntShortCircuit():
     y = Variable()
-    z = Divide(Constant(0), NaturalLogarithm(y))
+    z = Divide(Constant(0), Logarithm(y))
     with raises(DomainException):
         z.derive({ y: 0 })
 
@@ -452,7 +493,7 @@ def testPowerWithConstantExponentZeroComposition():
 
 def testPowerWithConstantExponentZeroDoesntShortCircuit():
     x = Variable()
-    z = Power(NaturalLogarithm(x), Constant(0))
+    z = Power(Logarithm(x), Constant(0))
     with raises(DomainException):
         z.derive({ x: 0 })
 
@@ -555,7 +596,7 @@ def testUnrelatedVariable():
 
 def testCompositeFunction():
     x = Variable()
-    z = NaturalExponential(x ** Constant(2))
+    z = Exponential(x ** Constant(2))
     result = z.derive({ x: 2 })
     assert result.value == approx(54.598150033)
     assert result.partialWithRespectTo(x) == approx(218.392600132)

@@ -226,7 +226,7 @@ class Reciprocal(UnaryExpression):
         aValue: numeric
     ) -> None:
         if aValue == 0:
-            raise DomainException("1 / x blows up around x = 0")
+            raise DomainException("Reciprocal(x) blows up around x = 0")
 
 class SquareRoot(UnaryExpression):
     def __init__(
@@ -260,68 +260,80 @@ class SquareRoot(UnaryExpression):
         aValue: numeric
     ) -> None:
         if aValue == 0:
-            raise DomainException("sqrt(x) is not smooth around x = 0")
+            raise DomainException("SquareRoot(x) is not smooth around x = 0")
         elif aValue < 0:
-            raise DomainException("sqrt(x) is undefined for x < 0")
+            raise DomainException("SquareRoot(x) is undefined for x < 0")
 
-class NaturalExponential(UnaryExpression):
+class Exponential(UnaryExpression):
     def __init__(
-        self: NaturalExponential,
-        a: Expression
+        self: Exponential,
+        exponent: Expression,
+        base: numeric = math.e
     ) -> None:
-        super().__init__(a)
+        super().__init__(exponent)
+        if base <= 0:
+            raise Exception("Exponentials must have a positive base")
+        self.base : numeric
+        self.base = base
 
     def _evaluate(
-        self: NaturalExponential,
+        self: Exponential,
         variableValues: VariableValues
     ) -> numeric:
         aValue = self.a._evaluateUsingCache(variableValues)
-        return math.e ** aValue
+        return self.base ** aValue
 
     def _derive(
-        self: NaturalExponential,
+        self: Exponential,
         result: InternalResult,
         variableValues: VariableValues,
         seed: numeric
     ) -> None:
         selfValue = self._evaluateUsingCache(variableValues)
         # d(e ** a) = e ** a * da
-        self.a._derive(result, variableValues, seed * selfValue)
+        self.a._derive(result, variableValues, seed * math.log(self.base) * selfValue)
 
-class NaturalLogarithm(UnaryExpression):
+class Logarithm(UnaryExpression):
     def __init__(
-        self: NaturalLogarithm,
-        a: Expression
+        self: Logarithm,
+        a: Expression,
+        base: numeric = math.e
     ) -> None:
         super().__init__(a)
+        if base <= 0:
+            raise Exception("Logarithms must have a positive base")
+        elif base == 1:
+            raise Exception("Logarithms cannot have base = 1")
+        base: numeric
+        self.base = base
 
     def _evaluate(
-        self: NaturalLogarithm,
+        self: Logarithm,
         variableValues: VariableValues
     ) -> numeric:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
-        return math.log(aValue)
+        return math.log(aValue, self.base)
 
     def _derive(
-        self: NaturalLogarithm,
+        self: Logarithm,
         result: InternalResult,
         variableValues: VariableValues,
         seed: numeric
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
-        # d(ln(a)) = (1 / a) * da
-        self.a._derive(result, variableValues, seed / aValue)
+        # d(log_C(a)) = (1 / (ln(C) * a)) * da
+        self.a._derive(result, variableValues, seed / (math.log(self.base) * aValue))
 
     def _ensureValueIsInDomain(
-        self: NaturalLogarithm,
+        self: Logarithm,
         aValue: numeric
     ) -> None:
         if aValue == 0:
-            raise DomainException("ln(x) blows up around x = 0")
+            raise DomainException("Logarithm(x) blows up around x = 0")
         elif aValue < 0:
-            raise DomainException("ln(x) is undefined for x < 0")
+            raise DomainException("Logarithm(x) is undefined for x < 0")
 
 class Sine(UnaryExpression):
     def __init__(
@@ -519,9 +531,9 @@ class Divide(BinaryExpression):
     ) -> None:
         if bValue == 0:
             if aValue == 0:
-                raise DomainException("x / y is not smooth around (x = 0, y = 0)")
+                raise DomainException("Divide(x, y) is not smooth around (x = 0, y = 0)")
             else: # aValue != 0
-                raise DomainException("x / y blows up around x != 0 and y = 0")
+                raise DomainException("Divide(x, y) blows up around x != 0 and y = 0")
 
 class Power(BinaryExpression):
     def __init__(
@@ -593,7 +605,7 @@ class Power(BinaryExpression):
         bValue: numeric
     ) -> None:
         if bValue <= -1 and aValue == 0:
-            raise DomainException("x ** C blows up around x = 0 when C is a negative integer")
+            raise DomainException("Power(x, C) blows up around x = 0 when C is a negative integer")
 
     def _ensureValueIsInDomainCaseII(
         self: Power,
@@ -602,10 +614,10 @@ class Power(BinaryExpression):
     ) -> None:
         if aValue == 0:
             if bValue > 0:
-                raise DomainException("x ** y is not smooth around x = 0 for y > 0")
+                raise DomainException("Power(x, y) is not smooth around x = 0 for y > 0")
             elif bValue == 0:
-                raise DomainException("x ** y is not smooth around (x = 0, y = 0)")
+                raise DomainException("Power(x, y) is not smooth around (x = 0, y = 0)")
             else: # bValue < 0
-                raise DomainException("x ** y blows up around x = 0 for y < 0")
+                raise DomainException("Power(x, y) blows up around x = 0 for y < 0")
         elif aValue < 0:
-            raise DomainException("x ** y is undefined for x < 0")
+            raise DomainException("Power(x, y) is undefined for x < 0")

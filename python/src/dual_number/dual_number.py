@@ -143,27 +143,35 @@ def squareRoot(
         uInfinitesimalPart / (2 * resultRealPart)
     )
 
-def naturalExponential(
-    u: DualNumber
+def exponential(
+    u: DualNumber,
+    base: Real = math.e
 ) -> DualNumber:
+    if base <= 0:
+        raise Exception("Exponentials must have a positive base")
     uRealPart, uInfinitesimalPart = u.toPair()
-    resultRealPart = math.e ** uRealPart
+    resultRealPart = base ** uRealPart
     return DualNumber(
         resultRealPart,
-        resultRealPart * uInfinitesimalPart
+        math.log(base) * resultRealPart * uInfinitesimalPart
     )
 
-def naturalLogarithm(
-    u: DualNumber
+def logarithm(
+    u: DualNumber,
+    base: Real = math.e
 ) -> DualNumber:
+    if base <= 0:
+        raise Exception("Logarithms must have a positive base")
+    elif base == 1:
+        raise Exception("Logarithms cannot have base = 1")
     uRealPart, uInfinitesimalPart = u.toPair()
     if uRealPart == 0:
-        raise DomainException("naturalLogarithm(a + b * ε) for a = 0")
+        raise DomainException("logarithm(a + b * ε) for a = 0")
     if uRealPart < 0:
-        raise DomainException("naturalLogarithm(a + b * ε) for a < 0")
+        raise DomainException("logarithm(a + b * ε) for a < 0")
     return DualNumber(
         math.log(uRealPart),
-        uInfinitesimalPart / uRealPart
+        uInfinitesimalPart / (math.log(base) * uRealPart)
     )
 
 def sine(

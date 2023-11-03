@@ -143,7 +143,7 @@ class Reciprocal(UnaryExpression):
     ) -> InternalResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
-            raise DomainException("1 / x blows up around x = 0")
+            raise DomainException("Reciprocal(x) blows up around x = 0")
         resultValue = 1 / aValue
         # d(1 / a) = - (1 / a ** 2) * da
         return InternalResult(
@@ -166,9 +166,9 @@ class SquareRoot(UnaryExpression):
     ) -> InternalResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
-            raise DomainException("sqrt(x) is not smooth around x = 0")
+            raise DomainException("SquareRoot(x) is not smooth around x = 0")
         elif aValue < 0:
-            raise DomainException("sqrt(x) is undefined for x < 0")
+            raise DomainException("SquareRoot(x) is undefined for x < 0")
         resultValue = math.sqrt(aValue)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         return InternalResult(
@@ -177,49 +177,61 @@ class SquareRoot(UnaryExpression):
             partial = aPartial / (2 * resultValue)
         )
 
-class NaturalExponential(UnaryExpression):
+class Exponential(UnaryExpression):
     def __init__(
-        self: NaturalExponential,
-        a: Expression
+        self: Exponential,
+        exponent: Expression,
+        base: numeric = math.e
     ) -> None:
-        super().__init__(a)
+        super().__init__(exponent)
+        if base <= 0:
+            raise Exception("Exponentials must have a positive base")
+        self.base : numeric
+        self.base = base
 
     def _derive(
-        self: NaturalExponential,
+        self: Exponential,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> InternalResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
-        resultValue = math.e ** aValue
-        # d(e ** a) = e ** a * da
+        resultValue = self.base ** aValue
+        # d(C ** b) = ln(C) * C ** b * db
         return InternalResult(
             lacksVariables = aLacksVariables,
             value = resultValue,
-            partial = resultValue * aPartial
+            partial = math.log(self.base) * resultValue * aPartial
         )
 
-class NaturalLogarithm(UnaryExpression):
+class Logarithm(UnaryExpression):
     def __init__(
-        self: NaturalLogarithm,
-        a: Expression
+        self: Logarithm,
+        a: Expression,
+        base: numeric = math.e
     ) -> None:
         super().__init__(a)
+        if base <= 0:
+            raise Exception("Logarithms must have a positive base")
+        elif base == 1:
+            raise Exception("Logarithms cannot have base = 1")
+        base: numeric
+        self.base = base
 
     def _derive(
-        self: NaturalLogarithm,
+        self: Logarithm,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> InternalResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
-            raise DomainException("ln(x) blows up around x = 0")
+            raise DomainException("Logarithm(x) blows up around x = 0")
         elif aValue < 0:
-            raise DomainException("ln(x) is undefined for x < 0")
-        # d(ln(a)) = (1 / a) * da
+            raise DomainException("Logarithm(x) is undefined for x < 0")
+        # d(log_C(a)) = (1 / (ln(C) * a)) * da
         return InternalResult(
             lacksVariables = aLacksVariables,
-            value = math.log(aValue),
-            partial = aPartial / aValue
+            value = math.log(aValue, self.base),
+            partial = aPartial / (math.log(self.base) * aValue)
         )
 
 class Sine(UnaryExpression):
@@ -363,9 +375,9 @@ class Divide(BinaryExpression):
             return InternalResult(0, 0, bLacksVariables)
         if bValue == 0:
             if aValue == 0:
-                raise DomainException("x / y is not smooth around (x = 0, y = 0)")
+                raise DomainException("Divide(x, y) is not smooth around (x = 0, y = 0)")
             else: # aValue != 0
-                raise DomainException("x / y blows up around x != 0 and y = 0")
+                raise DomainException("Divide(x, y) blows up around x != 0 and y = 0")
         # d(a / b) = (1 / b) * da - (a / b ** 2) * db
         return InternalResult(
             lacksVariables = aLacksVariables and bLacksVariables,
@@ -415,7 +427,7 @@ class Power(BinaryExpression):
                 return InternalResult(lacksVariables, resultValue, resultPartial)
             else: # bValue <= -1:
                 if aValue == 0:
-                    raise DomainException("x ** C blows up around x = 0 when C is a negative integer")
+                    raise DomainException("Power(x, C) blows up around x = 0 when C is a negative integer")
                 resultValue = aValue ** bValue
                 # d(a ** C) = C * a ** (C - 1) * da
                 resultPartial = (bValue * resultValue / aValue) * aPartial
@@ -431,10 +443,10 @@ class Power(BinaryExpression):
                 return InternalResult(lacksVariables, resultValue, resultPartial)
             elif aValue == 0:
                 if bValue > 0:
-                    raise DomainException("x ** y is not smooth around x = 0 for y > 0")
+                    raise DomainException("Power(x, y) is not smooth around x = 0 for y > 0")
                 elif bValue == 0:
-                    raise DomainException("x ** y is not smooth around (x = 0, y = 0)")
+                    raise DomainException("Power(x, y) is not smooth around (x = 0, y = 0)")
                 else: # bValue < 0
-                    raise DomainException("x ** y blows up around x = 0 for y < 0")
+                    raise DomainException("Power(x, y) blows up around x = 0 for y < 0")
             else: # aValue < 0
-                raise DomainException("x ** y is undefined for x < 0")
+                raise DomainException("Power(x, y) is undefined for x < 0")
