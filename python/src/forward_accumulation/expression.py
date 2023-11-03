@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
-from src.forward_accumulation.custom_types import numeric, VariableValues
+from src.forward_accumulation.custom_types import Real, VariableValues
 from src.forward_accumulation.custom_exceptions import DomainException
 from src.forward_accumulation.result import Result, InternalResult
 
@@ -63,7 +63,7 @@ class Expression(ABC):
 class Constant(Expression):
     def __init__(
         self: Constant,
-        value: numeric
+        value: Real
     ) -> None:
         self.value = value
 
@@ -181,12 +181,12 @@ class Exponential(UnaryExpression):
     def __init__(
         self: Exponential,
         exponent: Expression,
-        base: numeric = math.e
+        base: Real = math.e
     ) -> None:
         super().__init__(exponent)
         if base <= 0:
             raise Exception("Exponentials must have a positive base")
-        self.base : numeric
+        self.base : Real
         self.base = base
 
     def _derive(
@@ -207,14 +207,14 @@ class Logarithm(UnaryExpression):
     def __init__(
         self: Logarithm,
         a: Expression,
-        base: numeric = math.e
+        base: Real = math.e
     ) -> None:
         super().__init__(a)
         if base <= 0:
             raise Exception("Logarithms must have a positive base")
         elif base == 1:
             raise Exception("Logarithms cannot have base = 1")
-        base: numeric
+        base: Real
         self.base = base
 
     def _derive(

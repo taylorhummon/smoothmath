@@ -1,7 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import math
-from src.reverse_accumulation.custom_types import numeric, VariableValues
+from src.reverse_accumulation.custom_types import Real, VariableValues
 from src.reverse_accumulation.custom_exceptions import DomainException
 from src.reverse_accumulation.result import Result, InternalResult
 
@@ -12,7 +12,7 @@ class Expression(ABC):
     ) -> None:
         self.lacksVariables : bool
         self.lacksVariables = lacksVariables
-        self._value : numeric | None
+        self._value : Real | None
         self._value = None
 
     def derive(
@@ -32,14 +32,14 @@ class Expression(ABC):
         self: Expression,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         raise Exception("concrete classes derived from Expression must implement _derive()")
 
     def _evaluateUsingCache(
         self: Expression,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         if self._value is None:
             self._value = self._evaluate(variableValues)
         return self._value
@@ -48,7 +48,7 @@ class Expression(ABC):
     def _evaluate(
         self: Expression,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         raise Exception("concrete classes derived from Expression must implement _evaluate()")
 
     @abstractmethod
@@ -111,7 +111,7 @@ class NullaryExpression(Expression):
 class Constant(NullaryExpression):
     def __init__(
         self: Constant,
-        value: numeric
+        value: Real
     ) -> None:
         super().__init__(lacksVariables = True)
         self._valueFromInit = value
@@ -119,14 +119,14 @@ class Constant(NullaryExpression):
     def _evaluate(
         self: Constant,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         return self._valueFromInit
 
     def _derive(
         self: Constant,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         pass
 
@@ -139,7 +139,7 @@ class Variable(NullaryExpression):
     def _evaluate(
         self: Variable,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         value = variableValues.get(self, None)
         if value is None:
             raise Exception("variableValues is missing a value for a variable")
@@ -149,7 +149,7 @@ class Variable(NullaryExpression):
         self: Variable,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         result.addSeed(self, seed)
 
@@ -181,7 +181,7 @@ class Negation(UnaryExpression):
     def _evaluate(
         self: Negation,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         return - aValue
 
@@ -189,7 +189,7 @@ class Negation(UnaryExpression):
         self: Negation,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         # d(-a) = -da
         self.a._derive(result, variableValues, -seed)
@@ -204,7 +204,7 @@ class Reciprocal(UnaryExpression):
     def _evaluate(
         self: Reciprocal,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
         return 1 / aValue
@@ -213,7 +213,7 @@ class Reciprocal(UnaryExpression):
         self: Reciprocal,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
@@ -223,7 +223,7 @@ class Reciprocal(UnaryExpression):
 
     def _ensureValueIsInDomain(
         self: Reciprocal,
-        aValue: numeric
+        aValue: Real
     ) -> None:
         if aValue == 0:
             raise DomainException("Reciprocal(x) blows up around x = 0")
@@ -238,7 +238,7 @@ class SquareRoot(UnaryExpression):
     def _evaluate(
         self: SquareRoot,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
         return math.sqrt(aValue)
@@ -247,7 +247,7 @@ class SquareRoot(UnaryExpression):
         self: SquareRoot,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
@@ -257,7 +257,7 @@ class SquareRoot(UnaryExpression):
 
     def _ensureValueIsInDomain(
         self: SquareRoot,
-        aValue: numeric
+        aValue: Real
     ) -> None:
         if aValue == 0:
             raise DomainException("SquareRoot(x) is not smooth around x = 0")
@@ -268,18 +268,18 @@ class Exponential(UnaryExpression):
     def __init__(
         self: Exponential,
         exponent: Expression,
-        base: numeric = math.e
+        base: Real = math.e
     ) -> None:
         super().__init__(exponent)
         if base <= 0:
             raise Exception("Exponentials must have a positive base")
-        self.base : numeric
+        self.base : Real
         self.base = base
 
     def _evaluate(
         self: Exponential,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         return self.base ** aValue
 
@@ -287,7 +287,7 @@ class Exponential(UnaryExpression):
         self: Exponential,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         selfValue = self._evaluateUsingCache(variableValues)
         # d(e ** a) = e ** a * da
@@ -297,20 +297,20 @@ class Logarithm(UnaryExpression):
     def __init__(
         self: Logarithm,
         a: Expression,
-        base: numeric = math.e
+        base: Real = math.e
     ) -> None:
         super().__init__(a)
         if base <= 0:
             raise Exception("Logarithms must have a positive base")
         elif base == 1:
             raise Exception("Logarithms cannot have base = 1")
-        base: numeric
+        base: Real
         self.base = base
 
     def _evaluate(
         self: Logarithm,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
         return math.log(aValue, self.base)
@@ -319,7 +319,7 @@ class Logarithm(UnaryExpression):
         self: Logarithm,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         self._ensureValueIsInDomain(aValue)
@@ -328,7 +328,7 @@ class Logarithm(UnaryExpression):
 
     def _ensureValueIsInDomain(
         self: Logarithm,
-        aValue: numeric
+        aValue: Real
     ) -> None:
         if aValue == 0:
             raise DomainException("Logarithm(x) blows up around x = 0")
@@ -345,7 +345,7 @@ class Sine(UnaryExpression):
     def _evaluate(
         self: Sine,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         return math.sin(aValue)
 
@@ -353,7 +353,7 @@ class Sine(UnaryExpression):
         self: Sine,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         # d(sin(a)) = cos(a) * da
@@ -369,7 +369,7 @@ class Cosine(UnaryExpression):
     def _evaluate(
         self: Cosine,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         return math.cos(aValue)
 
@@ -377,7 +377,7 @@ class Cosine(UnaryExpression):
         self: Cosine,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         # d(cos(a)) = - sin(a) * da
@@ -417,7 +417,7 @@ class Plus(BinaryExpression):
     def _evaluate(
         self: Plus,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         return aValue + bValue
@@ -426,7 +426,7 @@ class Plus(BinaryExpression):
         self: Plus,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         # d(a + b) = da + db
         self.a._derive(result, variableValues, seed)
@@ -443,7 +443,7 @@ class Minus(BinaryExpression):
     def _evaluate(
         self: Minus,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         return aValue - bValue
@@ -452,7 +452,7 @@ class Minus(BinaryExpression):
         self: Minus,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         # d(a - b) = da - db
         self.a._derive(result, variableValues, seed)
@@ -469,7 +469,7 @@ class Multiply(BinaryExpression):
     def _evaluate(
         self: Multiply,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         return aValue * bValue
@@ -478,7 +478,7 @@ class Multiply(BinaryExpression):
         self: Multiply,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
@@ -497,7 +497,7 @@ class Divide(BinaryExpression):
     def _evaluate(
         self: Divide,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
@@ -511,7 +511,7 @@ class Divide(BinaryExpression):
         self: Divide,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
@@ -526,8 +526,8 @@ class Divide(BinaryExpression):
 
     def _ensureValueIsInDomain(
         self: Divide,
-        aValue: numeric,
-        bValue: numeric
+        aValue: Real,
+        bValue: Real
     ) -> None:
         if bValue == 0:
             if aValue == 0:
@@ -553,7 +553,7 @@ class Power(BinaryExpression):
     def _evaluate(
         self: Power,
         variableValues: VariableValues
-    ) -> numeric:
+    ) -> Real:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         if self.b.lacksVariables and bValue.is_integer():
@@ -573,7 +573,7 @@ class Power(BinaryExpression):
         self: Power,
         result: InternalResult,
         variableValues: VariableValues,
-        seed: numeric
+        seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
@@ -601,16 +601,16 @@ class Power(BinaryExpression):
 
     def _ensureValueIsInDomainCaseI(
         self: Power,
-        aValue: numeric,
-        bValue: numeric
+        aValue: Real,
+        bValue: Real
     ) -> None:
         if bValue <= -1 and aValue == 0:
             raise DomainException("Power(x, C) blows up around x = 0 when C is a negative integer")
 
     def _ensureValueIsInDomainCaseII(
         self: Power,
-        aValue: numeric,
-        bValue: numeric
+        aValue: Real,
+        bValue: Real
     ) -> None:
         if aValue == 0:
             if bValue > 0:
