@@ -1,8 +1,8 @@
 from __future__ import annotations
 import math
 from src.dual_number.custom_types import Real
+from src.dual_number.custom_exceptions import DomainException
 
-# !!! think about domain issues
 # !!! add comments that give the differential rules
 
 # A dual number takes the form
@@ -96,6 +96,11 @@ class DualNumber:
         self: DualNumber,
         other: DualNumber
     ) -> DualNumber:
+        if other.realPart == 0:
+            if self.realPart == 0:
+                raise DomainException("(a1 + b1 * ε) / (a2 + b2 * ε) for a1 = 0 and a2 = 0")
+            else:
+                raise DomainException("(a1 + b1 * ε) / (a2 + b2 * ε) for a1 != 0 and a2 = 0")
         return DualNumber(
             self.realPart / other.realPart,
             (
@@ -109,12 +114,7 @@ class DualNumber:
         self: DualNumber,
         other: DualNumber
     ) -> DualNumber:
-        resultValue = self.realPart ** other.realPart
-        return DualNumber(
-            self.realPart ** other.realPart,
-            other.realPart * (self.realPart ** (other.realPart - 1)) * self.infinitesimalPart +
-            math.log(self.infinitesimalPart) * resultValue * other.infinitesimalPart
-        )
+        raise Exception("Operator ** is not supported on dual numbers. Consider using power1D() or power2D() instead.")
 
 ### Functions that work on dual numbers
 
@@ -122,6 +122,8 @@ def reciprocal(
     u: DualNumber
 ) -> DualNumber:
     uRealPart, uInfinitesimalPart = u.toPair()
+    if uRealPart == 0:
+        raise DomainException("reciprocal(a + b * ε) for a = 0")
     return DualNumber(
         1 / uRealPart,
         - uInfinitesimalPart / uRealPart ** 2
@@ -131,6 +133,10 @@ def squareRoot(
     u: DualNumber
 ) -> DualNumber:
     uRealPart, uInfinitesimalPart = u.toPair()
+    if uRealPart == 0:
+        raise DomainException("squareRoot(a + b * ε) for a = 0")
+    if uRealPart < 0:
+        raise DomainException("squareRoot(a + b * ε) for a < 0")
     resultRealPart = math.sqrt(uRealPart)
     return DualNumber(
         resultRealPart,
@@ -151,6 +157,10 @@ def naturalLogarithm(
     u: DualNumber
 ) -> DualNumber:
     uRealPart, uInfinitesimalPart = u.toPair()
+    if uRealPart == 0:
+        raise DomainException("naturalLogarithm(a + b * ε) for a = 0")
+    if uRealPart < 0:
+        raise DomainException("naturalLogarithm(a + b * ε) for a < 0")
     return DualNumber(
         math.log(uRealPart),
         uInfinitesimalPart / uRealPart
@@ -173,6 +183,48 @@ def cosine(
         math.log(uRealPart),
         uInfinitesimalPart / uRealPart
     )
+
+def power1D(
+    base: DualNumber,
+    exponent: int
+) -> DualNumber:
+    if not exponent.is_integer():
+        raise Exception("must provide an integer as the second argument to power1D()")
+    baseRealPart, baseInfinitesimalPart = base.toPair()
+    if exponent >= 2:
+        return DualNumber(
+            baseRealPart ** exponent,
+            exponent * (baseRealPart ** (exponent - 1)) * baseInfinitesimalPart
+        )
+    elif exponent == 1:
+        return DualNumber(baseRealPart, baseInfinitesimalPart)
+    elif exponent == 0:
+        return DualNumber(1, 0)
+    else: # exponent <= -1
+        if baseRealPart == 0:
+            raise DomainException("power1D(a + b * ε, k) for a = 0 and k negative integer")
+        return DualNumber(
+            baseRealPart ** exponent,
+            exponent * (baseRealPart ** (exponent - 1)) * baseInfinitesimalPart
+        )
+
+def power2D(
+    base: DualNumber,
+    exponent: DualNumber
+) -> DualNumber:
+    baseRealPart, baseInfinitesimalPart = base.toPair()
+    exponentRealPart, exponentInfinitesimalPart = exponent.toPair()
+    if baseRealPart > 0:
+        resultRealPart = baseRealPart ** exponentRealPart
+        return DualNumber(
+            resultRealPart,
+            exponentRealPart * (resultRealPart / baseRealPart) * baseInfinitesimalPart +
+            math.log(baseRealPart) * resultRealPart * exponentInfinitesimalPart
+        )
+    elif baseRealPart == 0:
+        raise DomainException("power2D(a1 + b1 * ε, a2 + b2 * ε) for a1 = 0.")
+    else: # baseRealPart < 0
+        raise DomainException("power2D(a1 + b1 * ε, a2 + b2 * ε) for a1 < 0.")
 
 ### Taking Derivatives ###
 
