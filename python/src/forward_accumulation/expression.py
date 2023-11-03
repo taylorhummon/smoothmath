@@ -174,7 +174,7 @@ class SquareRoot(UnaryExpression):
         return InternalResult(
             lacksVariables = aLacksVariables,
             value = resultValue,
-            partial = (1 / (2 * resultValue)) * aPartial
+            partial = aPartial / (2 * resultValue)
         )
 
 class NaturalExponential(UnaryExpression):
