@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 from abc import ABC, abstractmethod
 import math
 from src.reverse_accumulation.custom_types import Real, VariableValues
@@ -10,9 +11,9 @@ class Expression(ABC):
         self: Expression,
         lacksVariables: bool
     ) -> None:
-        self.lacksVariables : bool
+        self.lacksVariables: bool
         self.lacksVariables = lacksVariables
-        self._value : Real | None
+        self._value: Real | None
         self._value = None
 
     def derive(
@@ -136,6 +137,12 @@ class Constant(NullaryExpression):
     ) -> None:
         pass
 
+    def __eq__(
+        self: Constant,
+        other: Any
+    ) -> bool:
+        return isinstance(other, Constant) and (other._valueFromInit == self._valueFromInit)
+
     def __str__(
         self: Constant
     ) -> str:
@@ -149,7 +156,10 @@ class Variable(NullaryExpression):
         super().__init__(lacksVariables = False)
         if not name:
             raise Exception("Variables must be given a non-blank name")
+        self.name: str
         self.name = name
+        self._cachedHash: int | None
+        self._cachedHash = None
 
     def _evaluate(
         self: Variable,
@@ -167,6 +177,17 @@ class Variable(NullaryExpression):
         seed: Real
     ) -> None:
         result.addSeed(self, seed)
+
+    def __eq__(
+        self: Variable,
+        other: Any
+    ) -> bool:
+        return isinstance(other, Variable) and (other.name == self.name)
+
+    def __hash__(self):
+        if not self._cachedHash:
+            self._cachedHash = hash(self.name)
+        return self._cachedHash
 
     def __str__(
         self: Variable
@@ -190,6 +211,12 @@ class UnaryExpression(Expression):
     ) -> None:
         self._value = None
         self.a._resetEvaluationCache()
+
+    def __eq__(
+        self: Variable,
+        other: Any
+    ) -> bool:
+        return other.__class__ == self.__class__ and (other.a == self.a)
 
     def __str__(
         self: UnaryExpression
@@ -299,7 +326,7 @@ class Exponential(UnaryExpression):
         super().__init__(exponent)
         if base <= 0:
             raise Exception("Exponentials must have a positive base")
-        self.base : Real
+        self.base: Real
         self.base = base
 
     def _evaluate(
@@ -431,6 +458,12 @@ class BinaryExpression(Expression):
         self._value = None
         self.a._resetEvaluationCache()
         self.b._resetEvaluationCache()
+
+    def __eq__(
+        self: Variable,
+        other: Any
+    ) -> bool:
+        return other.__class__ == self.__class__ and (other.a == self.a) and (other.b == self.b)
 
     def __str__(
         self: UnaryExpression

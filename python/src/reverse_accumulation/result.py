@@ -11,9 +11,9 @@ class Result:
         value: Real,
         dictionary: dict[Variable, Real] | None = None
     ) -> None:
-        self.value : Real
+        self.value: Real
         self.value = value
-        self._dict : dict[Variable, Real]
+        self._dict: dict[Variable, Real]
         self._dict = dictionary or {}
 
     def partialWithRespectTo(
