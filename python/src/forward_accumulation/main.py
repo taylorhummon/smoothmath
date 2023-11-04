@@ -1,4 +1,4 @@
-from src.forward_accumulation.expression import Constant, Variable, Negation
+from src.forward_accumulation.expression import Constant, Variable
 
 print("Forward Accumulation Method")
 

@@ -87,7 +87,7 @@ class Constant(Expression):
     def __str__(
         self: Constant
     ) -> str:
-        return self.value
+        return str(self.value)
 
 class Variable(Expression):
     def __init__(
@@ -128,6 +128,12 @@ class UnaryExpression(Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {a}")
         self.a = a
 
+    def __str__(
+        self: UnaryExpression
+    ) -> str:
+        className = type(self).__name__
+        return f"{className}({self.a})"
+
 class Negation(UnaryExpression):
     def __init__(
         self: Negation,
@@ -147,11 +153,6 @@ class Negation(UnaryExpression):
             value = -aValue,
             partial = -aPartial
         )
-
-    def __str__(
-        self: Negation
-    ) -> str:
-        return f"Negation({self.a})"
 
 class Reciprocal(UnaryExpression):
     def __init__(
@@ -175,11 +176,6 @@ class Reciprocal(UnaryExpression):
             value = resultValue,
             partial = - (resultValue ** 2) * aPartial
         )
-
-    def __str__(
-        self: Reciprocal
-    ) -> str:
-        return f"Reciprocal({self.a})"
 
 class SquareRoot(UnaryExpression):
     def __init__(
@@ -205,11 +201,6 @@ class SquareRoot(UnaryExpression):
             value = resultValue,
             partial = aPartial / (2 * resultValue)
         )
-
-    def __str__(
-        self: SquareRoot
-    ) -> str:
-        return f"SquareRoot({self.a})"
 
 class Exponential(UnaryExpression):
     def __init__(
@@ -304,11 +295,6 @@ class Sine(UnaryExpression):
             partial = math.cos(aValue) * aPartial
         )
 
-    def __str__(
-        self: Sine
-    ) -> str:
-        return f"Sine({self.a})"
-
 class Cosine(UnaryExpression):
     def __init__(
         self: Cosine,
@@ -329,11 +315,6 @@ class Cosine(UnaryExpression):
             partial = - math.sin(aValue) * aPartial
         )
 
-    def __str__(
-        self: Cosine
-    ) -> str:
-        return f"Cosine({self.a})"
-
 ### Binary Expressions ###
 
 class BinaryExpression(Expression):
@@ -348,6 +329,12 @@ class BinaryExpression(Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {b}")
         self.a = a
         self.b = b
+
+    def __str__(
+        self: UnaryExpression
+    ) -> str:
+        className = type(self).__name__
+        return f"{className}({self.a}, {self.b})"
 
 class Plus(BinaryExpression):
     def __init__(
@@ -371,11 +358,6 @@ class Plus(BinaryExpression):
             partial = aPartial + bPartial
         )
 
-    def __str__(
-        self: Plus
-    ) -> str:
-        return f"Plus({self.a}, {self.b})"
-
 class Minus(BinaryExpression):
     def __init__(
         self: Minus,
@@ -398,11 +380,6 @@ class Minus(BinaryExpression):
             partial = aPartial - bPartial
         )
 
-    def __str__(
-        self: Minus
-    ) -> str:
-        return f"Minus({self.a}, {self.b})"
-
 class Multiply(BinaryExpression):
     def __init__(
         self: Multiply,
@@ -424,11 +401,6 @@ class Multiply(BinaryExpression):
             value = aValue * bValue,
             partial = bValue * aPartial + aValue * bPartial
         )
-
-    def __str__(
-        self: Multiply
-    ) -> str:
-        return f"Multiply({self.a}, {self.b})"
 
 class Divide(BinaryExpression):
     def __init__(
@@ -459,11 +431,6 @@ class Divide(BinaryExpression):
             value = aValue / bValue,
             partial = (bValue * aPartial - aValue * bPartial) / bValue ** 2
         )
-
-    def __str__(
-        self: Divide
-    ) -> str:
-        return f"Divide({self.a}, {self.b})"
 
 class Power(BinaryExpression):
     def __init__(
@@ -530,8 +497,3 @@ class Power(BinaryExpression):
                     raise DomainException("Power(x, y) blows up around x = 0 for y < 0")
             else: # aValue < 0
                 raise DomainException("Power(x, y) is undefined for x < 0")
-
-    def __str__(
-        self: Power
-    ) -> str:
-        return f"Power({self.a}, {self.b})"

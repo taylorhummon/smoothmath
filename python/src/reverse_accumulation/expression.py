@@ -57,6 +57,12 @@ class Expression(ABC):
     ) -> None:
         raise Exception("concrete classes derived from Expression must implement _resetEvaluationCache()")
 
+    @abstractmethod
+    def __str__(
+        self: Expression,
+    ) -> InternalResult:
+        raise Exception("concrete classes derived from Expression must implement __str__()")
+
     ## Operations ##
 
     def __neg__(
@@ -130,11 +136,20 @@ class Constant(NullaryExpression):
     ) -> None:
         pass
 
+    def __str__(
+        self: Constant
+    ) -> str:
+        return str(self._valueFromInit)
+
 class Variable(NullaryExpression):
     def __init__(
-        self: Variable
+        self: Variable,
+        name: str
     ) -> None:
         super().__init__(lacksVariables = False)
+        if not name:
+            raise Exception("Variables must be given a non-blank name")
+        self.name = name
 
     def _evaluate(
         self: Variable,
@@ -153,6 +168,11 @@ class Variable(NullaryExpression):
     ) -> None:
         result.addSeed(self, seed)
 
+    def __str__(
+        self: Variable
+    ) -> str:
+        return self.name
+
 ### Unary Expressions ###
 
 class UnaryExpression(Expression):
@@ -170,6 +190,12 @@ class UnaryExpression(Expression):
     ) -> None:
         self._value = None
         self.a._resetEvaluationCache()
+
+    def __str__(
+        self: UnaryExpression
+    ) -> str:
+        className = type(self).__name__
+        return f"{className}({self.a})"
 
 class Negation(UnaryExpression):
     def __init__(
@@ -405,6 +431,12 @@ class BinaryExpression(Expression):
         self._value = None
         self.a._resetEvaluationCache()
         self.b._resetEvaluationCache()
+
+    def __str__(
+        self: UnaryExpression
+    ) -> str:
+        className = type(self).__name__
+        return f"{className}({self.a}, {self.b})"
 
 class Plus(BinaryExpression):
     def __init__(
