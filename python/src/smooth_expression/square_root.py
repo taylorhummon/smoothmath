@@ -1,0 +1,68 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from src.smooth_expression.custom_types import Real, VariableValues
+    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.expression import Expression
+    from src.smooth_expression.variable import Variable
+import math
+from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.single_result import InternalSingleResult
+from src.smooth_expression.unary_expression import UnaryExpression
+
+class SquareRoot(UnaryExpression):
+    def __init__(
+        self: SquareRoot,
+        a: Expression
+    ) -> None:
+        super().__init__(a)
+
+    def _evaluate(
+        self: SquareRoot,
+        variableValues: VariableValues
+    ) -> Real:
+        if self._value is not None:
+            return self._value
+        aValue = self.a._evaluate(variableValues)
+        self._ensureValueIsInDomain(aValue)
+        self._value = math.sqrt(aValue)
+        return self._value
+
+    def _deriveSingle(
+        self: SquareRoot,
+        variableValues: VariableValues,
+        withRespectTo: Variable
+    ) -> InternalSingleResult:
+        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
+        if aValue == 0:
+            raise DomainException("SquareRoot(x) is not smooth around x = 0")
+        elif aValue < 0:
+            raise DomainException("SquareRoot(x) is undefined for x < 0")
+        singleResultValue = math.sqrt(aValue)
+        # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
+        return InternalSingleResult(
+            lacksVariables = aLacksVariables,
+            value = singleResultValue,
+            partial = aPartial / (2 * singleResultValue)
+        )
+
+    def _deriveMulti(
+        self: SquareRoot,
+        multiResult: InternalMultiResult,
+        variableValues: VariableValues,
+        seed: Real
+    ) -> None:
+        aValue = self.a._evaluate(variableValues)
+        self._ensureValueIsInDomain(aValue)
+        selfValue = self._evaluate(variableValues)
+        # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
+        self.a._deriveMulti(multiResult, variableValues, seed / (2 * selfValue))
+
+    def _ensureValueIsInDomain(
+        self: SquareRoot,
+        aValue: Real
+    ) -> None:
+        if aValue == 0:
+            raise DomainException("SquareRoot(x) is not smooth around x = 0")
+        elif aValue < 0:
+            raise DomainException("SquareRoot(x) is undefined for x < 0")
