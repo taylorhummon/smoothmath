@@ -1,5 +1,5 @@
 from src.reverse_accumulation.result import Result, InternalResult
-from src.reverse_accumulation.expression import Variable
+from src.reverse_accumulation.variable import Variable
 
 def testResult():
     x = Variable("x")

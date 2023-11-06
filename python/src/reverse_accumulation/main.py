@@ -1,4 +1,5 @@
-from src.reverse_accumulation.expression import Constant, Variable
+from src.reverse_accumulation.constant import Constant
+from src.reverse_accumulation.variable import Variable
 
 print("Reverse Accumulation Method")
 
