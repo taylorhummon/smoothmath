@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 import math
 from src.forward_accumulation.custom_types import VariableValues, Real
 from src.forward_accumulation.custom_exceptions import DomainException
-from src.forward_accumulation.result import InternalResult
+from src.forward_accumulation.single_result import InternalSingleResult
 from src.forward_accumulation.expression import UnaryExpression
 
 class Logarithm(UnaryExpression):
@@ -27,14 +27,14 @@ class Logarithm(UnaryExpression):
         self: Logarithm,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalResult:
+    ) -> InternalSingleResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise DomainException("Logarithm(x) blows up around x = 0")
         elif aValue < 0:
             raise DomainException("Logarithm(x) is undefined for x < 0")
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
-        return InternalResult(
+        return InternalSingleResult(
             lacksVariables = aLacksVariables,
             value = math.log(aValue, self.base),
             partial = aPartial / (math.log(self.base) * aValue)

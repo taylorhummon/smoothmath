@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any
 from abc import ABC, abstractmethod
 from src.reverse_accumulation.custom_types import Real, VariableValues
-from src.reverse_accumulation.result import Result, InternalResult
+from src.reverse_accumulation.multi_result import MultiResult, InternalMultiResult
 
 class Expression(ABC):
     def __init__(
@@ -17,19 +17,19 @@ class Expression(ABC):
     def derive(
         self: Expression,
         variableValues: VariableValues
-    ) -> Result:
+    ) -> MultiResult:
         try:
             value = self._evaluateUsingCache(variableValues)
-            result = InternalResult(value)
-            self._derive(result, variableValues, 1)
-            return result.toResult()
+            multiResult = InternalMultiResult(value)
+            self._derive(multiResult, variableValues, 1)
+            return multiResult.toMultiResult()
         finally:
             self._resetEvaluationCache()
 
     @abstractmethod
     def _derive(
         self: Expression,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -59,7 +59,7 @@ class Expression(ABC):
     @abstractmethod
     def __str__(
         self: Expression,
-    ) -> InternalResult:
+    ) -> InternalMultiResult:
         raise Exception("concrete classes derived from Expression must implement __str__()")
 
     ## Operations ##

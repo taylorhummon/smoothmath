@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from src.forward_accumulation.variable import Variable
 from src.forward_accumulation.custom_types import VariableValues
 from src.forward_accumulation.custom_exceptions import DomainException
-from src.forward_accumulation.result import InternalResult
+from src.forward_accumulation.single_result import InternalSingleResult
 from src.forward_accumulation.expression import UnaryExpression
 
 class Reciprocal(UnaryExpression):
@@ -19,14 +19,14 @@ class Reciprocal(UnaryExpression):
         self: Reciprocal,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalResult:
+    ) -> InternalSingleResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise DomainException("Reciprocal(x) blows up around x = 0")
-        resultValue = 1 / aValue
+        singleResultValue = 1 / aValue
         # d(1 / a) = - (1 / a ** 2) * da
-        return InternalResult(
+        return InternalSingleResult(
             lacksVariables = aLacksVariables,
-            value = resultValue,
-            partial = - (resultValue ** 2) * aPartial
+            value = singleResultValue,
+            partial = - (singleResultValue ** 2) * aPartial
         )

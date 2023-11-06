@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.reverse_accumulation.expression import Expression
-    from src.reverse_accumulation.result import InternalResult
+    from src.reverse_accumulation.multi_result import InternalMultiResult
     from src.reverse_accumulation.custom_types import Real, VariableValues
 import math
 from src.reverse_accumulation.expression import UnaryExpression
@@ -23,10 +23,10 @@ class Sine(UnaryExpression):
 
     def _derive(
         self: Sine,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         # d(sin(a)) = cos(a) * da
-        self.a._derive(result, variableValues, seed * math.cos(aValue))
+        self.a._derive(multiResult, variableValues, seed * math.cos(aValue))

@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from src.forward_accumulation.variable import Variable
 import math
 from src.forward_accumulation.custom_types import VariableValues
-from src.forward_accumulation.result import InternalResult
+from src.forward_accumulation.single_result import InternalSingleResult
 from src.forward_accumulation.expression import UnaryExpression
 
 class Sine(UnaryExpression):
@@ -19,10 +19,10 @@ class Sine(UnaryExpression):
         self: Sine,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalResult:
+    ) -> InternalSingleResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
         # d(sin(a)) = cos(a) * da
-        return InternalResult(
+        return InternalSingleResult(
             lacksVariables = aLacksVariables,
             value = math.sin(aValue),
             partial = math.cos(aValue) * aPartial

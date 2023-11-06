@@ -4,28 +4,28 @@ if TYPE_CHECKING:
     from src.forward_accumulation.variable import Variable
 from abc import ABC, abstractmethod
 from src.forward_accumulation.custom_types import VariableValues
-from src.forward_accumulation.result import Result, InternalResult
+from src.forward_accumulation.single_result import SingleResult, InternalSingleResult
 
 class Expression(ABC):
     def derive(
         self: Expression,
         variableValues: VariableValues,
         withRespectTo: Variable,
-    ) -> Result:
-        return self._derive(variableValues, withRespectTo).toResult()
+    ) -> SingleResult:
+        return self._derive(variableValues, withRespectTo).toSingleResult()
 
     @abstractmethod
     def _derive(
         self: Expression,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalResult:
+    ) -> InternalSingleResult:
         raise Exception("concrete classes derived from Expression must implement _derive()")
 
     @abstractmethod
     def __str__(
         self: Expression,
-    ) -> InternalResult:
+    ) -> InternalSingleResult:
         raise Exception("concrete classes derived from Expression must implement __str__()")
 
     ## Operations ##

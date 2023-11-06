@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.reverse_accumulation.expression import Expression
-    from src.reverse_accumulation.result import InternalResult
+    from src.reverse_accumulation.multi_result import InternalMultiResult
     from src.reverse_accumulation.custom_types import Real, VariableValues
 from src.reverse_accumulation.expression import BinaryExpression
 
@@ -24,10 +24,10 @@ class Plus(BinaryExpression):
 
     def _derive(
         self: Plus,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
         # d(a + b) = da + db
-        self.a._derive(result, variableValues, seed)
-        self.b._derive(result, variableValues, seed)
+        self.a._derive(multiResult, variableValues, seed)
+        self.b._derive(multiResult, variableValues, seed)

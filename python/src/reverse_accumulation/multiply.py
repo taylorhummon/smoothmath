@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.reverse_accumulation.expression import Expression
-    from src.reverse_accumulation.result import InternalResult
+    from src.reverse_accumulation.multi_result import InternalMultiResult
     from src.reverse_accumulation.custom_types import Real, VariableValues
 from src.reverse_accumulation.expression import BinaryExpression
 
@@ -24,12 +24,12 @@ class Multiply(BinaryExpression):
 
     def _derive(
         self: Multiply,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
         aValue = self.a._evaluateUsingCache(variableValues)
         bValue = self.b._evaluateUsingCache(variableValues)
         # d(a * b) = b * da + a * db
-        self.a._derive(result, variableValues, seed * bValue)
-        self.b._derive(result, variableValues, seed * aValue)
+        self.a._derive(multiResult, variableValues, seed * bValue)
+        self.b._derive(multiResult, variableValues, seed * aValue)

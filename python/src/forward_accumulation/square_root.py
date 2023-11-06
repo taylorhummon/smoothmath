@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 import math
 from src.forward_accumulation.custom_types import VariableValues
 from src.forward_accumulation.custom_exceptions import DomainException
-from src.forward_accumulation.result import InternalResult
+from src.forward_accumulation.single_result import InternalSingleResult
 from src.forward_accumulation.expression import UnaryExpression
 
 class SquareRoot(UnaryExpression):
@@ -20,16 +20,16 @@ class SquareRoot(UnaryExpression):
         self: SquareRoot,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalResult:
+    ) -> InternalSingleResult:
         aLacksVariables, aValue, aPartial = self.a._derive(variableValues, withRespectTo).toTriple()
         if aValue == 0:
             raise DomainException("SquareRoot(x) is not smooth around x = 0")
         elif aValue < 0:
             raise DomainException("SquareRoot(x) is undefined for x < 0")
-        resultValue = math.sqrt(aValue)
+        singleResultValue = math.sqrt(aValue)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        return InternalResult(
+        return InternalSingleResult(
             lacksVariables = aLacksVariables,
-            value = resultValue,
-            partial = aPartial / (2 * resultValue)
+            value = singleResultValue,
+            partial = aPartial / (2 * singleResultValue)
         )

@@ -1,9 +1,9 @@
 from __future__ import annotations
 from src.forward_accumulation.custom_types import Real
 
-class Result:
+class SingleResult:
     def __init__(
-        self: Result,
+        self: SingleResult,
         value: Real,
         partial: Real
     ) -> None:
@@ -11,13 +11,13 @@ class Result:
         self.partial = partial
 
     def toPair(
-        self: Result
+        self: SingleResult
     ) -> tuple[Real, Real]:
         return (self.value, self.partial)
 
-class InternalResult(Result):
+class InternalSingleResult(SingleResult):
     def __init__(
-        self: InternalResult,
+        self: InternalSingleResult,
         lacksVariables: bool,
         value: Real,
         partial: Real
@@ -26,11 +26,11 @@ class InternalResult(Result):
         self.lacksVariables = lacksVariables
 
     def toTriple(
-        self: InternalResult
+        self: InternalSingleResult
     ) -> tuple[bool, Real, Real]:
         return (self.lacksVariables, self.value, self.partial)
 
-    def toResult(
-        self: InternalResult
-    ) -> Result:
-        return Result(self.value, self.partial)
+    def toSingleResult(
+        self: InternalSingleResult
+    ) -> SingleResult:
+        return SingleResult(self.value, self.partial)

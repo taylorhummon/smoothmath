@@ -3,7 +3,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from src.forward_accumulation.variable import Variable
 from src.forward_accumulation.custom_types import VariableValues
-from src.forward_accumulation.result import InternalResult
+from src.forward_accumulation.single_result import InternalSingleResult
 from src.forward_accumulation.expression import NullaryExpression
 
 class Variable(NullaryExpression):
@@ -22,11 +22,11 @@ class Variable(NullaryExpression):
         self: Variable,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalResult:
+    ) -> InternalSingleResult:
         value = variableValues.get(self, None)
         if value is None:
             raise Exception("variableValues is missing a value for a variable")
-        return InternalResult(
+        return InternalSingleResult(
             lacksVariables = False,
             value = value,
             partial = 1 if self == withRespectTo else 0

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.reverse_accumulation.expression import Expression
-    from src.reverse_accumulation.result import InternalResult
+    from src.reverse_accumulation.multi_result import InternalMultiResult
     from src.reverse_accumulation.custom_types import Real, VariableValues
 from src.reverse_accumulation.custom_exceptions import DomainException
 from src.reverse_accumulation.expression import UnaryExpression
@@ -24,7 +24,7 @@ class Reciprocal(UnaryExpression):
 
     def _derive(
         self: Reciprocal,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -32,7 +32,7 @@ class Reciprocal(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluateUsingCache(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
-        self.a._derive(result, variableValues, - seed * (selfValue ** 2))
+        self.a._derive(multiResult, variableValues, - seed * (selfValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Reciprocal,

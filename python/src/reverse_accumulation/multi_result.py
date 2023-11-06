@@ -5,9 +5,9 @@ if TYPE_CHECKING:
 
 from src.reverse_accumulation.custom_types import Real
 
-class Result:
+class MultiResult:
     def __init__(
-        self: Result,
+        self: MultiResult,
         value: Real,
         dictionary: dict[Variable, Real] | None = None
     ) -> None:
@@ -17,27 +17,27 @@ class Result:
         self._dict = dictionary or {}
 
     def partialWithRespectTo(
-        self: Result,
+        self: MultiResult,
         variable: Variable
     ) -> Real:
         return self._dict.get(variable, 0)
 
-class InternalResult(Result):
+class InternalMultiResult(MultiResult):
     def __init__(
-        self: InternalResult,
+        self: InternalMultiResult,
         value: Real,
         dictionary: dict[Variable, Real] | None = None
     ) -> None:
         super().__init__(value, dictionary)
 
     def addSeed(
-        self: InternalResult,
+        self: InternalMultiResult,
         variable: Variable,
         seed: Real
     ) -> None:
         self._dict[variable] = seed + self._dict.get(variable, 0)
 
-    def toResult(
-        self: InternalResult
-    ) -> Result:
-        return Result(self.value, self._dict)
+    def toMultiResult(
+        self: InternalMultiResult
+    ) -> MultiResult:
+        return MultiResult(self.value, self._dict)

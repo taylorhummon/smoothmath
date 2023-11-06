@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.reverse_accumulation.expression import Expression
-    from src.reverse_accumulation.result import InternalResult
+    from src.reverse_accumulation.multi_result import InternalMultiResult
     from src.reverse_accumulation.custom_types import Real, VariableValues
 import math
 from src.reverse_accumulation.custom_exceptions import DomainException
@@ -44,7 +44,7 @@ class Power(BinaryExpression):
 
     def _derive(
         self: Power,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -53,24 +53,24 @@ class Power(BinaryExpression):
         if self.b.lacksVariables and bValue.is_integer():
             if bValue >= 2:
                 # d(a ** C) = C * a ** (C - 1) * da
-                self.a._derive(result, variableValues, seed * bValue * (aValue ** (bValue - 1)))
+                self.a._derive(multiResult, variableValues, seed * bValue * (aValue ** (bValue - 1)))
             elif bValue == 1:
                 # d(a ** 1) = da
-                self.a._derive(result, variableValues, seed)
+                self.a._derive(multiResult, variableValues, seed)
             elif bValue == 0:
                 # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
                 # d(a ** 0) = 0 * da
-                self.a._derive(result, variableValues, 0)
+                self.a._derive(multiResult, variableValues, 0)
             else: # bValue <= -1
                 self._ensureValueIsInDomainCaseI(aValue, bValue)
                 # d(a ** C) = C * a ** (C - 1) * da
-                self.a._derive(result, variableValues, seed * bValue * (aValue ** (bValue - 1)))
+                self.a._derive(multiResult, variableValues, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
             self._ensureValueIsInDomainCaseII(aValue, bValue)
             selfValue = self._evaluateUsingCache(variableValues)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
-            self.a._derive(result, variableValues, seed * bValue * selfValue / aValue)
-            self.b._derive(result, variableValues, seed * math.log(aValue) * selfValue)
+            self.a._derive(multiResult, variableValues, seed * bValue * selfValue / aValue)
+            self.b._derive(multiResult, variableValues, seed * math.log(aValue) * selfValue)
 
     def _ensureValueIsInDomainCaseI(
         self: Power,

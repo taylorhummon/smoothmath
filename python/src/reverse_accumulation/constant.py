@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.reverse_accumulation.result import InternalResult
+    from src.reverse_accumulation.multi_result import InternalMultiResult
     from src.reverse_accumulation.custom_types import Real, VariableValues
 from src.reverse_accumulation.expression import NullaryExpression
 
@@ -21,7 +21,7 @@ class Constant(NullaryExpression):
 
     def _derive(
         self: Constant,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:

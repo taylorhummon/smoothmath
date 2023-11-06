@@ -3,7 +3,7 @@ from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from src.forward_accumulation.variable import Variable
 from src.forward_accumulation.custom_types import VariableValues, Real
-from src.forward_accumulation.result import InternalResult
+from src.forward_accumulation.single_result import InternalSingleResult
 from src.forward_accumulation.expression import NullaryExpression
 
 class Constant(NullaryExpression):
@@ -17,8 +17,8 @@ class Constant(NullaryExpression):
         self: Constant,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalResult:
-        return InternalResult(
+    ) -> InternalSingleResult:
+        return InternalSingleResult(
             lacksVariables = True,
             value = self.value,
             partial = 0

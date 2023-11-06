@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.reverse_accumulation.expression import Expression
-    from src.reverse_accumulation.result import InternalResult
+    from src.reverse_accumulation.multi_result import InternalMultiResult
     from src.reverse_accumulation.custom_types import Real, VariableValues
 from src.reverse_accumulation.custom_exceptions import DomainException
 from src.reverse_accumulation.expression import BinaryExpression
@@ -30,7 +30,7 @@ class Divide(BinaryExpression):
 
     def _derive(
         self: Divide,
-        result: InternalResult,
+        multiResult: InternalMultiResult,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -38,12 +38,12 @@ class Divide(BinaryExpression):
         bValue = self.b._evaluateUsingCache(variableValues)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
-            self.b._derive(result, variableValues, 0)
+            self.b._derive(multiResult, variableValues, 0)
         else:
             self._ensureValueIsInDomain(aValue, bValue)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * dv
-            self.a._derive(result, variableValues, seed / bValue)
-            self.b._derive(result, variableValues, - seed * aValue / (bValue ** 2))
+            self.a._derive(multiResult, variableValues, seed / bValue)
+            self.b._derive(multiResult, variableValues, - seed * aValue / (bValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Divide,
