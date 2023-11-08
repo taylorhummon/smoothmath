@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.multi_result import InternalMultiResult
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.unary_expression import UnaryExpression
 
 
@@ -30,13 +29,12 @@ class Negation(UnaryExpression):
         self: Negation,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
+    ) -> tuple[bool, Real]:
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
         # d(-a) = -da
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables,
-            value = -aValue,
-            partial = -aPartial
+        return (
+            aLacksVariables,
+            - aPartial
         )
 
     def _deriveMulti(

@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable import Variable
 import math
 from src.smooth_expression.custom_exceptions import DomainException
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.binary_expression import BinaryExpression
 
 class Power(BinaryExpression):
@@ -51,43 +50,40 @@ class Power(BinaryExpression):
         self: Power,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
-        bLacksVariables, bValue, bPartial = self.b._deriveSingle(variableValues, withRespectTo).toTriple()
-        lacksVariables = aLacksVariables and bLacksVariables
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        bValue = self.b._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._deriveSingle(variableValues, withRespectTo)
+        resultLacksVariables = aLacksVariables and bLacksVariables
         if bLacksVariables and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
-                singleResultValue = aValue ** bValue
                 # d(a ** C) = C * a ** (C - 1) * da
-                singleResultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
-                return InternalSingleResult(lacksVariables, singleResultValue, singleResultPartial)
+                resultPartial = bValue * (aValue ** (bValue - 1)) * aPartial
+                return (resultLacksVariables, resultPartial)
             elif bValue == 1:
-                singleResultValue = aValue
                 # d(a ** 1) = 1 * da
-                singleResultPartial = aPartial
-                return InternalSingleResult(lacksVariables, singleResultValue, singleResultPartial)
+                return (resultLacksVariables, aPartial)
             elif bValue == 0:
                 # Note: x ** 0 is smooth at x = 0 despite x ** y not being smooth at (0, 0)
-                singleResultValue = 1
                 # d(a ** 0) = 0 * da
-                singleResultPartial = 0
-                return InternalSingleResult(lacksVariables, singleResultValue, singleResultPartial)
+                return (resultLacksVariables, 0)
             else: # bValue <= -1:
                 if aValue == 0:
                     raise DomainException("Power(x, C) blows up around x = 0 when C is a negative integer")
-                singleResultValue = aValue ** bValue
+                resultValue = self._evaluate(variableValues)
                 # d(a ** C) = C * a ** (C - 1) * da
-                singleResultPartial = (bValue * singleResultValue / aValue) * aPartial
-                return InternalSingleResult(lacksVariables, singleResultValue, singleResultPartial)
+                resultPartial = (bValue * resultValue / aValue) * aPartial
+                return (resultLacksVariables, resultPartial)
         else: # CASE II: does not have a constant integer exponent
             if aValue > 0:
-                singleResultValue = aValue ** bValue
+                resultValue = self._evaluate(variableValues)
                 # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
-                singleResultPartial = (
-                    (bValue * singleResultValue / aValue) * aPartial +
-                    math.log(aValue) * singleResultValue * bPartial
+                resultPartial = (
+                    (bValue * resultValue / aValue) * aPartial +
+                    math.log(aValue) * resultValue * bPartial
                 )
-                return InternalSingleResult(lacksVariables, singleResultValue, singleResultPartial)
+                return (resultLacksVariables, resultPartial)
             elif aValue == 0:
                 if bValue > 0:
                     raise DomainException("Power(x, y) is not smooth around x = 0 for y > 0")

@@ -7,21 +7,18 @@ from src.smooth_expression.reciprocal import Reciprocal
 def testReciprocal():
     x = Variable("x")
     z = Reciprocal(x)
-    singleResult = z.deriveSingle({ x: 2 }, x)
-    assert singleResult.value == approx(0.5)
-    assert singleResult.partial == approx(-0.25)
+    partial = z.deriveSingle({ x: 2 }, x)
+    assert partial == approx(-0.25)
     with raises(DomainException):
         z.deriveSingle({ x: 0 }, x)
-    singleResult = z.deriveSingle({ x: -1 }, x)
-    assert singleResult.value == approx(-1)
-    assert singleResult.partial == approx(-1)
+    partial = z.deriveSingle({ x: -1 }, x)
+    assert partial == approx(-1)
 
 def testReciprocalComposition():
     x = Variable("x")
     z = Reciprocal(Constant(2) * x - Constant(4))
-    singleResult = z.deriveSingle({ x: 3 }, x)
-    assert singleResult.value == approx(0.5)
-    assert singleResult.partial == approx(-0.5)
+    partial = z.deriveSingle({ x: 3 }, x)
+    assert partial == approx(-0.5)
 
 def testReciprocalMulti():
     x = Variable("x")

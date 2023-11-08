@@ -11,7 +11,7 @@ class MultiResult:
         dictionary: dict[Variable, Real] | None = None
     ) -> None:
         self.value: Real
-        self.value = value
+        self.value = value # !!! remove value
         self._dict: dict[Variable, Real]
         self._dict = dictionary or {}
 

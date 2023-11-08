@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.multi_result import InternalMultiResult
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.binary_expression import BinaryExpression
 
 class Multiply(BinaryExpression):
@@ -31,14 +30,15 @@ class Multiply(BinaryExpression):
         self: Multiply,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
-        bLacksVariables, bValue, bPartial = self.b._deriveSingle(variableValues, withRespectTo).toTriple()
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        bValue = self.b._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._deriveSingle(variableValues, withRespectTo)
         # d(a * b) = b * da + a * db
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables and bLacksVariables,
-            value = aValue * bValue,
-            partial = bValue * aPartial + aValue * bPartial
+        return (
+            aLacksVariables and bLacksVariables,
+            bValue * aPartial + aValue * bPartial
         )
 
     def _deriveMulti(

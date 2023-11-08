@@ -4,7 +4,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
     from src.smooth_expression.multi_result import InternalMultiResult
     from src.smooth_expression.variable import Variable
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.nullary_expression import NullaryExpression
 
 class Constant(NullaryExpression):
@@ -26,12 +25,8 @@ class Constant(NullaryExpression):
         self: Constant,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        return InternalSingleResult(
-            lacksVariables = True,
-            value = self._value,
-            partial = 0
-        )
+    ) -> tuple[bool, Real]:
+        return (True, 0)
 
     def _deriveMulti(
         self: Constant,

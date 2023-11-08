@@ -4,7 +4,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
     from src.smooth_expression.variable import Variable
 from abc import ABC, abstractmethod
-from src.smooth_expression.single_result import SingleResult, InternalSingleResult
 from src.smooth_expression.multi_result import MultiResult, InternalMultiResult
 
 class Expression(ABC):
@@ -26,8 +25,10 @@ class Expression(ABC):
         self: Expression,
         variableValues: VariableValues,
         withRespectTo: Variable,
-    ) -> SingleResult:
-        return self._deriveSingle(variableValues, withRespectTo).toSingleResult()
+    ) -> Real:
+        self._resetEvaluationCache()
+        _, partial = self._deriveSingle(variableValues, withRespectTo)
+        return partial
 
     def deriveMulti(
         self: Expression,
@@ -35,9 +36,9 @@ class Expression(ABC):
     ) -> MultiResult:
         self._resetEvaluationCache()
         value = self._evaluate(variableValues)
-        multiResult = InternalMultiResult(value)
-        self._deriveMulti(multiResult, variableValues, 1)
-        return multiResult.toMultiResult()
+        internalMultiResult = InternalMultiResult(value)
+        self._deriveMulti(internalMultiResult, variableValues, 1)
+        return internalMultiResult.toMultiResult()
 
     ## Abstract methods ##
 
@@ -59,7 +60,7 @@ class Expression(ABC):
         self: Expression,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
+    ) -> tuple[bool, Real]:
         raise Exception("Concrete classes derived from Expression must implement _deriveSingle()")
 
     @abstractmethod

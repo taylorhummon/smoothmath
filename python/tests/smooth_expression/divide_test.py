@@ -10,12 +10,10 @@ def testDivide():
     y = Variable("y")
     z = Divide(x, y)
     variableValues = { x: 5, y: 2 }
-    singleResultForX = z.deriveSingle(variableValues, x)
-    assert singleResultForX.value == approx(2.5)
-    assert singleResultForX.partial == approx(0.5)
-    singleResultForY = z.deriveSingle(variableValues, y)
-    assert singleResultForY.value == approx(2.5)
-    assert singleResultForY.partial == approx(-1.25)
+    partialWithRespectToX = z.deriveSingle(variableValues, x)
+    assert partialWithRespectToX == approx(0.5)
+    partialWithRespectToY = z.deriveSingle(variableValues, y)
+    assert partialWithRespectToY == approx(-1.25)
     variableValues = { x: 3, y: 0 }
     with raises(DomainException):
         z.deriveSingle(variableValues, x)
@@ -32,29 +30,24 @@ def testDivideComposition():
     y = Variable("y")
     z = Divide(Constant(2) * x + Constant(4), Constant(5) * y)
     variableValues = { x: 3, y: 1 }
-    singleResultForX = z.deriveSingle(variableValues, x)
-    assert singleResultForX.value == approx(2)
-    assert singleResultForX.partial == approx(0.4)
-    singleResultForY = z.deriveSingle(variableValues, y)
-    assert singleResultForY.value == approx(2)
-    assert singleResultForY.partial == approx(-2)
+    partialWithRespectToX = z.deriveSingle(variableValues, x)
+    assert partialWithRespectToX == approx(0.4)
+    partialWithRespectToY = z.deriveSingle(variableValues, y)
+    assert partialWithRespectToY == approx(-2)
 
 def testDivideWithConstantNumeratorZero():
     y = Variable("y")
     z = Divide(Constant(0), y)
-    singleResult = z.deriveSingle({ y: 3 }, y)
-    assert singleResult.value == approx(0)
-    assert singleResult.partial == approx(0)
-    singleResult = z.deriveSingle({ y: 0 }, y)
-    assert singleResult.value == approx(0)
-    assert singleResult.partial == approx(0)
+    partial = z.deriveSingle({ y: 3 }, y)
+    assert partial == approx(0)
+    partial = z.deriveSingle({ y: 0 }, y)
+    assert partial == approx(0)
 
 def testDivideWithConstantNumeratorZeroComposition():
     y = Variable("y")
     z = Divide(Constant(0), Constant(2) * y + Constant(4))
-    singleResult = z.deriveSingle({ y: 3 }, y)
-    assert singleResult.value == approx(0)
-    assert singleResult.partial == approx(0)
+    partial = z.deriveSingle({ y: 3 }, y)
+    assert partial == approx(0)
 
 def testDivideWithConstantNumeratorZeroDoesntShortCircuit():
     y = Variable("y")
@@ -65,12 +58,10 @@ def testDivideWithConstantNumeratorZeroDoesntShortCircuit():
 def testDivideWithConstantDenominatorOne():
     x = Variable("x")
     z = Divide(x, Constant(1))
-    singleResult = z.deriveSingle({ x: 3 }, x)
-    assert singleResult.value == approx(3)
-    assert singleResult.partial == approx(1)
-    singleResult = z.deriveSingle({ x: 0 }, x)
-    assert singleResult.value == approx(0)
-    assert singleResult.partial == approx(1)
+    partial = z.deriveSingle({ x: 3 }, x)
+    assert partial == approx(1)
+    partial = z.deriveSingle({ x: 0 }, x)
+    assert partial == approx(1)
 
 def testDivideWithConstantDenominatorZero():
     x = Variable("x")

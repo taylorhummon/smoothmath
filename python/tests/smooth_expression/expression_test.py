@@ -7,21 +7,18 @@ from src.smooth_expression.exponential import Exponential
 def testPolynomialOfOneVariable():
     x = Variable("x")
     z = x * x - Constant(6) * x + Constant(4)
-    singleResult = z.deriveSingle({ x: 2 }, x)
-    assert singleResult.value == -4
-    assert singleResult.partial == -2
+    partial = z.deriveSingle({ x: 2 }, x)
+    assert partial == -2
 
 def testPolynomialOfTwoVariables():
     x = Variable("x")
     y = Variable("y")
     z = x * (x + y) - Constant(5) * y * y
     variableValues = { x: 2, y: 3 }
-    singleResultForX = z.deriveSingle(variableValues, x)
-    assert singleResultForX.value == -35
-    assert singleResultForX.partial == 7
-    singleResultForY = z.deriveSingle(variableValues, y)
-    assert singleResultForY.value == -35
-    assert singleResultForY.partial == -28
+    partialWithRespectToX = z.deriveSingle(variableValues, x)
+    assert partialWithRespectToX == 7
+    partialWithRespectToY = z.deriveSingle(variableValues, y)
+    assert partialWithRespectToY == -28
 
 def testPolynomialOfThreeVariables():
     w = Variable("w")
@@ -29,30 +26,25 @@ def testPolynomialOfThreeVariables():
     y = Variable("y")
     z = w * w + Constant(5) * w * x * x - w * x * y
     variableValues = { w: 2, x: 3, y: 4 }
-    singleResultForW = z.deriveSingle(variableValues, w)
-    assert singleResultForW.value == 70
-    assert singleResultForW.partial == 37
-    singleResultForX = z.deriveSingle(variableValues, x)
-    assert singleResultForX.value == 70
-    assert singleResultForX.partial == 52
-    singleResultForY = z.deriveSingle(variableValues, y)
-    assert singleResultForY.value == 70
-    assert singleResultForY.partial == -6
+    partialWithRespectToW = z.deriveSingle(variableValues, w)
+    assert partialWithRespectToW == 37
+    partialWithRespectToX = z.deriveSingle(variableValues, x)
+    assert partialWithRespectToX == 52
+    partialWithRespectToY = z.deriveSingle(variableValues, y)
+    assert partialWithRespectToY == -6
 
 def testUnrelatedVariable():
     x = Variable("x")
     y = Variable("y")
     z = x ** Constant(2)
-    singleResult = z.deriveSingle({ x: 2 }, y)
-    assert singleResult.value == 4
-    assert singleResult.partial == 0
+    partial = z.deriveSingle({ x: 2 }, y)
+    assert partial == 0
 
 def testCompositeFunction():
     x = Variable("x")
     z = Exponential(x ** Constant(2))
-    singleResult = z.deriveSingle({ x: 2 }, x)
-    assert singleResult.value == approx(54.598150033)
-    assert singleResult.partial == approx(218.392600132)
+    partial = z.deriveSingle({ x: 2 }, x)
+    assert partial == approx(218.392600132)
 
 def testIndeterminateForm():
     t = Variable("t")
@@ -64,9 +56,8 @@ def testExpressionReuse():
     x = Variable("x")
     w = x ** Constant(2)
     z = (w + Constant(1)) / w
-    singleResult = z.deriveSingle({ x: 2 }, x)
-    assert singleResult.value == approx(1.25)
-    assert singleResult.partial == approx(-0.25)
+    partial = z.deriveSingle({ x: 2 }, x)
+    assert partial == approx(-0.25)
 
 def testPolynomialOfOneVariableMulti():
     x = Variable("x")

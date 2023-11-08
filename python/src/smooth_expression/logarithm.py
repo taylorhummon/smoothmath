@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable import Variable
 import math
 from src.smooth_expression.custom_exceptions import DomainException
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.unary_expression import UnaryExpression
 
 class Logarithm(UnaryExpression):
@@ -39,17 +38,17 @@ class Logarithm(UnaryExpression):
         self: Logarithm,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
         if aValue == 0:
             raise DomainException("Logarithm(x) blows up around x = 0")
         elif aValue < 0:
             raise DomainException("Logarithm(x) is undefined for x < 0")
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables,
-            value = math.log(aValue, self._base),
-            partial = aPartial / (math.log(self._base) * aValue)
+        return (
+            aLacksVariables,
+            aPartial / (math.log(self._base) * aValue)
         )
 
     def _deriveMulti(

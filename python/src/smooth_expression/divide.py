@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.custom_exceptions import DomainException
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.binary_expression import BinaryExpression
 
 class Divide(BinaryExpression):
@@ -37,22 +36,23 @@ class Divide(BinaryExpression):
         self: Divide,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
-        bLacksVariables, bValue, bPartial = self.b._deriveSingle(variableValues, withRespectTo).toTriple()
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        bValue = self.b._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._deriveSingle(variableValues, withRespectTo)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
         if aLacksVariables and aValue == 0:
-            return InternalSingleResult(0, 0, bLacksVariables)
+            return (bLacksVariables, 0)
         if bValue == 0:
             if aValue == 0:
                 raise DomainException("Divide(x, y) is not smooth around (x = 0, y = 0)")
             else: # aValue != 0
                 raise DomainException("Divide(x, y) blows up around x != 0 and y = 0")
         # d(a / b) = (1 / b) * da - (a / b ** 2) * db
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables and bLacksVariables,
-            value = aValue / bValue,
-            partial = (bValue * aPartial - aValue * bPartial) / bValue ** 2
+        return (
+            aLacksVariables and bLacksVariables,
+            (bValue * aPartial - aValue * bPartial) / bValue ** 2
         )
 
     def _deriveMulti(

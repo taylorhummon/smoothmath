@@ -4,7 +4,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
     from src.smooth_expression.multi_result import InternalMultiResult
     from src.smooth_expression.variable import Variable
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.nullary_expression import NullaryExpression
 
 class Variable(NullaryExpression):
@@ -33,15 +32,14 @@ class Variable(NullaryExpression):
         self: Variable,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
+    ) -> tuple[bool, Real]:
         value = variableValues.get(self, None)
         if value is None:
             raise Exception("variableValues is missing a value for a variable")
-        return InternalSingleResult(
-            lacksVariables = False,
-            value = value,
-            partial = 1 if self == withRespectTo else 0
-        )
+        if self == withRespectTo:
+            return (False, 1)
+        else:
+            return (False, 0)
 
     def _deriveMulti(
         self: Variable,

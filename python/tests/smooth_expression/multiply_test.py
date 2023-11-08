@@ -10,31 +10,26 @@ def testMultiply():
     y = Variable("y")
     z = Multiply(x, y)
     variableValues = { x: 2, y: 3 }
-    singleResultForX = z.deriveSingle(variableValues, x)
-    assert singleResultForX.value == approx(6)
-    assert singleResultForX.partial == approx(3)
-    singleResultForY = z.deriveSingle(variableValues, y)
-    assert singleResultForY.value == approx(6)
-    assert singleResultForY.partial == approx(2)
+    partialWithRespectToX = z.deriveSingle(variableValues, x)
+    assert partialWithRespectToX == approx(3)
+    partialWithRespectToY = z.deriveSingle(variableValues, y)
+    assert partialWithRespectToY == approx(2)
 
 def testMultiplyComposition():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(Constant(5) * x, y - Constant(1))
     variableValues = { x: 2, y: 3 }
-    singleResultForX = z.deriveSingle(variableValues, x)
-    assert singleResultForX.value == approx(20)
-    assert singleResultForX.partial == approx(10)
-    singleResultForY = z.deriveSingle(variableValues, y)
-    assert singleResultForY.value == approx(20)
-    assert singleResultForY.partial == approx(10)
+    partialWithRespectToX = z.deriveSingle(variableValues, x)
+    assert partialWithRespectToX == approx(10)
+    partialWithRespectToY = z.deriveSingle(variableValues, y)
+    assert partialWithRespectToY == approx(10)
 
 def testMultiplyByZero():
     x = Variable("x")
     z = Multiply(Constant(0), x)
-    singleResult = z.deriveSingle({ x: 2 }, x)
-    assert singleResult.value == approx(0)
-    assert singleResult.partial == approx(0)
+    partial = z.deriveSingle({ x: 2 }, x)
+    assert partial == approx(0)
 
 def testMultiplyByZeroDoesntShortCircuit():
     x = Variable("x")
@@ -45,9 +40,8 @@ def testMultiplyByZeroDoesntShortCircuit():
 def testMultiplyByOne():
     x = Variable("x")
     z = Multiply(Constant(1), x)
-    singleResult = z.deriveSingle({ x: 2 }, x)
-    assert singleResult.value == approx(2)
-    assert singleResult.partial == approx(1)
+    partial = z.deriveSingle({ x: 2 }, x)
+    assert partial == approx(1)
 
 def testMultiplyMulti():
     x = Variable("x")

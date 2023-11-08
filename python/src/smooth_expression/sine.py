@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 import math
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.unary_expression import UnaryExpression
 
 class Sine(UnaryExpression):
@@ -30,13 +29,13 @@ class Sine(UnaryExpression):
         self: Sine,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
         # d(sin(a)) = cos(a) * da
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables,
-            value = math.sin(aValue),
-            partial = math.cos(aValue) * aPartial
+        return (
+            aLacksVariables,
+            math.cos(aValue) * aPartial
         )
 
     def _deriveMulti(

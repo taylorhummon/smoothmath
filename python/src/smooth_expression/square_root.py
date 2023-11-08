@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable import Variable
 import math
 from src.smooth_expression.custom_exceptions import DomainException
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.unary_expression import UnaryExpression
 
 class SquareRoot(UnaryExpression):
@@ -32,18 +31,18 @@ class SquareRoot(UnaryExpression):
         self: SquareRoot,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
         if aValue == 0:
             raise DomainException("SquareRoot(x) is not smooth around x = 0")
         elif aValue < 0:
             raise DomainException("SquareRoot(x) is undefined for x < 0")
         singleResultValue = math.sqrt(aValue)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables,
-            value = singleResultValue,
-            partial = aPartial / (2 * singleResultValue)
+        return (
+            aLacksVariables,
+            aPartial / (2 * singleResultValue)
         )
 
     def _deriveMulti(

@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.custom_exceptions import DomainException
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.unary_expression import UnaryExpression
 
 class Reciprocal(UnaryExpression):
@@ -31,16 +30,16 @@ class Reciprocal(UnaryExpression):
         self: Reciprocal,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
         if aValue == 0:
             raise DomainException("Reciprocal(x) blows up around x = 0")
-        singleResultValue = 1 / aValue
+        resultValue = self._evaluate(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables,
-            value = singleResultValue,
-            partial = - (singleResultValue ** 2) * aPartial
+        return (
+            aLacksVariables,
+            - (resultValue ** 2) * aPartial
         )
 
     def _deriveMulti(

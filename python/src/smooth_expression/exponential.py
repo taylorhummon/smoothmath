@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 import math
-from src.smooth_expression.single_result import InternalSingleResult
 from src.smooth_expression.unary_expression import UnaryExpression
 
 class Exponential(UnaryExpression):
@@ -35,14 +34,14 @@ class Exponential(UnaryExpression):
         self: Exponential,
         variableValues: VariableValues,
         withRespectTo: Variable
-    ) -> InternalSingleResult:
-        aLacksVariables, aValue, aPartial = self.a._deriveSingle(variableValues, withRespectTo).toTriple()
-        singleResultValue = self._base ** aValue
+    ) -> tuple[bool, Real]:
+        aValue = self.a._evaluate(variableValues)
+        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        resultValue = self._base ** aValue
         # d(C ** b) = ln(C) * C ** b * db
-        return InternalSingleResult(
-            lacksVariables = aLacksVariables,
-            value = singleResultValue,
-            partial = math.log(self._base) * singleResultValue * aPartial
+        return (
+            aLacksVariables,
+            math.log(self._base) * resultValue * aPartial
         )
 
     def _deriveMulti(
