@@ -4,14 +4,14 @@ if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
     from src.smooth_expression.variable import Variable
 from abc import ABC, abstractmethod
-from src.smooth_expression.multi_result import MultiResult, InternalMultiResult
+from src.smooth_expression.all_partials import AllPartials
 
 class Expression(ABC):
     def __init__(
         self: Expression,
         lacksVariables: bool
     ) -> None:
-        self.lacksVariables: bool
+        self.lacksVariables : bool
         self.lacksVariables = lacksVariables
 
     def evaluate(
@@ -21,24 +21,23 @@ class Expression(ABC):
         self._resetEvaluationCache()
         return self._evaluate(variableValues)
 
-    def deriveSingle(
+    def partialAt(
         self: Expression,
         variableValues: VariableValues,
         withRespectTo: Variable,
     ) -> Real:
         self._resetEvaluationCache()
-        _, partial = self._deriveSingle(variableValues, withRespectTo)
+        _, partial = self._partialAt(variableValues, withRespectTo)
         return partial
 
-    def deriveMulti(
+    def allPartialsAt(
         self: Expression,
         variableValues: VariableValues
-    ) -> MultiResult:
+    ) -> AllPartials:
         self._resetEvaluationCache()
-        value = self._evaluate(variableValues)
-        internalMultiResult = InternalMultiResult(value)
-        self._deriveMulti(internalMultiResult, variableValues, 1)
-        return internalMultiResult.toMultiResult()
+        allPartials = AllPartials()
+        self._allPartialsAt(allPartials, variableValues, 1)
+        return allPartials
 
     ## Abstract methods ##
 
@@ -56,21 +55,21 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
     @abstractmethod
-    def _deriveSingle(
+    def _partialAt(
         self: Expression,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
-        raise Exception("Concrete classes derived from Expression must implement _deriveSingle()")
+        raise Exception("Concrete classes derived from Expression must implement _partialAt()")
 
     @abstractmethod
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Expression,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
-        raise Exception("Concrete classes derived from Expression must implement _deriveMulti()")
+        raise Exception("Concrete classes derived from Expression must implement _allPartialsAt()")
 
     ## Operations ##
 

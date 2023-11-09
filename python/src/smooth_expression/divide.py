@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.custom_exceptions import DomainException
@@ -32,15 +32,15 @@ class Divide(BinaryExpression):
             self._value = aValue / bValue
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Divide,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._deriveSingle(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._partialAt(variableValues, withRespectTo)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
         if aLacksVariables and aValue == 0:
             return (bLacksVariables, 0)
@@ -55,9 +55,9 @@ class Divide(BinaryExpression):
             (bValue * aPartial - aValue * bPartial) / bValue ** 2
         )
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Divide,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -65,12 +65,12 @@ class Divide(BinaryExpression):
         bValue = self.b._evaluate(variableValues)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
-            self.b._deriveMulti(multiResult, variableValues, 0)
+            self.b._allPartialsAt(allPartials, variableValues, 0)
         else:
             self._ensureValueIsInDomain(aValue, bValue)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * dv
-            self.a._deriveMulti(multiResult, variableValues, seed / bValue)
-            self.b._deriveMulti(multiResult, variableValues, - seed * aValue / (bValue ** 2))
+            self.a._allPartialsAt(allPartials, variableValues, seed / bValue)
+            self.b._allPartialsAt(allPartials, variableValues, - seed * aValue / (bValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Divide,

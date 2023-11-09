@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
 from src.smooth_expression.binary_expression import BinaryExpression
 
 class Plus(BinaryExpression):
@@ -26,25 +26,25 @@ class Plus(BinaryExpression):
         self._value = aValue + bValue
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Plus,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
-        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._deriveSingle(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._partialAt(variableValues, withRespectTo)
         # d(a + b) = da + db
         return (
             aLacksVariables and bLacksVariables,
             aPartial + bPartial
         )
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Plus,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
         # d(a + b) = da + db
-        self.a._deriveMulti(multiResult, variableValues, seed)
-        self.b._deriveMulti(multiResult, variableValues, seed)
+        self.a._allPartialsAt(allPartials, variableValues, seed)
+        self.b._allPartialsAt(allPartials, variableValues, seed)

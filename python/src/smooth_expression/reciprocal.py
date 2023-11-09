@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.custom_exceptions import DomainException
@@ -26,13 +26,13 @@ class Reciprocal(UnaryExpression):
         self._value = 1 / aValue
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Reciprocal,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
         if aValue == 0:
             raise DomainException("Reciprocal(x) blows up around x = 0")
         resultValue = self._evaluate(variableValues)
@@ -42,9 +42,9 @@ class Reciprocal(UnaryExpression):
             - (resultValue ** 2) * aPartial
         )
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Reciprocal,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -52,7 +52,7 @@ class Reciprocal(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluate(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
-        self.a._deriveMulti(multiResult, variableValues, - seed * (selfValue ** 2))
+        self.a._allPartialsAt(allPartials, variableValues, - seed * (selfValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Reciprocal,

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.unary_expression import UnaryExpression
@@ -25,23 +25,23 @@ class Negation(UnaryExpression):
         self._value = - aValue
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Negation,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
-        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
         # d(-a) = -da
         return (
             aLacksVariables,
             - aPartial
         )
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Negation,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
         # d(-a) = -da
-        self.a._deriveMulti(multiResult, variableValues, -seed)
+        self.a._allPartialsAt(allPartials, variableValues, -seed)

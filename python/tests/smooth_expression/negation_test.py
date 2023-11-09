@@ -6,20 +6,20 @@ def testNegation():
     x = Variable("x")
     z = Negation(x)
     variableValues = { x: 2 }
-    partial = z.deriveSingle(variableValues, x)
+    value = z.evaluate(variableValues)
+    assert value == -2
+    partial = z.partialAt(variableValues, x)
     assert partial == -1
-    multiResult = z.deriveMulti(variableValues)
-    assert multiResult.value == -2
-    assert multiResult.partialWithRespectTo(x) == -1
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == -1
 
 def testNegationComposition():
     x = Variable("x")
     z = Negation(Constant(2) * x + Constant(1))
     variableValues = { x: 3 }
-    partial = z.deriveSingle(variableValues, x)
+    value = z.evaluate(variableValues)
+    assert value == -7
+    partial = z.partialAt(variableValues, x)
     assert partial == -2
-    x = Variable("x")
-    z = Negation(Constant(2) * x + Constant(1))
-    multiResult = z.deriveMulti(variableValues)
-    assert multiResult.value == -7
-    assert multiResult.partialWithRespectTo(x) == -2
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == -2

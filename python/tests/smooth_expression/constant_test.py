@@ -5,8 +5,7 @@ def testConstant():
     c = Constant(7)
     assert c.evaluate({}) == 7
     x = Variable("x")
-    partial = c.deriveSingle({ x: 2 }, x)
+    partial = c.partialAt({ x: 2 }, x)
     assert partial == 0
-    multiResult = c.deriveMulti({ x: 2 })
-    assert multiResult.value == 7
-    assert multiResult.partialWithRespectTo(x) == 0
+    allPartials = c.allPartialsAt({ x: 2 })
+    assert allPartials.partialWithRespectTo(x) == 0

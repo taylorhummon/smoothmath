@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 import math
@@ -30,13 +30,13 @@ class Exponential(UnaryExpression):
         self._value = self._base ** aValue
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Exponential,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
         resultValue = self._base ** aValue
         # d(C ** b) = ln(C) * C ** b * db
         return (
@@ -44,15 +44,15 @@ class Exponential(UnaryExpression):
             math.log(self._base) * resultValue * aPartial
         )
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Exponential,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
         selfValue = self._evaluate(variableValues)
         # d(e ** a) = e ** a * da
-        self.a._deriveMulti(multiResult, variableValues, seed * math.log(self._base) * selfValue)
+        self.a._allPartialsAt(allPartials, variableValues, seed * math.log(self._base) * selfValue)
 
 
     def __str__(

@@ -8,77 +8,85 @@ from src.smooth_expression.logarithm import Logarithm
 def testLogarithm():
     x = Variable("x")
     z = Logarithm(x)
-    partial = z.deriveSingle({ x: 1 }, x)
+    variableValues = { x: 1 }
+    value = z.evaluate(variableValues)
+    assert value == approx(0)
+    partial = z.partialAt(variableValues, x)
     assert partial == approx(1)
-    partial = z.deriveSingle({ x: math.e }, x)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == approx(1)
+    variableValues = { x: math.e }
+    value = z.evaluate(variableValues)
+    assert value == approx(1)
+    partial = z.partialAt(variableValues, x)
     assert partial == approx(1 / math.e)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == approx(1 / math.e)
+    variableValues = { x: 0 }
     with raises(DomainException):
-        z.deriveSingle({ x: 0 }, x)
+        z.evaluate({ x: 0 })
     with raises(DomainException):
-        z.deriveSingle({ x: -1 }, x)
+        z.partialAt({ x: 0 }, x)
+    with raises(DomainException):
+        z.allPartialsAt({ x: 0 })
+    variableValues = { x: -1 }
+    with raises(DomainException):
+        z.evaluate({ x: -1 })
+    with raises(DomainException):
+        z.partialAt({ x: -1 }, x)
+    with raises(DomainException):
+        z.allPartialsAt({ x: -1 })
 
 def testLogarithmComposition():
     x = Variable("x")
     z = Logarithm(Constant(2) * x - Constant(3))
-    partial = z.deriveSingle({ x: 2 }, x)
+    variableValues = { x: 2 }
+    value = z.evaluate(variableValues)
+    assert value == approx(0)
+    partial = z.partialAt(variableValues, x)
     assert partial == approx(2)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == approx(2)
 
 def testBaseTwoLogarithm():
     x = Variable("x")
     z = Logarithm(x, 2)
-    partial = z.deriveSingle({ x: 1 }, x)
+    variableValues = { x: 1 }
+    value = z.evaluate(variableValues)
+    assert value == approx(0)
+    partial = z.partialAt(variableValues, x)
     assert partial == approx(1.442695040888)
-    partial = z.deriveSingle({ x: 2 }, x)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == approx(1.442695040888)
+    variableValues = { x: 2 }
+    value = z.evaluate(variableValues)
+    assert value == approx(1)
+    partial = z.partialAt(variableValues, x)
     assert partial == approx(0.721347520444)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == approx(0.721347520444)
+
     with raises(DomainException):
-        z.deriveSingle({ x: 0 }, x)
+        z.evaluate({ x: 0 })
     with raises(DomainException):
-        z.deriveSingle({ x: -1 }, x)
+        z.partialAt({ x: 0 }, x)
+    with raises(DomainException):
+        z.allPartialsAt({ x: 0 })
+
+    with raises(DomainException):
+        z.evaluate({ x: -1 })
+    with raises(DomainException):
+        z.partialAt({ x: -1 }, x)
+    with raises(DomainException):
+        z.allPartialsAt({ x: -1 })
 
 def testBaseTwoLogarithmComposition():
     x = Variable("x")
     z = Logarithm(Constant(2) * x - Constant(6), 2)
-    partial = z.deriveSingle({ x: 7 }, x)
+    variableValues = { x: 7 }
+    value = z.evaluate(variableValues)
+    assert value == approx(3)
+    partial = z.partialAt(variableValues, x)
     assert partial == approx(0.3606737602222)
-
-def testLogarithmMulti():
-    x = Variable("x")
-    z = Logarithm(x)
-    multiResult = z.deriveMulti({ x: 1 })
-    assert multiResult.value == approx(0)
-    assert multiResult.partialWithRespectTo(x) == approx(1)
-    multiResult = z.deriveMulti({ x: math.e })
-    assert multiResult.value == approx(1)
-    assert multiResult.partialWithRespectTo(x) == approx(1 / math.e)
-    with raises(DomainException):
-        z.deriveMulti({ x: 0 })
-    with raises(DomainException):
-        z.deriveMulti({ x: -1 })
-
-def testLogarithmCompositionMulti():
-    x = Variable("x")
-    z = Logarithm(Constant(2) * x - Constant(3))
-    multiResult = z.deriveMulti({ x: 2 })
-    assert multiResult.value == approx(0)
-    assert multiResult.partialWithRespectTo(x) == approx(2)
-
-def testBaseTwoLogarithmMulti():
-    x = Variable("x")
-    z = Logarithm(x, 2)
-    multiResult = z.deriveMulti({ x: 1 })
-    assert multiResult.value == approx(0)
-    assert multiResult.partialWithRespectTo(x) == approx(1.442695040888)
-    multiResult = z.deriveMulti({ x: 2 })
-    assert multiResult.value == approx(1)
-    assert multiResult.partialWithRespectTo(x) == approx(0.721347520444)
-    with raises(DomainException):
-        z.deriveMulti({ x: 0 })
-    with raises(DomainException):
-        z.deriveMulti({ x: -1 })
-
-def testBaseTwoLogarithmCompositionMulti():
-    x = Variable("x")
-    z = Logarithm(Constant(2) * x - Constant(6), 2)
-    multiResult = z.deriveMulti({ x: 7 })
-    assert multiResult.value == approx(3)
-    assert multiResult.partialWithRespectTo(x) == approx(0.3606737602222)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(x) == approx(0.3606737602222)

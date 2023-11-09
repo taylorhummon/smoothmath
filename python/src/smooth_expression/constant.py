@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.nullary_expression import NullaryExpression
 
@@ -21,16 +21,16 @@ class Constant(NullaryExpression):
     ) -> Real:
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Constant,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
         return (True, 0)
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Constant,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:

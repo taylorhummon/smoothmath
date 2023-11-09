@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 import math
@@ -27,27 +27,26 @@ class SquareRoot(UnaryExpression):
         self._value = math.sqrt(aValue)
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: SquareRoot,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
         if aValue == 0:
             raise DomainException("SquareRoot(x) is not smooth around x = 0")
         elif aValue < 0:
             raise DomainException("SquareRoot(x) is undefined for x < 0")
-        singleResultValue = math.sqrt(aValue)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         return (
             aLacksVariables,
-            aPartial / (2 * singleResultValue)
+            aPartial / (2 * math.sqrt(aValue))
         )
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: SquareRoot,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -55,7 +54,7 @@ class SquareRoot(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluate(variableValues)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        self.a._deriveMulti(multiResult, variableValues, seed / (2 * selfValue))
+        self.a._allPartialsAt(allPartials, variableValues, seed / (2 * selfValue))
 
     def _ensureValueIsInDomain(
         self: SquareRoot,

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
     from src.smooth_expression.variable import Variable
 import math
@@ -46,15 +46,15 @@ class Power(BinaryExpression):
             self._value = aValue ** bValue
         return self._value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Power,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._deriveSingle(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._deriveSingle(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._partialAt(variableValues, withRespectTo)
         resultLacksVariables = aLacksVariables and bLacksVariables
         if bLacksVariables and bValue.is_integer(): # CASE I: has constant integer exponent
             if bValue >= 2:
@@ -94,9 +94,9 @@ class Power(BinaryExpression):
             else: # aValue < 0
                 raise DomainException("Power(x, y) is undefined for x < 0")
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Power,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
@@ -105,24 +105,24 @@ class Power(BinaryExpression):
         if self.b.lacksVariables and bValue.is_integer():
             if bValue >= 2:
                 # d(a ** C) = C * a ** (C - 1) * da
-                self.a._deriveMulti(multiResult, variableValues, seed * bValue * (aValue ** (bValue - 1)))
+                self.a._allPartialsAt(allPartials, variableValues, seed * bValue * (aValue ** (bValue - 1)))
             elif bValue == 1:
                 # d(a ** 1) = da
-                self.a._deriveMulti(multiResult, variableValues, seed)
+                self.a._allPartialsAt(allPartials, variableValues, seed)
             elif bValue == 0:
                 # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
                 # d(a ** 0) = 0 * da
-                self.a._deriveMulti(multiResult, variableValues, 0)
+                self.a._allPartialsAt(allPartials, variableValues, 0)
             else: # bValue <= -1
                 self._ensureValueIsInDomainCaseI(aValue, bValue)
                 # d(a ** C) = C * a ** (C - 1) * da
-                self.a._deriveMulti(multiResult, variableValues, seed * bValue * (aValue ** (bValue - 1)))
+                self.a._allPartialsAt(allPartials, variableValues, seed * bValue * (aValue ** (bValue - 1)))
         else: # bValue is not an integer
             self._ensureValueIsInDomainCaseII(aValue, bValue)
             selfValue = self._evaluate(variableValues)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
-            self.a._deriveMulti(multiResult, variableValues, seed * bValue * selfValue / aValue)
-            self.b._deriveMulti(multiResult, variableValues, seed * math.log(aValue) * selfValue)
+            self.a._allPartialsAt(allPartials, variableValues, seed * bValue * selfValue / aValue)
+            self.b._allPartialsAt(allPartials, variableValues, seed * math.log(aValue) * selfValue)
 
     def _ensureValueIsInDomainCaseI(
         self: Power,

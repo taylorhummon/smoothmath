@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableValues
-    from src.smooth_expression.multi_result import InternalMultiResult
+    from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.nullary_expression import NullaryExpression
 
@@ -14,9 +14,9 @@ class Variable(NullaryExpression):
         super().__init__(lacksVariables = False)
         if not name:
             raise Exception("Variables must be given a non-blank name")
-        self.name: str
+        self.name : str
         self.name = name
-        self._cachedHash: int | None
+        self._cachedHash : int | None
         self._cachedHash = None
 
     def _evaluate(
@@ -28,7 +28,7 @@ class Variable(NullaryExpression):
             raise Exception("variableValues is missing a value for a variable")
         return value
 
-    def _deriveSingle(
+    def _partialAt(
         self: Variable,
         variableValues: VariableValues,
         withRespectTo: Variable
@@ -41,13 +41,13 @@ class Variable(NullaryExpression):
         else:
             return (False, 0)
 
-    def _deriveMulti(
+    def _allPartialsAt(
         self: Variable,
-        multiResult: InternalMultiResult,
+        allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
-        multiResult.addSeed(self, seed)
+        allPartials._addSeed(self, seed)
 
     def __eq__(
         self: Variable,

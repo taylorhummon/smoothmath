@@ -6,8 +6,15 @@ x = Variable("x")
 y = Variable("y")
 z = x * (x + y) + Constant(5) * y ** Constant(2)
 variableValues = { x: 2, y: 3 }
-singleResultWithXPartial = z.deriveSingle(variableValues, x)
-singleResultWithYPartial = z.deriveSingle(variableValues, y)
-print(f"z = {singleResultWithXPartial.value}")       # Output: z = 55
-print(f"∂z/∂x = {singleResultWithXPartial.partial}") # Output: ∂z/∂x = 7
-print(f"∂z/∂y = {singleResultWithYPartial.partial}") # Output: ∂z/∂y = 32
+zValue = z.evaluate(variableValues)
+print("### evaluation ###")
+print(f"z = {zValue}")       # Output: z = 55
+print("### forward accumulation ###")
+xPartial = z.partialAt(variableValues, x)
+yPartial = z.partialAt(variableValues, y)
+print(f"∂z/∂x = {xPartial}") # Output: ∂z/∂x = 7
+print(f"∂z/∂y = {yPartial}") # Output: ∂z/∂y = 32
+print("### reverse accumulation ###")
+allPartials = z.allPartialsAt(variableValues)
+print(f"∂z/∂x = {allPartials.partialWithRespectTo(x)}") # Output: ∂z/∂x = 7
+print(f"∂z/∂y = {allPartials.partialWithRespectTo(y)}") # Output: ∂z/∂y = 32

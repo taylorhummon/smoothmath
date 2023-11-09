@@ -7,30 +7,27 @@ from src.smooth_expression.sine import Sine
 def testSine():
     theta = Variable("theta")
     z = Sine(theta)
-    partial = z.deriveSingle({ theta: 0 }, theta)
+    variableValues = { theta: 0 }
+    assert z.evaluate(variableValues) == approx(0)
+    partial = z.partialAt(variableValues, theta)
     assert partial == approx(1)
-    partial = z.deriveSingle({ theta: math.pi / 2 }, theta)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(theta) == approx(1)
+    variableValues = { theta: math.pi / 2 }
+    value = z.evaluate(variableValues)
+    assert value == approx(1)
+    partial = z.partialAt(variableValues, theta)
     assert partial == approx(0)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(theta) == approx(0)
 
 def testSineComposition():
     theta = Variable("theta")
     z = Sine(Constant(2) * theta)
-    partial = z.deriveSingle({ theta: 0 }, theta)
+    variableValues = { theta: 0 }
+    value = z.evaluate(variableValues)
+    assert value == approx(0)
+    partial = z.partialAt(variableValues, theta)
     assert partial == approx(2)
-
-def testSineMulti():
-    theta = Variable("theta")
-    z = Sine(theta)
-    multiResult = z.deriveMulti({ theta: 0 })
-    assert multiResult.value == approx(0)
-    assert multiResult.partialWithRespectTo(theta) == approx(1)
-    multiResult = z.deriveMulti({ theta: math.pi / 2 })
-    assert multiResult.value == approx(1)
-    assert multiResult.partialWithRespectTo(theta) == approx(0)
-
-def testSineCompositionMulti():
-    theta = Variable("theta")
-    z = Sine(Constant(2) * theta)
-    multiResult = z.deriveMulti({ theta: 0 })
-    assert multiResult.value == approx(0)
-    assert multiResult.partialWithRespectTo(theta) == approx(2)
+    allPartials = z.allPartialsAt(variableValues)
+    assert allPartials.partialWithRespectTo(theta) == approx(2)
