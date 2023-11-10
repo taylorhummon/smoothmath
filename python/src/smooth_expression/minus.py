@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
-    from src.smooth_expression.variable import Variable
 from src.smooth_expression.binary_expression import BinaryExpression
 
 class Minus(BinaryExpression):
@@ -30,7 +29,7 @@ class Minus(BinaryExpression):
     def _partialAt(
         self: Minus,
         variableValues: VariableValues,
-        withRespectTo: Variable
+        withRespectTo: str
     ) -> tuple[bool, Real]:
         aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
         bLacksVariables, bPartial = self.b._partialAt(variableValues, withRespectTo)

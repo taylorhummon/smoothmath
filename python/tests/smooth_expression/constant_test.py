@@ -5,7 +5,7 @@ from src.smooth_expression.variable_values import VariableValues
 def testConstant():
     c = Constant(7)
     variableValues = VariableValues({})
-    assert c.evaluate({}) == 7
+    assert c.evaluate(variableValues) == 7
     x = Variable("x")
     variableValues = VariableValues({ x: 2 })
     partial = c.partialAt(variableValues, x)

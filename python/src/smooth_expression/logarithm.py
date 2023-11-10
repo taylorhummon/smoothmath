@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
-    from src.smooth_expression.variable import Variable
 import math
 from src.smooth_expression.custom_exceptions import DomainException
 from src.smooth_expression.unary_expression import UnaryExpression
@@ -38,7 +37,7 @@ class Logarithm(UnaryExpression):
     def _partialAt(
         self: Logarithm,
         variableValues: VariableValues,
-        withRespectTo: Variable
+        withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)

@@ -4,7 +4,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.variable_values import VariableValues
-    from src.smooth_expression.variable import Variable
 from src.smooth_expression.nullary_expression import NullaryExpression
 
 class Constant(NullaryExpression):
@@ -25,7 +24,7 @@ class Constant(NullaryExpression):
     def _partialAt(
         self: Constant,
         variableValues: VariableValues,
-        withRespectTo: Variable
+        withRespectTo: str
     ) -> tuple[bool, Real]:
         return (True, 0)
 

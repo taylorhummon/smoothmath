@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
-    from src.smooth_expression.variable import Variable
 from src.smooth_expression.unary_expression import UnaryExpression
 
 
@@ -29,7 +28,7 @@ class Negation(UnaryExpression):
     def _partialAt(
         self: Negation,
         variableValues: VariableValues,
-        withRespectTo: Variable
+        withRespectTo: str
     ) -> tuple[bool, Real]:
         aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
         # d(-a) = -da

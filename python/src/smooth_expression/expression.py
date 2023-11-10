@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.smooth_expression.custom_types import Real
-    from src.smooth_expression.variable_values import VariableValues
-    from src.smooth_expression.variable import Variable
+    from src.smooth_expression.custom_types import Real, VariableOrString
 from abc import ABC, abstractmethod
+from src.smooth_expression.utilities import _nameFromVariableOrName
+from src.smooth_expression.variable_values import VariableValues
 from src.smooth_expression.all_partials import AllPartials
 
 class Expression(ABC):
@@ -27,12 +27,12 @@ class Expression(ABC):
     def partialAt(
         self: Expression,
         variableValues: VariableValues,
-        withRespectTo: Variable,
+        withRespectTo: VariableOrString,
     ) -> Real:
         if not isinstance(variableValues, VariableValues):
             raise Exception("Must provide a VariableValues object to partialAt()")
         self._resetEvaluationCache()
-        _, partial = self._partialAt(variableValues, withRespectTo)
+        _, partial = self._partialAt(variableValues, _nameFromVariableOrName(withRespectTo))
         return partial
 
     def allPartialsAt(
@@ -65,7 +65,7 @@ class Expression(ABC):
     def _partialAt(
         self: Expression,
         variableValues: VariableValues,
-        withRespectTo: Variable
+        withRespectTo: str
     ) -> tuple[bool, Real]:
         raise Exception("Concrete classes derived from Expression must implement _partialAt()")
 
