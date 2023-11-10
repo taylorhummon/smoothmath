@@ -38,7 +38,7 @@ class Exponential(UnaryExpression):
         aValue = self.a._evaluate(variableValues)
         aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
         resultValue = self._base ** aValue
-        # d(C ** b) = ln(C) * C ** b * db
+        # d(C ** a) = ln(C) * C ** a * da
         return (
             aLacksVariables,
             math.log(self._base) * resultValue * aPartial

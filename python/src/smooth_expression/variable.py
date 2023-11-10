@@ -49,8 +49,10 @@ class Variable(NullaryExpression):
     ) -> bool:
         return isinstance(other, Variable) and (other.name == self.name)
 
-    def __hash__(self):
-        if not self._cachedHash:
+    def __hash__(
+        self: Variable
+    ) -> int:
+        if self._cachedHash is None:
             self._cachedHash = hash(self.name)
         return self._cachedHash
 
