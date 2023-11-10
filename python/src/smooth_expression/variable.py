@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.smooth_expression.custom_types import Real, VariableValues
+    from src.smooth_expression.custom_types import Real
+    from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.nullary_expression import NullaryExpression
@@ -23,19 +24,13 @@ class Variable(NullaryExpression):
         self: Variable,
         variableValues: VariableValues
     ) -> Real:
-        value = variableValues.get(self, None)
-        if value is None:
-            raise Exception("variableValues is missing a value for a variable")
-        return value
+        return variableValues.valueFor(self.name)
 
     def _partialAt(
         self: Variable,
         variableValues: VariableValues,
         withRespectTo: Variable
     ) -> tuple[bool, Real]:
-        value = variableValues.get(self, None)
-        if value is None:
-            raise Exception("variableValues is missing a value for a variable")
         if self == withRespectTo:
             return (False, 1)
         else:

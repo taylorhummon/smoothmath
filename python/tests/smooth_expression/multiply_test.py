@@ -1,5 +1,6 @@
 from pytest import approx, raises
 from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.variable_values import VariableValues
 from src.smooth_expression.constant import Constant
 from src.smooth_expression.variable import Variable
 from src.smooth_expression.multiply import Multiply
@@ -9,14 +10,14 @@ def testMultiply():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(x, y)
-    variableValues = { x: 2, y: 3 }
+    variableValues = VariableValues({ x: 2, y: 3 })
     value = z.evaluate(variableValues)
     assert value == approx(6)
     partialWithRespectToX = z.partialAt(variableValues, x)
     assert partialWithRespectToX == approx(3)
     partialWithRespectToY = z.partialAt(variableValues, y)
     assert partialWithRespectToY == approx(2)
-    allPartials = z.allPartialsAt({ x: 2, y: 3 })
+    allPartials = z.allPartialsAt(variableValues)
     assert allPartials.partialWithRespectTo(x) == approx(3)
     assert allPartials.partialWithRespectTo(y) == approx(2)
 
@@ -24,21 +25,21 @@ def testMultiplyComposition():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(Constant(5) * x, y - Constant(1))
-    variableValues = { x: 2, y: 3 }
+    variableValues = VariableValues({ x: 2, y: 3 })
     value = z.evaluate(variableValues)
     assert value == approx(20)
     partialWithRespectToX = z.partialAt(variableValues, x)
     assert partialWithRespectToX == approx(10)
     partialWithRespectToY = z.partialAt(variableValues, y)
     assert partialWithRespectToY == approx(10)
-    allPartials = z.allPartialsAt({ x: 2, y: 3 })
+    allPartials = z.allPartialsAt(variableValues)
     assert allPartials.partialWithRespectTo(x) == approx(10)
     assert allPartials.partialWithRespectTo(y) == approx(10)
 
 def testMultiplyByZero():
     x = Variable("x")
     z = Multiply(Constant(0), x)
-    variableValues = { x: 2 }
+    variableValues = VariableValues({ x: 2 })
     value = z.evaluate(variableValues)
     assert value == approx(0)
     partial = z.partialAt(variableValues, x)
@@ -49,7 +50,7 @@ def testMultiplyByZero():
 def testMultiplyByZeroDoesntShortCircuit():
     x = Variable("x")
     z = Multiply(Constant(0), Power(Constant(-1), x))
-    variableValues = { x: 2 }
+    variableValues = VariableValues({ x: 2 })
     with raises(DomainException):
         z.evaluate(variableValues)
     with raises(DomainException):
@@ -60,7 +61,7 @@ def testMultiplyByZeroDoesntShortCircuit():
 def testMultiplyByOne():
     x = Variable("x")
     z = Multiply(Constant(1), x)
-    variableValues = { x: 2 }
+    variableValues = VariableValues({ x: 2 })
     value = z.evaluate(variableValues)
     assert value == approx(2)
     partial = z.partialAt(variableValues, x)

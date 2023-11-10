@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.smooth_expression.custom_types import Real, VariableValues
+    from src.smooth_expression.custom_types import Real
+    from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.variable import Variable
 from abc import ABC, abstractmethod
 from src.smooth_expression.all_partials import AllPartials
@@ -18,6 +19,8 @@ class Expression(ABC):
         self: Expression,
         variableValues: VariableValues
     ) -> Real:
+        if not isinstance(variableValues, VariableValues):
+            raise Exception("Must provide a VariableValues object to evaluate()")
         self._resetEvaluationCache()
         return self._evaluate(variableValues)
 
@@ -26,6 +29,8 @@ class Expression(ABC):
         variableValues: VariableValues,
         withRespectTo: Variable,
     ) -> Real:
+        if not isinstance(variableValues, VariableValues):
+            raise Exception("Must provide a VariableValues object to partialAt()")
         self._resetEvaluationCache()
         _, partial = self._partialAt(variableValues, withRespectTo)
         return partial
@@ -34,6 +39,8 @@ class Expression(ABC):
         self: Expression,
         variableValues: VariableValues
     ) -> AllPartials:
+        if not isinstance(variableValues, VariableValues):
+            raise Exception("Must provide a VariableValues object to allPartialsAt()")
         self._resetEvaluationCache()
         allPartials = AllPartials()
         self._allPartialsAt(allPartials, variableValues, 1)

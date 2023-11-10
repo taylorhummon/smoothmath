@@ -1,8 +1,9 @@
 from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from src.smooth_expression.custom_types import Real, VariableValues
+    from src.smooth_expression.custom_types import Real
     from src.smooth_expression.all_partials import AllPartials
+    from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.variable import Variable
 from src.smooth_expression.nullary_expression import NullaryExpression
 
