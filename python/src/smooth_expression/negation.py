@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from src.smooth_expression.expression import Expression
 from src.smooth_expression.unary_expression import UnaryExpression
 
-
 class Negation(UnaryExpression):
     def __init__(
         self: Negation,
@@ -44,4 +43,4 @@ class Negation(UnaryExpression):
         seed: Real
     ) -> None:
         # d(-a) = -da
-        self.a._allPartialsAt(allPartials, variableValues, -seed)
+        self.a._allPartialsAt(allPartials, variableValues, - seed)
