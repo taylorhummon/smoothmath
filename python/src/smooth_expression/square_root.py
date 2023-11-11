@@ -27,21 +27,21 @@ class SquareRoot(UnaryExpression):
         self._value = math.sqrt(aValue)
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: SquareRoot,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         self._ensureValueIsInDomain(aValue)
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         return (
             aLacksVariables,
             aPartial / (2 * math.sqrt(aValue))
         )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: SquareRoot,
         allPartials: AllPartials,
         variableValues: VariableValues,
@@ -51,7 +51,7 @@ class SquareRoot(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluate(variableValues)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        self.a._allPartialsAt(allPartials, variableValues, seed / (2 * selfValue))
+        self.a._computeAllPartialsAt(allPartials, variableValues, seed / (2 * selfValue))
 
     def _ensureValueIsInDomain(
         self: SquareRoot,

@@ -26,25 +26,25 @@ class Plus(BinaryExpression):
         self._value = aValue + bValue
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Plus,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._computePartialAt(variableValues, withRespectTo)
         # d(a + b) = da + db
         return (
             aLacksVariables and bLacksVariables,
             aPartial + bPartial
         )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Plus,
         allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
         # d(a + b) = da + db
-        self.a._allPartialsAt(allPartials, variableValues, seed)
-        self.b._allPartialsAt(allPartials, variableValues, seed)
+        self.a._computeAllPartialsAt(allPartials, variableValues, seed)
+        self.b._computeAllPartialsAt(allPartials, variableValues, seed)

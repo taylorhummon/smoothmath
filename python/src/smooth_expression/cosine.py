@@ -25,20 +25,20 @@ class Cosine(UnaryExpression):
         self._value = math.cos(aValue)
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Cosine,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
         # d(cos(a)) = - sin(a) * da
         return (
              aLacksVariables,
             - math.sin(aValue) * aPartial
         )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Cosine,
         allPartials: AllPartials,
         variableValues: VariableValues,
@@ -46,4 +46,4 @@ class Cosine(UnaryExpression):
     ) -> None:
         aValue = self.a._evaluate(variableValues)
         # d(cos(a)) = - sin(a) * da
-        self.a._allPartialsAt(allPartials, variableValues, - seed * math.sin(aValue))
+        self.a._computeAllPartialsAt(allPartials, variableValues, - seed * math.sin(aValue))

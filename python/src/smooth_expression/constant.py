@@ -21,14 +21,14 @@ class Constant(NullaryExpression):
     ) -> Real:
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Constant,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         return (True, 0)
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Constant,
         allPartials: AllPartials,
         variableValues: VariableValues,

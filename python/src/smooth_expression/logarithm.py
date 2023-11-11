@@ -34,13 +34,13 @@ class Logarithm(UnaryExpression):
         self._value = math.log(aValue, self._base)
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Logarithm,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
         self._ensureValueIsInDomain(aValue)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
         return (
@@ -48,7 +48,7 @@ class Logarithm(UnaryExpression):
             aPartial / (math.log(self._base) * aValue)
         )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Logarithm,
         allPartials: AllPartials,
         variableValues: VariableValues,
@@ -57,7 +57,7 @@ class Logarithm(UnaryExpression):
         aValue = self.a._evaluate(variableValues)
         self._ensureValueIsInDomain(aValue)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
-        self.a._allPartialsAt(allPartials, variableValues, seed / (math.log(self._base) * aValue))
+        self.a._computeAllPartialsAt(allPartials, variableValues, seed / (math.log(self._base) * aValue))
 
     def _ensureValueIsInDomain(
         self: Logarithm,

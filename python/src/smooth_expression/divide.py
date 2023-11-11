@@ -32,15 +32,15 @@ class Divide(BinaryExpression):
             self._value = aValue / bValue
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Divide,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._computePartialAt(variableValues, withRespectTo)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
         if aLacksVariables and aValue == 0:
             return (bLacksVariables, 0)
@@ -52,7 +52,7 @@ class Divide(BinaryExpression):
                 (bValue * aPartial - aValue * bPartial) / bValue ** 2
             )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Divide,
         allPartials: AllPartials,
         variableValues: VariableValues,
@@ -62,12 +62,12 @@ class Divide(BinaryExpression):
         bValue = self.b._evaluate(variableValues)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self.a.lacksVariables and aValue == 0:
-            self.b._allPartialsAt(allPartials, variableValues, 0)
+            self.b._computeAllPartialsAt(allPartials, variableValues, 0)
         else:
             self._ensureValueIsInDomain(aValue, bValue)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
-            self.a._allPartialsAt(allPartials, variableValues, seed / bValue)
-            self.b._allPartialsAt(allPartials, variableValues, - seed * aValue / (bValue ** 2))
+            self.a._computeAllPartialsAt(allPartials, variableValues, seed / bValue)
+            self.b._computeAllPartialsAt(allPartials, variableValues, - seed * aValue / (bValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Divide,

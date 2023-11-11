@@ -26,13 +26,13 @@ class Reciprocal(UnaryExpression):
         self._value = 1 / aValue
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Reciprocal,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
         self._ensureValueIsInDomain(aValue)
         resultValue = self._evaluate(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
@@ -41,7 +41,7 @@ class Reciprocal(UnaryExpression):
             - (resultValue ** 2) * aPartial
         )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Reciprocal,
         allPartials: AllPartials,
         variableValues: VariableValues,
@@ -51,7 +51,7 @@ class Reciprocal(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluate(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
-        self.a._allPartialsAt(allPartials, variableValues, - seed * (selfValue ** 2))
+        self.a._computeAllPartialsAt(allPartials, variableValues, - seed * (selfValue ** 2))
 
     def _ensureValueIsInDomain(
         self: Reciprocal,

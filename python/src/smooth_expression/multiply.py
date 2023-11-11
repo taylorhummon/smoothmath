@@ -26,22 +26,22 @@ class Multiply(BinaryExpression):
         self._value = aValue * bValue
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Multiply,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
+        bLacksVariables, bPartial = self.b._computePartialAt(variableValues, withRespectTo)
         # d(a * b) = b * da + a * db
         return (
             aLacksVariables and bLacksVariables,
             bValue * aPartial + aValue * bPartial
         )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Multiply,
         allPartials: AllPartials,
         variableValues: VariableValues,
@@ -50,5 +50,5 @@ class Multiply(BinaryExpression):
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
         # d(a * b) = b * da + a * db
-        self.a._allPartialsAt(allPartials, variableValues, seed * bValue)
-        self.b._allPartialsAt(allPartials, variableValues, seed * aValue)
+        self.a._computeAllPartialsAt(allPartials, variableValues, seed * bValue)
+        self.b._computeAllPartialsAt(allPartials, variableValues, seed * aValue)

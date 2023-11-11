@@ -25,20 +25,20 @@ class Sine(UnaryExpression):
         self._value = math.sin(aValue)
         return self._value
 
-    def _partialAt(
+    def _computePartialAt(
         self: Sine,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
+        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
         # d(sin(a)) = cos(a) * da
         return (
             aLacksVariables,
             math.cos(aValue) * aPartial
         )
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Sine,
         allPartials: AllPartials,
         variableValues: VariableValues,
@@ -46,4 +46,4 @@ class Sine(UnaryExpression):
     ) -> None:
         aValue = self.a._evaluate(variableValues)
         # d(sin(a)) = cos(a) * da
-        self.a._allPartialsAt(allPartials, variableValues, seed * math.cos(aValue))
+        self.a._computeAllPartialsAt(allPartials, variableValues, seed * math.cos(aValue))

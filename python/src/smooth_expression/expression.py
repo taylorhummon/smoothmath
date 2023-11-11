@@ -32,7 +32,7 @@ class Expression(ABC):
         if not isinstance(variableValues, VariableValues):
             raise Exception("Must provide a VariableValues object to partialAt()")
         self._resetEvaluationCache()
-        _, partial = self._partialAt(variableValues, _nameFromVariableOrName(withRespectTo))
+        _, partial = self._computePartialAt(variableValues, _nameFromVariableOrName(withRespectTo))
         return partial
 
     def allPartialsAt(
@@ -43,7 +43,7 @@ class Expression(ABC):
             raise Exception("Must provide a VariableValues object to allPartialsAt()")
         self._resetEvaluationCache()
         allPartials = AllPartials()
-        self._allPartialsAt(allPartials, variableValues, 1)
+        self._computeAllPartialsAt(allPartials, variableValues, 1)
         return allPartials
 
     ## Abstract methods ##
@@ -62,21 +62,21 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
     @abstractmethod
-    def _partialAt(
+    def _computePartialAt(
         self: Expression,
         variableValues: VariableValues,
         withRespectTo: str
     ) -> tuple[bool, Real]:
-        raise Exception("Concrete classes derived from Expression must implement _partialAt()")
+        raise Exception("Concrete classes derived from Expression must implement _computePartialAt()")
 
     @abstractmethod
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Expression,
         allPartials: AllPartials,
         variableValues: VariableValues,
         seed: Real
     ) -> None:
-        raise Exception("Concrete classes derived from Expression must implement _allPartialsAt()")
+        raise Exception("Concrete classes derived from Expression must implement _computeAllPartialsAt()")
 
     ## Operations ##
 

@@ -25,7 +25,7 @@ class Variable(NullaryExpression):
     ) -> Real:
         return variableValues.valueFor(self.name)
 
-    def _partialAt(
+    def _computePartialAt(
         self: Variable,
         variableValues: VariableValues,
         withRespectTo: str
@@ -35,7 +35,7 @@ class Variable(NullaryExpression):
         else:
             return (False, 0)
 
-    def _allPartialsAt(
+    def _computeAllPartialsAt(
         self: Variable,
         allPartials: AllPartials,
         variableValues: VariableValues,
