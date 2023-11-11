@@ -41,10 +41,7 @@ class Logarithm(UnaryExpression):
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
-        if aValue == 0:
-            raise DomainException("Logarithm(x) blows up around x = 0")
-        elif aValue < 0:
-            raise DomainException("Logarithm(x) is undefined for x < 0")
+        self._ensureValueIsInDomain(aValue)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
         return (
             aLacksVariables,

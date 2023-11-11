@@ -33,11 +33,8 @@ class SquareRoot(UnaryExpression):
         withRespectTo: str
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
+        self._ensureValueIsInDomain(aValue)
         aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
-        if aValue == 0:
-            raise DomainException("SquareRoot(x) is not smooth around x = 0")
-        elif aValue < 0:
-            raise DomainException("SquareRoot(x) is undefined for x < 0")
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         return (
             aLacksVariables,

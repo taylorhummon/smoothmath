@@ -33,8 +33,7 @@ class Reciprocal(UnaryExpression):
     ) -> tuple[bool, Real]:
         aValue = self.a._evaluate(variableValues)
         aLacksVariables, aPartial = self.a._partialAt(variableValues, withRespectTo)
-        if aValue == 0:
-            raise DomainException("Reciprocal(x) blows up around x = 0")
+        self._ensureValueIsInDomain(aValue)
         resultValue = self._evaluate(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
         return (

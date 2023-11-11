@@ -44,16 +44,13 @@ class Divide(BinaryExpression):
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
         if aLacksVariables and aValue == 0:
             return (bLacksVariables, 0)
-        if bValue == 0:
-            if aValue == 0:
-                raise DomainException("Divide(x, y) is not smooth around (x = 0, y = 0)")
-            else: # aValue != 0
-                raise DomainException("Divide(x, y) blows up around x != 0 and y = 0")
-        # d(a / b) = (1 / b) * da - (a / b ** 2) * db
-        return (
-            aLacksVariables and bLacksVariables,
-            (bValue * aPartial - aValue * bPartial) / bValue ** 2
-        )
+        else:
+            self._ensureValueIsInDomain(aValue, bValue)
+            # d(a / b) = (1 / b) * da - (a / b ** 2) * db
+            return (
+                aLacksVariables and bLacksVariables,
+                (bValue * aPartial - aValue * bPartial) / bValue ** 2
+            )
 
     def _allPartialsAt(
         self: Divide,
