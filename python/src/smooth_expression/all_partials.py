@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Mapping
 if TYPE_CHECKING:
     from src.smooth_expression.custom_types import Real, VariableOrString
     from src.smooth_expression.expression import Variable
@@ -9,7 +9,7 @@ class AllPartials:
     def __init__(
         self: AllPartials
     ) -> None:
-        self._dictionary : dict[Variable, Real]
+        self._dictionary : Mapping[Variable, Real]
         self._dictionary = {}
 
     def partialWithRespectTo(

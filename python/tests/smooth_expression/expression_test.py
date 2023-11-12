@@ -101,3 +101,21 @@ def testPartialAtUsingVariableName():
     z = x ** Constant(2)
     partial = z.partialAt(VariableValues({ "x": 3 }), "x")
     assert partial == approx(6)
+
+def testEquality():
+    c = Constant(7)
+    assert c == c
+    assert c == Constant(7)
+    assert c == Constant(7.0)
+    assert c != Constant(8)
+    x = Variable("x")
+    assert x == x
+    assert x != Variable("y")
+    assert x == Variable("x")
+    assert x != c
+    z = x ** c
+    assert z == z
+    assert z == x ** c
+    assert z != c
+    assert z != x
+    assert z != x ** c + Constant(1)
