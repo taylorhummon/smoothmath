@@ -12,3 +12,4 @@ def testAllPartials():
     assert allPartials.partialWithRespectTo(w) == 0
     assert allPartials.partialWithRespectTo(x) == 3
     assert allPartials.partialWithRespectTo(y) == 6
+    assert allPartials.partialWithRespectTo("y") == 6
