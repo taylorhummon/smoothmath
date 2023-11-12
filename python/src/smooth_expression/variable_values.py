@@ -12,11 +12,11 @@ class VariableValues:
     ) -> None:
         self._dictionary : Mapping[str, Real]
         self._dictionary = {}
-        for variableOrName in dictionary:
+        for variableOrName, value in dictionary.items():
             name = _nameFromVariableOrName(variableOrName)
             if name in self._dictionary:
                 raise Exception(f"Provided more than one value for variable: {name}")
-            self._dictionary[name] = dictionary[variableOrName]
+            self._dictionary[name] = value
 
     def valueFor(
         self: VariableValues,

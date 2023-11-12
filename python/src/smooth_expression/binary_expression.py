@@ -33,7 +33,7 @@ class BinaryExpression(Expression):
         self: BinaryExpression,
         other: Any
     ) -> bool:
-        return other.__class__ == self.__class__ and (other.a == self.a) and (other.b == self.b)
+        return (other.__class__ == self.__class__) and (other.a == self.a) and (other.b == self.b)
 
     def __str__(
         self: BinaryExpression
