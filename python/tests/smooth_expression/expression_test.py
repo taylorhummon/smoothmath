@@ -95,3 +95,9 @@ def testExpressionReuse():
     assert partial == approx(-0.25)
     allPartials = z.allPartialsAt(variableValues)
     assert allPartials.partialWithRespectTo(x) == approx(-0.25)
+
+def testPartialAtUsingVariableName():
+    x = Variable("x")
+    z = x ** Constant(2)
+    partial = z.partialAt(VariableValues({ "x": 3 }), "x")
+    assert partial == approx(6)
