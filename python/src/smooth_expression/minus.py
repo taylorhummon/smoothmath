@@ -26,18 +26,15 @@ class Minus(BinaryExpression):
         self._value = aValue - bValue
         return self._value
 
-    def _computePartialAt(
+    def _partialAt(
         self: Minus,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
-        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._computePartialAt(variableValues, withRespectTo)
+    ) -> Real:
+        aPartial = self.a._partialAt(variableValues, withRespectTo)
+        bPartial = self.b._partialAt(variableValues, withRespectTo)
         # d(a - b) = da - db
-        return (
-            aLacksVariables and bLacksVariables,
-            aPartial - bPartial
-        )
+        return aPartial - bPartial
 
     def _computeAllPartialsAt(
         self: Minus,

@@ -25,15 +25,15 @@ class Variable(NullaryExpression):
     ) -> Real:
         return variableValues.valueFor(self.name)
 
-    def _computePartialAt(
+    def _partialAt(
         self: Variable,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
+    ) -> Real:
         if self.name == withRespectTo:
-            return (False, 1)
+            return 1
         else:
-            return (False, 0)
+            return 0
 
     def _computeAllPartialsAt(
         self: Variable,

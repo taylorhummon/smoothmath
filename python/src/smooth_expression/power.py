@@ -45,24 +45,21 @@ class Power(BinaryExpression):
         self._value = aValue ** bValue
         return self._value
 
-    def _computePartialAt(
+    def _partialAt(
         self: Power,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
+    ) -> Real:
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._computePartialAt(variableValues, withRespectTo)
-        resultLacksVariables = aLacksVariables and bLacksVariables
+        aPartial = self.a._partialAt(variableValues, withRespectTo)
+        bPartial = self.b._partialAt(variableValues, withRespectTo)
         if _isCaseI(bValue, self.b.lacksVariables):
             self._ensureValueIsInDomainCaseI(aValue, bValue)
-            resultPartial = self._partialCaseI(aValue, aPartial, bValue)
-            return (resultLacksVariables, resultPartial)
+            return self._partialCaseI(aValue, aPartial, bValue)
         else: # Case II
             self._ensureValueIsInDomainCaseII(aValue, bValue)
-            resultPartial = self._partialCaseII(aValue, aPartial, bValue, bPartial)
-            return (resultLacksVariables, resultPartial)
+            return self._partialCaseII(aValue, aPartial, bValue, bPartial)
 
     def _partialCaseI(
         self: Power,

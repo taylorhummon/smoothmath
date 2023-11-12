@@ -34,19 +34,16 @@ class Logarithm(UnaryExpression):
         self._value = math.log(aValue, self._base)
         return self._value
 
-    def _computePartialAt(
+    def _partialAt(
         self: Logarithm,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
+    ) -> Real:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
+        aPartial = self.a._partialAt(variableValues, withRespectTo)
         self._ensureValueIsInDomain(aValue)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
-        return (
-            aLacksVariables,
-            aPartial / (math.log(self._base) * aValue)
-        )
+        return aPartial / (math.log(self._base) * aValue)
 
     def _computeAllPartialsAt(
         self: Logarithm,

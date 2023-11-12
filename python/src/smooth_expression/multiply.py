@@ -26,20 +26,17 @@ class Multiply(BinaryExpression):
         self._value = aValue * bValue
         return self._value
 
-    def _computePartialAt(
+    def _partialAt(
         self: Multiply,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
+    ) -> Real:
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._computePartialAt(variableValues, withRespectTo)
+        aPartial = self.a._partialAt(variableValues, withRespectTo)
+        bPartial = self.b._partialAt(variableValues, withRespectTo)
         # d(a * b) = b * da + a * db
-        return (
-            aLacksVariables and bLacksVariables,
-            bValue * aPartial + aValue * bPartial
-        )
+        return bValue * aPartial + aValue * bPartial
 
     def _computeAllPartialsAt(
         self: Multiply,

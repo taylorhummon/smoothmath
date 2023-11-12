@@ -30,19 +30,17 @@ class Exponential(UnaryExpression):
         self._value = self._base ** aValue
         return self._value
 
-    def _computePartialAt(
+    def _partialAt(
         self: Exponential,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
+    ) -> Real:
         aValue = self.a._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
+        aPartial = self.a._partialAt(variableValues, withRespectTo)
         resultValue = self._base ** aValue
         # d(C ** a) = ln(C) * C ** a * da
-        return (
-            aLacksVariables,
-            math.log(self._base) * resultValue * aPartial
-        )
+        return math.log(self._base) * resultValue * aPartial
+
 
     def _computeAllPartialsAt(
         self: Exponential,

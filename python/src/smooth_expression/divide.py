@@ -32,25 +32,22 @@ class Divide(BinaryExpression):
             self._value = aValue / bValue
         return self._value
 
-    def _computePartialAt(
+    def _partialAt(
         self: Divide,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
+    ) -> Real:
         aValue = self.a._evaluate(variableValues)
         bValue = self.b._evaluate(variableValues)
-        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
-        bLacksVariables, bPartial = self.b._computePartialAt(variableValues, withRespectTo)
+        aPartial = self.a._partialAt(variableValues, withRespectTo)
+        bPartial = self.b._partialAt(variableValues, withRespectTo)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
-        if aLacksVariables and aValue == 0:
-            return (bLacksVariables, 0)
+        if self.a.lacksVariables and aValue == 0:
+            return 0
         else:
             self._ensureValueIsInDomain(aValue, bValue)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
-            return (
-                aLacksVariables and bLacksVariables,
-                (bValue * aPartial - aValue * bPartial) / bValue ** 2
-            )
+            return (bValue * aPartial - aValue * bPartial) / bValue ** 2
 
     def _computeAllPartialsAt(
         self: Divide,

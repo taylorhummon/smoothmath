@@ -24,17 +24,14 @@ class Negation(UnaryExpression):
         self._value = - aValue
         return self._value
 
-    def _computePartialAt(
+    def _partialAt(
         self: Negation,
         variableValues: VariableValues,
         withRespectTo: str
-    ) -> tuple[bool, Real]:
-        aLacksVariables, aPartial = self.a._computePartialAt(variableValues, withRespectTo)
+    ) -> Real:
+        aPartial = self.a._partialAt(variableValues, withRespectTo)
         # d(-a) = -da
-        return (
-            aLacksVariables,
-            - aPartial
-        )
+        return - aPartial
 
     def _computeAllPartialsAt(
         self: Negation,
