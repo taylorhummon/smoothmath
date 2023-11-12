@@ -57,7 +57,8 @@ class Logarithm(UnaryExpression):
         aValue = self.a._evaluate(variableValues)
         self._ensureValueIsInDomain(aValue)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
-        self.a._computeAllPartialsAt(allPartials, variableValues, seed / (math.log(self._base) * aValue))
+        nextSeed = seed / (math.log(self._base) * aValue)
+        self.a._computeAllPartialsAt(allPartials, variableValues, nextSeed)
 
     def _ensureValueIsInDomain(
         self: Logarithm,
@@ -67,11 +68,3 @@ class Logarithm(UnaryExpression):
             raise DomainException("Logarithm(x) blows up around x = 0")
         elif aValue < 0:
             raise DomainException("Logarithm(x) is undefined for x < 0")
-
-    def __str__(
-        self: Logarithm
-    ) -> str:
-        if self._base == math.e:
-            return f"Logarithm({self.a})"
-        else:
-            return f"Logarithm({self.a}, base = {self._base})"

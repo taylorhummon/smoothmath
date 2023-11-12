@@ -51,7 +51,8 @@ class SquareRoot(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluate(variableValues)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        self.a._computeAllPartialsAt(allPartials, variableValues, seed / (2 * selfValue))
+        nextSeed = seed / (2 * selfValue)
+        self.a._computeAllPartialsAt(allPartials, variableValues, nextSeed)
 
     def _ensureValueIsInDomain(
         self: SquareRoot,

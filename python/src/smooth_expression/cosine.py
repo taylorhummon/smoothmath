@@ -46,4 +46,5 @@ class Cosine(UnaryExpression):
     ) -> None:
         aValue = self.a._evaluate(variableValues)
         # d(cos(a)) = - sin(a) * da
-        self.a._computeAllPartialsAt(allPartials, variableValues, - seed * math.sin(aValue))
+        nextSeed = - seed * math.sin(aValue)
+        self.a._computeAllPartialsAt(allPartials, variableValues, nextSeed)

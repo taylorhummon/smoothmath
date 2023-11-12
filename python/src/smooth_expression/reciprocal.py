@@ -51,7 +51,8 @@ class Reciprocal(UnaryExpression):
         self._ensureValueIsInDomain(aValue)
         selfValue = self._evaluate(variableValues)
         # d(1 / a) = - (1 / a ** 2) * da
-        self.a._computeAllPartialsAt(allPartials, variableValues, - seed * (selfValue ** 2))
+        nextSeed = - seed * (selfValue ** 2)
+        self.a._computeAllPartialsAt(allPartials, variableValues, nextSeed)
 
     def _ensureValueIsInDomain(
         self: Reciprocal,

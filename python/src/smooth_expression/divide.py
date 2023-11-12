@@ -66,8 +66,10 @@ class Divide(BinaryExpression):
         else:
             self._ensureValueIsInDomain(aValue, bValue)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
-            self.a._computeAllPartialsAt(allPartials, variableValues, seed / bValue)
-            self.b._computeAllPartialsAt(allPartials, variableValues, - seed * aValue / (bValue ** 2))
+            nextSeedA = seed / bValue
+            nextSeedB =  - seed * aValue / (bValue ** 2)
+            self.a._computeAllPartialsAt(allPartials, variableValues, nextSeedA)
+            self.b._computeAllPartialsAt(allPartials, variableValues, nextSeedB)
 
     def _ensureValueIsInDomain(
         self: Divide,

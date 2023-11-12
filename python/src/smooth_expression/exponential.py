@@ -52,13 +52,5 @@ class Exponential(UnaryExpression):
     ) -> None:
         selfValue = self._evaluate(variableValues)
         # d(e ** a) = e ** a * da
-        self.a._computeAllPartialsAt(allPartials, variableValues, seed * math.log(self._base) * selfValue)
-
-
-    def __str__(
-        self: Exponential
-    ) -> str:
-        if self._base == math.e:
-            return f"Exponential({self.a})"
-        else:
-            return f"Exponential({self.a}, base = {self._base})"
+        nextSeed = seed * math.log(self._base) * selfValue
+        self.a._computeAllPartialsAt(allPartials, variableValues, nextSeed)

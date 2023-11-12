@@ -46,4 +46,5 @@ class Sine(UnaryExpression):
     ) -> None:
         aValue = self.a._evaluate(variableValues)
         # d(sin(a)) = cos(a) * da
-        self.a._computeAllPartialsAt(allPartials, variableValues, seed * math.cos(aValue))
+        nextSeed = seed * math.cos(aValue)
+        self.a._computeAllPartialsAt(allPartials, variableValues, nextSeed)
