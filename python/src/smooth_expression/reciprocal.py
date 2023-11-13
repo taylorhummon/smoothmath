@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
-from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.custom_exceptions import DomainError
 from src.smooth_expression.unary_expression import UnaryExpression
 
 class Reciprocal(UnaryExpression):
@@ -56,4 +56,4 @@ class Reciprocal(UnaryExpression):
         aValue: Real
     ) -> None:
         if aValue == 0:
-            raise DomainException("Reciprocal(x) blows up around x = 0")
+            raise DomainError("Reciprocal(x) blows up around x = 0")

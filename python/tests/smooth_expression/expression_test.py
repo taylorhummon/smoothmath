@@ -1,5 +1,5 @@
 from pytest import approx, raises
-from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.custom_exceptions import DomainError
 from src.smooth_expression.variable_values import VariableValues
 from src.smooth_expression.constant import Constant
 from src.smooth_expression.variable import Variable
@@ -77,11 +77,11 @@ def testIndeterminateForm():
     t = Variable("t")
     z = (Constant(2) * t) / t
     variableValues = VariableValues({ t: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, t)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
 
 def testExpressionReuse():

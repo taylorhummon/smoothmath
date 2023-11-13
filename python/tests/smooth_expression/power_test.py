@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from src.smooth_expression.variable_values import VariableValues
-from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.custom_exceptions import DomainError
 from src.smooth_expression.constant import Constant
 from src.smooth_expression.variable import Variable
 from src.smooth_expression.square_root import SquareRoot
@@ -42,58 +42,58 @@ def testPower():
     assert allPartials.partialWithRespectTo(x) == approx(-0.0534583582)
     assert allPartials.partialWithRespectTo(y) == approx(0.0704760111)
     variableValues = VariableValues({ x: 0, y: 2.5 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: 0, y: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: 0, y: -2.5 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: -3, y: 2.5 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: -3, y: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: -3, y: -2.5 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
 
 def testPowerComposition():
@@ -140,61 +140,61 @@ def testPowerWithConstantBaseOneDoesntShortCircuit():
     x = Variable("x")
     z = Power(Constant(1), SquareRoot(x))
     variableValues = VariableValues({ x: -1 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
 
 def testPowerWithConstantBaseZero():
     y = Variable("y")
     z = Power(Constant(0), y)
     variableValues = VariableValues({ y: 3 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ y: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ y: -5 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
 
 def testPowerWithConstantBaseNegativeOne():
     y = Variable("y")
     z = Power(Constant(-1), y)
     variableValues = VariableValues({ y: 3 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ y: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ y: -5 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, y)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
 
 def testPowerWithConstantExponentTwo():
@@ -309,11 +309,11 @@ def testPowerWithConstantExponentZeroDoesntShortCircuit():
     x = Variable("x")
     z = Power(Logarithm(x), Constant(0))
     variableValues = VariableValues({ x: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
 
 def testPowerWithConstantExponentNegativeOne():
@@ -327,11 +327,11 @@ def testPowerWithConstantExponentNegativeOne():
     allPartials = z.allPartialsAt(variableValues)
     assert allPartials.partialWithRespectTo(x) == approx(-0.25)
     variableValues = VariableValues({ x: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: -5 })
     value = z.evaluate(variableValues)
@@ -363,11 +363,11 @@ def testPowerWithConstantExponentNegativeTwo():
     allPartials = z.allPartialsAt(variableValues)
     assert allPartials.partialWithRespectTo(x) == approx(-0.25)
     variableValues = VariableValues({ x: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: -5 })
     value = z.evaluate(variableValues)

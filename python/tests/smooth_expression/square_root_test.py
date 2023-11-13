@@ -1,5 +1,5 @@
 from pytest import approx, raises
-from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.custom_exceptions import DomainError
 from src.smooth_expression.variable_values import VariableValues
 from src.smooth_expression.constant import Constant
 from src.smooth_expression.variable import Variable
@@ -16,18 +16,18 @@ def testSquareRoot():
     allPartials = z.allPartialsAt(variableValues)
     assert allPartials.partialWithRespectTo(x) == approx(0.25)
     variableValues = VariableValues({ x: 0 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
     variableValues = VariableValues({ x: -1 })
-    with raises(DomainException):
+    with raises(DomainError):
         z.evaluate(variableValues)
-    with raises(DomainException):
+    with raises(DomainError):
         z.partialAt(variableValues, x)
-    with raises(DomainException):
+    with raises(DomainError):
         z.allPartialsAt(variableValues)
 
 def testSquareRootComposition():

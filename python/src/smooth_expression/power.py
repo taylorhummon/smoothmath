@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
 import math
-from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.custom_exceptions import DomainError
 from src.smooth_expression.binary_expression import BinaryExpression
 
 # For a power a ** b, there are two over-arching cases we work with:
@@ -150,7 +150,7 @@ class Power(BinaryExpression):
         bValue: Real
     ) -> None:
         if aValue == 0 and bValue <= -1:
-            raise DomainException("Power(x, C) blows up around x = 0 when C is a negative integer")
+            raise DomainError("Power(x, C) blows up around x = 0 when C is a negative integer")
 
     def _ensureValueIsInDomainCaseII(
         self: Power,
@@ -159,10 +159,10 @@ class Power(BinaryExpression):
     ) -> None:
         if aValue == 0:
             if bValue > 0:
-                raise DomainException("Power(x, y) is not smooth around x = 0 for y > 0")
+                raise DomainError("Power(x, y) is not smooth around x = 0 for y > 0")
             elif bValue == 0:
-                raise DomainException("Power(x, y) is not smooth around (x = 0, y = 0)")
+                raise DomainError("Power(x, y) is not smooth around (x = 0, y = 0)")
             else: # bValue < 0
-                raise DomainException("Power(x, y) blows up around x = 0 for y < 0")
+                raise DomainError("Power(x, y) blows up around x = 0 for y < 0")
         elif aValue < 0:
-            raise DomainException("Power(x, y) is undefined for x < 0")
+            raise DomainError("Power(x, y) is undefined for x < 0")

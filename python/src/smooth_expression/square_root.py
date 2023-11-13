@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
 import math
-from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.custom_exceptions import DomainError
 from src.smooth_expression.unary_expression import UnaryExpression
 
 class SquareRoot(UnaryExpression):
@@ -56,6 +56,6 @@ class SquareRoot(UnaryExpression):
         aValue: Real
     ) -> None:
         if aValue == 0:
-            raise DomainException("SquareRoot(x) is not smooth around x = 0")
+            raise DomainError("SquareRoot(x) is not smooth around x = 0")
         elif aValue < 0:
-            raise DomainException("SquareRoot(x) is undefined for x < 0")
+            raise DomainError("SquareRoot(x) is undefined for x < 0")

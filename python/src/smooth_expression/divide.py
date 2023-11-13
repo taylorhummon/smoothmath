@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from src.smooth_expression.variable_values import VariableValues
     from src.smooth_expression.all_partials import AllPartials
     from src.smooth_expression.expression import Expression
-from src.smooth_expression.custom_exceptions import DomainException
+from src.smooth_expression.custom_exceptions import DomainError
 from src.smooth_expression.binary_expression import BinaryExpression
 
 class Divide(BinaryExpression):
@@ -75,6 +75,6 @@ class Divide(BinaryExpression):
     ) -> None:
         if bValue == 0:
             if aValue == 0:
-                raise DomainException("Divide(x, y) is not smooth around (x = 0, y = 0)")
+                raise DomainError("Divide(x, y) is not smooth around (x = 0, y = 0)")
             else: # aValue != 0
-                raise DomainException("Divide(x, y) blows up around x != 0 and y = 0")
+                raise DomainError("Divide(x, y) blows up around x != 0 and y = 0")
