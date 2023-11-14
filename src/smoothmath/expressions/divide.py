@@ -22,10 +22,10 @@ class Divide(BinaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
-        if self.a.lacks_variables and a_value == 0:
+        if self._a.lacks_variables and a_value == 0:
             self._value = 0
         else:
             self._ensure_value_is_in_domain(a_value, b_value)
@@ -37,12 +37,12 @@ class Divide(BinaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
-        b_partial = self.b._partial_at(variable_values, with_respect_to)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
+        b_partial = self._b._partial_at(variable_values, with_respect_to)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
-        if self.a.lacks_variables and a_value == 0:
+        if self._a.lacks_variables and a_value == 0:
             return 0
         else:
             self._ensure_value_is_in_domain(a_value, b_value)
@@ -55,18 +55,18 @@ class Divide(BinaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
-        if self.a.lacks_variables and a_value == 0:
-            self.b._compute_all_partials_at(all_partials, variable_values, 0)
+        if self._a.lacks_variables and a_value == 0:
+            self._b._compute_all_partials_at(all_partials, variable_values, 0)
         else:
             self._ensure_value_is_in_domain(a_value, b_value)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
             next_seedA = seed / b_value
             next_seedB =  - seed * a_value / (b_value ** 2)
-            self.a._compute_all_partials_at(all_partials, variable_values, next_seedA)
-            self.b._compute_all_partials_at(all_partials, variable_values, next_seedB)
+            self._a._compute_all_partials_at(all_partials, variable_values, next_seedA)
+            self._b._compute_all_partials_at(all_partials, variable_values, next_seedB)
 
     def _ensure_value_is_in_domain(
         self: Divide,

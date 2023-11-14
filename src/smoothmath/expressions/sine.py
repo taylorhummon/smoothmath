@@ -21,7 +21,7 @@ class Sine(UnaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._value = math.sin(a_value)
         return self._value
 
@@ -30,8 +30,8 @@ class Sine(UnaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
+        a_value = self._a._evaluate(variable_values)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         # d(sin(a)) = cos(a) * da
         return math.cos(a_value) * a_partial
 
@@ -41,7 +41,7 @@ class Sine(UnaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         # d(sin(a)) = cos(a) * da
         next_seed = seed * math.cos(a_value)
-        self.a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)

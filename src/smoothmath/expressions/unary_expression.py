@@ -9,11 +9,11 @@ class UnaryExpression(Expression):
         self: UnaryExpression,
         a: Expression
     ) -> None:
-        super().__init__(lacks_variables = a.lacks_variables)
         if not isinstance(a, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {a}")
-        self.a : Expression
-        self.a = a
+        super().__init__(lacks_variables = a.lacks_variables)
+        self._a : Expression
+        self._a = a
         self._value : real_number | None
         self._value = None
 
@@ -21,16 +21,16 @@ class UnaryExpression(Expression):
         self: UnaryExpression
     ) -> None:
         self._value = None
-        self.a._reset_evaluation_cache()
+        self._a._reset_evaluation_cache()
 
     def __eq__(
         self: UnaryExpression,
         other: Any
     ) -> bool:
-        return other.__class__ == self.__class__ and (other.a == self.a)
+        return other.__class__ == self.__class__ and (other._a == self._a)
 
     def __str__(
         self: UnaryExpression
     ) -> str:
         class_name = type(self).__name__
-        return f"{class_name}({self.a})"
+        return f"{class_name}({self._a})"

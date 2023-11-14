@@ -26,7 +26,7 @@ class Exponential(UnaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._value = self._base ** a_value
         return self._value
 
@@ -35,8 +35,8 @@ class Exponential(UnaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
+        a_value = self._a._evaluate(variable_values)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         resultValue = self._base ** a_value
         # d(C ** a) = ln(C) * C ** a * da
         return math.log(self._base) * resultValue * a_partial
@@ -50,4 +50,4 @@ class Exponential(UnaryExpression):
         self_value = self._evaluate(variable_values)
         # d(e ** a) = e ** a * da
         next_seed = seed * math.log(self._base) * self_value
-        self.a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)

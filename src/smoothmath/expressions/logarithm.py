@@ -29,7 +29,7 @@ class Logarithm(UnaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._ensure_value_is_in_domain(a_value)
         self._value = math.log(a_value, self._base)
         return self._value
@@ -39,8 +39,8 @@ class Logarithm(UnaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
+        a_value = self._a._evaluate(variable_values)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         self._ensure_value_is_in_domain(a_value)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
         return a_partial / (math.log(self._base) * a_value)
@@ -51,11 +51,11 @@ class Logarithm(UnaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._ensure_value_is_in_domain(a_value)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
         next_seed = seed / (math.log(self._base) * a_value)
-        self.a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
 
     def _ensure_value_is_in_domain(
         self: Logarithm,

@@ -10,15 +10,15 @@ class BinaryExpression(Expression):
         a: Expression,
         b: Expression
     ) -> None:
-        super().__init__(lacks_variables = a.lacks_variables and b.lacks_variables)
         if not isinstance(a, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {a}")
         if not isinstance(b, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {b}")
-        self.a : Expression
-        self.a = a
-        self.b : Expression
-        self.b = b
+        super().__init__(lacks_variables = a.lacks_variables and b.lacks_variables)
+        self._a : Expression
+        self._a = a
+        self._b : Expression
+        self._b = b
         self._value : real_number | None
         self._value = None
 
@@ -26,17 +26,17 @@ class BinaryExpression(Expression):
         self: BinaryExpression
     ) -> None:
         self._value = None
-        self.a._reset_evaluation_cache()
-        self.b._reset_evaluation_cache()
+        self._a._reset_evaluation_cache()
+        self._b._reset_evaluation_cache()
 
     def __eq__(
         self: BinaryExpression,
         other: Any
     ) -> bool:
-        return (other.__class__ == self.__class__) and (other.a == self.a) and (other.b == self.b)
+        return (other.__class__ == self.__class__) and (other._a == self._a) and (other._b == self._b)
 
     def __str__(
         self: BinaryExpression
     ) -> str:
         class_name = type(self).__name__
-        return f"{class_name}({self.a}, {self.b})"
+        return f"{class_name}({self._a}, {self._b})"

@@ -21,7 +21,7 @@ class Reciprocal(UnaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._ensure_value_is_in_domain(a_value)
         self._value = 1 / a_value
         return self._value
@@ -31,8 +31,8 @@ class Reciprocal(UnaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
+        a_value = self._a._evaluate(variable_values)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         self._ensure_value_is_in_domain(a_value)
         resultValue = self._evaluate(variable_values)
         # d(1 / a) = - (1 / a ** 2) * da
@@ -44,12 +44,12 @@ class Reciprocal(UnaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._ensure_value_is_in_domain(a_value)
         self_value = self._evaluate(variable_values)
         # d(1 / a) = - (1 / a ** 2) * da
         next_seed = - seed * (self_value ** 2)
-        self.a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
 
     def _ensure_value_is_in_domain(
         self: Reciprocal,

@@ -22,7 +22,7 @@ class SquareRoot(UnaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._ensure_value_is_in_domain(a_value)
         self._value = math.sqrt(a_value)
         return self._value
@@ -32,9 +32,9 @@ class SquareRoot(UnaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._ensure_value_is_in_domain(a_value)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         return a_partial / (2 * math.sqrt(a_value))
 
@@ -44,12 +44,12 @@ class SquareRoot(UnaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._ensure_value_is_in_domain(a_value)
         self_value = self._evaluate(variable_values)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         next_seed = seed / (2 * self_value)
-        self.a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
 
     def _ensure_value_is_in_domain(
         self: SquareRoot,

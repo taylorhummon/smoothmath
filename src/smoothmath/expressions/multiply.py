@@ -21,8 +21,8 @@ class Multiply(BinaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
         self._value = a_value * b_value
         return self._value
 
@@ -31,10 +31,10 @@ class Multiply(BinaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
-        b_partial = self.b._partial_at(variable_values, with_respect_to)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
+        b_partial = self._b._partial_at(variable_values, with_respect_to)
         # d(a * b) = b * da + a * db
         return b_value * a_partial + a_value * b_partial
 
@@ -44,8 +44,8 @@ class Multiply(BinaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
         # d(a * b) = b * da + a * db
-        self.a._compute_all_partials_at(all_partials, variable_values, seed * b_value)
-        self.b._compute_all_partials_at(all_partials, variable_values, seed * a_value)
+        self._a._compute_all_partials_at(all_partials, variable_values, seed * b_value)
+        self._b._compute_all_partials_at(all_partials, variable_values, seed * a_value)

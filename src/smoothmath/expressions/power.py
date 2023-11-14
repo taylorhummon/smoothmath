@@ -37,9 +37,9 @@ class Power(BinaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
-        if _is_case_i(b_value, self.b.lacks_variables):
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
+        if _is_case_i(b_value, self._b.lacks_variables):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
         else: # Case II
             self._ensure_value_is_in_domain_case_ii(a_value, b_value)
@@ -51,11 +51,11 @@ class Power(BinaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
-        b_partial = self.b._partial_at(variable_values, with_respect_to)
-        if _is_case_i(b_value, self.b.lacks_variables):
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
+        b_partial = self._b._partial_at(variable_values, with_respect_to)
+        if _is_case_i(b_value, self._b.lacks_variables):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
             return self._partial_case_i(a_value, a_partial, b_value)
         else: # Case II
@@ -98,19 +98,19 @@ class Power(BinaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        a_value = self.a._evaluate(variable_values)
-        b_value = self.b._evaluate(variable_values)
-        if _is_case_i(b_value, self.b.lacks_variables):
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values)
+        if _is_case_i(b_value, self._b.lacks_variables):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
             next_seed = self._next_seed_case_i(a_value, b_value, seed)
-            self.a._compute_all_partials_at(all_partials, variable_values, next_seed)
+            self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
         else: # Case II
             self._ensure_value_is_in_domain_case_ii(a_value, b_value)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_seed_a = self._next_seed_a_case_ii(a_value, b_value, seed)
             next_seed_b = self._next_seed_b_case_ii(a_value, b_value, seed)
-            self.a._compute_all_partials_at(all_partials, variable_values, next_seed_a)
-            self.b._compute_all_partials_at(all_partials, variable_values, next_seed_b)
+            self._a._compute_all_partials_at(all_partials, variable_values, next_seed_a)
+            self._b._compute_all_partials_at(all_partials, variable_values, next_seed_b)
 
     def _next_seed_case_i(
         self: Power,

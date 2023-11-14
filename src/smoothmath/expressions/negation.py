@@ -20,7 +20,7 @@ class Negation(UnaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self.a._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
         self._value = - a_value
         return self._value
 
@@ -29,7 +29,7 @@ class Negation(UnaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        a_partial = self.a._partial_at(variable_values, with_respect_to)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         # d(-a) = -da
         return - a_partial
 
@@ -40,4 +40,4 @@ class Negation(UnaryExpression):
         seed: real_number
     ) -> None:
         # d(-a) = -da
-        self.a._compute_all_partials_at(all_partials, variable_values, - seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, - seed)
