@@ -5,6 +5,8 @@ if TYPE_CHECKING:
     from smoothmath.variable_values import VariableValues
     from smoothmath.expressions.expression import Expression
     from smoothmath.all_partials import AllPartials
+
+# imports needed for class declaration
 from smoothmath.expressions.binary_expression import BinaryExpression
 
 class Plus(BinaryExpression):

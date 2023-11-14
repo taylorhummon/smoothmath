@@ -5,7 +5,8 @@ if TYPE_CHECKING:
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
     from smoothmath.expressions.expression import Expression
-from smoothmath.errors import DomainError
+
+# imports needed for class declaration
 from smoothmath.expressions.binary_expression import BinaryExpression
 
 class Divide(BinaryExpression):
@@ -78,3 +79,6 @@ class Divide(BinaryExpression):
                 raise DomainError("Divide(x, y) is not smooth around (x = 0, y = 0)")
             else: # a_value != 0
                 raise DomainError("Divide(x, y) blows up around x != 0 and y = 0")
+
+# imports needed for class implementation
+from smoothmath.errors import DomainError

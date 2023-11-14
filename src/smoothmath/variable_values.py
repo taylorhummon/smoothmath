@@ -3,7 +3,6 @@ from typing import TYPE_CHECKING, Mapping
 if TYPE_CHECKING:
     from smoothmath.typing import real_number
     from smoothmath.expressions.variable import Variable
-import smoothmath.utilities as utilities
 
 class VariableValues:
     def __init__(
@@ -27,3 +26,6 @@ class VariableValues:
         if value is None:
             raise Exception(f"Missing a value for a variable: {name}")
         return value
+
+# imports needed for class implementation
+import smoothmath.utilities as utilities

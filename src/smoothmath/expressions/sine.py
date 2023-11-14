@@ -5,7 +5,8 @@ if TYPE_CHECKING:
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
     from smoothmath.expressions.expression import Expression
-import math
+
+# imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
 
 class Sine(UnaryExpression):
@@ -45,3 +46,6 @@ class Sine(UnaryExpression):
         # d(sin(a)) = cos(a) * da
         next_seed = seed * math.cos(a_value)
         self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+
+# imports needed for class implementation
+import math

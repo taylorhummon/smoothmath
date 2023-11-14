@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.typing import real_number
+
+# imports needed for class declaration
 from smoothmath.expressions.expression import Expression
 
 class BinaryExpression(Expression):

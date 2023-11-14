@@ -5,8 +5,8 @@ if TYPE_CHECKING:
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
     from smoothmath.expressions.expression import Expression
-import math
-from smoothmath.errors import DomainError
+
+# imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
 
 class SquareRoot(UnaryExpression):
@@ -59,3 +59,7 @@ class SquareRoot(UnaryExpression):
             raise DomainError("SquareRoot(x) is not smooth around x = 0")
         elif a_value < 0:
             raise DomainError("SquareRoot(x) is undefined for x < 0")
+
+# imports needed for class implementation
+import math
+from smoothmath.errors import DomainError

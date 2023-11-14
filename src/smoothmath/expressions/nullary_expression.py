@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+# imports needed for class declaration
 from smoothmath.expressions.expression import Expression
 
 class NullaryExpression(Expression):

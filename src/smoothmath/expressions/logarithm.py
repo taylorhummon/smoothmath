@@ -5,9 +5,10 @@ if TYPE_CHECKING:
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
     from smoothmath.expressions.expression import Expression
-import math
-from smoothmath.errors import DomainError
+
+# imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
+import math
 
 class Logarithm(UnaryExpression):
     def __init__(
@@ -65,3 +66,6 @@ class Logarithm(UnaryExpression):
             raise DomainError("Logarithm(x) blows up around x = 0")
         elif a_value < 0:
             raise DomainError("Logarithm(x) is undefined for x < 0")
+
+# imports needed for class implementation
+from smoothmath.errors import DomainError

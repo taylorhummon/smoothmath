@@ -5,9 +5,8 @@ if TYPE_CHECKING:
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
     from smoothmath.expressions.expression import Expression
-import math
-from smoothmath.errors import DomainError
-import smoothmath.utilities as utilities
+
+# imports needed for class declaration
 from smoothmath.expressions.binary_expression import BinaryExpression
 
 # For a power a ** b, there are two over-arching cases we work with:
@@ -167,3 +166,8 @@ class Power(BinaryExpression):
                 raise DomainError("Power(x, y) blows up around x = 0 for y < 0")
         elif a_value < 0:
             raise DomainError("Power(x, y) is undefined for x < 0")
+
+# imports needed for class implementation
+import math
+from smoothmath.errors import DomainError
+import smoothmath.utilities as utilities

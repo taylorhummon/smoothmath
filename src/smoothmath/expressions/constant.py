@@ -4,6 +4,8 @@ if TYPE_CHECKING:
     from smoothmath.typing import real_number
     from smoothmath.all_partials import AllPartials
     from smoothmath.variable_values import VariableValues
+
+# imports needed for class declaration
 from smoothmath.expressions.nullary_expression import NullaryExpression
 
 class Constant(NullaryExpression):

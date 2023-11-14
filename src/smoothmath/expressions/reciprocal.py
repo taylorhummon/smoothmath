@@ -5,7 +5,8 @@ if TYPE_CHECKING:
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
     from smoothmath.expressions.expression import Expression
-from smoothmath.errors import DomainError
+
+# imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
 
 class Reciprocal(UnaryExpression):
@@ -57,3 +58,6 @@ class Reciprocal(UnaryExpression):
     ) -> None:
         if a_value == 0:
             raise DomainError("Reciprocal(x) blows up around x = 0")
+
+# imports needed for class implementation
+from smoothmath.errors import DomainError

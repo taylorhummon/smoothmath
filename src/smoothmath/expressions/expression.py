@@ -3,10 +3,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.typing import real_number
     from smoothmath.expressions.variable import Variable
+
+# imports needed for class declaration
 from abc import ABC, abstractmethod
-from smoothmath.variable_values import VariableValues
-from smoothmath.all_partials import AllPartials
-import smoothmath.utilities as utilities
 
 class Expression(ABC):
     def __init__(
@@ -116,6 +115,10 @@ class Expression(ABC):
     ) -> Power:
         return Power(self, other)
 
+# imports needed for class implementation
+import smoothmath.utilities as utilities
+from smoothmath.variable_values import VariableValues
+from smoothmath.all_partials import AllPartials
 from smoothmath.expressions.negation import Negation
 from smoothmath.expressions.plus import Plus
 from smoothmath.expressions.minus import Minus
