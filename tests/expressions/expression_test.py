@@ -21,10 +21,10 @@ def test_polynomial_of_two_variables():
     variable_values = VariableValues({ x: 2, y: 3 })
     value = z.evaluate(variable_values)
     assert value == -35
-    partial_with_respect_toX = z.partial_at(variable_values, x)
-    assert partial_with_respect_toX == 7
-    partial_with_respect_toY = z.partial_at(variable_values, y)
-    assert partial_with_respect_toY == -28
+    partial_with_respect_to_x = z.partial_at(variable_values, x)
+    assert partial_with_respect_to_x == 7
+    partial_with_respect_to_y = z.partial_at(variable_values, y)
+    assert partial_with_respect_to_y == -28
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == 7
     assert all_partials.partial_with_respect_to(y) == -28
@@ -39,10 +39,10 @@ def test_polynomial_of_three_variables():
     assert value == 70
     partial_with_respect_toW = z.partial_at(variable_values, w)
     assert partial_with_respect_toW == 37
-    partial_with_respect_toX = z.partial_at(variable_values, x)
-    assert partial_with_respect_toX == 52
-    partial_with_respect_toY = z.partial_at(variable_values, y)
-    assert partial_with_respect_toY == -6
+    partial_with_respect_to_x = z.partial_at(variable_values, x)
+    assert partial_with_respect_to_x == 52
+    partial_with_respect_to_y = z.partial_at(variable_values, y)
+    assert partial_with_respect_to_y == -6
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(w) == 37
     assert all_partials.partial_with_respect_to(x) == 52
