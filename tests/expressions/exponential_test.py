@@ -5,7 +5,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.exponential import Exponential
 
-def testExponential():
+def test_exponential():
     x = Variable("x")
     z = Exponential(x)
     variable_values = VariableValues({ x: 0 })
@@ -31,7 +31,7 @@ def testExponential():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1 / math.e)
 
-def testExponentialComposition():
+def test_Exponential_composition():
     x = Variable("x")
     z = Exponential(Constant(2) * x - Constant(6))
     variable_values = VariableValues({ x: 3 })
@@ -42,7 +42,7 @@ def testExponentialComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(2)
 
-def testBaseTwoExponential():
+def test_base_two_Exponential():
     x = Variable("x")
     z = Exponential(x, 2)
     variable_values = VariableValues({ x: 0 })
@@ -67,7 +67,7 @@ def testBaseTwoExponential():
     partial = z.partial_at(variable_values, x)
     assert partial == approx(0.346573590279)
 
-def testBaseTwoExponentialComposition():
+def test_base_two_Exponential_composition():
     x = Variable("x")
     z = Exponential(Constant(2) * x - Constant(5), 2)
     variable_values = VariableValues({ x: 3 })

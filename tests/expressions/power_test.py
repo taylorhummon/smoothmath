@@ -7,7 +7,7 @@ from smoothmath.expressions.square_root import SquareRoot
 from smoothmath.expressions.logarithm import Logarithm
 from smoothmath.expressions.power import Power
 
-def testPower():
+def test_Power():
     x = Variable("x")
     y = Variable("y")
     z = Power(x, y)
@@ -96,7 +96,7 @@ def testPower():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testPowerComposition():
+def test_Power_composition():
     x = Variable("x")
     y = Variable("y")
     z = Power(Constant(2) * x, Constant(3) * y)
@@ -111,7 +111,7 @@ def testPowerComposition():
     assert all_partials.partial_with_respect_to(x) == approx(24)
     assert all_partials.partial_with_respect_to(y) == approx(16.63553233343)
 
-def testPowerWithConstantBaseOne():
+def test_Power_with_constant_base_one():
     y = Variable("y")
     z = Power(Constant(1), y)
     variable_values = VariableValues({ y: 3 })
@@ -136,7 +136,7 @@ def testPowerWithConstantBaseOne():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(y) == approx(0)
 
-def testPowerWithConstantBaseOneDoesntShortCircuit():
+def test_Power_with_constant_base_one_doesnt_short_circuit():
     x = Variable("x")
     z = Power(Constant(1), SquareRoot(x))
     variable_values = VariableValues({ x: -1 })
@@ -147,7 +147,7 @@ def testPowerWithConstantBaseOneDoesntShortCircuit():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testPowerWithConstantBaseZero():
+def test_Power_with_constant_base_zero():
     y = Variable("y")
     z = Power(Constant(0), y)
     variable_values = VariableValues({ y: 3 })
@@ -172,7 +172,7 @@ def testPowerWithConstantBaseZero():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testPowerWithConstantBaseNegativeOne():
+def test_Power_with_constant_base_negative_one():
     y = Variable("y")
     z = Power(Constant(-1), y)
     variable_values = VariableValues({ y: 3 })
@@ -197,7 +197,7 @@ def testPowerWithConstantBaseNegativeOne():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testPowerWithConstantExponentTwo():
+def test_Power_with_constant_exponent_two():
     x = Variable("x")
     z = Power(x, Constant(2))
     variable_values = VariableValues({ x: 3 })
@@ -222,7 +222,7 @@ def testPowerWithConstantExponentTwo():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(-10)
 
-def testPowerWithConstantExponentTwoComposition():
+def test_Power_with_constant_exponent_two_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(2))
     variable_values = VariableValues({ x: 1 })
@@ -233,7 +233,7 @@ def testPowerWithConstantExponentTwoComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(12)
 
-def testPowerWithConstantExponentOne():
+def test_Power_with_constant_exponent_one():
     x = Variable("x")
     z = Power(x, Constant(1))
     variable_values = VariableValues({ x: 3 })
@@ -258,7 +258,7 @@ def testPowerWithConstantExponentOne():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1)
 
-def testPowerWithConstantExponentOneComposition():
+def test_Power_with_constant_exponent_one_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(1))
     variable_values = VariableValues({ x: 1 })
@@ -269,7 +269,7 @@ def testPowerWithConstantExponentOneComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(3)
 
-def testPowerWithConstantExponentZero():
+def test_Power_with_constant_exponent_zero():
     x = Variable("x")
     z = Power(x, Constant(0))
     variable_values = VariableValues({ x: 3 })
@@ -294,7 +294,7 @@ def testPowerWithConstantExponentZero():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(0)
 
-def testPowerWithConstantExponentZeroComposition():
+def test_Power_with_constant_exponent_zero_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(0))
     variable_values = VariableValues({ x: 1 })
@@ -305,7 +305,7 @@ def testPowerWithConstantExponentZeroComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(0)
 
-def testPowerWithConstantExponentZeroDoesntShortCircuit():
+def test_Power_with_constant_exponent_zero_doesnt_short_circuit():
     x = Variable("x")
     z = Power(Logarithm(x), Constant(0))
     variable_values = VariableValues({ x: 0 })
@@ -316,7 +316,7 @@ def testPowerWithConstantExponentZeroDoesntShortCircuit():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testPowerWithConstantExponentNegativeOne():
+def test_Power_with_constant_exponent_negative_one():
     x = Variable("x")
     z = Power(x, Constant(-1))
     variable_values = VariableValues({ x: 2 })
@@ -341,7 +341,7 @@ def testPowerWithConstantExponentNegativeOne():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(-0.04)
 
-def testPowerWithConstantExponentNegativeOneComposition():
+def test_Power_with_constant_exponent_negative_one_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(-1))
     variable_values = VariableValues({ x: 1 })
@@ -352,7 +352,7 @@ def testPowerWithConstantExponentNegativeOneComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(-0.75)
 
-def testPowerWithConstantExponentNegativeTwo():
+def test_Power_with_constant_exponent_negative_two():
     x = Variable("x")
     z = Power(x, Constant(-2))
     variable_values = VariableValues({ x: 2 })
@@ -377,7 +377,7 @@ def testPowerWithConstantExponentNegativeTwo():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(0.016)
 
-def testPowerWithConstantExponentNegativeTwoComposition():
+def test_Power_with_constant_exponent_negative_two_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(-2))
     variable_values = VariableValues({ x: 1 })
@@ -388,7 +388,7 @@ def testPowerWithConstantExponentNegativeTwoComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(-0.75)
 
-def testPowerWithExponentMadeFromAddingConstants():
+def test_Power_with_exponent_made_from_adding_constants():
     x = Variable("x")
     z = Power(x, Constant(1) + Constant(1))
     variable_values = VariableValues({ x: 3 })
@@ -413,7 +413,7 @@ def testPowerWithExponentMadeFromAddingConstants():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(-10)
 
-def testPowerWhereExponentIsAnIntegerRepresentedAsAFloat():
+def test_Power_where_exponent_is_an_integer_represented_as_a_float():
     x = Variable("x")
     z = Power(x, Constant(2.0))
     variable_values = VariableValues({ x: -5 })

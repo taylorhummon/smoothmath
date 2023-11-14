@@ -5,7 +5,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.exponential import Exponential
 
-def testPolynomialOfOneVariable():
+def test_polynomial_of_one_variable():
     x = Variable("x")
     z = x * x - Constant(6) * x + Constant(4)
     variable_values = VariableValues({ x: 2 })
@@ -16,7 +16,7 @@ def testPolynomialOfOneVariable():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == -2
 
-def testPolynomialOfTwoVariables():
+def test_polynomial_of_two_variables():
     x = Variable("x")
     y = Variable("y")
     z = x * (x + y) - Constant(5) * y * y
@@ -31,7 +31,7 @@ def testPolynomialOfTwoVariables():
     assert all_partials.partial_with_respect_to(x) == 7
     assert all_partials.partial_with_respect_to(y) == -28
 
-def testPolynomialOfThreeVariables():
+def test_polynomial_of_three_variables():
     w = Variable("w")
     x = Variable("x")
     y = Variable("y")
@@ -50,7 +50,7 @@ def testPolynomialOfThreeVariables():
     assert all_partials.partial_with_respect_to(x) == 52
     assert all_partials.partial_with_respect_to(y) == -6
 
-def testUnrelatedVariable():
+def test_unrelated_variable():
     x = Variable("x")
     y = Variable("y")
     z = x ** Constant(2)
@@ -62,7 +62,7 @@ def testUnrelatedVariable():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(y) == 0
 
-def testCompositeFunction():
+def test_composite_function():
     x = Variable("x")
     z = Exponential(x ** Constant(2))
     variable_values = VariableValues({ x: 2 })
@@ -73,7 +73,7 @@ def testCompositeFunction():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(218.392600132)
 
-def testIndeterminateForm():
+def test_indeterminate_form():
     t = Variable("t")
     z = (Constant(2) * t) / t
     variable_values = VariableValues({ t: 0 })
@@ -84,7 +84,7 @@ def testIndeterminateForm():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testExpressionReuse():
+def test_expression_reuse():
     x = Variable("x")
     w = x ** Constant(2)
     z = (w + Constant(1)) / w
@@ -96,13 +96,13 @@ def testExpressionReuse():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(-0.25)
 
-def testPartialAtUsingVariableName():
+def test_partial_at_using_variable_name():
     x = Variable("x")
     z = x ** Constant(2)
     partial = z.partial_at(VariableValues({ "x": 3 }), "x")
     assert partial == approx(6)
 
-def testEquality():
+def test_equality():
     c = Constant(7)
     assert c == c
     assert c == Constant(7)

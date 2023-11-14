@@ -1,7 +1,7 @@
 from smoothmath.expressions.variable import Variable
 from smoothmath.variable_values import VariableValues
 
-def testVariable():
+def test_variable():
     x = Variable("x")
     variable_values = VariableValues({ x: 2 })
     value = x.evaluate(variable_values)

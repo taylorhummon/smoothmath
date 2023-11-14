@@ -5,7 +5,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.cosine import Cosine
 
-def testCosine():
+def test_Cosine():
     theta = Variable("theta")
     z = Cosine(theta)
     variable_values = VariableValues({ theta: 0 })
@@ -23,7 +23,7 @@ def testCosine():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(theta) == approx(-1)
 
-def testCosineComposition():
+def test_Cosine_composition():
     theta = Variable("theta")
     z = Cosine(Constant(2) * theta)
     variable_values = VariableValues({ theta: math.pi / 4 })

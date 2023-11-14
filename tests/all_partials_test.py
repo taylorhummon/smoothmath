@@ -1,7 +1,7 @@
 from smoothmath.all_partials import AllPartials
 from smoothmath.expressions.variable import Variable
 
-def testAllPartials():
+def test_AllPartials():
     w = Variable("w")
     x = Variable("x")
     y = Variable("y")

@@ -5,7 +5,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.reciprocal import Reciprocal
 
-def testReciprocal():
+def test_Reciprocal():
     x = Variable("x")
     z = Reciprocal(x)
     variable_values = VariableValues({ x: 2 })
@@ -30,7 +30,7 @@ def testReciprocal():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(-1)
 
-def testReciprocalComposition():
+def test_Reciprocal_composition():
     x = Variable("x")
     z = Reciprocal(Constant(2) * x - Constant(4))
     variable_values = VariableValues({ x: 3 })

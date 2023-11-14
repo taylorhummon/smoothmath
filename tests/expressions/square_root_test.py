@@ -5,7 +5,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.square_root import SquareRoot
 
-def testSquareRoot():
+def test_SquareRoot():
     x = Variable("x")
     z = SquareRoot(x)
     variable_values = VariableValues({ x: 4 })
@@ -30,7 +30,7 @@ def testSquareRoot():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testSquareRootComposition():
+def test_SquareRoot_composition():
     x = Variable("x")
     z = SquareRoot(Constant(2) * x + Constant(7))
     variable_values = VariableValues({ x: 1 })

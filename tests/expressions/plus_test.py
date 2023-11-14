@@ -4,7 +4,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.plus import Plus
 
-def testPlus():
+def test_Plus():
     x = Variable("x")
     y = Variable("y")
     z = Plus(x, y)
@@ -19,7 +19,7 @@ def testPlus():
     assert all_partials.partial_with_respect_to(x) == approx(1)
     assert all_partials.partial_with_respect_to(y) == approx(1)
 
-def testPlusComposition():
+def test_Plus_composition():
     x = Variable("x")
     y = Variable("y")
     z = Plus(Constant(5) * x, Constant(4) * y)

@@ -5,7 +5,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.sine import Sine
 
-def testSine():
+def test_Sine():
     theta = Variable("theta")
     z = Sine(theta)
     variable_values = VariableValues({ theta: 0 })
@@ -22,7 +22,7 @@ def testSine():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(theta) == approx(0)
 
-def testSineComposition():
+def test_Sine_composition():
     theta = Variable("theta")
     z = Sine(Constant(2) * theta)
     variable_values = VariableValues({ theta: 0 })

@@ -6,7 +6,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.logarithm import Logarithm
 
-def testLogarithm():
+def test_Logarithm():
     x = Variable("x")
     z = Logarithm(x)
     variable_values = VariableValues({ x: 1 })
@@ -38,7 +38,7 @@ def testLogarithm():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testLogarithmComposition():
+def test_Logarithm_composition():
     x = Variable("x")
     z = Logarithm(Constant(2) * x - Constant(3))
     variable_values = VariableValues({ x: 2 })
@@ -49,7 +49,7 @@ def testLogarithmComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(2)
 
-def testBaseTwoLogarithm():
+def test_base_two_Logarithm():
     x = Variable("x")
     z = Logarithm(x, 2)
     variable_values = VariableValues({ x: 1 })
@@ -81,7 +81,7 @@ def testBaseTwoLogarithm():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testBaseTwoLogarithmComposition():
+def test_base_two_Logarithm_composition():
     x = Variable("x")
     z = Logarithm(Constant(2) * x - Constant(6), 2)
     variable_values = VariableValues({ x: 7 })

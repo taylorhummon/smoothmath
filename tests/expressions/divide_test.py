@@ -6,7 +6,7 @@ from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.logarithm import Logarithm
 from smoothmath.expressions.divide import Divide
 
-def testDivide():
+def test_Divide():
     x = Variable("x")
     y = Variable("y")
     z = Divide(x, y)
@@ -39,7 +39,7 @@ def testDivide():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testDivideComposition():
+def test_Divide_composition():
     x = Variable("x")
     y = Variable("y")
     z = Divide(Constant(2) * x + Constant(4), Constant(5) * y)
@@ -54,7 +54,7 @@ def testDivideComposition():
     assert all_partials.partial_with_respect_to(x) == approx(0.4)
     assert all_partials.partial_with_respect_to(y) == approx(-2)
 
-def testDivideWithConstantNumeratorZero():
+def test_Divide_with_constant_numerator_zero():
     y = Variable("y")
     z = Divide(Constant(0), y)
     variable_values = VariableValues({ y: 3 })
@@ -72,7 +72,7 @@ def testDivideWithConstantNumeratorZero():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(y) == approx(0)
 
-def testDivideWithConstantNumeratorZeroComposition():
+def test_Divide_with_constant_numerator_zero_composition():
     y = Variable("y")
     z = Divide(Constant(0), Constant(2) * y + Constant(4))
     variable_values = VariableValues({ y: 3 })
@@ -83,7 +83,7 @@ def testDivideWithConstantNumeratorZeroComposition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(y) == approx(0)
 
-def testDivideWithConstantNumeratorZeroDoesntShortCircuit():
+def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     y = Variable("y")
     z = Divide(Constant(0), Logarithm(y))
     variable_values = VariableValues({ y: 0 })
@@ -94,7 +94,7 @@ def testDivideWithConstantNumeratorZeroDoesntShortCircuit():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testDivideWithConstantDenominatorOne():
+def test_Divide_with_constant_denominator_one():
     x = Variable("x")
     z = Divide(x, Constant(1))
     variable_values = VariableValues({ x: 3 })
@@ -112,7 +112,7 @@ def testDivideWithConstantDenominatorOne():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1)
 
-def testDivideWithConstantDenominatorZero():
+def test_divide_with_constant_denominator_zero():
     x = Variable("x")
     z = Divide(x, Constant(0))
     variable_values = VariableValues({ x: 3 })

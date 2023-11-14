@@ -6,7 +6,7 @@ from smoothmath.expressions.variable import Variable
 from smoothmath.expressions.multiply import Multiply
 from smoothmath.expressions.power import Power
 
-def testMultiply():
+def test_Multiply():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(x, y)
@@ -21,7 +21,7 @@ def testMultiply():
     assert all_partials.partial_with_respect_to(x) == approx(3)
     assert all_partials.partial_with_respect_to(y) == approx(2)
 
-def testMultiplyComposition():
+def test_Multiply_composition():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(Constant(5) * x, y - Constant(1))
@@ -36,7 +36,7 @@ def testMultiplyComposition():
     assert all_partials.partial_with_respect_to(x) == approx(10)
     assert all_partials.partial_with_respect_to(y) == approx(10)
 
-def testMultiplyByZero():
+def test_Multiply_by_zero():
     x = Variable("x")
     z = Multiply(Constant(0), x)
     variable_values = VariableValues({ x: 2 })
@@ -47,7 +47,7 @@ def testMultiplyByZero():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(0)
 
-def testMultiplyByZeroDoesntShortCircuit():
+def test_Multiply_by_zero_doesnt_short_circuit():
     x = Variable("x")
     z = Multiply(Constant(0), Power(Constant(-1), x))
     variable_values = VariableValues({ x: 2 })
@@ -58,7 +58,7 @@ def testMultiplyByZeroDoesntShortCircuit():
     with raises(DomainError):
         z.all_partials_at(variable_values)
 
-def testMultiplyByOne():
+def test_Multiply_by_one():
     x = Variable("x")
     z = Multiply(Constant(1), x)
     variable_values = VariableValues({ x: 2 })

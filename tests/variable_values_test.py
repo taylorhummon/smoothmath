@@ -2,7 +2,7 @@ from pytest import raises
 from smoothmath.expressions.variable import Variable
 from smoothmath.variable_values import VariableValues
 
-def testVariableValues():
+def test_VariableValues():
     x = Variable("x")
     y = Variable("y")
     variable_values = VariableValues({ x: 3, y: 4 })
@@ -16,14 +16,14 @@ def testVariableValues():
     assert variable_values.value_for("x") == 5
     assert variable_values.value_for("y") == 6
 
-def testVariableValuesWhenMissingAVariable():
+def test_VariableValues_when_missing_a_variable():
     x = Variable("x")
     y = Variable("y")
     variable_values = VariableValues({ x: 3 })
     with raises(Exception):
         variable_values.value_for(y)
 
-def testVariableValuesWhenProvidingTheSameVariableTwice():
+def test_VariableValues_when_providing_the_same_variable_twice():
     x = Variable("x")
     y = Variable("y")
     with raises(Exception):

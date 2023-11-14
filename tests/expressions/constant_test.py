@@ -2,7 +2,7 @@ from smoothmath.expressions.constant import Constant
 from smoothmath.expressions.variable import Variable
 from smoothmath.variable_values import VariableValues
 
-def testConstant():
+def test_Constant():
     c = Constant(7)
     variable_values = VariableValues({})
     assert c.evaluate(variable_values) == 7
