@@ -1,7 +1,5 @@
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions.constant import Constant
-from smoothmath.expressions.variable import Variable
-from smoothmath.expressions.negation import Negation
+from smoothmath.expressions import Constant, Variable, Negation
 
 def test_Negation():
     x = Variable("x")

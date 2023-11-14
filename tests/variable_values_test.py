@@ -1,5 +1,5 @@
 from pytest import raises
-from smoothmath.expressions.variable import Variable
+from smoothmath.expressions import Variable
 from smoothmath.variable_values import VariableValues
 
 def test_VariableValues():

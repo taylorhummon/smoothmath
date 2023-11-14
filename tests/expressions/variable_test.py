@@ -1,5 +1,5 @@
-from smoothmath.expressions.variable import Variable
 from smoothmath.variable_values import VariableValues
+from smoothmath.expressions import Variable
 
 def test_variable():
     x = Variable("x")

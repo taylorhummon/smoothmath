@@ -1,9 +1,7 @@
 from pytest import approx
 import math
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions.constant import Constant
-from smoothmath.expressions.variable import Variable
-from smoothmath.expressions.exponential import Exponential
+from smoothmath.expressions import Constant, Variable, Exponential
 
 def test_exponential():
     x = Variable("x")

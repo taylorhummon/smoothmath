@@ -1,11 +1,7 @@
 from pytest import approx, raises
-from smoothmath.variable_values import VariableValues
 from smoothmath.errors import DomainError
-from smoothmath.expressions.constant import Constant
-from smoothmath.expressions.variable import Variable
-from smoothmath.expressions.square_root import SquareRoot
-from smoothmath.expressions.logarithm import Logarithm
-from smoothmath.expressions.power import Power
+from smoothmath.variable_values import VariableValues
+from smoothmath.expressions import Constant, Variable, SquareRoot, Logarithm, Power
 
 def test_Power():
     x = Variable("x")

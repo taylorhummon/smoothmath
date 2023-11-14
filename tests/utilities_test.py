@@ -1,5 +1,5 @@
 import smoothmath.utilities as utilities
-from smoothmath.expressions.variable import Variable
+from smoothmath.expressions import Variable
 
 def test_is_integer():
     assert utilities.is_integer(3) == True

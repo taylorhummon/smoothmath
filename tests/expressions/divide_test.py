@@ -1,10 +1,7 @@
 from pytest import approx, raises
 from smoothmath.errors import DomainError
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions.constant import Constant
-from smoothmath.expressions.variable import Variable
-from smoothmath.expressions.logarithm import Logarithm
-from smoothmath.expressions.divide import Divide
+from smoothmath.expressions import Constant, Variable, Logarithm, Divide
 
 def test_Divide():
     x = Variable("x")

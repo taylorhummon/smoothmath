@@ -1,10 +1,7 @@
 from pytest import approx, raises
 from smoothmath.errors import DomainError
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions.constant import Constant
-from smoothmath.expressions.variable import Variable
-from smoothmath.expressions.multiply import Multiply
-from smoothmath.expressions.power import Power
+from smoothmath.expressions import Constant, Variable, Power, Multiply
 
 def test_Multiply():
     x = Variable("x")

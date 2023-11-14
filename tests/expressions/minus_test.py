@@ -1,8 +1,6 @@
 from pytest import approx
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions.constant import Constant
-from smoothmath.expressions.variable import Variable
-from smoothmath.expressions.minus import Minus
+from smoothmath.expressions import Constant, Variable, Minus
 
 def test_Minus():
     x = Variable("x")

@@ -1,9 +1,7 @@
 from pytest import approx, raises
 from smoothmath.errors import DomainError
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions.constant import Constant
-from smoothmath.expressions.variable import Variable
-from smoothmath.expressions.reciprocal import Reciprocal
+from smoothmath.expressions import Constant, Variable, Reciprocal
 
 def test_Reciprocal():
     x = Variable("x")
