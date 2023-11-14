@@ -9,7 +9,7 @@ class VariableValues:
         self: VariableValues,
         dictionary: Mapping[Variable | str, real_number]
     ) -> None:
-        self._value_by_variable_name : Mapping[str, real_number]
+        self._value_by_variable_name: Mapping[str, real_number]
         self._value_by_variable_name = {}
         for variable_or_name, value in dictionary.items():
             name = utilities.get_variable_name(variable_or_name)

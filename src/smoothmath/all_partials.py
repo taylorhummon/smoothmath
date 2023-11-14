@@ -8,7 +8,7 @@ class AllPartials:
     def __init__(
         self: AllPartials
     ) -> None:
-        self._partial_by_variable_name : dict[str, real_number]
+        self._partial_by_variable_name: dict[str, real_number]
         self._partial_by_variable_name = {}
 
     def partial_with_respect_to(
@@ -23,7 +23,7 @@ class AllPartials:
         variable: Variable,
         seed: real_number
     ) -> None:
-        existing_value =  self._partial_by_variable_name.get(variable.name, 0)
+        existing_value = self._partial_by_variable_name.get(variable.name, 0)
         self._partial_by_variable_name[variable.name] = existing_value + seed
 
 # imports needed for class implementation

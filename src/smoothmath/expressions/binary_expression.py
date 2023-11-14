@@ -17,11 +17,11 @@ class BinaryExpression(Expression):
         if not isinstance(b, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {b}")
         super().__init__(lacks_variables = a.lacks_variables and b.lacks_variables)
-        self._a : Expression
+        self._a: Expression
         self._a = a
-        self._b : Expression
+        self._b: Expression
         self._b = b
-        self._value : real_number | None
+        self._value: real_number | None
         self._value = None
 
     def _reset_evaluation_cache(

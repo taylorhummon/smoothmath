@@ -19,7 +19,7 @@ class Exponential(UnaryExpression):
         super().__init__(exponent)
         if base <= 0:
             raise Exception("Exponentials must have a positive base")
-        self._base : real_number
+        self._base: real_number
         self._base = base
 
     def _evaluate(

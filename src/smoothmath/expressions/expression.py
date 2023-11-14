@@ -12,7 +12,7 @@ class Expression(ABC):
         self: Expression,
         lacks_variables: bool
     ) -> None:
-        self.lacks_variables : bool
+        self.lacks_variables: bool
         self.lacks_variables = lacks_variables
 
     def evaluate(

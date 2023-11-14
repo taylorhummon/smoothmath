@@ -21,7 +21,7 @@ class Logarithm(UnaryExpression):
             raise Exception("Logarithms must have a positive base")
         elif base == 1:
             raise Exception("Logarithms cannot have base = 1")
-        self._base : real_number
+        self._base: real_number
         self._base = base
 
     def _evaluate(

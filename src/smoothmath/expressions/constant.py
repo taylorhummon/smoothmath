@@ -14,7 +14,7 @@ class Constant(NullaryExpression):
         value: real_number
     ) -> None:
         super().__init__(lacks_variables = True)
-        self._value : real_number
+        self._value: real_number
         self._value = value
 
     def _evaluate(

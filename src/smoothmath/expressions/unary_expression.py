@@ -14,9 +14,9 @@ class UnaryExpression(Expression):
         if not isinstance(a, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {a}")
         super().__init__(lacks_variables = a.lacks_variables)
-        self._a : Expression
+        self._a: Expression
         self._a = a
-        self._value : real_number | None
+        self._value: real_number | None
         self._value = None
 
     def _reset_evaluation_cache(

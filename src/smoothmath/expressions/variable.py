@@ -16,9 +16,9 @@ class Variable(NullaryExpression):
         super().__init__(lacks_variables = False)
         if not name:
             raise Exception("Variables must be given a non-blank name")
-        self.name : str
+        self.name: str
         self.name = name
-        self._cached_hash : int | None
+        self._cached_hash: int | None
         self._cached_hash = None
 
     def _evaluate(
