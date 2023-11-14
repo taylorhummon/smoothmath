@@ -27,7 +27,7 @@ class Divide(BinaryExpression):
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
-        if self._a.lacks_variables and a_value == 0:
+        if self._a._lacks_variables and a_value == 0:
             self._value = 0
         else:
             self._ensure_value_is_in_domain(a_value, b_value)
@@ -44,7 +44,7 @@ class Divide(BinaryExpression):
         a_partial = self._a._partial_at(variable_values, with_respect_to)
         b_partial = self._b._partial_at(variable_values, with_respect_to)
         # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
-        if self._a.lacks_variables and a_value == 0:
+        if self._a._lacks_variables and a_value == 0:
             return 0
         else:
             self._ensure_value_is_in_domain(a_value, b_value)
@@ -60,7 +60,7 @@ class Divide(BinaryExpression):
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
-        if self._a.lacks_variables and a_value == 0:
+        if self._a._lacks_variables and a_value == 0:
             self._b._compute_all_partials_at(all_partials, variable_values, 0)
         else:
             self._ensure_value_is_in_domain(a_value, b_value)

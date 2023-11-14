@@ -18,10 +18,13 @@ from smoothmath.expressions.binary_expression import BinaryExpression
 
 
 def _is_case_i(
-        b_value: real_number,
-        b_lacks_variables: bool
-    ) -> bool:
-        return b_lacks_variables and utilities.is_integer(b_value)
+    b: Expression,
+    variable_values: VariableValues
+) -> bool:
+    if not b._lacks_variables:
+        return False
+    b_value = b.evaluate(variable_values)
+    return utilities.is_integer(b_value)
 
 
 class Power(BinaryExpression):
@@ -40,7 +43,7 @@ class Power(BinaryExpression):
             return self._value
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values)
-        if _is_case_i(b_value, self._b.lacks_variables):
+        if _is_case_i(self._b, variable_values):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
         else: # case ii
             self._ensure_value_is_in_domain_case_ii(a_value, b_value)
@@ -56,7 +59,7 @@ class Power(BinaryExpression):
         b_value = self._b._evaluate(variable_values)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
         b_partial = self._b._partial_at(variable_values, with_respect_to)
-        if _is_case_i(b_value, self._b.lacks_variables):
+        if _is_case_i(self._b, variable_values):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
             return self._partial_case_i(a_value, a_partial, b_value)
         else: # case ii
@@ -101,7 +104,7 @@ class Power(BinaryExpression):
     ) -> None:
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values)
-        if _is_case_i(b_value, self._b.lacks_variables):
+        if _is_case_i(self._b, variable_values):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
             next_seed = self._next_seed_case_i(a_value, b_value, seed)
             self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
