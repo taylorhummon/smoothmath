@@ -9,12 +9,12 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.binary_expression import BinaryExpression
 
-# For a power a ** b, there are two over-arching cases we work with:
-# (I) the exponent, b, can be determined to be a constant integer
+# For a power, a ** b, there are two over-arching cases we work with:
+# (i) the exponent, b, can be determined to be a constant integer
 #     e.g. a ** 2, a ** 3, or a ** (-1)
-# (II) otherwise
+# (ii) otherwise
 #     e.g. e ** b, or 3 ** b, a ** b,
-# In case (I), we allow negative bases. In case (II), we only allow positive bases.
+# In case (i), we allow negative bases. In case (i), we only allow positive bases.
 
 def _is_case_i(
         b_value: real_number,
@@ -40,7 +40,7 @@ class Power(BinaryExpression):
         b_value = self._b._evaluate(variable_values)
         if _is_case_i(b_value, self._b.lacks_variables):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
-        else: # Case II
+        else: # case ii
             self._ensure_value_is_in_domain_case_ii(a_value, b_value)
         self._value = a_value ** b_value
         return self._value
@@ -57,7 +57,7 @@ class Power(BinaryExpression):
         if _is_case_i(b_value, self._b.lacks_variables):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
             return self._partial_case_i(a_value, a_partial, b_value)
-        else: # Case II
+        else: # case ii
             self._ensure_value_is_in_domain_case_ii(a_value, b_value)
             return self._partial_case_ii(a_value, a_partial, b_value, b_partial)
 
@@ -103,7 +103,7 @@ class Power(BinaryExpression):
             self._ensure_value_is_in_domain_case_i(a_value, b_value)
             next_seed = self._next_seed_case_i(a_value, b_value, seed)
             self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
-        else: # Case II
+        else: # case ii
             self._ensure_value_is_in_domain_case_ii(a_value, b_value)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_seed_a = self._next_seed_a_case_ii(a_value, b_value, seed)
