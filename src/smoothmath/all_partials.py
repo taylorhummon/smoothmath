@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.typing import real_number
     from smoothmath.expressions.variable import Variable
 
+
 class AllPartials:
     def __init__(
         self: AllPartials
@@ -25,6 +26,7 @@ class AllPartials:
     ) -> None:
         existing_value = self._partial_by_variable_name.get(variable.name, 0)
         self._partial_by_variable_name[variable.name] = existing_value + seed
+
 
 # imports needed for class implementation
 import smoothmath.utilities as utilities

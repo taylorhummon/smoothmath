@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.binary_expression import BinaryExpression
 
+
 class Multiply(BinaryExpression):
     def __init__(
         self: Multiply,

@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
 
+
 class Negation(UnaryExpression):
     def __init__(
         self: Negation,

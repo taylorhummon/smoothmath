@@ -7,10 +7,12 @@ if TYPE_CHECKING:
 # This is_integer() function will be no longer needed as of Python 3.12
 # when the is_integer() method is defined on int objects.
 
+
 def is_integer(
     value: real_number
 ) -> bool:
     return isinstance(value, int) or value.is_integer()
+
 
 def get_variable_name(
     variable_or_name: Variable | str

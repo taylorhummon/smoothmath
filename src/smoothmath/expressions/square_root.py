@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
 
+
 class SquareRoot(UnaryExpression):
     def __init__(
         self: SquareRoot,
@@ -59,6 +60,7 @@ class SquareRoot(UnaryExpression):
             raise DomainError("SquareRoot(x) is not smooth around x = 0")
         elif a_value < 0:
             raise DomainError("SquareRoot(x) is undefined for x < 0")
+
 
 # imports needed for class implementation
 import math

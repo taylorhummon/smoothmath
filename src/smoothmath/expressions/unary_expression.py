@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.expression import Expression
 
+
 class UnaryExpression(Expression):
     def __init__(
         self: UnaryExpression,

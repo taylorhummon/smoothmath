@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
 
+
 class Cosine(UnaryExpression):
     def __init__(
         self: Cosine,
@@ -46,6 +47,7 @@ class Cosine(UnaryExpression):
         # d(cos(a)) = - sin(a) * da
         next_seed = - seed * math.sin(a_value)
         self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+
 
 # imports needed for class implementation
 import math

@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.unary_expression import UnaryExpression
 
+
 class Reciprocal(UnaryExpression):
     def __init__(
         self: Reciprocal,
@@ -58,6 +59,7 @@ class Reciprocal(UnaryExpression):
     ) -> None:
         if a_value == 0:
             raise DomainError("Reciprocal(x) blows up around x = 0")
+
 
 # imports needed for class implementation
 from smoothmath.errors import DomainError

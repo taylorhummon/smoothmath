@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from abc import ABC, abstractmethod
 
+
 class Expression(ABC):
     def __init__(
         self: Expression,
@@ -114,6 +115,7 @@ class Expression(ABC):
         other: Expression
     ) -> Power:
         return Power(self, other)
+
 
 # imports needed for class implementation
 import smoothmath.utilities as utilities

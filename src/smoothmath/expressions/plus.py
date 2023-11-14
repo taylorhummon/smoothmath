@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.binary_expression import BinaryExpression
 
+
 class Plus(BinaryExpression):
     def __init__(
         self: Plus,

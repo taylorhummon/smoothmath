@@ -16,11 +16,13 @@ from smoothmath.expressions.binary_expression import BinaryExpression
 #     e.g. e ** b, or 3 ** b, a ** b,
 # In case (i), we allow negative bases. In case (i), we only allow positive bases.
 
+
 def _is_case_i(
         b_value: real_number,
         b_lacks_variables: bool
     ) -> bool:
         return b_lacks_variables and utilities.is_integer(b_value)
+
 
 class Power(BinaryExpression):
     def __init__(
@@ -166,6 +168,7 @@ class Power(BinaryExpression):
                 raise DomainError("Power(x, y) blows up around x = 0 for y < 0")
         elif a_value < 0:
             raise DomainError("Power(x, y) is undefined for x < 0")
+
 
 # imports needed for class implementation
 import math

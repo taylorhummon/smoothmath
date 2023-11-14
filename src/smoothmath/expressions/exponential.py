@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 from smoothmath.expressions.unary_expression import UnaryExpression
 import math
 
+
 class Exponential(UnaryExpression):
     def __init__(
         self: Exponential,

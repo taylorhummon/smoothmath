@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 # imports needed for class declaration
 from smoothmath.expressions.nullary_expression import NullaryExpression
 
+
 class Constant(NullaryExpression):
     def __init__(
         self: Constant,
