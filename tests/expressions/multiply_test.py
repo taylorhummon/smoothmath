@@ -7,7 +7,7 @@ def test_Multiply():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(x, y)
-    variable_values = VariableValues({ x: 2, y: 3 })
+    variable_values = VariableValues({x: 2, y: 3})
     value = z.evaluate(variable_values)
     assert value == approx(6)
     partial_with_respect_to_x = z.partial_at(variable_values, x)
@@ -22,7 +22,7 @@ def test_Multiply_composition():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(Constant(5) * x, y - Constant(1))
-    variable_values = VariableValues({ x: 2, y: 3 })
+    variable_values = VariableValues({x: 2, y: 3})
     value = z.evaluate(variable_values)
     assert value == approx(20)
     partial_with_respect_to_x = z.partial_at(variable_values, x)
@@ -36,7 +36,7 @@ def test_Multiply_composition():
 def test_Multiply_by_zero():
     x = Variable("x")
     z = Multiply(Constant(0), x)
-    variable_values = VariableValues({ x: 2 })
+    variable_values = VariableValues({x: 2})
     value = z.evaluate(variable_values)
     assert value == approx(0)
     partial = z.partial_at(variable_values, x)
@@ -47,7 +47,7 @@ def test_Multiply_by_zero():
 def test_Multiply_by_zero_doesnt_short_circuit():
     x = Variable("x")
     z = Multiply(Constant(0), Power(Constant(-1), x))
-    variable_values = VariableValues({ x: 2 })
+    variable_values = VariableValues({x: 2})
     with raises(DomainError):
         z.evaluate(variable_values)
     with raises(DomainError):
@@ -58,7 +58,7 @@ def test_Multiply_by_zero_doesnt_short_circuit():
 def test_Multiply_by_one():
     x = Variable("x")
     z = Multiply(Constant(1), x)
-    variable_values = VariableValues({ x: 2 })
+    variable_values = VariableValues({x: 2})
     value = z.evaluate(variable_values)
     assert value == approx(2)
     partial = z.partial_at(variable_values, x)
