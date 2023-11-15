@@ -1,13 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.binary_expression import BinaryExpression
+import math
+from smoothmath.expression import BinaryExpression
+from smoothmath.errors import DomainError
+import smoothmath.utilities as utilities
+import smoothmath.expressions as ex
 
 # For a power, a ** b, there are two over-arching cases we work with:
 # (i) the exponent, b, can be determined to be a constant integer
@@ -155,7 +158,7 @@ class Power(BinaryExpression):
         b_value: real_number
     ) -> None:
         if a_value == 0 and b_value <= -1:
-            raise DomainError("Power(x, C) blows up around x = 0 when C is a negative integer")
+            raise DomainError("Power(x, Constant(c)) blows up around x = 0 when c is a negative integer")
 
     def _ensure_value_is_in_domain_case_ii(
         self: Power,
@@ -172,8 +175,30 @@ class Power(BinaryExpression):
         elif a_value < 0:
             raise DomainError("Power(x, y) is undefined for x < 0")
 
-
-# imports needed for class implementation
-import math
-from smoothmath.errors import DomainError
-import smoothmath.utilities as utilities
+    def _synthetic_partial(
+            self: Power,
+            with_respect_to: str
+        ) -> Expression:
+            a_partial = self._a._synthetic_partial(with_respect_to)
+            b_partial = self._b._synthetic_partial(with_respect_to)
+            term_1 = (
+                ex.Multiply(
+                    self._b,
+                    Power(
+                        self._a,
+                        ex.Minus(self._b, ex.Constant(1))
+                    )
+                )
+            )
+            term_2 = (
+                ex.Multiply(
+                    ex.Logarithm(self._a),
+                    ex.Power(self._a, self._b)
+                )
+            )
+            return (
+                ex.Plus(
+                    ex.Multiply(term_1, a_partial),
+                    ex.Multiply(term_2, b_partial)
+                )
+            )

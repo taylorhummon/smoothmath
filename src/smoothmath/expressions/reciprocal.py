@@ -1,13 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.unary_expression import UnaryExpression
+from smoothmath.expression import UnaryExpression
+from smoothmath.errors import DomainError
+import smoothmath.expressions as ex
 
 
 class Reciprocal(UnaryExpression):
@@ -60,6 +61,14 @@ class Reciprocal(UnaryExpression):
         if a_value == 0:
             raise DomainError("Reciprocal(x) blows up around x = 0")
 
-
-# imports needed for class implementation
-from smoothmath.errors import DomainError
+    def _synthetic_partial(
+        self: Reciprocal,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        return (
+            ex.Multiply(
+                ex.Negation(ex.Reciprocal(ex.Power(self._a, ex.Constant(2)))),
+                a_partial
+            )
+        )

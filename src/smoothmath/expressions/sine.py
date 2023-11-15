@@ -1,13 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.unary_expression import UnaryExpression
+import math
+from smoothmath.expression import UnaryExpression
+import smoothmath.expressions as ex
 
 
 class Sine(UnaryExpression):
@@ -48,6 +49,12 @@ class Sine(UnaryExpression):
         next_seed = seed * math.cos(a_value)
         self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
 
-
-# imports needed for class implementation
-import math
+    def _synthetic_partial(
+        self: Sine,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        return ex.Multiply(
+            ex.Cosine(self._a),
+            a_partial
+        )

@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.nullary_expression import NullaryExpression
+from smoothmath.expression import NullaryExpression
+import smoothmath.expressions as ex
 
 
 class Variable(NullaryExpression):
@@ -21,6 +22,24 @@ class Variable(NullaryExpression):
         self.name = name
         self._cached_hash: int | None
         self._cached_hash = None
+
+    def __eq__(
+        self: Variable,
+        other: Any
+    ) -> bool:
+        return isinstance(other, Variable) and (other.name == self.name)
+
+    def __hash__(
+        self: Variable
+    ) -> int:
+        if self._cached_hash is None:
+            self._cached_hash = hash(self.name)
+        return self._cached_hash
+
+    def __str__(
+        self: Variable
+    ) -> str:
+        return f"Variable(\"{self.name}\")"
 
     def _evaluate(
         self: Variable,
@@ -46,20 +65,11 @@ class Variable(NullaryExpression):
     ) -> None:
         all_partials._add_seed(self, seed)
 
-    def __eq__(
+    def _synthetic_partial(
         self: Variable,
-        other: Any
-    ) -> bool:
-        return isinstance(other, Variable) and (other.name == self.name)
-
-    def __hash__(
-        self: Variable
-    ) -> int:
-        if self._cached_hash is None:
-            self._cached_hash = hash(self.name)
-        return self._cached_hash
-
-    def __str__(
-        self: Variable
-    ) -> str:
-        return self.name
+        with_respect_to: str
+    ) -> Expression:
+        if self.name == with_respect_to:
+            return ex.Constant(1)
+        else:
+            return ex.Constant(0)

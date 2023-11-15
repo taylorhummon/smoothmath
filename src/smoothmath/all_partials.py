@@ -1,9 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
-    from smoothmath.expressions.variable import Variable
+    from smoothmath.types import real_number
+    from smoothmath.expressions import Variable
 
+import smoothmath.utilities as utilities
 
 class AllPartials:
     def __init__(
@@ -26,7 +27,3 @@ class AllPartials:
     ) -> None:
         existing_value = self._partial_by_variable_name.get(variable.name, 0)
         self._partial_by_variable_name[variable.name] = existing_value + seed
-
-
-# imports needed for class implementation
-import smoothmath.utilities as utilities

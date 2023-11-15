@@ -1,14 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.unary_expression import UnaryExpression
 import math
+from smoothmath.expression import UnaryExpression
+from smoothmath.errors import DomainError
+import smoothmath.expressions as ex
 
 
 class Logarithm(UnaryExpression):
@@ -68,6 +69,9 @@ class Logarithm(UnaryExpression):
         elif a_value < 0:
             raise DomainError("Logarithm(x) is undefined for x < 0")
 
-
-# imports needed for class implementation
-from smoothmath.errors import DomainError
+    def _synthetic_partial(
+        self: Logarithm,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        return ex.Divide(a_partial, self._a)

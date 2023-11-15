@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.unary_expression import UnaryExpression
 import math
+from smoothmath.expression import UnaryExpression
+import smoothmath.expressions as ex
 
 
 class Exponential(UnaryExpression):
@@ -51,6 +51,19 @@ class Exponential(UnaryExpression):
         seed: real_number
     ) -> None:
         self_value = self._evaluate(variable_values)
-        # d(e ** a) = e ** a * da
+        # d(C ** a) = ln(C) * C ** a * da
         next_seed = seed * math.log(self._base) * self_value
         self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+
+    def _synthetic_partial(
+        self: Exponential,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        return ex.Multiply(
+            ex.Multiply(
+                ex.Logarithm(ex.Constant(self._base)),
+                ex.Exponential(self._a, self._base)
+            ),
+            a_partial
+        )

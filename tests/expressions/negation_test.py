@@ -1,6 +1,7 @@
 from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Constant, Variable, Negation
 
+
 def test_Negation():
     x = Variable("x")
     z = Negation(x)
@@ -11,6 +12,9 @@ def test_Negation():
     assert partial == -1
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == -1
+    synthetic_partial = z.synthetic_partial(x)
+    assert synthetic_partial.evaluate(variable_values) == -1
+
 
 def test_Negation_composition():
     x = Variable("x")
@@ -22,3 +26,5 @@ def test_Negation_composition():
     assert partial == -2
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == -2
+    synthetic_partial = z.synthetic_partial(x)
+    assert synthetic_partial.evaluate(variable_values) == -2

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
-    from smoothmath.expressions.variable import Variable
+    from smoothmath.types import real_number
+    from smoothmath.expressions import Variable
 
 # This is_integer() function will be no longer needed as of Python 3.12
 # when the is_integer() method is defined on int objects.

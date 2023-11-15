@@ -1,6 +1,7 @@
 from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Constant, Variable
 
+
 def test_Constant():
     c = Constant(7)
     variable_values = VariableValues({})
@@ -11,3 +12,5 @@ def test_Constant():
     assert partial == 0
     all_partials = c.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == 0
+    synthetic_partial = c.synthetic_partial(x)
+    assert synthetic_partial.evaluate(variable_values) == 0

@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
     from smoothmath.all_partials import AllPartials
 
-# imports needed for class declaration
-from smoothmath.expressions.binary_expression import BinaryExpression
+from smoothmath.expression import BinaryExpression
+import smoothmath.expressions as ex
 
 
 class Plus(BinaryExpression):
@@ -48,3 +48,11 @@ class Plus(BinaryExpression):
         # d(a + b) = da + db
         self._a._compute_all_partials_at(all_partials, variable_values, seed)
         self._b._compute_all_partials_at(all_partials, variable_values, seed)
+
+    def _synthetic_partial(
+        self: Plus,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        b_partial = self._b._synthetic_partial(with_respect_to)
+        return ex.Plus(a_partial, b_partial)

@@ -1,6 +1,7 @@
 from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Variable
 
+
 def test_variable():
     x = Variable("x")
     variable_values = VariableValues({x: 2})
@@ -13,3 +14,5 @@ def test_variable():
     all_partials = x.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == 1
     assert all_partials.partial_with_respect_to(y) == 0
+    assert x.synthetic_partial(x).evaluate(variable_values) == 1
+    assert x.synthetic_partial(y).evaluate(variable_values) == 0

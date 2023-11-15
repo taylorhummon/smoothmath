@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import Any, TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.all_partials import AllPartials
     from smoothmath.variable_values import VariableValues
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.nullary_expression import NullaryExpression
+from smoothmath.expression import NullaryExpression
+import smoothmath.expressions as ex
 
 
 class Constant(NullaryExpression):
@@ -17,6 +18,24 @@ class Constant(NullaryExpression):
         super().__init__(lacks_variables = True)
         self._value: real_number
         self._value = value
+
+    def __eq__(
+        self: Constant,
+        other: Any
+    ) -> bool:
+        return isinstance(other, Constant) and (other._value == self._value)
+
+    def __hash__(
+        self: Constant
+    ) -> int:
+        if self._cached_hash is None:
+            self._cached_hash = hash(self._value)
+        return self._cached_hash
+
+    def __str__(
+        self: Constant
+    ) -> str:
+        return f"Constant({self._value})"
 
     def _evaluate(
         self: Constant,
@@ -39,13 +58,8 @@ class Constant(NullaryExpression):
     ) -> None:
         pass
 
-    def __eq__(
+    def _synthetic_partial(
         self: Constant,
-        other: Any
-    ) -> bool:
-        return isinstance(other, Constant) and (other._value == self._value)
-
-    def __str__(
-        self: Constant
-    ) -> str:
-        return str(self._value)
+        with_respect_to: str
+    ) -> Expression:
+        return ex.Constant(0)

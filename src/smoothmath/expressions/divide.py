@@ -1,13 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.binary_expression import BinaryExpression
+from smoothmath.expression import BinaryExpression
+from smoothmath.errors import DomainError
+import smoothmath.expressions as ex
 
 
 class Divide(BinaryExpression):
@@ -81,6 +82,18 @@ class Divide(BinaryExpression):
             else: # a_value != 0
                 raise DomainError("Divide(x, y) blows up around x != 0 and y = 0")
 
-
-# imports needed for class implementation
-from smoothmath.errors import DomainError
+    def _synthetic_partial(
+        self: Divide,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        b_partial = self._b._synthetic_partial(with_respect_to)
+        return (
+            ex.Divide(
+                ex.Minus(
+                    ex.Multiply(self._b, a_partial),
+                    ex.Multiply(self._a, b_partial)
+                ),
+                ex.Power(self._b, ex.Constant(2))
+            )
+        )

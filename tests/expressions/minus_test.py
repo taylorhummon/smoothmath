@@ -2,6 +2,7 @@ from pytest import approx
 from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Constant, Variable, Minus
 
+
 def test_Minus():
     x = Variable("x")
     y = Variable("y")
@@ -16,6 +17,9 @@ def test_Minus():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1)
     assert all_partials.partial_with_respect_to(y) == approx(-1)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(1)
+    assert z.synthetic_partial(y).evaluate(variable_values) == approx(-1)
+
 
 def test_Minus_composition():
     x = Variable("x")
@@ -31,3 +35,5 @@ def test_Minus_composition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(5)
     assert all_partials.partial_with_respect_to(y) == approx(-4)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(5)
+    assert z.synthetic_partial(y).evaluate(variable_values) == approx(-4)

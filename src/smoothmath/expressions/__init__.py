@@ -17,7 +17,18 @@ from smoothmath.expressions.divide import Divide
 from smoothmath.expressions.power import Power
 
 __all__ = [
-    "Constant", "Variable",
-    "Negation", "Reciprocal", "SquareRoot", "Exponential", "Logarithm", "Sine", "Cosine",
-    "Plus", "Minus", "Multiply", "Divide", "Power"
+    "Constant",
+    "Variable",
+    "Negation",
+    "Reciprocal",
+    "SquareRoot",
+    "Exponential",
+    "Logarithm",
+    "Sine",
+    "Cosine",
+    "Plus",
+    "Minus",
+    "Multiply",
+    "Divide",
+    "Power"
 ]

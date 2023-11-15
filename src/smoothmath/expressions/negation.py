@@ -1,13 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.typing import real_number
+    from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
-    from smoothmath.expressions.expression import Expression
+    from smoothmath.expression import Expression
 
-# imports needed for class declaration
-from smoothmath.expressions.unary_expression import UnaryExpression
+from smoothmath.expression import UnaryExpression
+import smoothmath.expressions as ex
 
 
 class Negation(UnaryExpression):
@@ -44,3 +44,10 @@ class Negation(UnaryExpression):
     ) -> None:
         # d(-a) = -da
         self._a._compute_all_partials_at(all_partials, variable_values, - seed)
+
+    def _synthetic_partial(
+        self: Negation,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        return ex.Negation(a_partial)
