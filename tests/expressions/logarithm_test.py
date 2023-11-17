@@ -4,9 +4,11 @@ from smoothmath.errors import DomainError
 from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Constant, Variable, Logarithm
 
+
 def test_Logarithm():
     x = Variable("x")
     z = Logarithm(x)
+    # at x = 1
     variable_values = VariableValues({x: 1})
     value = z.evaluate(variable_values)
     assert value == approx(0)
@@ -14,6 +16,7 @@ def test_Logarithm():
     assert partial == approx(1)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1)
+    # at x = e
     variable_values = VariableValues({x: math.e})
     value = z.evaluate(variable_values)
     assert value == approx(1)
@@ -21,6 +24,7 @@ def test_Logarithm():
     assert partial == approx(1 / math.e)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1 / math.e)
+    # at x = 0
     variable_values = VariableValues({x: 0})
     with raises(DomainError):
         z.evaluate(variable_values)
@@ -28,6 +32,7 @@ def test_Logarithm():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+    # at x = -1
     variable_values = VariableValues({x: -1})
     with raises(DomainError):
         z.evaluate(variable_values)
@@ -35,6 +40,7 @@ def test_Logarithm():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+
 
 def test_Logarithm_composition():
     x = Variable("x")
@@ -47,9 +53,11 @@ def test_Logarithm_composition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(2)
 
+
 def test_base_two_Logarithm():
     x = Variable("x")
     z = Logarithm(x, 2)
+    # at x = 1
     variable_values = VariableValues({x: 1})
     value = z.evaluate(variable_values)
     assert value == approx(0)
@@ -57,6 +65,7 @@ def test_base_two_Logarithm():
     assert partial == approx(1.442695040888)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1.442695040888)
+    # at x = 2
     variable_values = VariableValues({x: 2})
     value = z.evaluate(variable_values)
     assert value == approx(1)
@@ -64,6 +73,7 @@ def test_base_two_Logarithm():
     assert partial == approx(0.721347520444)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(0.721347520444)
+    # at x = 0
     variable_values = VariableValues({x: 0})
     with raises(DomainError):
         z.evaluate(variable_values)
@@ -71,6 +81,7 @@ def test_base_two_Logarithm():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+    # at x = -1
     variable_values = VariableValues({x: -1})
     with raises(DomainError):
         z.evaluate(variable_values)
@@ -78,6 +89,7 @@ def test_base_two_Logarithm():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+
 
 def test_base_two_Logarithm_composition():
     x = Variable("x")

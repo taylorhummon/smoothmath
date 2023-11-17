@@ -3,9 +3,11 @@ import math
 from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Constant, Variable, Cosine
 
+
 def test_Cosine():
     theta = Variable("theta")
     z = Cosine(theta)
+    # at theta = 0
     variable_values = VariableValues({theta: 0})
     value = z.evaluate(variable_values)
     assert value == approx(1)
@@ -13,6 +15,7 @@ def test_Cosine():
     assert partial == approx(0)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(theta) == approx(0)
+    # theta = pi / 2
     variable_values = VariableValues({theta: math.pi / 2})
     value = z.evaluate(variable_values)
     assert value == approx(0)
@@ -20,6 +23,7 @@ def test_Cosine():
     assert partial == approx(-1)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(theta) == approx(-1)
+
 
 def test_Cosine_composition():
     theta = Variable("theta")

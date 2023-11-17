@@ -3,6 +3,7 @@ import math
 from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Constant, Variable, Exponential
 
+
 def test_exponential():
     x = Variable("x")
     z = Exponential(x)
@@ -34,6 +35,7 @@ def test_exponential():
     assert all_partials.partial_with_respect_to(x) == approx(1 / math.e)
     assert z.synthetic_partial(x).evaluate(variable_values) == approx(1 / math.e)
 
+
 def test_Exponential_composition():
     x = Variable("x")
     z = Exponential(Constant(2) * x - Constant(6))
@@ -45,6 +47,7 @@ def test_Exponential_composition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(2)
     assert z.synthetic_partial(x).evaluate(variable_values) == approx(2)
+
 
 def test_base_two_Exponential():
     x = Variable("x")
@@ -76,6 +79,7 @@ def test_base_two_Exponential():
     partial = z.partial_at(variable_values, x)
     assert partial == approx(0.346573590279)
     assert z.synthetic_partial(x).evaluate(variable_values) == approx(0.346573590279)
+
 
 def test_base_two_Exponential_composition():
     x = Variable("x")
