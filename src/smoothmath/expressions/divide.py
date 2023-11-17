@@ -2,12 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
 from smoothmath.errors import DomainError
+from smoothmath.variable_values import VariableValues
 import smoothmath.expressions as ex
 
 
@@ -18,6 +18,17 @@ class Divide(BinaryExpression):
         b: Expression
     ) -> None:
         super().__init__(a, b)
+
+    def _ensure_value_is_in_domain(
+        self: Divide,
+        a_value: real_number,
+        b_value: real_number
+    ) -> None:
+        if b_value == 0:
+            if a_value == 0:
+                raise DomainError("Divide(x, y) is not smooth around (x = 0, y = 0)")
+            else: # a_value != 0
+                raise DomainError("Divide(x, y) blows up around x != 0 and y = 0")
 
     def _evaluate(
         self: Divide,
@@ -44,7 +55,7 @@ class Divide(BinaryExpression):
         b_value = self._b._evaluate(variable_values)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
         b_partial = self._b._partial_at(variable_values, with_respect_to)
-        # Note: 0 / y is smooth at y = 0 despite x / y not being smooth at (0, 0)
+        # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self._a._lacks_variables and a_value == 0:
             return 0
         else:
@@ -71,29 +82,23 @@ class Divide(BinaryExpression):
             self._a._compute_all_partials_at(all_partials, variable_values, next_seedA)
             self._b._compute_all_partials_at(all_partials, variable_values, next_seedB)
 
-    def _ensure_value_is_in_domain(
-        self: Divide,
-        a_value: real_number,
-        b_value: real_number
-    ) -> None:
-        if b_value == 0:
-            if a_value == 0:
-                raise DomainError("Divide(x, y) is not smooth around (x = 0, y = 0)")
-            else: # a_value != 0
-                raise DomainError("Divide(x, y) blows up around x != 0 and y = 0")
-
     def _synthetic_partial(
         self: Divide,
         with_respect_to: str
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
         b_partial = self._b._synthetic_partial(with_respect_to)
-        return (
-            ex.Divide(
-                ex.Minus(
-                    ex.Multiply(self._b, a_partial),
-                    ex.Multiply(self._a, b_partial)
-                ),
-                ex.Power(self._b, ex.Constant(2))
+        # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
+        if self._a._lacks_variables and self._a._evaluate(VariableValues({})) == 0:
+            # Note: 0 * b will equal zero unless b happens to blow up during evaluation
+            return ex.Multiply(ex.Constant(0), self._b)
+        else:
+            return (
+                ex.Divide(
+                    ex.Minus(
+                        ex.Multiply(self._b, a_partial),
+                        ex.Multiply(self._a, b_partial)
+                    ),
+                    ex.Power(self._b, ex.Constant(2))
+                )
             )
-        )
