@@ -15,6 +15,7 @@ def test_SquareRoot():
     assert partial == approx(0.25)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(0.25)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(0.25)
     # at x = 0
     variable_values = VariableValues({x: 0})
     with raises(DomainError):
@@ -23,6 +24,9 @@ def test_SquareRoot():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+    synthetic_partial = z.synthetic_partial(x)
+    with raises(DomainError):
+        assert synthetic_partial.evaluate(variable_values)
     # at x = -1
     variable_values = VariableValues({x: -1})
     with raises(DomainError):
@@ -31,7 +35,9 @@ def test_SquareRoot():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
-
+    synthetic_partial = z.synthetic_partial(x)
+    with raises(DomainError):
+        assert synthetic_partial.evaluate(variable_values)
 
 def test_SquareRoot_composition():
     x = Variable("x")
@@ -43,3 +49,4 @@ def test_SquareRoot_composition():
     assert partial == approx(1 / 3)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1 / 3)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(1 / 3)

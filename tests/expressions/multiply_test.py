@@ -18,6 +18,8 @@ def test_Multiply():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(3)
     assert all_partials.partial_with_respect_to(y) == approx(2)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(3)
+    assert z.synthetic_partial(y).evaluate(variable_values) == approx(2)
 
 
 def test_Multiply_composition():
@@ -34,6 +36,8 @@ def test_Multiply_composition():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(10)
     assert all_partials.partial_with_respect_to(y) == approx(10)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(10)
+    assert z.synthetic_partial(y).evaluate(variable_values) == approx(10)
 
 
 def test_Multiply_by_zero():
@@ -46,6 +50,7 @@ def test_Multiply_by_zero():
     assert partial == approx(0)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(0)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(0)
 
 
 def test_Multiply_by_zero_doesnt_short_circuit():
@@ -58,6 +63,9 @@ def test_Multiply_by_zero_doesnt_short_circuit():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+    synthetic_partial = z.synthetic_partial(x)
+    with raises(DomainError):
+        synthetic_partial.evaluate(variable_values)
 
 
 def test_Multiply_by_one():
@@ -70,3 +78,4 @@ def test_Multiply_by_one():
     assert partial == approx(1)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(1)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(1)

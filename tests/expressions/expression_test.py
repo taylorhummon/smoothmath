@@ -4,6 +4,62 @@ from smoothmath.variable_values import VariableValues
 from smoothmath.expressions import Constant, Variable, Exponential
 
 
+def test_equality():
+    c = Constant(7)
+    assert c == c
+    assert c == Constant(7)
+    assert c == Constant(7.0)
+    assert c != Constant(8)
+    x = Variable("x")
+    assert x == x
+    assert x != Variable("y")
+    assert x == Variable("x")
+    assert x != c
+    z = x ** c
+    assert z == z
+    assert z == x ** c
+    assert z != c
+    assert z != x
+    assert z != x ** c + Constant(1)
+
+
+def test_expression_reuse():
+    x = Variable("x")
+    w = x ** Constant(2)
+    z = (w + Constant(1)) / w
+    variable_values = VariableValues({x: 2})
+    value = z.evaluate(variable_values)
+    assert value == approx(1.25)
+    partial = z.partial_at(variable_values, x)
+    assert partial == approx(-0.25)
+    all_partials = z.all_partials_at(variable_values)
+    assert all_partials.partial_with_respect_to(x) == approx(-0.25)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(-0.25)
+
+
+def test_partial_at_using_variable_name():
+    x = Variable("x")
+    z = x ** Constant(2)
+    variable_values = VariableValues({"x": 3})
+    partial = z.partial_at(variable_values, "x")
+    assert partial == approx(6)
+    assert z.synthetic_partial("x").evaluate(variable_values) == approx(6)
+
+
+def test_unrelated_variable():
+    x = Variable("x")
+    y = Variable("y")
+    z = x ** Constant(2)
+    variable_values = VariableValues({x: 2})
+    value = z.evaluate(variable_values)
+    assert value == 4
+    partial = z.partial_at(variable_values, y)
+    assert partial == 0
+    all_partials = z.all_partials_at(variable_values)
+    assert all_partials.partial_with_respect_to(y) == 0
+    assert z.synthetic_partial(y).evaluate(variable_values) == 0
+
+
 def test_polynomial_of_one_variable():
     x = Variable("x")
     z = x * x - Constant(6) * x + Constant(4)
@@ -14,6 +70,7 @@ def test_polynomial_of_one_variable():
     assert partial == -2
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == -2
+    assert z.synthetic_partial(x).evaluate(variable_values) == -2
 
 
 def test_polynomial_of_two_variables():
@@ -30,6 +87,8 @@ def test_polynomial_of_two_variables():
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == 7
     assert all_partials.partial_with_respect_to(y) == -28
+    assert z.synthetic_partial(x).evaluate(variable_values) == 7
+    assert z.synthetic_partial(y).evaluate(variable_values) == -28
 
 
 def test_polynomial_of_three_variables():
@@ -50,19 +109,9 @@ def test_polynomial_of_three_variables():
     assert all_partials.partial_with_respect_to(w) == 37
     assert all_partials.partial_with_respect_to(x) == 52
     assert all_partials.partial_with_respect_to(y) == -6
-
-
-def test_unrelated_variable():
-    x = Variable("x")
-    y = Variable("y")
-    z = x ** Constant(2)
-    variable_values = VariableValues({x: 2})
-    value = z.evaluate(variable_values)
-    assert value == 4
-    partial = z.partial_at(variable_values, y)
-    assert partial == 0
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(y) == 0
+    assert z.synthetic_partial(w).evaluate(variable_values) == 37
+    assert z.synthetic_partial(x).evaluate(variable_values) == 52
+    assert z.synthetic_partial(y).evaluate(variable_values) == -6
 
 
 def test_composite_function():
@@ -75,6 +124,7 @@ def test_composite_function():
     assert partial == approx(218.392600132)
     all_partials = z.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == approx(218.392600132)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(218.392600132)
 
 
 def test_indeterminate_form():
@@ -87,42 +137,6 @@ def test_indeterminate_form():
         z.partial_at(variable_values, t)
     with raises(DomainError):
         z.all_partials_at(variable_values)
-
-
-def test_expression_reuse():
-    x = Variable("x")
-    w = x ** Constant(2)
-    z = (w + Constant(1)) / w
-    variable_values = VariableValues({x: 2})
-    value = z.evaluate(variable_values)
-    assert value == approx(1.25)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-0.25)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-0.25)
-
-
-def test_partial_at_using_variable_name():
-    x = Variable("x")
-    z = x ** Constant(2)
-    partial = z.partial_at(VariableValues({"x": 3}), "x")
-    assert partial == approx(6)
-
-
-def test_equality():
-    c = Constant(7)
-    assert c == c
-    assert c == Constant(7)
-    assert c == Constant(7.0)
-    assert c != Constant(8)
-    x = Variable("x")
-    assert x == x
-    assert x != Variable("y")
-    assert x == Variable("x")
-    assert x != c
-    z = x ** c
-    assert z == z
-    assert z == x ** c
-    assert z != c
-    assert z != x
-    assert z != x ** c + Constant(1)
+    synthetic_partial = z.synthetic_partial(t)
+    with raises(DomainError):
+        synthetic_partial.evaluate(variable_values)
