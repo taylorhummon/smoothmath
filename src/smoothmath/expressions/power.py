@@ -38,6 +38,29 @@ class Power(BinaryExpression):
     ) -> None:
         super().__init__(a, b)
 
+    def _verify_domain_constraints_case_i(
+        self: Power,
+        a_value: real_number,
+        b_value: real_number
+    ) -> None:
+        if a_value == 0 and b_value <= -1:
+            raise DomainError("Power(x, Constant(c)) blows up around x = 0 when c is a negative integer")
+
+    def _verify_domain_constraints_case_ii(
+        self: Power,
+        a_value: real_number,
+        b_value: real_number
+    ) -> None:
+        if a_value == 0:
+            if b_value > 0:
+                raise DomainError("Power(x, y) is not smooth around x = 0 for y > 0")
+            elif b_value == 0:
+                raise DomainError("Power(x, y) is not smooth around (x = 0, y = 0)")
+            else: # b_value < 0
+                raise DomainError("Power(x, y) blows up around x = 0 for y < 0")
+        elif a_value < 0:
+            raise DomainError("Power(x, y) is undefined for x < 0")
+
     def _evaluate(
         self: Power,
         variable_values: VariableValues
@@ -47,9 +70,9 @@ class Power(BinaryExpression):
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values)
         if _is_case_i(self._b, variable_values):
-            self._ensure_value_is_in_domain_case_i(a_value, b_value)
+            self._verify_domain_constraints_case_i(a_value, b_value)
         else: # case ii
-            self._ensure_value_is_in_domain_case_ii(a_value, b_value)
+            self._verify_domain_constraints_case_ii(a_value, b_value)
         self._value = a_value ** b_value
         return self._value
 
@@ -63,10 +86,10 @@ class Power(BinaryExpression):
         a_partial = self._a._partial_at(variable_values, with_respect_to)
         b_partial = self._b._partial_at(variable_values, with_respect_to)
         if _is_case_i(self._b, variable_values):
-            self._ensure_value_is_in_domain_case_i(a_value, b_value)
+            self._verify_domain_constraints_case_i(a_value, b_value)
             return self._partial_case_i(a_value, a_partial, b_value)
         else: # case ii
-            self._ensure_value_is_in_domain_case_ii(a_value, b_value)
+            self._verify_domain_constraints_case_ii(a_value, b_value)
             return self._partial_case_ii(a_value, a_partial, b_value, b_partial)
 
     def _partial_case_i(
@@ -108,11 +131,11 @@ class Power(BinaryExpression):
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values)
         if _is_case_i(self._b, variable_values):
-            self._ensure_value_is_in_domain_case_i(a_value, b_value)
+            self._verify_domain_constraints_case_i(a_value, b_value)
             next_seed = self._next_seed_case_i(a_value, b_value, seed)
             self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
         else: # case ii
-            self._ensure_value_is_in_domain_case_ii(a_value, b_value)
+            self._verify_domain_constraints_case_ii(a_value, b_value)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_seed_a = self._next_seed_a_case_ii(a_value, b_value, seed)
             next_seed_b = self._next_seed_b_case_ii(a_value, b_value, seed)
@@ -151,29 +174,6 @@ class Power(BinaryExpression):
         seed: real_number
     ) -> real_number:
         return seed * math.log(a_value) * a_value ** b_value
-
-    def _ensure_value_is_in_domain_case_i(
-        self: Power,
-        a_value: real_number,
-        b_value: real_number
-    ) -> None:
-        if a_value == 0 and b_value <= -1:
-            raise DomainError("Power(x, Constant(c)) blows up around x = 0 when c is a negative integer")
-
-    def _ensure_value_is_in_domain_case_ii(
-        self: Power,
-        a_value: real_number,
-        b_value: real_number
-    ) -> None:
-        if a_value == 0:
-            if b_value > 0:
-                raise DomainError("Power(x, y) is not smooth around x = 0 for y > 0")
-            elif b_value == 0:
-                raise DomainError("Power(x, y) is not smooth around (x = 0, y = 0)")
-            else: # b_value < 0
-                raise DomainError("Power(x, y) blows up around x = 0 for y < 0")
-        elif a_value < 0:
-            raise DomainError("Power(x, y) is undefined for x < 0")
 
     def _synthetic_partial(
             self: Power,

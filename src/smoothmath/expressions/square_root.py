@@ -19,6 +19,15 @@ class SquareRoot(UnaryExpression):
     ) -> None:
         super().__init__(a)
 
+    def _verify_domain_constraints(
+        self: SquareRoot,
+        a_value: real_number
+    ) -> None:
+        if a_value == 0:
+            raise DomainError("SquareRoot(x) is not smooth around x = 0")
+        elif a_value < 0:
+            raise DomainError("SquareRoot(x) is undefined for x < 0")
+
     def _evaluate(
         self: SquareRoot,
         variable_values: VariableValues
@@ -26,7 +35,7 @@ class SquareRoot(UnaryExpression):
         if self._value is not None:
             return self._value
         a_value = self._a._evaluate(variable_values)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         self._value = math.sqrt(a_value)
         return self._value
 
@@ -36,7 +45,7 @@ class SquareRoot(UnaryExpression):
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(variable_values)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         return a_partial / (2 * math.sqrt(a_value))
@@ -48,20 +57,11 @@ class SquareRoot(UnaryExpression):
         seed: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         self_value = self._evaluate(variable_values)
         # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         next_seed = seed / (2 * self_value)
         self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
-
-    def _ensure_value_is_in_domain(
-        self: SquareRoot,
-        a_value: real_number
-    ) -> None:
-        if a_value == 0:
-            raise DomainError("SquareRoot(x) is not smooth around x = 0")
-        elif a_value < 0:
-            raise DomainError("SquareRoot(x) is undefined for x < 0")
 
     def _synthetic_partial(
         self: SquareRoot,

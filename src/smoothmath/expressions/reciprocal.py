@@ -18,6 +18,13 @@ class Reciprocal(UnaryExpression):
     ) -> None:
         super().__init__(a)
 
+    def _verify_domain_constraints(
+        self: Reciprocal,
+        a_value: real_number
+    ) -> None:
+        if a_value == 0:
+            raise DomainError("Reciprocal(x) blows up around x = 0")
+
     def _evaluate(
         self: Reciprocal,
         variable_values: VariableValues
@@ -25,7 +32,7 @@ class Reciprocal(UnaryExpression):
         if self._value is not None:
             return self._value
         a_value = self._a._evaluate(variable_values)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         self._value = 1 / a_value
         return self._value
 
@@ -36,7 +43,7 @@ class Reciprocal(UnaryExpression):
     ) -> real_number:
         a_value = self._a._evaluate(variable_values)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         resultValue = self._evaluate(variable_values)
         # d(1 / a) = - (1 / a ** 2) * da
         return - (resultValue ** 2) * a_partial
@@ -48,18 +55,11 @@ class Reciprocal(UnaryExpression):
         seed: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         self_value = self._evaluate(variable_values)
         # d(1 / a) = - (1 / a ** 2) * da
         next_seed = - seed * (self_value ** 2)
         self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
-
-    def _ensure_value_is_in_domain(
-        self: Reciprocal,
-        a_value: real_number
-    ) -> None:
-        if a_value == 0:
-            raise DomainError("Reciprocal(x) blows up around x = 0")
 
     def _synthetic_partial(
         self: Reciprocal,

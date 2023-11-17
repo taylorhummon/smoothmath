@@ -26,6 +26,15 @@ class Logarithm(UnaryExpression):
         self._base: real_number
         self._base = base
 
+    def _verify_domain_constraints(
+        self: Logarithm,
+        a_value: real_number
+    ) -> None:
+        if a_value == 0:
+            raise DomainError("Logarithm(x) blows up around x = 0")
+        elif a_value < 0:
+            raise DomainError("Logarithm(x) is undefined for x < 0")
+
     def _evaluate(
         self: Logarithm,
         variable_values: VariableValues
@@ -33,7 +42,7 @@ class Logarithm(UnaryExpression):
         if self._value is not None:
             return self._value
         a_value = self._a._evaluate(variable_values)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         self._value = math.log(a_value, self._base)
         return self._value
 
@@ -44,7 +53,7 @@ class Logarithm(UnaryExpression):
     ) -> real_number:
         a_value = self._a._evaluate(variable_values)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
         return a_partial / (math.log(self._base) * a_value)
 
@@ -55,19 +64,10 @@ class Logarithm(UnaryExpression):
         seed: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
-        self._ensure_value_is_in_domain(a_value)
+        self._verify_domain_constraints(a_value)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
         next_seed = seed / (math.log(self._base) * a_value)
         self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
-
-    def _ensure_value_is_in_domain(
-        self: Logarithm,
-        a_value: real_number
-    ) -> None:
-        if a_value == 0:
-            raise DomainError("Logarithm(x) blows up around x = 0")
-        elif a_value < 0:
-            raise DomainError("Logarithm(x) is undefined for x < 0")
 
     def _synthetic_partial(
         self: Logarithm,

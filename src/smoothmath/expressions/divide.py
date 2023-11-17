@@ -19,7 +19,7 @@ class Divide(BinaryExpression):
     ) -> None:
         super().__init__(a, b)
 
-    def _ensure_value_is_in_domain(
+    def _verify_domain_constraints(
         self: Divide,
         a_value: real_number,
         b_value: real_number
@@ -42,7 +42,7 @@ class Divide(BinaryExpression):
         if self._a._lacks_variables and a_value == 0:
             self._value = 0
         else:
-            self._ensure_value_is_in_domain(a_value, b_value)
+            self._verify_domain_constraints(a_value, b_value)
             self._value = a_value / b_value
         return self._value
 
@@ -59,7 +59,7 @@ class Divide(BinaryExpression):
         if self._a._lacks_variables and a_value == 0:
             return 0
         else:
-            self._ensure_value_is_in_domain(a_value, b_value)
+            self._verify_domain_constraints(a_value, b_value)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
             return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
@@ -75,7 +75,7 @@ class Divide(BinaryExpression):
         if self._a._lacks_variables and a_value == 0:
             self._b._compute_all_partials_at(all_partials, variable_values, 0)
         else:
-            self._ensure_value_is_in_domain(a_value, b_value)
+            self._verify_domain_constraints(a_value, b_value)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
             next_seedA = seed / b_value
             next_seedB =  - seed * a_value / (b_value ** 2)
