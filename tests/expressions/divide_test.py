@@ -61,9 +61,12 @@ def test_Divide_with_constant_numerator_zero():
     assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
     # at y = 0
     variable_values = VariableValues({y: 0})
-    assert z.evaluate(variable_values) == approx(0)
-    assert z.partial_at(variable_values, y) == approx(0)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
+    with raises(DomainError):
+        z.evaluate(variable_values)
+    with raises(DomainError):
+        z.partial_at(variable_values, y)
+    with raises(DomainError):
+        z.all_partials_at(variable_values)
 
 
 def test_Divide_with_constant_numerator_zero_composition():
@@ -75,13 +78,16 @@ def test_Divide_with_constant_numerator_zero_composition():
     assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
 
 
-def test_Divide_with_constant_numerator_zero_short_circuits():
+def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     y = Variable("y")
     z = Divide(Constant(0), Logarithm(y))
     variable_values = VariableValues({y: 0})
-    assert z.evaluate(variable_values) == approx(0)
-    assert z.partial_at(variable_values, y) == approx(0)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
+    with raises(DomainError):
+        z.evaluate(variable_values)
+    with raises(DomainError):
+        z.partial_at(variable_values, y)
+    with raises(DomainError):
+        z.all_partials_at(variable_values)
 
 
 def test_Divide_with_constant_denominator_one():
