@@ -52,8 +52,8 @@ class Logarithm(UnaryExpression):
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(variable_values)
-        a_partial = self._a._partial_at(variable_values, with_respect_to)
         self._verify_domain_constraints(a_value)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         # d(log_C(a)) = (1 / (ln(C) * a)) * da
         return a_partial / (math.log(self._base) * a_value)
 
@@ -74,4 +74,12 @@ class Logarithm(UnaryExpression):
         with_respect_to: str
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
-        return ex.Divide(a_partial, self._a)
+        return (
+            ex.Divide(
+                a_partial,
+                ex.Multiply(
+                    ex.Logarithm(ex.Constant(self._base), base = math.e),
+                    self._a,
+                )
+            )
+        )

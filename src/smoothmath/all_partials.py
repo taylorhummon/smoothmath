@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 
 import smoothmath.utilities as utilities
 
+
 class AllPartials:
     def __init__(
         self: AllPartials

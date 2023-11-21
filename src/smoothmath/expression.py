@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.expressions import Variable
@@ -89,7 +89,7 @@ class Expression(ABC):
     ) -> None:
         raise Exception("Concrete classes derived from Expression must implement _compute_all_partials_at()")
 
-    # @abstractmethod # !!!
+    @abstractmethod
     def _synthetic_partial(
         self: Expression,
         with_respect_to: str

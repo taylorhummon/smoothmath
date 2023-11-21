@@ -10,37 +10,28 @@ def test_Power():
     z = Power(x, y)
     # at (x, y) = (3, 2.5)
     variable_values = VariableValues({x: 3, y: 2.5})
-    value = z.evaluate(variable_values)
-    assert value == approx(15.588457268)
-    partial_with_respect_to_x = z.partial_at(variable_values, x)
-    assert partial_with_respect_to_x == approx(12.990381056)
-    partial_with_respect_to_y = z.partial_at(variable_values, y)
-    assert partial_with_respect_to_y == approx(17.125670716)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(12.990381056)
-    assert all_partials.partial_with_respect_to(y) == approx(17.125670716)
+    assert z.evaluate(variable_values) == approx(15.588457268)
+    assert z.partial_at(variable_values, x) == approx(12.990381056)
+    assert z.partial_at(variable_values, y) == approx(17.125670716)
+    both_partials = z.all_partials_at(variable_values)
+    assert both_partials.partial_with_respect_to(x) == approx(12.990381056)
+    assert both_partials.partial_with_respect_to(y) == approx(17.125670716)
     # at (x, y) = (3, 0)
     variable_values = VariableValues({x: 3, y: 0})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial_with_respect_to_x = z.partial_at(variable_values, x)
-    assert partial_with_respect_to_x == approx(0)
-    partial_with_respect_to_y = z.partial_at(variable_values, y)
-    assert partial_with_respect_to_y == approx(1.0986122886)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0)
-    assert all_partials.partial_with_respect_to(y) == approx(1.0986122886)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.partial_at(variable_values, y) == approx(1.0986122886)
+    both_partials = z.all_partials_at(variable_values)
+    assert both_partials.partial_with_respect_to(x) == approx(0)
+    assert both_partials.partial_with_respect_to(y) == approx(1.0986122886)
     # at (x, y) = (3, -2.5)
     variable_values = VariableValues({x: 3, y: -2.5})
-    value = z.evaluate(variable_values)
-    assert value == approx(0.0641500299)
-    partial_with_respect_to_x = z.partial_at(variable_values, x)
-    assert partial_with_respect_to_x == approx(-0.0534583582)
-    partial_with_respect_to_y = z.partial_at(variable_values, y)
-    assert partial_with_respect_to_y == approx(0.0704760111)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-0.0534583582)
-    assert all_partials.partial_with_respect_to(y) == approx(0.0704760111)
+    assert z.evaluate(variable_values) == approx(0.0641500299)
+    assert z.partial_at(variable_values, x) == approx(-0.0534583582)
+    assert z.partial_at(variable_values, y) == approx(0.0704760111)
+    both_partials = z.all_partials_at(variable_values)
+    assert both_partials.partial_with_respect_to(x) == approx(-0.0534583582)
+    assert both_partials.partial_with_respect_to(y) == approx(0.0704760111)
     # at (x, y) = (0, 2.5)
     variable_values = VariableValues({x: 0, y: 2.5})
     with raises(DomainError):
@@ -108,15 +99,12 @@ def test_Power_composition():
     y = Variable("y")
     z = Power(Constant(2) * x, Constant(3) * y)
     variable_values = VariableValues({x: 1, y: 1})
-    value = z.evaluate(variable_values)
-    assert value == approx(8)
-    partial_with_respect_to_x = z.partial_at(variable_values, x)
-    assert partial_with_respect_to_x == approx(24)
-    partial_with_respect_to_y = z.partial_at(variable_values, y)
-    assert partial_with_respect_to_y == approx(16.63553233343)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(24)
-    assert all_partials.partial_with_respect_to(y) == approx(16.63553233343)
+    assert z.evaluate(variable_values) == approx(8)
+    assert z.partial_at(variable_values, x) == approx(24)
+    assert z.partial_at(variable_values, y) == approx(16.63553233343)
+    both_partials = z.all_partials_at(variable_values)
+    assert both_partials.partial_with_respect_to(x) == approx(24)
+    assert both_partials.partial_with_respect_to(y) == approx(16.63553233343)
 
 
 def test_Power_with_constant_base_one():
@@ -124,40 +112,28 @@ def test_Power_with_constant_base_one():
     z = Power(Constant(1), y)
     # at y = 3
     variable_values = VariableValues({y: 3})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial = z.partial_at(variable_values, y)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(y) == approx(0)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, y) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
     # at y = 0
     variable_values = VariableValues({y: 0})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial = z.partial_at(variable_values, y)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(y) == approx(0)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, y) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
     # at y = -5
     variable_values = VariableValues({y: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial = z.partial_at(variable_values, y)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(y) == approx(0)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, y) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
 
 
-def test_Power_with_constant_base_one_doesnt_short_circuit():
+def test_Power_with_constant_base_one_short_circuits():
     x = Variable("x")
     z = Power(Constant(1), SquareRoot(x))
     variable_values = VariableValues({x: -1})
-    with raises(DomainError):
-        z.evaluate(variable_values)
-    with raises(DomainError):
-        z.partial_at(variable_values, x)
-    with raises(DomainError):
-        z.all_partials_at(variable_values)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
 
 
 def test_Power_with_constant_base_zero():
@@ -223,40 +199,28 @@ def test_Power_with_constant_exponent_two():
     z = Power(x, Constant(2))
     # at y = 3
     variable_values = VariableValues({x: 3})
-    value = z.evaluate(variable_values)
-    assert value == approx(9)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(6)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(6)
+    assert z.evaluate(variable_values) == approx(9)
+    assert z.partial_at(variable_values, x) == approx(6)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(6)
     # at y = 0
     variable_values = VariableValues({x: 0})
-    value = z.evaluate(variable_values)
-    assert value == approx(0)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0)
+    assert z.evaluate(variable_values) == approx(0)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
     # at y = -5
     variable_values = VariableValues({x: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(25)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-10)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-10)
+    assert z.evaluate(variable_values) == approx(25)
+    assert z.partial_at(variable_values, x) == approx(-10)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-10)
 
 
 def test_Power_with_constant_exponent_two_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(2))
     variable_values = VariableValues({x: 1})
-    value = z.evaluate(variable_values)
-    assert value == approx(4)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(12)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(12)
+    assert z.evaluate(variable_values) == approx(4)
+    assert z.partial_at(variable_values, x) == approx(12)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(12)
 
 
 def test_Power_with_constant_exponent_one():
@@ -264,40 +228,28 @@ def test_Power_with_constant_exponent_one():
     z = Power(x, Constant(1))
     # at y = 3
     variable_values = VariableValues({x: 3})
-    value = z.evaluate(variable_values)
-    assert value == approx(3)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(1)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(1)
+    assert z.evaluate(variable_values) == approx(3)
+    assert z.partial_at(variable_values, x) == approx(1)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(1)
     # at y = 0
     variable_values = VariableValues({x: 0})
-    value = z.evaluate(variable_values)
-    assert value == approx(0)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(1)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(1)
+    assert z.evaluate(variable_values) == approx(0)
+    assert z.partial_at(variable_values, x) == approx(1)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(1)
     # at y = -5
     variable_values = VariableValues({x: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(-5)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(1)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(1)
+    assert z.evaluate(variable_values) == approx(-5)
+    assert z.partial_at(variable_values, x) == approx(1)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(1)
 
 
 def test_Power_with_constant_exponent_one_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(1))
     variable_values = VariableValues({x: 1})
-    value = z.evaluate(variable_values)
-    assert value == approx(2)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(3)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(3)
+    assert z.evaluate(variable_values) == approx(2)
+    assert z.partial_at(variable_values, x) == approx(3)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(3)
 
 
 def test_Power_with_constant_exponent_zero():
@@ -305,52 +257,37 @@ def test_Power_with_constant_exponent_zero():
     z = Power(x, Constant(0))
     # at x = 3
     variable_values = VariableValues({x: 3})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
     # at x = 0
     variable_values = VariableValues({x: 0})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
     # at x = -5
     variable_values = VariableValues({x: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
 
 
 def test_Power_with_constant_exponent_zero_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(0))
     variable_values = VariableValues({x: 1})
-    value = z.evaluate(variable_values)
-    assert value == approx(1)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
 
 
-def test_Power_with_constant_exponent_zero_doesnt_short_circuit():
+def test_Power_with_constant_exponent_zero_short_circuits():
     x = Variable("x")
     z = Power(Logarithm(x), Constant(0))
     variable_values = VariableValues({x: 0})
-    with raises(DomainError):
-        z.evaluate(variable_values)
-    with raises(DomainError):
-        z.partial_at(variable_values, x)
-    with raises(DomainError):
-        z.all_partials_at(variable_values)
+    assert z.evaluate(variable_values) == approx(1)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
 
 
 def test_Power_with_constant_exponent_negative_one():
@@ -358,12 +295,9 @@ def test_Power_with_constant_exponent_negative_one():
     z = Power(x, Constant(-1))
     # at x = 2
     variable_values = VariableValues({x: 2})
-    value = z.evaluate(variable_values)
-    assert value == approx(0.5)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-0.25)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-0.25)
+    assert z.evaluate(variable_values) == approx(0.5)
+    assert z.partial_at(variable_values, x) == approx(-0.25)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.25)
     # at x = 0
     variable_values = VariableValues({x: 0})
     with raises(DomainError):
@@ -374,24 +308,18 @@ def test_Power_with_constant_exponent_negative_one():
         z.all_partials_at(variable_values)
     # at x = -5
     variable_values = VariableValues({x: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(-0.2)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-0.04)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-0.04)
+    assert z.evaluate(variable_values) == approx(-0.2)
+    assert z.partial_at(variable_values, x) == approx(-0.04)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.04)
 
 
 def test_Power_with_constant_exponent_negative_one_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(-1))
     variable_values = VariableValues({x: 1})
-    value = z.evaluate(variable_values)
-    assert value == approx(0.5)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-0.75)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-0.75)
+    assert z.evaluate(variable_values) == approx(0.5)
+    assert z.partial_at(variable_values, x) == approx(-0.75)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.75)
 
 
 def test_Power_with_constant_exponent_negative_two():
@@ -399,12 +327,9 @@ def test_Power_with_constant_exponent_negative_two():
     z = Power(x, Constant(-2))
     # at x = 2
     variable_values = VariableValues({x: 2})
-    value = z.evaluate(variable_values)
-    assert value == approx(0.25)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-0.25)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-0.25)
+    assert z.evaluate(variable_values) == approx(0.25)
+    assert z.partial_at(variable_values, x) == approx(-0.25)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.25)
     # at x = 0
     variable_values = VariableValues({x: 0})
     with raises(DomainError):
@@ -415,24 +340,23 @@ def test_Power_with_constant_exponent_negative_two():
         z.all_partials_at(variable_values)
     # at x = -5
     variable_values = VariableValues({x: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(0.04)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(0.016)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0.016)
+    assert z.evaluate(variable_values) == approx(0.04)
+    assert z.partial_at(variable_values, x) == approx(0.016)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0.016)
 
 
 def test_Power_with_constant_exponent_negative_two_composition():
     x = Variable("x")
     z = Power(Constant(3) * x - Constant(1), Constant(-2))
     variable_values = VariableValues({x: 1})
-    value = z.evaluate(variable_values)
-    assert value == approx(0.25)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-0.75)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-0.75)
+    assert z.evaluate(variable_values) == approx(0.25)
+    assert z.partial_at(variable_values, x) == approx(-0.75)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.75)
+
+
+def test_Power_one_to_the_zero():
+    z = Power(Constant(1), Constant(0))
+    assert z.evaluate(VariableValues({})) == approx(1)
 
 
 def test_Power_with_exponent_made_from_adding_constants():
@@ -440,37 +364,25 @@ def test_Power_with_exponent_made_from_adding_constants():
     z = Power(x, Constant(1) + Constant(1))
     # at x = 3
     variable_values = VariableValues({x: 3})
-    value = z.evaluate(variable_values)
-    assert value == approx(9)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(6)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(6)
+    assert z.evaluate(variable_values) == approx(9)
+    assert z.partial_at(variable_values, x) == approx(6)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(6)
     # at x = 0
     variable_values = VariableValues({x: 0})
-    value = z.evaluate(variable_values)
-    assert value == approx(0)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(0)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(0)
+    assert z.evaluate(variable_values) == approx(0)
+    assert z.partial_at(variable_values, x) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
     # at x = -5
     variable_values = VariableValues({x: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(25)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-10)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-10)
+    assert z.evaluate(variable_values) == approx(25)
+    assert z.partial_at(variable_values, x) == approx(-10)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-10)
 
 
 def test_Power_where_exponent_is_an_integer_represented_as_a_float():
     x = Variable("x")
     z = Power(x, Constant(2.0))
     variable_values = VariableValues({x: -5})
-    value = z.evaluate(variable_values)
-    assert value == approx(25)
-    partial = z.partial_at(variable_values, x)
-    assert partial == approx(-10)
-    all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(x) == approx(-10)
+    assert z.evaluate(variable_values) == approx(25)
+    assert z.partial_at(variable_values, x) == approx(-10)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-10)

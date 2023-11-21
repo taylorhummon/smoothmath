@@ -37,11 +37,11 @@ class Divide(BinaryExpression):
         if self._value is not None:
             return self._value
         a_value = self._a._evaluate(variable_values)
-        b_value = self._b._evaluate(variable_values)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self._a._lacks_variables and a_value == 0:
             self._value = 0
         else:
+            b_value = self._b._evaluate(variable_values)
             self._verify_domain_constraints(a_value, b_value)
             self._value = a_value / b_value
         return self._value
@@ -52,14 +52,14 @@ class Divide(BinaryExpression):
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(variable_values)
-        b_value = self._b._evaluate(variable_values)
-        a_partial = self._a._partial_at(variable_values, with_respect_to)
-        b_partial = self._b._partial_at(variable_values, with_respect_to)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self._a._lacks_variables and a_value == 0:
             return 0
         else:
+            b_value = self._b._evaluate(variable_values)
             self._verify_domain_constraints(a_value, b_value)
+            a_partial = self._a._partial_at(variable_values, with_respect_to)
+            b_partial = self._b._partial_at(variable_values, with_respect_to)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
             return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
@@ -70,11 +70,11 @@ class Divide(BinaryExpression):
         seed: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
-        b_value = self._b._evaluate(variable_values)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self._a._lacks_variables and a_value == 0:
-            self._b._compute_all_partials_at(all_partials, variable_values, 0)
+            return
         else:
+            b_value = self._b._evaluate(variable_values)
             self._verify_domain_constraints(a_value, b_value)
             # d(a / b) = (1 / b) * da - (a / b ** 2) * db
             next_seedA = seed / b_value
@@ -87,12 +87,12 @@ class Divide(BinaryExpression):
         with_respect_to: str
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
         # Note: 0 / b is smooth at b = 0 despite a / b not being smooth at (0, 0)
         if self._a._lacks_variables and self._a._evaluate(VariableValues({})) == 0:
-            # Note: 0 * b will equal zero unless b happens to blow up during evaluation
-            return ex.Multiply(ex.Constant(0), self._b)
+            # Note: 0 * b will evaluate to zero unless b is undefined
+            return ex.Constant(0)
         else:
+            b_partial = self._b._synthetic_partial(with_respect_to)
             return (
                 ex.Divide(
                     ex.Minus(

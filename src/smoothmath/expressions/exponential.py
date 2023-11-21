@@ -62,8 +62,8 @@ class Exponential(UnaryExpression):
         a_partial = self._a._synthetic_partial(with_respect_to)
         return ex.Multiply(
             ex.Multiply(
-                ex.Logarithm(ex.Constant(self._base)),
-                ex.Exponential(self._a, self._base)
+                ex.Logarithm(ex.Constant(self._base), base = math.e),
+                ex.Exponential(self._a, base = self._base)
             ),
             a_partial
         )

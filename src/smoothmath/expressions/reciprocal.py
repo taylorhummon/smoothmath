@@ -42,8 +42,8 @@ class Reciprocal(UnaryExpression):
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(variable_values)
-        a_partial = self._a._partial_at(variable_values, with_respect_to)
         self._verify_domain_constraints(a_value)
+        a_partial = self._a._partial_at(variable_values, with_respect_to)
         resultValue = self._evaluate(variable_values)
         # d(1 / a) = - (1 / a ** 2) * da
         return - (resultValue ** 2) * a_partial

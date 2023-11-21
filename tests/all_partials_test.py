@@ -1,6 +1,7 @@
 from smoothmath.all_partials import AllPartials
 from smoothmath.expressions import Variable
 
+
 def test_AllPartials():
     w = Variable("w")
     x = Variable("x")
