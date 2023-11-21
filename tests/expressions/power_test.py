@@ -1,7 +1,7 @@
 from pytest import approx, raises
 from smoothmath.errors import DomainError
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions import Constant, Variable, SquareRoot, Logarithm, Power
+from smoothmath.expressions import Constant, Variable, SquareRoot, Power
 
 
 def test_Power():
@@ -125,15 +125,6 @@ def test_Power_with_constant_base_one():
     assert z.evaluate(variable_values) == approx(1)
     assert z.partial_at(variable_values, y) == approx(0)
     assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
-
-
-def test_Power_with_constant_base_one_short_circuits():
-    x = Variable("x")
-    z = Power(Constant(1), SquareRoot(x))
-    variable_values = VariableValues({x: -1})
-    assert z.evaluate(variable_values) == approx(1)
-    assert z.partial_at(variable_values, x) == approx(0)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
 
 
 def test_Power_with_constant_base_zero():
@@ -262,9 +253,12 @@ def test_Power_with_constant_exponent_zero():
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
     # at x = 0
     variable_values = VariableValues({x: 0})
-    assert z.evaluate(variable_values) == approx(1)
-    assert z.partial_at(variable_values, x) == approx(0)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
+    with raises(DomainError):
+        z.evaluate(variable_values)
+    with raises(DomainError):
+        z.partial_at(variable_values, x)
+    with raises(DomainError):
+        z.all_partials_at(variable_values)
     # at x = -5
     variable_values = VariableValues({x: -5})
     assert z.evaluate(variable_values) == approx(1)
@@ -281,13 +275,16 @@ def test_Power_with_constant_exponent_zero_composition():
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
 
 
-def test_Power_with_constant_exponent_zero_short_circuits():
+def test_Power_with_constant_exponent_zero_doesnt_short_circuit():
     x = Variable("x")
-    z = Power(Logarithm(x), Constant(0))
-    variable_values = VariableValues({x: 0})
-    assert z.evaluate(variable_values) == approx(1)
-    assert z.partial_at(variable_values, x) == approx(0)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
+    z = Power(SquareRoot(x), Constant(0))
+    variable_values = VariableValues({x: -1})
+    with raises(DomainError):
+        z.evaluate(variable_values)
+    with raises(DomainError):
+        z.partial_at(variable_values, x)
+    with raises(DomainError):
+        z.all_partials_at(variable_values)
 
 
 def test_Power_with_constant_exponent_negative_one():

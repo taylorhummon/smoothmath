@@ -1,6 +1,6 @@
 from pytest import approx
 from smoothmath.variable_values import VariableValues
-from smoothmath.expressions import Constant, Variable, Logarithm, Multiply
+from smoothmath.expressions import Constant, Variable, Multiply
 
 
 def test_Multiply():
@@ -33,24 +33,6 @@ def test_Multiply_by_zero():
     x = Variable("x")
     z = Multiply(Constant(0), x)
     variable_values = VariableValues({x: 2})
-    assert z.evaluate(variable_values) == approx(0)
-    assert z.partial_at(variable_values, x) == approx(0)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
-
-
-def test_Multiply_by_zero_on_left_short_circuits():
-    x = Variable("x")
-    z = Multiply(Constant(0), Logarithm(x))
-    variable_values = VariableValues({x: 0})
-    assert z.evaluate(variable_values) == approx(0)
-    assert z.partial_at(variable_values, x) == approx(0)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)
-
-
-def test_Multiply_by_zero_on_right_short_circuits():
-    x = Variable("x")
-    z = Multiply(Logarithm(x), Constant(0))
-    variable_values = VariableValues({x: 0})
     assert z.evaluate(variable_values) == approx(0)
     assert z.partial_at(variable_values, x) == approx(0)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(0)

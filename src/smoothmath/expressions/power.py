@@ -81,8 +81,11 @@ class Power(BinaryExpression):
         a_value: real_number,
         b_value: real_number
     ) -> None:
-        if a_value == 0 and b_value <= -1:
-            raise DomainError("Power(x, Constant(c)) blows up around x = 0 when c is a negative integer")
+        if a_value == 0:
+            if b_value == 0:
+                raise DomainError("Power(x, y) is not smooth around (x = 0, y = 0)")
+            elif b_value <= -1:
+                raise DomainError("Power(x, Constant(c)) blows up around x = 0 when c is a negative integer")
 
     def _evaluate_case_i(
         self: Power,
@@ -90,12 +93,12 @@ class Power(BinaryExpression):
     ) -> real_number:
         if self._value is not None:
             return self._value
-        b_value = self._b._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values) # b_value is an integer (this is case i)
+        self._verify_domain_constraints_case_i(a_value, b_value)
         if b_value == 0:
             self._value = 1
         else: # b_value is non-zero
-            a_value = self._a._evaluate(variable_values)
-            self._verify_domain_constraints_case_i(a_value, b_value)
             self._value = a_value ** b_value
         return self._value
 
@@ -104,17 +107,16 @@ class Power(BinaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        b_value = self._b._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values) # b_value is an integer (this is case i)
+        self._verify_domain_constraints_case_i(a_value, b_value)
         if b_value == 0:
-            # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
             # d(a ** 0) = 0 * da
             return 0
         elif b_value == 1:
             # d(a ** 1) = 1 * da
             return self._a._partial_at(variable_values, with_respect_to)
         else: # b_value >= 2 or b_value <= -1
-            a_value = self._a._evaluate(variable_values)
-            self._verify_domain_constraints_case_i(a_value, b_value)
             a_partial = self._a._partial_at(variable_values, with_respect_to)
             # d(a ** C) = C * a ** (C - 1) * da
             return b_value * (a_value ** (b_value - 1)) * a_partial
@@ -125,17 +127,16 @@ class Power(BinaryExpression):
         variable_values: VariableValues,
         seed: real_number
     ) -> None:
-        b_value = self._b._evaluate(variable_values)
+        a_value = self._a._evaluate(variable_values)
+        b_value = self._b._evaluate(variable_values) # b_value is an integer (this is case i)
+        self._verify_domain_constraints_case_i(a_value, b_value)
         if b_value == 0:
-            # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
             # d(a ** 0) = 0 * da
             return
         elif b_value == 1:
             # d(a ** 1) = da
             self._a._compute_all_partials_at(all_partials, variable_values, seed)
         else: # b_value >= 2 or b_value <= -1
-            a_value = self._a._evaluate(variable_values)
-            self._verify_domain_constraints_case_i(a_value, b_value)
             # d(a ** C) = C * a ** (C - 1) * da
             next_seed = seed * b_value * (a_value ** (b_value - 1))
             self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
@@ -144,10 +145,8 @@ class Power(BinaryExpression):
         self: Power,
         with_respect_to: str
     ) -> Expression:
-        b_value = self._b._evaluate(VariableValues({}))
+        b_value = self._b._evaluate(VariableValues({})) # b_value is an integer (this is case i)
         if b_value == 0:
-            # Note: a ** 0 is smooth at a = 0 despite a ** b not being smooth at (0, 0)
-            # Note: 0 * a will evaluate to zero unless a is undefined
             return ex.Constant(0)
         elif b_value == 1:
             # d(a ** 1) = 1 * da
@@ -192,6 +191,7 @@ class Power(BinaryExpression):
         if self._value is not None:
             return self._value
         if self._a._lacks_variables and self._a._evaluate(variable_values) == 1:
+            # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
             self._value = 1
         else:
             a_value = self._a._evaluate(variable_values)
@@ -206,6 +206,7 @@ class Power(BinaryExpression):
         with_respect_to: str
     ) -> real_number:
         if self._a._lacks_variables and self._a._evaluate(variable_values) == 1:
+            # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
             return 0
         else:
             a_value = self._a._evaluate(variable_values)
@@ -226,6 +227,7 @@ class Power(BinaryExpression):
         seed: real_number
     ) -> None:
         if self._a._lacks_variables and self._a._evaluate(variable_values) == 1:
+            # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
             pass
         else:
             a_value = self._a._evaluate(variable_values)

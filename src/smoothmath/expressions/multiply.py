@@ -72,6 +72,7 @@ class Multiply(BinaryExpression):
             ex.Multiply(self._a, b_partial)
         )
 
+    # the following method is used to allow shirt-circuiting of either a * 0 or 0 * b
     def _get_a_and_b_values_or_none(
         self: Multiply,
         variable_values: VariableValues
