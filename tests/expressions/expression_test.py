@@ -45,18 +45,18 @@ def test_unrelated_variable():
     y = Variable("y")
     z = x ** Constant(2)
     variable_values = VariableValues({x: 2})
-    assert z.evaluate(variable_values) == 4
-    assert z.partial_at(variable_values, y) == 0
-    assert z.all_partials_at(variable_values).partial_with_respect_to(y) == 0
+    assert z.evaluate(variable_values) == approx(4)
+    assert z.partial_at(variable_values, y) == approx(0)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
 
 
 def test_polynomial_of_one_variable():
     x = Variable("x")
     z = x * x - Constant(6) * x + Constant(4)
     variable_values = VariableValues({x: 2})
-    assert z.evaluate(variable_values) == -4
-    assert z.partial_at(variable_values, x) == -2
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == -2
+    assert z.evaluate(variable_values) == approx(-4)
+    assert z.partial_at(variable_values, x) == approx(-2)
+    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-2)
 
 
 def test_polynomial_of_two_variables():
@@ -64,12 +64,12 @@ def test_polynomial_of_two_variables():
     y = Variable("y")
     z = x * (x + y) - Constant(5) * y * y
     variable_values = VariableValues({x: 2, y: 3})
-    assert z.evaluate(variable_values) == -35
-    assert z.partial_at(variable_values, x) == 7
-    assert z.partial_at(variable_values, y) == -28
+    assert z.evaluate(variable_values) == approx(-35)
+    assert z.partial_at(variable_values, x) == approx(7)
+    assert z.partial_at(variable_values, y) == approx(-28)
     both_partials = z.all_partials_at(variable_values)
-    assert both_partials.partial_with_respect_to(x) == 7
-    assert both_partials.partial_with_respect_to(y) == -28
+    assert both_partials.partial_with_respect_to(x) == approx(7)
+    assert both_partials.partial_with_respect_to(y) == approx(-28)
 
 
 def test_polynomial_of_three_variables():
@@ -78,14 +78,14 @@ def test_polynomial_of_three_variables():
     y = Variable("y")
     z = w * w + Constant(5) * w * x * x - w * x * y
     variable_values = VariableValues({w: 2, x: 3, y: 4})
-    assert z.evaluate(variable_values) == 70
-    assert z.partial_at(variable_values, w) == 37
-    assert z.partial_at(variable_values, x) == 52
-    assert z.partial_at(variable_values, y) == -6
+    assert z.evaluate(variable_values) == approx(70)
+    assert z.partial_at(variable_values, w) == approx(37)
+    assert z.partial_at(variable_values, x) == approx(52)
+    assert z.partial_at(variable_values, y) == approx(-6)
     all_partials = z.all_partials_at(variable_values)
-    assert all_partials.partial_with_respect_to(w) == 37
-    assert all_partials.partial_with_respect_to(x) == 52
-    assert all_partials.partial_with_respect_to(y) == -6
+    assert all_partials.partial_with_respect_to(w) == approx(37)
+    assert all_partials.partial_with_respect_to(x) == approx(52)
+    assert all_partials.partial_with_respect_to(y) == approx(-6)
 
 
 def test_composite_function():
