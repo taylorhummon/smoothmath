@@ -31,7 +31,7 @@ def test_expression_reuse():
     assert z.evaluate(variable_values) == approx(1.25)
     assert z.partial_at(variable_values, x) == approx(-0.25)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.25)
-    assert z.synthetic_partial(x).evaluate(variable_values) == approx(-0.25)
+    assert z.synthetic().partial_at(variable_values, x) == approx(-0.25)
 
 
 def test_taking_partials_using_string_variable_name():
@@ -39,7 +39,7 @@ def test_taking_partials_using_string_variable_name():
     z = x ** Constant(2)
     variable_values = VariableValues({"x": 3})
     assert z.partial_at(variable_values, "x") == approx(6)
-    assert z.synthetic_partial("x").evaluate(variable_values) == approx(6)
+    assert z.synthetic().partial_at(variable_values, x) == approx(6)
 
 
 def test_unrelated_variable():
@@ -50,7 +50,7 @@ def test_unrelated_variable():
     assert z.evaluate(variable_values) == approx(4)
     assert z.partial_at(variable_values, y) == approx(0)
     assert z.all_partials_at(variable_values).partial_with_respect_to(y) == approx(0)
-    assert z.synthetic_partial(y).evaluate(variable_values) == approx(0)
+    assert z.synthetic().partial_at(variable_values, y) == approx(0)
 
 
 def test_polynomial_of_one_variable():
@@ -60,7 +60,7 @@ def test_polynomial_of_one_variable():
     assert z.evaluate(variable_values) == approx(-4)
     assert z.partial_at(variable_values, x) == approx(-2)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-2)
-    assert z.synthetic_partial(x).evaluate(variable_values) == approx(-2)
+    assert z.synthetic().partial_at(variable_values, x) == approx(-2)
 
 
 def test_polynomial_of_two_variables():
@@ -74,8 +74,9 @@ def test_polynomial_of_two_variables():
     both_partials = z.all_partials_at(variable_values)
     assert both_partials.partial_with_respect_to(x) == approx(7)
     assert both_partials.partial_with_respect_to(y) == approx(-28)
-    assert z.synthetic_partial(x).evaluate(variable_values) == approx(7)
-    assert z.synthetic_partial(y).evaluate(variable_values) == approx(-28)
+    synthetic = z.synthetic()
+    assert synthetic.partial_at(variable_values, x) == approx(7)
+    assert synthetic.partial_at(variable_values, y) == approx(-28)
 
 
 def test_polynomial_of_three_variables():
@@ -92,9 +93,10 @@ def test_polynomial_of_three_variables():
     assert all_partials.partial_with_respect_to(w) == approx(37)
     assert all_partials.partial_with_respect_to(x) == approx(52)
     assert all_partials.partial_with_respect_to(y) == approx(-6)
-    assert z.synthetic_partial(w).evaluate(variable_values) == approx(37)
-    assert z.synthetic_partial(x).evaluate(variable_values) == approx(52)
-    assert z.synthetic_partial(y).evaluate(variable_values) == approx(-6)
+    synthetic = z.synthetic()
+    assert synthetic.partial_at(variable_values, w) == approx(37)
+    assert synthetic.partial_at(variable_values, x) == approx(52)
+    assert synthetic.partial_at(variable_values, y) == approx(-6)
 
 
 def test_composite_function():
@@ -104,7 +106,7 @@ def test_composite_function():
     assert z.evaluate(variable_values) == approx(54.598150033)
     assert z.partial_at(variable_values, x) == approx(218.392600132)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(218.392600132)
-    assert z.synthetic_partial(x).evaluate(variable_values) == approx(218.392600132)
+    assert z.synthetic().partial_at(variable_values, x) == approx(218.392600132)
 
 
 def test_indeterminate_form():
@@ -117,5 +119,6 @@ def test_indeterminate_form():
         z.partial_at(variable_values, t)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+    synthetic = z.synthetic()
     with raises(DomainError):
-        z.synthetic_partial(t).evaluate(variable_values)
+        synthetic.partial_at(variable_values, t)

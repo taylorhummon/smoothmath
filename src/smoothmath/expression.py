@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 import smoothmath.utilities as utilities
 from smoothmath.variable_values import VariableValues
 from smoothmath.all_partials import AllPartials
+from smoothmath.synthetic import Synthetic
 import smoothmath.expressions as ex
 
 
@@ -31,7 +32,7 @@ class Expression(ABC):
     def partial_at(
         self: Expression,
         variable_values: VariableValues,
-        with_respect_to: Variable | str,
+        with_respect_to: Variable | str
     ) -> real_number:
         if not isinstance(variable_values, VariableValues):
             raise Exception("Must provide a VariableValues object to partial_at()")
@@ -50,12 +51,16 @@ class Expression(ABC):
         self._compute_all_partials_at(all_partials, variable_values, 1)
         return all_partials
 
-    def synthetic_partial(
-        self: Expression,
-        with_respect_to: Variable | str,
-    ) -> Expression:
-        variable_name = utilities.get_variable_name(with_respect_to)
-        return self._synthetic_partial(variable_name)
+    def synthetic(
+        self: Expression
+    ) -> Synthetic:
+        synthetic = Synthetic(original_expression = self)
+        # !!! this implementation is a temporary hack
+        for variable_name in self._variable_names():
+            synthetic_partial = self._synthetic_partial(variable_name)
+            synthetic._register_partial(variable_name, synthetic_partial)
+        return synthetic
+
 
     ## Abstract methods ##
 
@@ -95,6 +100,14 @@ class Expression(ABC):
         with_respect_to: str
     ) -> Expression:
         raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
+
+    # !!! this is a temporary hack
+    @abstractmethod
+    def _variable_names(
+        self: Expression
+    ) -> frozenset[str]:
+        raise Exception("Concrete classes derived from Expression must implement _variable_names()")
+
 
     ## Operations ##
 
@@ -178,6 +191,12 @@ class UnaryExpression(Expression):
         class_name = type(self).__name__
         return f"{class_name}({self._a})"
 
+    # !!! this is a temporary hack
+    def _variable_names(
+        self: UnaryExpression
+    ) -> frozenset[str]:
+        return self._a._variable_names()
+
 
 class BinaryExpression(Expression):
     def __init__(
@@ -219,3 +238,9 @@ class BinaryExpression(Expression):
     ) -> str:
         class_name = type(self).__name__
         return f"{class_name}({self._a}, {self._b})"
+
+    # !!! this is a temporary hack
+    def _variable_names(
+        self: BinaryExpression
+    ) -> frozenset[str]:
+        return self._a._variable_names() | self._b._variable_names()

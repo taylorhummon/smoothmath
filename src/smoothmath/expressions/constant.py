@@ -63,3 +63,9 @@ class Constant(NullaryExpression):
         with_respect_to: str
     ) -> Expression:
         return ex.Constant(0)
+
+    # !!! this is a temporary hack
+    def _variable_names(
+        self: Constant
+    ) -> frozenset[str]:
+        return frozenset()

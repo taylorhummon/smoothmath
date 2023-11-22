@@ -21,6 +21,7 @@ class AllPartials:
         variable_name = utilities.get_variable_name(variable)
         return self._partial_by_variable_name.get(variable_name, 0)
 
+    # !!! consider renaming this to match Synthetic
     def _add_seed(
         self: AllPartials,
         variable: Variable,

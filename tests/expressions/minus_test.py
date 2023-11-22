@@ -14,8 +14,9 @@ def test_Minus():
     both_partials = z.all_partials_at(variable_values)
     assert both_partials.partial_with_respect_to(x) == approx(1)
     assert both_partials.partial_with_respect_to(y) == approx(-1)
-    assert z.synthetic_partial(x).evaluate(variable_values) == approx(1)
-    assert z.synthetic_partial(y).evaluate(variable_values) == approx(-1)
+    synthetic = z.synthetic()
+    assert synthetic.partial_at(variable_values, x) == approx(1)
+    assert synthetic.partial_at(variable_values, y) == approx(-1)
 
 
 def test_Minus_composition():
@@ -29,5 +30,6 @@ def test_Minus_composition():
     both_partials = z.all_partials_at(variable_values)
     assert both_partials.partial_with_respect_to(x) == approx(5)
     assert both_partials.partial_with_respect_to(y) == approx(-4)
-    assert z.synthetic_partial(x).evaluate(variable_values) == approx(5)
-    assert z.synthetic_partial(y).evaluate(variable_values) == approx(-4)
+    synthetic = z.synthetic()
+    assert synthetic.partial_at(variable_values, x) == approx(5)
+    assert synthetic.partial_at(variable_values, y) == approx(-4)

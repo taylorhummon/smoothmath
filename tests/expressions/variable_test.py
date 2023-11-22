@@ -13,5 +13,6 @@ def test_variable():
     all_partials = y.all_partials_at(variable_values)
     assert all_partials.partial_with_respect_to(x) == 0
     assert all_partials.partial_with_respect_to(y) == 1
-    assert y.synthetic_partial(x).evaluate(variable_values) == 0
-    assert y.synthetic_partial(y).evaluate(variable_values) == 1
+    synthetic = y.synthetic()
+    assert synthetic.partial_at(variable_values, x) == 0
+    assert synthetic.partial_at(variable_values, y) == 1

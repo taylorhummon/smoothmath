@@ -73,3 +73,9 @@ class Variable(NullaryExpression):
             return ex.Constant(1)
         else:
             return ex.Constant(0)
+
+    # !!! this is a temporary hack
+    def _variable_names(
+        self: Variable
+    ) -> frozenset[str]:
+        return frozenset([self.name])
