@@ -36,8 +36,8 @@ class Expression(ABC):
         if not isinstance(variable_values, VariableValues):
             raise Exception("Must provide a VariableValues object to partial_at()")
         self._reset_evaluation_cache()
-        variableName = utilities.get_variable_name(with_respect_to)
-        return self._partial_at(variable_values, variableName)
+        variable_name = utilities.get_variable_name(with_respect_to)
+        return self._partial_at(variable_values, variable_name)
 
     def all_partials_at(
         self: Expression,
@@ -54,8 +54,8 @@ class Expression(ABC):
         self: Expression,
         with_respect_to: Variable | str,
     ) -> Expression:
-        variableName = utilities.get_variable_name(with_respect_to)
-        return self._synthetic_partial(variableName)
+        variable_name = utilities.get_variable_name(with_respect_to)
+        return self._synthetic_partial(variable_name)
 
     ## Abstract methods ##
 
