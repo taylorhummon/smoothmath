@@ -7,11 +7,13 @@ from smoothmath.expressions import Constant, Variable, Reciprocal
 def test_Reciprocal():
     x = Variable("x")
     z = Reciprocal(x)
+    synthetic_partial = z.synthetic_partial(x)
     # at x = 2
     variable_values = VariableValues({x: 2})
     assert z.evaluate(variable_values) == approx(0.5)
     assert z.partial_at(variable_values, x) == approx(-0.25)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.25)
+    assert synthetic_partial.evaluate(variable_values) == approx(-0.25)
     # at x = 0
     variable_values = VariableValues({x: 0})
     with raises(DomainError):
@@ -20,11 +22,14 @@ def test_Reciprocal():
         z.partial_at(variable_values, x)
     with raises(DomainError):
         z.all_partials_at(variable_values)
+    with raises(DomainError):
+        synthetic_partial.evaluate(variable_values)
     # at x = -1
     variable_values = VariableValues({x: -1})
     assert z.evaluate(variable_values) == approx(-1)
     assert z.partial_at(variable_values, x) == approx(-1)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-1)
+    assert synthetic_partial.evaluate(variable_values) == approx(-1)
 
 
 def test_Reciprocal_composition():
@@ -34,3 +39,4 @@ def test_Reciprocal_composition():
     assert z.evaluate(variable_values) == approx(0.5)
     assert z.partial_at(variable_values, x) == approx(-0.5)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.5)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(-0.5)

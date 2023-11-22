@@ -10,6 +10,7 @@ def test_Negation():
     assert z.evaluate(variable_values) == approx(-2)
     assert z.partial_at(variable_values, x) == approx(-1)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-1)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(-1)
 
 
 def test_Negation_composition():
@@ -19,3 +20,4 @@ def test_Negation_composition():
     assert z.evaluate(variable_values) == approx(-7)
     assert z.partial_at(variable_values, x) == approx(-2)
     assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-2)
+    assert z.synthetic_partial(x).evaluate(variable_values) == approx(-2)

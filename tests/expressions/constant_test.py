@@ -10,3 +10,4 @@ def test_Constant():
     variable_values = VariableValues({x: 2})
     assert c.partial_at(variable_values, x) == 0
     assert c.all_partials_at(variable_values).partial_with_respect_to(x) == 0
+    assert c.synthetic_partial(x).evaluate(variable_values) == 0
