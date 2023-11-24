@@ -2,13 +2,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.all_partials import AllPartials
     from smoothmath.variable_values import VariableValues
+    from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 from smoothmath.expression import NullaryExpression
 import smoothmath.expressions as ex
 
+
+# differential rule: d(C) = 0
 
 class Constant(NullaryExpression):
     def __init__(
@@ -54,7 +57,7 @@ class Constant(NullaryExpression):
         self: Constant,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         pass
 
@@ -64,8 +67,9 @@ class Constant(NullaryExpression):
     ) -> Expression:
         return ex.Constant(0)
 
-    # !!! this is a temporary hack
-    def _variable_names(
-        self: Constant
-    ) -> frozenset[str]:
-        return frozenset()
+    def _compute_all_synthetic_partials(
+        self: Constant,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        pass

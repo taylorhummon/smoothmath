@@ -55,10 +55,7 @@ class Expression(ABC):
         self: Expression
     ) -> Synthetic:
         synthetic = Synthetic(original_expression = self)
-        # !!! this implementation is a temporary hack
-        for variable_name in self._variable_names():
-            synthetic_partial = self._synthetic_partial(variable_name)
-            synthetic._register_partial(variable_name, synthetic_partial)
+        self._compute_all_synthetic_partials(synthetic, ex.Constant(1))
         return synthetic
 
 
@@ -90,7 +87,7 @@ class Expression(ABC):
         self: Expression,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         raise Exception("Concrete classes derived from Expression must implement _compute_all_partials_at()")
 
@@ -101,12 +98,13 @@ class Expression(ABC):
     ) -> Expression:
         raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
 
-    # !!! this is a temporary hack
     @abstractmethod
-    def _variable_names(
-        self: Expression
-    ) -> frozenset[str]:
-        raise Exception("Concrete classes derived from Expression must implement _variable_names()")
+    def _compute_all_synthetic_partials(
+        self: Expression,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        raise Exception("Concrete classes derived from Expression must implement _compute_all_synthetic_partials()")
 
 
     ## Operations ##
@@ -191,12 +189,6 @@ class UnaryExpression(Expression):
         class_name = type(self).__name__
         return f"{class_name}({self._a})"
 
-    # !!! this is a temporary hack
-    def _variable_names(
-        self: UnaryExpression
-    ) -> frozenset[str]:
-        return self._a._variable_names()
-
 
 class BinaryExpression(Expression):
     def __init__(
@@ -238,9 +230,3 @@ class BinaryExpression(Expression):
     ) -> str:
         class_name = type(self).__name__
         return f"{class_name}({self._a}, {self._b})"
-
-    # !!! this is a temporary hack
-    def _variable_names(
-        self: BinaryExpression
-    ) -> frozenset[str]:
-        return self._a._variable_names() | self._b._variable_names()

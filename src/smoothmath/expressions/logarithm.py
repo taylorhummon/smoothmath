@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 import math
@@ -11,6 +12,8 @@ from smoothmath.expression import UnaryExpression
 from smoothmath.errors import DomainError
 import smoothmath.expressions as ex
 
+
+# differential rule: d(log_C(a)) = (1 / (log_e(C) * a)) * da
 
 class Logarithm(UnaryExpression):
     def __init__(
@@ -54,32 +57,45 @@ class Logarithm(UnaryExpression):
         a_value = self._a._evaluate(variable_values)
         self._verify_domain_constraints(a_value)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
-        # d(log_C(a)) = (1 / (ln(C) * a)) * da
         return a_partial / (math.log(self._base) * a_value)
 
     def _compute_all_partials_at(
         self: Logarithm,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
         self._verify_domain_constraints(a_value)
-        # d(log_C(a)) = (1 / (ln(C) * a)) * da
-        next_seed = seed / (math.log(self._base) * a_value)
-        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        next_accumulated = accumulated / (math.log(self._base) * a_value)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated)
 
     def _synthetic_partial(
         self: Logarithm,
         with_respect_to: str
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
-        return (
-            ex.Divide(
-                a_partial,
+        return self._synthetic_partial_helper(a_partial)
+
+    def _compute_all_synthetic_partials(
+        self: Logarithm,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        next_accumulated = self._synthetic_partial_helper(accumulated)
+        self._a._compute_all_synthetic_partials(synthetic, next_accumulated)
+
+    def _synthetic_partial_helper(
+        self: Logarithm,
+        multiplier: Expression
+    ) -> Expression:
+        if self._base == math.e:
+            return ex.Divide(multiplier, self._a)
+        else:
+            return ex.Divide(
+                multiplier,
                 ex.Multiply(
                     ex.Logarithm(ex.Constant(self._base), base = math.e),
                     self._a,
                 )
             )
-        )

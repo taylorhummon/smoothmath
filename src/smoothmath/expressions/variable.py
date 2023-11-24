@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 from smoothmath.expression import NullaryExpression
@@ -61,9 +62,9 @@ class Variable(NullaryExpression):
         self: Variable,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
-        all_partials._add_seed(self, seed)
+        all_partials._add_to(self, accumulated)
 
     def _synthetic_partial(
         self: Variable,
@@ -74,8 +75,9 @@ class Variable(NullaryExpression):
         else:
             return ex.Constant(0)
 
-    # !!! this is a temporary hack
-    def _variable_names(
-        self: Variable
-    ) -> frozenset[str]:
-        return frozenset([self.name])
+    def _compute_all_synthetic_partials(
+        self: Variable,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        synthetic._add_to(self, accumulated)

@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
@@ -10,6 +11,8 @@ from smoothmath.errors import DomainError
 from smoothmath.variable_values import VariableValues
 import smoothmath.expressions as ex
 
+
+# differential rule: d(a / b) = (1 / b) * da - (a / b ** 2) * db
 
 class Divide(BinaryExpression):
     def __init__(
@@ -52,23 +55,21 @@ class Divide(BinaryExpression):
         self._verify_domain_constraints(a_value, b_value)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
         b_partial = self._b._partial_at(variable_values, with_respect_to)
-        # d(a / b) = (1 / b) * da - (a / b ** 2) * db
         return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
     def _compute_all_partials_at(
         self: Divide,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values)
         self._verify_domain_constraints(a_value, b_value)
-        # d(a / b) = (1 / b) * da - (a / b ** 2) * db
-        next_seedA = seed / b_value
-        next_seedB =  - seed * a_value / (b_value ** 2)
-        self._a._compute_all_partials_at(all_partials, variable_values, next_seedA)
-        self._b._compute_all_partials_at(all_partials, variable_values, next_seedB)
+        next_accumulated_a = accumulated / b_value
+        next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated_a)
+        self._b._compute_all_partials_at(all_partials, variable_values, next_accumulated_b)
 
     def _synthetic_partial(
         self: Divide,
@@ -76,12 +77,22 @@ class Divide(BinaryExpression):
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
         b_partial = self._b._synthetic_partial(with_respect_to)
-        return (
-            ex.Divide(
-                ex.Minus(
-                    ex.Multiply(self._b, a_partial),
-                    ex.Multiply(self._a, b_partial)
-                ),
-                ex.Power(self._b, ex.Constant(2))
-            )
+        numerator = ex.Minus(
+            ex.Multiply(self._b, a_partial),
+            ex.Multiply(self._a, b_partial)
         )
+        denominator = ex.Power(self._b, ex.Constant(2))
+        return ex.Divide(numerator, denominator)
+
+    def _compute_all_synthetic_partials(
+        self: Divide,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        next_accumulated_a = ex.Divide(accumulated, self._b)
+        next_accumulated_b = ex.Multiply(
+            accumulated,
+            ex.Negation(ex.Divide(self._a, ex.Power(self._b, ex.Constant(2))))
+        )
+        self._a._compute_all_synthetic_partials(synthetic, next_accumulated_a)
+        self._b._compute_all_synthetic_partials(synthetic, next_accumulated_b)

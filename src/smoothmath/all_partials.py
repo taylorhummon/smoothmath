@@ -21,11 +21,10 @@ class AllPartials:
         variable_name = utilities.get_variable_name(variable)
         return self._partial_by_variable_name.get(variable_name, 0)
 
-    # !!! consider renaming this to match Synthetic
-    def _add_seed(
+    def _add_to(
         self: AllPartials,
         variable: Variable,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         existing_value = self._partial_by_variable_name.get(variable.name, 0)
-        self._partial_by_variable_name[variable.name] = existing_value + seed
+        self._partial_by_variable_name[variable.name] = existing_value + accumulated

@@ -3,12 +3,15 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
-    from smoothmath.expression import Expression
+    from smoothmath.synthetic import Synthetic
     from smoothmath.all_partials import AllPartials
+    from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
 import smoothmath.expressions as ex
 
+
+# differential rule: d(a + b) = da + db
 
 class Plus(BinaryExpression):
     def __init__(
@@ -36,18 +39,16 @@ class Plus(BinaryExpression):
     ) -> real_number:
         a_partial = self._a._partial_at(variable_values, with_respect_to)
         b_partial = self._b._partial_at(variable_values, with_respect_to)
-        # d(a + b) = da + db
         return a_partial + b_partial
 
     def _compute_all_partials_at(
         self: Plus,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
-        # d(a + b) = da + db
-        self._a._compute_all_partials_at(all_partials, variable_values, seed)
-        self._b._compute_all_partials_at(all_partials, variable_values, seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, accumulated)
+        self._b._compute_all_partials_at(all_partials, variable_values, accumulated)
 
     def _synthetic_partial(
         self: Plus,
@@ -56,3 +57,11 @@ class Plus(BinaryExpression):
         a_partial = self._a._synthetic_partial(with_respect_to)
         b_partial = self._b._synthetic_partial(with_respect_to)
         return ex.Plus(a_partial, b_partial)
+
+    def _compute_all_synthetic_partials(
+        self: Plus,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        self._a._compute_all_synthetic_partials(synthetic, accumulated)
+        self._b._compute_all_synthetic_partials(synthetic, accumulated)

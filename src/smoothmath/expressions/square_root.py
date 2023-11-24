@@ -4,6 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 import math
@@ -11,6 +12,8 @@ from smoothmath.expression import UnaryExpression
 from smoothmath.errors import DomainError
 import smoothmath.expressions as ex
 
+
+# differential rule: d(sqrt(a)) = (1 / (2 sqrt(a))) * da
 
 class SquareRoot(UnaryExpression):
     def __init__(
@@ -47,30 +50,40 @@ class SquareRoot(UnaryExpression):
         a_value = self._a._evaluate(variable_values)
         self._verify_domain_constraints(a_value)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
-        # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
         return a_partial / (2 * math.sqrt(a_value))
 
     def _compute_all_partials_at(
         self: SquareRoot,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
         self._verify_domain_constraints(a_value)
         self_value = self._evaluate(variable_values)
-        # d(sqrt(a)) = (1 / (2 sqrt(a))) * da
-        next_seed = seed / (2 * self_value)
-        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        next_accumulated = accumulated / (2 * self_value)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated)
 
     def _synthetic_partial(
         self: SquareRoot,
         with_respect_to: str
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
-        return (
-            ex.Divide(
-                a_partial,
-                ex.Multiply(ex.Constant(2), ex.SquareRoot(self._a))
-            )
+        return self._synthetic_partial_helper(a_partial)
+
+    def _compute_all_synthetic_partials(
+        self: SquareRoot,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        next_accumulated = self._synthetic_partial_helper(accumulated)
+        self._a._compute_all_synthetic_partials(synthetic, next_accumulated)
+
+    def _synthetic_partial_helper(
+        self: SquareRoot,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Divide(
+            multiplier,
+            ex.Multiply(ex.Constant(2), ex.SquareRoot(self._a))
         )

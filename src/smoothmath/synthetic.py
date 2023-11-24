@@ -25,19 +25,20 @@ class Synthetic:
         variable_values: VariableValues,
         variable: Variable | str
     ) -> real_number:
-        # we evaluate the original expression to ensure it is defined for variable_values
+        # We evaluate the original expression to check for DomainErrors.
+        # e.g. (ln(x))' = 1 / x
+        # Naively, the RHS is defined for negative x, but ln(x) isn't defined there!
         self.original_expression.evaluate(variable_values)
-        variable_name = utilities.get_variable_name(variable)
-        synthetic_partial = self._lookup(variable_name)
+        synthetic_partial = self._lookup(utilities.get_variable_name(variable))
         return synthetic_partial.evaluate(variable_values)
 
     def _add_to(
         self: Synthetic,
         variable: Variable,
-        summand: Expression
+        expression: Expression
     ) -> None:
-        expression = self._lookup(variable.name)
-        self._partial_by_variable_name[variable.name] = ex.Plus(expression, summand)
+        existing = self._lookup(variable.name)
+        self._partial_by_variable_name[variable.name] = ex.Plus(existing, expression)
 
     def _lookup(
         self: Synthetic,
@@ -48,11 +49,3 @@ class Synthetic:
             return ex.Constant(0)
         else:
             return existing_or_none
-
-    # !!! this is a temporary hack
-    def _register_partial(
-        self: Synthetic,
-        variable_name: str,
-        partial: Expression
-    ) -> None:
-        self._partial_by_variable_name[variable_name] = partial

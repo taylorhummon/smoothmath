@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 import math
@@ -26,6 +27,8 @@ def _is_case_i(
 ) -> bool:
     return b._lacks_variables and utilities.is_integer(b.evaluate(VariableValues({})))
 
+
+# differential rule: d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
 
 class Power(BinaryExpression):
     def __init__(
@@ -58,21 +61,31 @@ class Power(BinaryExpression):
         self: Power,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_all_partials_at_case_i(all_partials, variable_values, seed)
+            self._compute_all_partials_at_case_i(all_partials, variable_values, accumulated)
         else:
-            self._compute_all_partials_at_case_ii(all_partials, variable_values, seed)
+            self._compute_all_partials_at_case_ii(all_partials, variable_values, accumulated)
 
     def _synthetic_partial(
-            self: Power,
-            with_respect_to: str
-        ) -> Expression:
-            if _is_case_i(self._b):
-                return self._synthetic_partial_case_i(with_respect_to)
-            else:
-                return self._synthetic_partial_case_ii(with_respect_to)
+        self: Power,
+        with_respect_to: str
+    ) -> Expression:
+        if _is_case_i(self._b):
+            return self._synthetic_partial_case_i(with_respect_to)
+        else:
+            return self._synthetic_partial_case_ii(with_respect_to)
+
+    def _compute_all_synthetic_partials(
+        self: Power,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        if _is_case_i(self._b):
+            self._compute_all_synthetic_partials_case_i(synthetic, accumulated)
+        else:
+            self._compute_all_synthetic_partials_case_ii(synthetic, accumulated)
 
     ### CASE i ###
 
@@ -125,7 +138,7 @@ class Power(BinaryExpression):
         self: Power,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
         b_value = self._b._evaluate(variable_values) # b_value is an integer (this is case i)
@@ -135,11 +148,11 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_all_partials_at(all_partials, variable_values, seed)
+            self._a._compute_all_partials_at(all_partials, variable_values, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
-            next_seed = seed * b_value * (a_value ** (b_value - 1))
-            self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+            next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
+            self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated)
 
     def _synthetic_partial_case_i(
         self: Power,
@@ -152,20 +165,24 @@ class Power(BinaryExpression):
             # d(a ** 1) = 1 * da
             return self._a._synthetic_partial(with_respect_to)
         else: # b_value >= 2 or b_value <= -1
-            a_partial = self._a._synthetic_partial(with_respect_to)
             # d(a ** C) = C * a ** (C - 1) * da
-            return (
-                ex.Multiply(
-                    ex.Multiply(
-                        self._b,
-                        Power(
-                            self._a,
-                            ex.Minus(self._b, ex.Constant(1))
-                        )
-                    ),
-                    a_partial
-                )
-            )
+            return self._term_1(self._a._synthetic_partial(with_respect_to))
+
+    def _compute_all_synthetic_partials_case_i(
+        self: Power,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        b_value = self._b._evaluate(VariableValues({})) # b_value is an integer (this is case i)
+        if b_value == 0:
+            # d(a ** 0) = 0 * da
+            return
+        elif b_value == 1:
+            # d(a ** 1) = da
+            self._a._compute_all_synthetic_partials(synthetic, accumulated)
+        else: # b_value >= 2 or b_value <= -1
+            # d(a ** C) = C * a ** (C - 1) * da
+            self._a._compute_all_synthetic_partials(synthetic, self._term_1(accumulated))
 
     ### CASE ii ###
 
@@ -224,7 +241,7 @@ class Power(BinaryExpression):
         self: Power,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         if self._a._lacks_variables and self._a._evaluate(variable_values) == 1:
             # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
@@ -234,35 +251,42 @@ class Power(BinaryExpression):
             b_value = self._b._evaluate(variable_values)
             self._verify_domain_constraints_case_ii(a_value, b_value)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
-            next_seed_a = seed * b_value * a_value ** (b_value - 1)
-            next_seed_b = seed * math.log(a_value) * a_value ** b_value
-            self._a._compute_all_partials_at(all_partials, variable_values, next_seed_a)
-            self._b._compute_all_partials_at(all_partials, variable_values, next_seed_b)
+            next_accumulated_a = accumulated * b_value * a_value ** (b_value - 1)
+            next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
+            self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated_a)
+            self._b._compute_all_partials_at(all_partials, variable_values, next_accumulated_b)
 
     def _synthetic_partial_case_ii(
         self: Power,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
-        term_1 = (
-            ex.Multiply(
-                self._b,
-                Power(
-                    self._a,
-                    ex.Minus(self._b, ex.Constant(1))
-                )
-            )
+        return ex.Plus(
+            self._term_1(self._a._synthetic_partial(with_respect_to)),
+            self._term_2(self._b._synthetic_partial(with_respect_to))
         )
-        term_2 = (
-            ex.Multiply(
-                ex.Logarithm(self._a),
-                ex.Power(self._a, self._b)
-            )
+
+    def _compute_all_synthetic_partials_case_ii(
+        self: Power,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        self._a._compute_all_synthetic_partials(synthetic, self._term_1(accumulated))
+        self._b._compute_all_synthetic_partials(synthetic, self._term_2(accumulated))
+
+    def _term_1(
+        self: Power,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Multiply(
+            ex.Multiply(self._b, ex.Power(self._a, ex.Minus(self._b, ex.Constant(1)))),
+            multiplier
         )
-        return (
-            ex.Plus(
-                ex.Multiply(term_1, a_partial),
-                ex.Multiply(term_2, b_partial)
-            )
+
+    def _term_2(
+        self: Power,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Multiply(
+            ex.Multiply(ex.Logarithm(self._a), ex.Power(self._a, self._b)),
+            multiplier
         )

@@ -4,12 +4,15 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
 from smoothmath.errors import DomainError
 import smoothmath.expressions as ex
 
+
+# differential rule: d(a * b) = b * da + a * db
 
 class Multiply(BinaryExpression):
     def __init__(
@@ -23,11 +26,11 @@ class Multiply(BinaryExpression):
         self: Multiply,
         variable_values: VariableValues
     ) -> real_number:
-        pairOrNone = self._get_a_and_b_values_or_none(variable_values)
-        if pairOrNone == None:
+        pair_or_none = self._get_a_and_b_values_or_none(variable_values)
+        if pair_or_none == None:
             self._value = 0
-        else: # pairOrNone is the pair (a_value, b_value)
-            a_value, b_value = pairOrNone
+        else: # pair_or_none is the pair (a_value, b_value)
+            a_value, b_value = pair_or_none
             self._value = a_value * b_value
         return self._value
 
@@ -36,30 +39,28 @@ class Multiply(BinaryExpression):
         variable_values: VariableValues,
         with_respect_to: str
     ) -> real_number:
-        pairOrNone = self._get_a_and_b_values_or_none(variable_values)
-        if pairOrNone == None:
+        pair_or_none = self._get_a_and_b_values_or_none(variable_values)
+        if pair_or_none == None:
             return 0
-        else: # pairOrNone is the pair (a_value, b_value)
-            a_value, b_value = pairOrNone
+        else: # pair_or_none is the pair (a_value, b_value)
+            a_value, b_value = pair_or_none
             a_partial = self._a._partial_at(variable_values, with_respect_to)
             b_partial = self._b._partial_at(variable_values, with_respect_to)
-            # d(a * b) = b * da + a * db
             return b_value * a_partial + a_value * b_partial
 
     def _compute_all_partials_at(
         self: Multiply,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
-        pairOrNone = self._get_a_and_b_values_or_none(variable_values)
-        if pairOrNone == None:
+        pair_or_none = self._get_a_and_b_values_or_none(variable_values)
+        if pair_or_none == None:
             return
-        else: # pairOrNone is the pair (a_value, b_value)
-            a_value, b_value = pairOrNone
-            # d(a * b) = b * da + a * db
-            self._a._compute_all_partials_at(all_partials, variable_values, seed * b_value)
-            self._b._compute_all_partials_at(all_partials, variable_values, seed * a_value)
+        else: # pair_or_none is the pair (a_value, b_value)
+            a_value, b_value = pair_or_none
+            self._a._compute_all_partials_at(all_partials, variable_values, accumulated * b_value)
+            self._b._compute_all_partials_at(all_partials, variable_values, accumulated * a_value)
 
     def _synthetic_partial(
         self: Multiply,
@@ -71,6 +72,14 @@ class Multiply(BinaryExpression):
             ex.Multiply(self._b, a_partial),
             ex.Multiply(self._a, b_partial)
         )
+
+    def _compute_all_synthetic_partials(
+        self: Multiply,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        self._a._compute_all_synthetic_partials(synthetic, ex.Multiply(accumulated, self._b))
+        self._b._compute_all_synthetic_partials(synthetic, ex.Multiply(accumulated, self._a))
 
     # the following method is used to allow shirt-circuiting of either a * 0 or 0 * b
     def _get_a_and_b_values_or_none(

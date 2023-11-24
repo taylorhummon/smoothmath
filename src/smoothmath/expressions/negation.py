@@ -4,11 +4,14 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 from smoothmath.expression import UnaryExpression
 import smoothmath.expressions as ex
 
+
+# differential rule: d(-a) = -da
 
 class Negation(UnaryExpression):
     def __init__(
@@ -33,17 +36,15 @@ class Negation(UnaryExpression):
         with_respect_to: str
     ) -> real_number:
         a_partial = self._a._partial_at(variable_values, with_respect_to)
-        # d(-a) = -da
         return - a_partial
 
     def _compute_all_partials_at(
         self: Negation,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
-        # d(-a) = -da
-        self._a._compute_all_partials_at(all_partials, variable_values, - seed)
+        self._a._compute_all_partials_at(all_partials, variable_values, - accumulated)
 
     def _synthetic_partial(
         self: Negation,
@@ -51,3 +52,10 @@ class Negation(UnaryExpression):
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
         return ex.Negation(a_partial)
+
+    def _compute_all_synthetic_partials(
+        self: Negation,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        self._a._compute_all_synthetic_partials(synthetic, ex.Negation(accumulated))

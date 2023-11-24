@@ -19,7 +19,6 @@ def test_Cosine():
     assert z.evaluate(variable_values) == approx(0)
     assert z.partial_at(variable_values, theta) == approx(-1)
     assert z.all_partials_at(variable_values).partial_with_respect_to(theta) == approx(-1)
-    print(synthetic._partial_by_variable_name)
     assert synthetic.partial_at(variable_values, theta) == approx(-1)
 
 

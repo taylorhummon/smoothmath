@@ -4,12 +4,15 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 from smoothmath.expression import UnaryExpression
 from smoothmath.errors import DomainError
 import smoothmath.expressions as ex
 
+
+# differential rule: d(1 / a) = - (1 / a ** 2) * da
 
 class Reciprocal(UnaryExpression):
     def __init__(
@@ -44,31 +47,41 @@ class Reciprocal(UnaryExpression):
         a_value = self._a._evaluate(variable_values)
         self._verify_domain_constraints(a_value)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
-        resultValue = self._evaluate(variable_values)
-        # d(1 / a) = - (1 / a ** 2) * da
-        return - (resultValue ** 2) * a_partial
+        result_value = self._evaluate(variable_values)
+        return - (result_value ** 2) * a_partial
 
     def _compute_all_partials_at(
         self: Reciprocal,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
         self._verify_domain_constraints(a_value)
         self_value = self._evaluate(variable_values)
-        # d(1 / a) = - (1 / a ** 2) * da
-        next_seed = - seed * (self_value ** 2)
-        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        next_accumulated = - accumulated * (self_value ** 2)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated)
 
     def _synthetic_partial(
         self: Reciprocal,
         with_respect_to: str
     ) -> Expression:
         a_partial = self._a._synthetic_partial(with_respect_to)
-        return (
-            ex.Multiply(
-                ex.Negation(ex.Reciprocal(ex.Power(self._a, ex.Constant(2)))),
-                a_partial
-            )
+        return self._synthetic_partial_helper(a_partial)
+
+    def _compute_all_synthetic_partials(
+        self: Reciprocal,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        next_accumulated = self._synthetic_partial_helper(accumulated)
+        self._a._compute_all_synthetic_partials(synthetic, next_accumulated)
+
+    def _synthetic_partial_helper(
+        self: Reciprocal,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Multiply(
+            ex.Negation(ex.Reciprocal(ex.Power(self._a, ex.Constant(2)))),
+            multiplier
         )

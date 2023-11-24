@@ -4,12 +4,15 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.variable_values import VariableValues
     from smoothmath.all_partials import AllPartials
+    from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
 import math
 from smoothmath.expression import UnaryExpression
 import smoothmath.expressions as ex
 
+
+# differential rule: d(sin(a)) = cos(a) * da
 
 class Sine(UnaryExpression):
     def __init__(
@@ -35,19 +38,17 @@ class Sine(UnaryExpression):
     ) -> real_number:
         a_value = self._a._evaluate(variable_values)
         a_partial = self._a._partial_at(variable_values, with_respect_to)
-        # d(sin(a)) = cos(a) * da
         return math.cos(a_value) * a_partial
 
     def _compute_all_partials_at(
         self: Sine,
         all_partials: AllPartials,
         variable_values: VariableValues,
-        seed: real_number
+        accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(variable_values)
-        # d(sin(a)) = cos(a) * da
-        next_seed = seed * math.cos(a_value)
-        self._a._compute_all_partials_at(all_partials, variable_values, next_seed)
+        next_accumulated = accumulated * math.cos(a_value)
+        self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated)
 
     def _synthetic_partial(
         self: Sine,
@@ -58,3 +59,11 @@ class Sine(UnaryExpression):
             ex.Cosine(self._a),
             a_partial
         )
+
+    def _compute_all_synthetic_partials(
+        self: Sine,
+        synthetic: Synthetic,
+        accumulated: Expression
+    ) -> None:
+        next_accumulated = ex.Multiply(accumulated, ex.Cosine(self._a))
+        self._a._compute_all_synthetic_partials(synthetic, next_accumulated)
