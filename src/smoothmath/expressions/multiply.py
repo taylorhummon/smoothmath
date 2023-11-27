@@ -34,7 +34,7 @@ class Multiply(BinaryExpression):
             self._value = a_value * b_value
         return self._value
 
-    def _partial_at(
+    def _local_partial(
         self: Multiply,
         point: Point,
         with_respect_to: str
@@ -44,8 +44,8 @@ class Multiply(BinaryExpression):
             return 0
         else: # pair_or_none is the pair (a_value, b_value)
             a_value, b_value = pair_or_none
-            a_partial = self._a._partial_at(point, with_respect_to)
-            b_partial = self._b._partial_at(point, with_respect_to)
+            a_partial = self._a._local_partial(point, with_respect_to)
+            b_partial = self._b._local_partial(point, with_respect_to)
             return b_value * a_partial + a_value * b_partial
 
     def _global_partial(

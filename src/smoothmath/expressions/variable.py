@@ -48,7 +48,7 @@ class Variable(NullaryExpression):
     ) -> real_number:
         return point.value_for(self.name)
 
-    def _partial_at(
+    def _local_partial(
         self: Variable,
         point: Point,
         with_respect_to: str

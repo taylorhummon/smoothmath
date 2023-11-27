@@ -39,7 +39,7 @@ class Expression(ABC):
             raise Exception("Must provide a Point to partial_at()")
         self._reset_evaluation_cache()
         variable_name = utilities.get_variable_name(with_respect_to)
-        return self._partial_at(point, variable_name)
+        return self._local_partial(point, variable_name)
 
     def compute_global_partial(
         self: Expression,
@@ -84,12 +84,12 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
     @abstractmethod
-    def _partial_at(
+    def _local_partial(
         self: Expression,
         point: Point,
         with_respect_to: str
     ) -> real_number:
-        raise Exception("Concrete classes derived from Expression must implement _partial_at()")
+        raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 
     @abstractmethod
     def _global_partial(

@@ -47,15 +47,15 @@ class Power(BinaryExpression):
         else:
             return self._evaluate_case_ii(point)
 
-    def _partial_at(
+    def _local_partial(
         self: Power,
         point: Point,
         with_respect_to: str
     ) -> real_number:
         if _is_case_i(self._b):
-            return self._partial_at_case_i(point, with_respect_to)
+            return self._local_partial_case_i(point, with_respect_to)
         else:
-            return self._partial_at_case_ii(point, with_respect_to)
+            return self._local_partial_case_ii(point, with_respect_to)
 
     def _global_partial(
         self: Power,
@@ -115,7 +115,7 @@ class Power(BinaryExpression):
             self._value = a_value ** b_value
         return self._value
 
-    def _partial_at_case_i(
+    def _local_partial_case_i(
         self: Power,
         point: Point,
         with_respect_to: str
@@ -128,9 +128,9 @@ class Power(BinaryExpression):
             return 0
         elif b_value == 1:
             # d(a ** 1) = 1 * da
-            return self._a._partial_at(point, with_respect_to)
+            return self._a._local_partial(point, with_respect_to)
         else: # b_value >= 2 or b_value <= -1
-            a_partial = self._a._partial_at(point, with_respect_to)
+            a_partial = self._a._local_partial(point, with_respect_to)
             # d(a ** C) = C * a ** (C - 1) * da
             return b_value * (a_value ** (b_value - 1)) * a_partial
 
@@ -218,7 +218,7 @@ class Power(BinaryExpression):
             self._value = a_value ** b_value
         return self._value
 
-    def _partial_at_case_ii(
+    def _local_partial_case_ii(
         self: Power,
         point: Point,
         with_respect_to: str
@@ -230,8 +230,8 @@ class Power(BinaryExpression):
             a_value = self._a._evaluate(point)
             b_value = self._b._evaluate(point)
             self._verify_domain_constraints_case_ii(a_value, b_value)
-            a_partial = self._a._partial_at(point, with_respect_to)
-            b_partial = self._b._partial_at(point, with_respect_to)
+            a_partial = self._a._local_partial(point, with_respect_to)
+            b_partial = self._b._local_partial(point, with_respect_to)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             return (
                 b_value * (a_value ** (b_value - 1)) * a_partial +

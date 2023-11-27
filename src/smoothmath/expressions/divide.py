@@ -45,7 +45,7 @@ class Divide(BinaryExpression):
         self._value = a_value / b_value
         return self._value
 
-    def _partial_at(
+    def _local_partial(
         self: Divide,
         point: Point,
         with_respect_to: str
@@ -53,8 +53,8 @@ class Divide(BinaryExpression):
         a_value = self._a._evaluate(point)
         b_value = self._b._evaluate(point)
         self._verify_domain_constraints(a_value, b_value)
-        a_partial = self._a._partial_at(point, with_respect_to)
-        b_partial = self._b._partial_at(point, with_respect_to)
+        a_partial = self._a._local_partial(point, with_respect_to)
+        b_partial = self._b._local_partial(point, with_respect_to)
         return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
     def _global_partial(

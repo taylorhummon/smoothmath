@@ -31,13 +31,13 @@ class Cosine(UnaryExpression):
         self._value = math.cos(a_value)
         return self._value
 
-    def _partial_at(
+    def _local_partial(
         self: Cosine,
         point: Point,
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(point)
-        a_partial = self._a._partial_at(point, with_respect_to)
+        a_partial = self._a._local_partial(point, with_respect_to)
         return - math.sin(a_value) * a_partial
 
     def _global_partial(

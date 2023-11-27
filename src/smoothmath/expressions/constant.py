@@ -46,7 +46,7 @@ class Constant(NullaryExpression):
     ) -> real_number:
         return self._value
 
-    def _partial_at(
+    def _local_partial(
         self: Constant,
         point: Point,
         with_respect_to: str

@@ -42,14 +42,14 @@ class SquareRoot(UnaryExpression):
         self._value = math.sqrt(a_value)
         return self._value
 
-    def _partial_at(
+    def _local_partial(
         self: SquareRoot,
         point: Point,
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(point)
         self._verify_domain_constraints(a_value)
-        a_partial = self._a._partial_at(point, with_respect_to)
+        a_partial = self._a._local_partial(point, with_respect_to)
         return a_partial / (2 * math.sqrt(a_value))
 
     def _global_partial(

@@ -36,13 +36,13 @@ class Exponential(UnaryExpression):
         self._value = self._base ** a_value
         return self._value
 
-    def _partial_at(
+    def _local_partial(
         self: Exponential,
         point: Point,
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(point)
-        a_partial = self._a._partial_at(point, with_respect_to)
+        a_partial = self._a._local_partial(point, with_respect_to)
         result_value = self._base ** a_value
         return math.log(self._base) * result_value * a_partial
 

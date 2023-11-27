@@ -49,14 +49,14 @@ class Logarithm(UnaryExpression):
         self._value = math.log(a_value, self._base)
         return self._value
 
-    def _partial_at(
+    def _local_partial(
         self: Logarithm,
         point: Point,
         with_respect_to: str
     ) -> real_number:
         a_value = self._a._evaluate(point)
         self._verify_domain_constraints(a_value)
-        a_partial = self._a._partial_at(point, with_respect_to)
+        a_partial = self._a._local_partial(point, with_respect_to)
         return a_partial / (math.log(self._base) * a_value)
 
     def _global_partial(
