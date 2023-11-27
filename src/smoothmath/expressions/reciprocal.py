@@ -50,6 +50,13 @@ class Reciprocal(UnaryExpression):
         result_value = self._evaluate(point)
         return - (result_value ** 2) * a_partial
 
+    def _global_partial(
+        self: Reciprocal,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        return self._global_partial_helper(a_partial)
+
     def _compute_local_partials(
         self: Reciprocal,
         computed_local_partials: ComputedLocalPartials,
@@ -61,13 +68,6 @@ class Reciprocal(UnaryExpression):
         self_value = self._evaluate(point)
         next_accumulated = - accumulated * (self_value ** 2)
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
-
-    def _global_partial(
-        self: Reciprocal,
-        with_respect_to: str
-    ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        return self._global_partial_helper(a_partial)
 
     def _compute_global_partials(
         self: Reciprocal,

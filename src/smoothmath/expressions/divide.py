@@ -57,6 +57,19 @@ class Divide(BinaryExpression):
         b_partial = self._b._partial_at(point, with_respect_to)
         return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
+    def _global_partial(
+        self: Divide,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        b_partial = self._b._global_partial(with_respect_to)
+        numerator = ex.Minus(
+            ex.Multiply(self._b, a_partial),
+            ex.Multiply(self._a, b_partial)
+        )
+        denominator = ex.Power(self._b, ex.Constant(2))
+        return ex.Divide(numerator, denominator)
+
     def _compute_local_partials(
         self: Divide,
         computed_local_partials: ComputedLocalPartials,
@@ -70,19 +83,6 @@ class Divide(BinaryExpression):
         next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
         self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
-
-    def _global_partial(
-        self: Divide,
-        with_respect_to: str
-    ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        b_partial = self._b._global_partial(with_respect_to)
-        numerator = ex.Minus(
-            ex.Multiply(self._b, a_partial),
-            ex.Multiply(self._a, b_partial)
-        )
-        denominator = ex.Power(self._b, ex.Constant(2))
-        return ex.Divide(numerator, denominator)
 
     def _compute_global_partials(
         self: Divide,

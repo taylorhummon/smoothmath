@@ -58,14 +58,6 @@ class Variable(NullaryExpression):
         else:
             return 0
 
-    def _compute_local_partials(
-        self: Variable,
-        computed_local_partials: ComputedLocalPartials,
-        point: Point,
-        accumulated: real_number
-    ) -> None:
-        computed_local_partials._add_to(self, accumulated)
-
     def _global_partial(
         self: Variable,
         with_respect_to: str
@@ -74,6 +66,14 @@ class Variable(NullaryExpression):
             return ex.Constant(1)
         else:
             return ex.Constant(0)
+
+    def _compute_local_partials(
+        self: Variable,
+        computed_local_partials: ComputedLocalPartials,
+        point: Point,
+        accumulated: real_number
+    ) -> None:
+        computed_local_partials._add_to(self, accumulated)
 
     def _compute_global_partials(
         self: Variable,

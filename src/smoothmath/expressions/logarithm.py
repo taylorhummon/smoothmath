@@ -59,6 +59,13 @@ class Logarithm(UnaryExpression):
         a_partial = self._a._partial_at(point, with_respect_to)
         return a_partial / (math.log(self._base) * a_value)
 
+    def _global_partial(
+        self: Logarithm,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        return self._global_partial_helper(a_partial)
+
     def _compute_local_partials(
         self: Logarithm,
         computed_local_partials: ComputedLocalPartials,
@@ -69,13 +76,6 @@ class Logarithm(UnaryExpression):
         self._verify_domain_constraints(a_value)
         next_accumulated = accumulated / (math.log(self._base) * a_value)
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
-
-    def _global_partial(
-        self: Logarithm,
-        with_respect_to: str
-    ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        return self._global_partial_helper(a_partial)
 
     def _compute_global_partials(
         self: Logarithm,

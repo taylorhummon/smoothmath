@@ -52,6 +52,13 @@ class SquareRoot(UnaryExpression):
         a_partial = self._a._partial_at(point, with_respect_to)
         return a_partial / (2 * math.sqrt(a_value))
 
+    def _global_partial(
+        self: SquareRoot,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        return self._global_partial_helper(a_partial)
+
     def _compute_local_partials(
         self: SquareRoot,
         computed_local_partials: ComputedLocalPartials,
@@ -63,13 +70,6 @@ class SquareRoot(UnaryExpression):
         self_value = self._evaluate(point)
         next_accumulated = accumulated / (2 * self_value)
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
-
-    def _global_partial(
-        self: SquareRoot,
-        with_respect_to: str
-    ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        return self._global_partial_helper(a_partial)
 
     def _compute_global_partials(
         self: SquareRoot,

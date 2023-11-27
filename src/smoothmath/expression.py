@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 from abc import ABC, abstractmethod
 import smoothmath.utilities as utilities
 from smoothmath.point import Point
+from smoothmath.computed_global_partial import ComputedGlobalPartial
 from smoothmath.computed_local_partials import ComputedLocalPartials
 from smoothmath.computed_global_partials import ComputedGlobalPartials
 import smoothmath.expressions as ex
@@ -40,6 +41,14 @@ class Expression(ABC):
         variable_name = utilities.get_variable_name(with_respect_to)
         return self._partial_at(point, variable_name)
 
+    def compute_global_partial(
+        self: Expression,
+        with_respect_to: Variable | str
+    ) -> ComputedGlobalPartial:
+        variable_name = utilities.get_variable_name(with_respect_to)
+        global_partial = self._global_partial(variable_name)
+        return ComputedGlobalPartial(self, global_partial)
+
     def compute_local_partials(
         self: Expression,
         point: Point
@@ -54,7 +63,7 @@ class Expression(ABC):
     def compute_global_partials(
         self: Expression
     ) -> ComputedGlobalPartials:
-        computed_global_partials = ComputedGlobalPartials(original_expression = self)
+        computed_global_partials = ComputedGlobalPartials(self)
         self._compute_global_partials(computed_global_partials, ex.Constant(1))
         return computed_global_partials
 
@@ -83,6 +92,13 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _partial_at()")
 
     @abstractmethod
+    def _global_partial(
+        self: Expression,
+        with_respect_to: str
+    ) -> Expression:
+        raise Exception("Concrete classes derived from Expression must implement _global_partial()")
+
+    @abstractmethod
     def _compute_local_partials(
         self: Expression,
         computed_local_partials: ComputedLocalPartials,
@@ -90,13 +106,6 @@ class Expression(ABC):
         accumulated: real_number
     ) -> None: # instead of returning a value, we mutate the computed_local_partials argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_partials()")
-
-    @abstractmethod
-    def _global_partial(
-        self: Expression,
-        with_respect_to: str
-    ) -> Expression:
-        raise Exception("Concrete classes derived from Expression must implement _global_partial()")
 
     @abstractmethod
     def _compute_global_partials(

@@ -57,6 +57,15 @@ class Power(BinaryExpression):
         else:
             return self._partial_at_case_ii(point, with_respect_to)
 
+    def _global_partial(
+        self: Power,
+        with_respect_to: str
+    ) -> Expression:
+        if _is_case_i(self._b):
+            return self._global_partial_case_i(with_respect_to)
+        else:
+            return self._global_partial_case_ii(with_respect_to)
+
     def _compute_local_partials(
         self: Power,
         computed_local_partials: ComputedLocalPartials,
@@ -67,15 +76,6 @@ class Power(BinaryExpression):
             self._compute_local_partials_case_i(computed_local_partials, point, accumulated)
         else:
             self._compute_local_partials_case_ii(computed_local_partials, point, accumulated)
-
-    def _global_partial(
-        self: Power,
-        with_respect_to: str
-    ) -> Expression:
-        if _is_case_i(self._b):
-            return self._global_partial_case_i(with_respect_to)
-        else:
-            return self._global_partial_case_ii(with_respect_to)
 
     def _compute_global_partials(
         self: Power,
@@ -134,6 +134,21 @@ class Power(BinaryExpression):
             # d(a ** C) = C * a ** (C - 1) * da
             return b_value * (a_value ** (b_value - 1)) * a_partial
 
+    def _global_partial_case_i(
+        self: Power,
+        with_respect_to: str
+    ) -> Expression:
+        b_value = self._b._evaluate(Point({})) # b_value is an integer (this is case i)
+        if b_value == 0:
+            return ex.Constant(0)
+        elif b_value == 1:
+            # d(a ** 1) = 1 * da
+            return self._a._global_partial(with_respect_to)
+        else: # b_value >= 2 or b_value <= -1
+            a_partial = self._a._global_partial(with_respect_to)
+            # d(a ** C) = C * a ** (C - 1) * da
+            return self._term_1(a_partial)
+
     def _compute_local_partials_case_i(
         self: Power,
         computed_local_partials: ComputedLocalPartials,
@@ -153,20 +168,6 @@ class Power(BinaryExpression):
             # d(a ** C) = C * a ** (C - 1) * da
             next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
             self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
-
-    def _global_partial_case_i(
-        self: Power,
-        with_respect_to: str
-    ) -> Expression:
-        b_value = self._b._evaluate(Point({})) # b_value is an integer (this is case i)
-        if b_value == 0:
-            return ex.Constant(0)
-        elif b_value == 1:
-            # d(a ** 1) = 1 * da
-            return self._a._global_partial(with_respect_to)
-        else: # b_value >= 2 or b_value <= -1
-            # d(a ** C) = C * a ** (C - 1) * da
-            return self._term_1(self._a._global_partial(with_respect_to))
 
     def _compute_global_partials_case_i(
         self: Power,
@@ -237,6 +238,14 @@ class Power(BinaryExpression):
                 math.log(a_value) * (a_value ** b_value) * b_partial
             )
 
+    def _global_partial_case_ii(
+        self: Power,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        b_partial = self._b._global_partial(with_respect_to)
+        return ex.Plus(self._term_1(a_partial), self._term_2(b_partial))
+
     def _compute_local_partials_case_ii(
         self: Power,
         computed_local_partials: ComputedLocalPartials,
@@ -255,15 +264,6 @@ class Power(BinaryExpression):
             next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
             self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
             self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
-
-    def _global_partial_case_ii(
-        self: Power,
-        with_respect_to: str
-    ) -> Expression:
-        return ex.Plus(
-            self._term_1(self._a._global_partial(with_respect_to)),
-            self._term_2(self._b._global_partial(with_respect_to))
-        )
 
     def _compute_global_partials_case_ii(
         self: Power,

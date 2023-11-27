@@ -46,6 +46,13 @@ class Exponential(UnaryExpression):
         result_value = self._base ** a_value
         return math.log(self._base) * result_value * a_partial
 
+    def _global_partial(
+        self: Exponential,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        return self._global_partial_helper(a_partial)
+
     def _compute_local_partials(
         self: Exponential,
         computed_local_partials: ComputedLocalPartials,
@@ -55,13 +62,6 @@ class Exponential(UnaryExpression):
         self_value = self._evaluate(point)
         next_accumulated = accumulated * math.log(self._base) * self_value
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
-
-    def _global_partial(
-        self: Exponential,
-        with_respect_to: str
-    ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        return self._global_partial_helper(a_partial)
 
     def _compute_global_partials(
         self: Exponential,

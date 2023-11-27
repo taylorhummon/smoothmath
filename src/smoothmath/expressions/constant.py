@@ -53,6 +53,12 @@ class Constant(NullaryExpression):
     ) -> real_number:
         return 0
 
+    def _global_partial(
+        self: Constant,
+        with_respect_to: str
+    ) -> Expression:
+        return ex.Constant(0)
+
     def _compute_local_partials(
         self: Constant,
         computed_local_partials: ComputedLocalPartials,
@@ -60,12 +66,6 @@ class Constant(NullaryExpression):
         accumulated: real_number
     ) -> None:
         pass
-
-    def _global_partial(
-        self: Constant,
-        with_respect_to: str
-    ) -> Expression:
-        return ex.Constant(0)
 
     def _compute_global_partials(
         self: Constant,

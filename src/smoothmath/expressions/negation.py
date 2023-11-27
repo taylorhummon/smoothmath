@@ -38,6 +38,13 @@ class Negation(UnaryExpression):
         a_partial = self._a._partial_at(point, with_respect_to)
         return - a_partial
 
+    def _global_partial(
+        self: Negation,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        return ex.Negation(a_partial)
+
     def _compute_local_partials(
         self: Negation,
         computed_local_partials: ComputedLocalPartials,
@@ -45,13 +52,6 @@ class Negation(UnaryExpression):
         accumulated: real_number
     ) -> None:
         self._a._compute_local_partials(computed_local_partials, point, - accumulated)
-
-    def _global_partial(
-        self: Negation,
-        with_respect_to: str
-    ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        return ex.Negation(a_partial)
 
     def _compute_global_partials(
         self: Negation,

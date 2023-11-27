@@ -41,6 +41,14 @@ class Plus(BinaryExpression):
         b_partial = self._b._partial_at(point, with_respect_to)
         return a_partial + b_partial
 
+    def _global_partial(
+        self: Plus,
+        with_respect_to: str
+    ) -> Expression:
+        a_partial = self._a._global_partial(with_respect_to)
+        b_partial = self._b._global_partial(with_respect_to)
+        return ex.Plus(a_partial, b_partial)
+
     def _compute_local_partials(
         self: Plus,
         computed_local_partials: ComputedLocalPartials,
@@ -49,14 +57,6 @@ class Plus(BinaryExpression):
     ) -> None:
         self._a._compute_local_partials(computed_local_partials, point, accumulated)
         self._b._compute_local_partials(computed_local_partials, point, accumulated)
-
-    def _global_partial(
-        self: Plus,
-        with_respect_to: str
-    ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        b_partial = self._b._global_partial(with_respect_to)
-        return ex.Plus(a_partial, b_partial)
 
     def _compute_global_partials(
         self: Plus,
