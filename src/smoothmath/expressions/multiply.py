@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -48,9 +48,9 @@ class Multiply(BinaryExpression):
             b_partial = self._b._partial_at(point, with_respect_to)
             return b_value * a_partial + a_value * b_partial
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Multiply,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -59,8 +59,8 @@ class Multiply(BinaryExpression):
             return
         else: # pair_or_none is the pair (a_value, b_value)
             a_value, b_value = pair_or_none
-            self._a._compute_all_partials_at(all_partials, point, accumulated * b_value)
-            self._b._compute_all_partials_at(all_partials, point, accumulated * a_value)
+            self._a._compute_local_partials(computed_local_partials, point, accumulated * b_value)
+            self._b._compute_local_partials(computed_local_partials, point, accumulated * a_value)
 
     def _synthetic_partial(
         self: Multiply,

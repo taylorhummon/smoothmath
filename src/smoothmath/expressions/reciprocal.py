@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -50,9 +50,9 @@ class Reciprocal(UnaryExpression):
         result_value = self._evaluate(point)
         return - (result_value ** 2) * a_partial
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Reciprocal,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -60,7 +60,7 @@ class Reciprocal(UnaryExpression):
         self._verify_domain_constraints(a_value)
         self_value = self._evaluate(point)
         next_accumulated = - accumulated * (self_value ** 2)
-        self._a._compute_all_partials_at(all_partials, point, next_accumulated)
+        self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
 
     def _synthetic_partial(
         self: Reciprocal,

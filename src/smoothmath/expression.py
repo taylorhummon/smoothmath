@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 from abc import ABC, abstractmethod
 import smoothmath.utilities as utilities
 from smoothmath.point import Point
-from smoothmath.all_partials import AllPartials
+from smoothmath.computed_local_partials import ComputedLocalPartials
 from smoothmath.synthetic import Synthetic
 import smoothmath.expressions as ex
 
@@ -40,16 +40,16 @@ class Expression(ABC):
         variable_name = utilities.get_variable_name(with_respect_to)
         return self._partial_at(point, variable_name)
 
-    def all_partials_at(
+    def compute_local_partials(
         self: Expression,
         point: Point
-    ) -> AllPartials:
+    ) -> ComputedLocalPartials:
         if not isinstance(point, Point):
-            raise Exception("Must provide a Point to all_partials_at()")
+            raise Exception("Must provide a Point to compute_local_partials()")
         self._reset_evaluation_cache()
-        all_partials = AllPartials()
-        self._compute_all_partials_at(all_partials, point, 1)
-        return all_partials
+        computed_local_partials = ComputedLocalPartials()
+        self._compute_local_partials(computed_local_partials, point, 1)
+        return computed_local_partials
 
     def synthetic(
         self: Expression
@@ -83,13 +83,13 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _partial_at()")
 
     @abstractmethod
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Expression,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
-        raise Exception("Concrete classes derived from Expression must implement _compute_all_partials_at()")
+        raise Exception("Concrete classes derived from Expression must implement _compute_local_partials()")
 
     @abstractmethod
     def _synthetic_partial(

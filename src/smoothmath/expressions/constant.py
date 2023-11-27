@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -53,9 +53,9 @@ class Constant(NullaryExpression):
     ) -> real_number:
         return 0
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Constant,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:

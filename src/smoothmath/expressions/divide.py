@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -57,9 +57,9 @@ class Divide(BinaryExpression):
         b_partial = self._b._partial_at(point, with_respect_to)
         return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Divide,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -68,8 +68,8 @@ class Divide(BinaryExpression):
         self._verify_domain_constraints(a_value, b_value)
         next_accumulated_a = accumulated / b_value
         next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
-        self._a._compute_all_partials_at(all_partials, point, next_accumulated_a)
-        self._b._compute_all_partials_at(all_partials, point, next_accumulated_b)
+        self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
+        self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
 
     def _synthetic_partial(
         self: Divide,

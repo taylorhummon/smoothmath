@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -41,14 +41,14 @@ class Minus(BinaryExpression):
         b_partial = self._b._partial_at(point, with_respect_to)
         return a_partial - b_partial
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Minus,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
-        self._a._compute_all_partials_at(all_partials, point, accumulated)
-        self._b._compute_all_partials_at(all_partials, point, - accumulated)
+        self._a._compute_local_partials(computed_local_partials, point, accumulated)
+        self._b._compute_local_partials(computed_local_partials, point, - accumulated)
 
     def _synthetic_partial(
         self: Minus,

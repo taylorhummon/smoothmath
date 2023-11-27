@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -57,16 +57,16 @@ class Power(BinaryExpression):
         else:
             return self._partial_at_case_ii(point, with_respect_to)
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Power,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_all_partials_at_case_i(all_partials, point, accumulated)
+            self._compute_local_partials_case_i(computed_local_partials, point, accumulated)
         else:
-            self._compute_all_partials_at_case_ii(all_partials, point, accumulated)
+            self._compute_local_partials_case_ii(computed_local_partials, point, accumulated)
 
     def _synthetic_partial(
         self: Power,
@@ -134,9 +134,9 @@ class Power(BinaryExpression):
             # d(a ** C) = C * a ** (C - 1) * da
             return b_value * (a_value ** (b_value - 1)) * a_partial
 
-    def _compute_all_partials_at_case_i(
+    def _compute_local_partials_case_i(
         self: Power,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -148,11 +148,11 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_all_partials_at(all_partials, point, accumulated)
+            self._a._compute_local_partials(computed_local_partials, point, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
             next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
-            self._a._compute_all_partials_at(all_partials, point, next_accumulated)
+            self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
 
     def _synthetic_partial_case_i(
         self: Power,
@@ -237,9 +237,9 @@ class Power(BinaryExpression):
                 math.log(a_value) * (a_value ** b_value) * b_partial
             )
 
-    def _compute_all_partials_at_case_ii(
+    def _compute_local_partials_case_ii(
         self: Power,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -253,8 +253,8 @@ class Power(BinaryExpression):
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_accumulated_a = accumulated * b_value * a_value ** (b_value - 1)
             next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
-            self._a._compute_all_partials_at(all_partials, point, next_accumulated_a)
-            self._b._compute_all_partials_at(all_partials, point, next_accumulated_b)
+            self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
+            self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
 
     def _synthetic_partial_case_ii(
         self: Power,

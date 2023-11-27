@@ -14,9 +14,9 @@ def test_Divide():
     assert z.evaluate(point) == approx(2.5)
     assert z.partial_at(point, x) == approx(0.5)
     assert z.partial_at(point, y) == approx(-1.25)
-    both_partials = z.all_partials_at(point)
-    assert both_partials.partial_with_respect_to(x) == approx(0.5)
-    assert both_partials.partial_with_respect_to(y) == approx(-1.25)
+    computed_local_partials = z.compute_local_partials(point)
+    assert computed_local_partials.partial_with_respect_to(x) == approx(0.5)
+    assert computed_local_partials.partial_with_respect_to(y) == approx(-1.25)
     assert synthetic.partial_at(point, x) == approx(0.5)
     assert synthetic.partial_at(point, y) == approx(-1.25)
     # at (x, y) = (3, 0)
@@ -28,7 +28,7 @@ def test_Divide():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -42,7 +42,7 @@ def test_Divide():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -57,9 +57,9 @@ def test_Divide_composition():
     assert z.evaluate(point) == approx(2)
     assert z.partial_at(point, x) == approx(0.4)
     assert z.partial_at(point, y) == approx(-2)
-    both_partials = z.all_partials_at(point)
-    assert both_partials.partial_with_respect_to(x) == approx(0.4)
-    assert both_partials.partial_with_respect_to(y) == approx(-2)
+    computed_local_partials = z.compute_local_partials(point)
+    assert computed_local_partials.partial_with_respect_to(x) == approx(0.4)
+    assert computed_local_partials.partial_with_respect_to(y) == approx(-2)
     synthetic = z.synthetic()
     assert synthetic.partial_at(point, x) == approx(0.4)
     assert synthetic.partial_at(point, y) == approx(-2)
@@ -73,7 +73,7 @@ def test_Divide_with_constant_numerator_zero():
     point = Point({y: 3})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, y) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(y) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(y) == approx(0)
     assert synthetic.partial_at(point, y) == approx(0)
     # at y = 0
     point = Point({y: 0})
@@ -82,7 +82,7 @@ def test_Divide_with_constant_numerator_zero():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, y)
 
@@ -93,7 +93,7 @@ def test_Divide_with_constant_numerator_zero_composition():
     point = Point({y: 3})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, y) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(y) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(y) == approx(0)
     assert z.synthetic().partial_at(point, y) == approx(0)
 
 
@@ -106,7 +106,7 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     synthetic = z.synthetic()
     with raises(DomainError):
         synthetic.partial_at(point, y)
@@ -120,13 +120,13 @@ def test_Divide_with_constant_denominator_one():
     point = Point({x: 3})
     assert z.evaluate(point) == approx(3)
     assert z.partial_at(point, x) == approx(1)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(1)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
     assert synthetic.partial_at(point, x) == approx(1)
     # at x = 0
     point = Point({x: 0})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, x) == approx(1)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(1)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
     assert synthetic.partial_at(point, x) == approx(1)
 
 
@@ -141,7 +141,7 @@ def test_divide_with_constant_denominator_zero():
     with raises(DomainError):
         z.partial_at(point, x)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     # at x = 0
@@ -151,6 +151,6 @@ def test_divide_with_constant_denominator_zero():
     with raises(DomainError):
         z.partial_at(point, x)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)

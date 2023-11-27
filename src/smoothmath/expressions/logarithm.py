@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -59,16 +59,16 @@ class Logarithm(UnaryExpression):
         a_partial = self._a._partial_at(point, with_respect_to)
         return a_partial / (math.log(self._base) * a_value)
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Logarithm,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(point)
         self._verify_domain_constraints(a_value)
         next_accumulated = accumulated / (math.log(self._base) * a_value)
-        self._a._compute_all_partials_at(all_partials, point, next_accumulated)
+        self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
 
     def _synthetic_partial(
         self: Logarithm,

@@ -14,9 +14,9 @@ def test_Power():
     assert z.evaluate(point) == approx(15.588457268)
     assert z.partial_at(point, x) == approx(12.990381056)
     assert z.partial_at(point, y) == approx(17.125670716)
-    both_partials = z.all_partials_at(point)
-    assert both_partials.partial_with_respect_to(x) == approx(12.990381056)
-    assert both_partials.partial_with_respect_to(y) == approx(17.125670716)
+    computed_local_partials = z.compute_local_partials(point)
+    assert computed_local_partials.partial_with_respect_to(x) == approx(12.990381056)
+    assert computed_local_partials.partial_with_respect_to(y) == approx(17.125670716)
     assert synthetic.partial_at(point, x) == approx(12.990381056)
     assert synthetic.partial_at(point, y) == approx(17.125670716)
     # at (x, y) = (3, 0)
@@ -24,9 +24,9 @@ def test_Power():
     assert z.evaluate(point) == approx(1)
     assert z.partial_at(point, x) == approx(0)
     assert z.partial_at(point, y) == approx(1.0986122886)
-    both_partials = z.all_partials_at(point)
-    assert both_partials.partial_with_respect_to(x) == approx(0)
-    assert both_partials.partial_with_respect_to(y) == approx(1.0986122886)
+    computed_local_partials = z.compute_local_partials(point)
+    assert computed_local_partials.partial_with_respect_to(x) == approx(0)
+    assert computed_local_partials.partial_with_respect_to(y) == approx(1.0986122886)
     assert synthetic.partial_at(point, x) == approx(0)
     assert synthetic.partial_at(point, y) == approx(1.0986122886)
     # at (x, y) = (3, -2.5)
@@ -34,9 +34,9 @@ def test_Power():
     assert z.evaluate(point) == approx(0.0641500299)
     assert z.partial_at(point, x) == approx(-0.0534583582)
     assert z.partial_at(point, y) == approx(0.0704760111)
-    both_partials = z.all_partials_at(point)
-    assert both_partials.partial_with_respect_to(x) == approx(-0.0534583582)
-    assert both_partials.partial_with_respect_to(y) == approx(0.0704760111)
+    computed_local_partials = z.compute_local_partials(point)
+    assert computed_local_partials.partial_with_respect_to(x) == approx(-0.0534583582)
+    assert computed_local_partials.partial_with_respect_to(y) == approx(0.0704760111)
     assert synthetic.partial_at(point, x) == approx(-0.0534583582)
     assert synthetic.partial_at(point, y) == approx(0.0704760111)
     # at (x, y) = (0, 2.5)
@@ -48,7 +48,7 @@ def test_Power():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -62,7 +62,7 @@ def test_Power():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -76,7 +76,7 @@ def test_Power():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -90,7 +90,7 @@ def test_Power():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -104,7 +104,7 @@ def test_Power():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -118,7 +118,7 @@ def test_Power():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     with raises(DomainError):
@@ -133,9 +133,9 @@ def test_Power_composition():
     assert z.evaluate(point) == approx(8)
     assert z.partial_at(point, x) == approx(24)
     assert z.partial_at(point, y) == approx(16.63553233343)
-    both_partials = z.all_partials_at(point)
-    assert both_partials.partial_with_respect_to(x) == approx(24)
-    assert both_partials.partial_with_respect_to(y) == approx(16.63553233343)
+    computed_local_partials = z.compute_local_partials(point)
+    assert computed_local_partials.partial_with_respect_to(x) == approx(24)
+    assert computed_local_partials.partial_with_respect_to(y) == approx(16.63553233343)
     synthetic = z.synthetic()
     assert synthetic.partial_at(point, x) == approx(24)
     assert synthetic.partial_at(point, y) == approx(16.63553233343)
@@ -149,19 +149,19 @@ def test_Power_with_constant_base_one():
     point = Point({y: 3})
     assert z.evaluate(point) == approx(1)
     assert z.partial_at(point, y) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(y) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(y) == approx(0)
     assert synthetic.partial_at(point, y) == approx(0)
     # at y = 0
     point = Point({y: 0})
     assert z.evaluate(point) == approx(1)
     assert z.partial_at(point, y) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(y) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(y) == approx(0)
     assert synthetic.partial_at(point, y) == approx(0)
     # at y = -5
     point = Point({y: -5})
     assert z.evaluate(point) == approx(1)
     assert z.partial_at(point, y) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(y) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(y) == approx(0)
     assert synthetic.partial_at(point, y) == approx(0)
 
 
@@ -176,7 +176,7 @@ def test_Power_with_constant_base_zero():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, y)
     # at y = 0
@@ -186,7 +186,7 @@ def test_Power_with_constant_base_zero():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, y)
     # at y = -5
@@ -196,7 +196,7 @@ def test_Power_with_constant_base_zero():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, y)
 
@@ -212,7 +212,7 @@ def test_Power_with_constant_base_negative_one():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, y)
     # at y = 0
@@ -222,7 +222,7 @@ def test_Power_with_constant_base_negative_one():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, y)
     # at y = -5
@@ -232,7 +232,7 @@ def test_Power_with_constant_base_negative_one():
     with raises(DomainError):
         z.partial_at(point, y)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, y)
 
@@ -245,19 +245,19 @@ def test_Power_with_constant_exponent_two():
     point = Point({x: 3})
     assert z.evaluate(point) == approx(9)
     assert z.partial_at(point, x) == approx(6)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(6)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(6)
     assert synthetic.partial_at(point, x) == approx(6)
     # at y = 0
     point = Point({x: 0})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, x) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0)
     assert synthetic.partial_at(point, x) == approx(0)
     # at y = -5
     point = Point({x: -5})
     assert z.evaluate(point) == approx(25)
     assert z.partial_at(point, x) == approx(-10)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-10)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-10)
     assert synthetic.partial_at(point, x) == approx(-10)
 
 
@@ -267,7 +267,7 @@ def test_Power_with_constant_exponent_two_composition():
     point = Point({x: 1})
     assert z.evaluate(point) == approx(4)
     assert z.partial_at(point, x) == approx(12)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(12)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(12)
     assert z.synthetic().partial_at(point, x) == approx(12)
 
 
@@ -279,19 +279,19 @@ def test_Power_with_constant_exponent_one():
     point = Point({x: 3})
     assert z.evaluate(point) == approx(3)
     assert z.partial_at(point, x) == approx(1)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(1)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
     assert synthetic.partial_at(point, x) == approx(1)
     # at y = 0
     point = Point({x: 0})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, x) == approx(1)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(1)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
     assert synthetic.partial_at(point, x) == approx(1)
     # at y = -5
     point = Point({x: -5})
     assert z.evaluate(point) == approx(-5)
     assert z.partial_at(point, x) == approx(1)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(1)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
     assert synthetic.partial_at(point, x) == approx(1)
 
 
@@ -301,7 +301,7 @@ def test_Power_with_constant_exponent_one_composition():
     point = Point({x: 1})
     assert z.evaluate(point) == approx(2)
     assert z.partial_at(point, x) == approx(3)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(3)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(3)
     assert z.synthetic().partial_at(point, x) == approx(3)
 
 
@@ -313,7 +313,7 @@ def test_Power_with_constant_exponent_zero():
     point = Point({x: 3})
     assert z.evaluate(point) == approx(1)
     assert z.partial_at(point, x) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0)
     assert synthetic.partial_at(point, x) == approx(0)
     # at x = 0
     point = Point({x: 0})
@@ -322,14 +322,14 @@ def test_Power_with_constant_exponent_zero():
     with raises(DomainError):
         z.partial_at(point, x)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     # at x = -5
     point = Point({x: -5})
     assert z.evaluate(point) == approx(1)
     assert z.partial_at(point, x) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0)
     assert synthetic.partial_at(point, x) == approx(0)
 
 
@@ -339,7 +339,7 @@ def test_Power_with_constant_exponent_zero_composition():
     point = Point({x: 1})
     assert z.evaluate(point) == approx(1)
     assert z.partial_at(point, x) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0)
     assert z.synthetic().partial_at(point, x) == approx(0)
 
 
@@ -352,7 +352,7 @@ def test_Power_with_constant_exponent_zero_doesnt_short_circuit():
     with raises(DomainError):
         z.partial_at(point, x)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     synthetic = z.synthetic()
     with raises(DomainError):
         synthetic.partial_at(point, x)
@@ -366,7 +366,7 @@ def test_Power_with_constant_exponent_negative_one():
     point = Point({x: 2})
     assert z.evaluate(point) == approx(0.5)
     assert z.partial_at(point, x) == approx(-0.25)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-0.25)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-0.25)
     assert synthetic.partial_at(point, x) == approx(-0.25)
     # at x = 0
     point = Point({x: 0})
@@ -375,14 +375,14 @@ def test_Power_with_constant_exponent_negative_one():
     with raises(DomainError):
         z.partial_at(point, x)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     # at x = -5
     point = Point({x: -5})
     assert z.evaluate(point) == approx(-0.2)
     assert z.partial_at(point, x) == approx(-0.04)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-0.04)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-0.04)
     assert synthetic.partial_at(point, x) == approx(-0.04)
 
 
@@ -392,7 +392,7 @@ def test_Power_with_constant_exponent_negative_one_composition():
     point = Point({x: 1})
     assert z.evaluate(point) == approx(0.5)
     assert z.partial_at(point, x) == approx(-0.75)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-0.75)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-0.75)
     assert z.synthetic().partial_at(point, x) == approx(-0.75)
 
 
@@ -404,7 +404,7 @@ def test_Power_with_constant_exponent_negative_two():
     point = Point({x: 2})
     assert z.evaluate(point) == approx(0.25)
     assert z.partial_at(point, x) == approx(-0.25)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-0.25)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-0.25)
     assert synthetic.partial_at(point, x) == approx(-0.25)
     # at x = 0
     point = Point({x: 0})
@@ -413,14 +413,14 @@ def test_Power_with_constant_exponent_negative_two():
     with raises(DomainError):
         z.partial_at(point, x)
     with raises(DomainError):
-        z.all_partials_at(point)
+        z.compute_local_partials(point)
     with raises(DomainError):
         synthetic.partial_at(point, x)
     # at x = -5
     point = Point({x: -5})
     assert z.evaluate(point) == approx(0.04)
     assert z.partial_at(point, x) == approx(0.016)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(0.016)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0.016)
     assert synthetic.partial_at(point, x) == approx(0.016)
 
 
@@ -430,7 +430,7 @@ def test_Power_with_constant_exponent_negative_two_composition():
     point = Point({x: 1})
     assert z.evaluate(point) == approx(0.25)
     assert z.partial_at(point, x) == approx(-0.75)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-0.75)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-0.75)
     assert z.synthetic().partial_at(point, x) == approx(-0.75)
 
 
@@ -447,19 +447,19 @@ def test_Power_with_exponent_made_from_adding_constants():
     point = Point({x: 3})
     assert z.evaluate(point) == approx(9)
     assert z.partial_at(point, x) == approx(6)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(6)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(6)
     assert synthetic.partial_at(point, x) == approx(6)
     # at x = 0
     point = Point({x: 0})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, x) == approx(0)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(0)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0)
     assert synthetic.partial_at(point, x) == approx(0)
     # at x = -5
     point = Point({x: -5})
     assert z.evaluate(point) == approx(25)
     assert z.partial_at(point, x) == approx(-10)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-10)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-10)
     assert synthetic.partial_at(point, x) == approx(-10)
 
 
@@ -469,5 +469,5 @@ def test_Power_where_exponent_is_an_integer_represented_as_a_float():
     point = Point({x: -5})
     assert z.evaluate(point) == approx(25)
     assert z.partial_at(point, x) == approx(-10)
-    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-10)
+    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-10)
     assert z.synthetic().partial_at(point, x) == approx(-10)

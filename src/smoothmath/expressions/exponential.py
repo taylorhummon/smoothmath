@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.all_partials import AllPartials
+    from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
 
@@ -46,15 +46,15 @@ class Exponential(UnaryExpression):
         result_value = self._base ** a_value
         return math.log(self._base) * result_value * a_partial
 
-    def _compute_all_partials_at(
+    def _compute_local_partials(
         self: Exponential,
-        all_partials: AllPartials,
+        computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
     ) -> None:
         self_value = self._evaluate(point)
         next_accumulated = accumulated * math.log(self._base) * self_value
-        self._a._compute_all_partials_at(all_partials, point, next_accumulated)
+        self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
 
     def _synthetic_partial(
         self: Exponential,
