@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 from abc import ABC, abstractmethod
 import smoothmath.utilities as utilities
-from smoothmath.variable_values import VariableValues
+from smoothmath.point import Point
 from smoothmath.all_partials import AllPartials
 from smoothmath.synthetic import Synthetic
 import smoothmath.expressions as ex
@@ -22,33 +22,33 @@ class Expression(ABC):
 
     def evaluate(
         self: Expression,
-        variable_values: VariableValues
+        point: Point
     ) -> real_number:
-        if not isinstance(variable_values, VariableValues):
-            raise Exception("Must provide a VariableValues object to evaluate()")
+        if not isinstance(point, Point):
+            raise Exception("Must provide a Point to evaluate()")
         self._reset_evaluation_cache()
-        return self._evaluate(variable_values)
+        return self._evaluate(point)
 
     def partial_at(
         self: Expression,
-        variable_values: VariableValues,
+        point: Point,
         with_respect_to: Variable | str
     ) -> real_number:
-        if not isinstance(variable_values, VariableValues):
-            raise Exception("Must provide a VariableValues object to partial_at()")
+        if not isinstance(point, Point):
+            raise Exception("Must provide a Point to partial_at()")
         self._reset_evaluation_cache()
         variable_name = utilities.get_variable_name(with_respect_to)
-        return self._partial_at(variable_values, variable_name)
+        return self._partial_at(point, variable_name)
 
     def all_partials_at(
         self: Expression,
-        variable_values: VariableValues
+        point: Point
     ) -> AllPartials:
-        if not isinstance(variable_values, VariableValues):
-            raise Exception("Must provide a VariableValues object to all_partials_at()")
+        if not isinstance(point, Point):
+            raise Exception("Must provide a Point to all_partials_at()")
         self._reset_evaluation_cache()
         all_partials = AllPartials()
-        self._compute_all_partials_at(all_partials, variable_values, 1)
+        self._compute_all_partials_at(all_partials, point, 1)
         return all_partials
 
     def synthetic(
@@ -70,14 +70,14 @@ class Expression(ABC):
     @abstractmethod
     def _evaluate(
         self: Expression,
-        variable_values: VariableValues
+        point: Point
     ) -> real_number:
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
     @abstractmethod
     def _partial_at(
         self: Expression,
-        variable_values: VariableValues,
+        point: Point,
         with_respect_to: str
     ) -> real_number:
         raise Exception("Concrete classes derived from Expression must implement _partial_at()")
@@ -86,7 +86,7 @@ class Expression(ABC):
     def _compute_all_partials_at(
         self: Expression,
         all_partials: AllPartials,
-        variable_values: VariableValues,
+        point: Point,
         accumulated: real_number
     ) -> None:
         raise Exception("Concrete classes derived from Expression must implement _compute_all_partials_at()")

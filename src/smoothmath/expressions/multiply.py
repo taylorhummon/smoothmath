@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.variable_values import VariableValues
+    from smoothmath.point import Point
     from smoothmath.all_partials import AllPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
@@ -24,9 +24,9 @@ class Multiply(BinaryExpression):
 
     def _evaluate(
         self: Multiply,
-        variable_values: VariableValues
+        point: Point
     ) -> real_number:
-        pair_or_none = self._get_a_and_b_values_or_none(variable_values)
+        pair_or_none = self._get_a_and_b_values_or_none(point)
         if pair_or_none == None:
             self._value = 0
         else: # pair_or_none is the pair (a_value, b_value)
@@ -36,31 +36,31 @@ class Multiply(BinaryExpression):
 
     def _partial_at(
         self: Multiply,
-        variable_values: VariableValues,
+        point: Point,
         with_respect_to: str
     ) -> real_number:
-        pair_or_none = self._get_a_and_b_values_or_none(variable_values)
+        pair_or_none = self._get_a_and_b_values_or_none(point)
         if pair_or_none == None:
             return 0
         else: # pair_or_none is the pair (a_value, b_value)
             a_value, b_value = pair_or_none
-            a_partial = self._a._partial_at(variable_values, with_respect_to)
-            b_partial = self._b._partial_at(variable_values, with_respect_to)
+            a_partial = self._a._partial_at(point, with_respect_to)
+            b_partial = self._b._partial_at(point, with_respect_to)
             return b_value * a_partial + a_value * b_partial
 
     def _compute_all_partials_at(
         self: Multiply,
         all_partials: AllPartials,
-        variable_values: VariableValues,
+        point: Point,
         accumulated: real_number
     ) -> None:
-        pair_or_none = self._get_a_and_b_values_or_none(variable_values)
+        pair_or_none = self._get_a_and_b_values_or_none(point)
         if pair_or_none == None:
             return
         else: # pair_or_none is the pair (a_value, b_value)
             a_value, b_value = pair_or_none
-            self._a._compute_all_partials_at(all_partials, variable_values, accumulated * b_value)
-            self._b._compute_all_partials_at(all_partials, variable_values, accumulated * a_value)
+            self._a._compute_all_partials_at(all_partials, point, accumulated * b_value)
+            self._b._compute_all_partials_at(all_partials, point, accumulated * a_value)
 
     def _synthetic_partial(
         self: Multiply,
@@ -84,23 +84,23 @@ class Multiply(BinaryExpression):
     # the following method is used to allow shirt-circuiting of either a * 0 or 0 * b
     def _get_a_and_b_values_or_none(
         self: Multiply,
-        variable_values: VariableValues
+        point: Point
     ) -> tuple[real_number, real_number] | None:
         try:
-            a_value = self._a._evaluate(variable_values)
+            a_value = self._a._evaluate(point)
         except DomainError as error:
             try:
-                b_value_inner = self._b._evaluate(variable_values)
+                b_value_inner = self._b._evaluate(point)
             except DomainError:
                 raise error
             if b_value_inner == 0:
                 return None
             raise
         try:
-            b_value = self._b._evaluate(variable_values)
+            b_value = self._b._evaluate(point)
         except DomainError as error:
             try:
-                a_value_inner = self._a._evaluate(variable_values)
+                a_value_inner = self._a._evaluate(point)
             except DomainError:
                 raise error
             if a_value_inner == 0:

@@ -7,9 +7,9 @@ if TYPE_CHECKING:
 import smoothmath.utilities as utilities
 
 
-class VariableValues:
+class Point:
     def __init__(
-        self: VariableValues,
+        self: Point,
         dictionary: Mapping[Variable | str, real_number]
     ) -> None:
         self._value_by_variable_name: Mapping[str, real_number]
@@ -21,11 +21,11 @@ class VariableValues:
             self._value_by_variable_name[name] = value
 
     def value_for(
-        self: VariableValues,
+        self: Point,
         variable_or_name: Variable | str
     ) -> real_number:
         name = utilities.get_variable_name(variable_or_name)
         value = self._value_by_variable_name.get(name, None)
         if value is None:
-            raise Exception(f"Missing a value for a variable: {name}")
+            raise Exception(f"No value provided for variable: {name}")
         return value

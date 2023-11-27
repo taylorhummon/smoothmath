@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.variable_values import VariableValues
+    from smoothmath.point import Point
     from smoothmath.all_partials import AllPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
@@ -28,33 +28,33 @@ class Exponential(UnaryExpression):
 
     def _evaluate(
         self: Exponential,
-        variable_values: VariableValues
+        point: Point
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self._a._evaluate(variable_values)
+        a_value = self._a._evaluate(point)
         self._value = self._base ** a_value
         return self._value
 
     def _partial_at(
         self: Exponential,
-        variable_values: VariableValues,
+        point: Point,
         with_respect_to: str
     ) -> real_number:
-        a_value = self._a._evaluate(variable_values)
-        a_partial = self._a._partial_at(variable_values, with_respect_to)
+        a_value = self._a._evaluate(point)
+        a_partial = self._a._partial_at(point, with_respect_to)
         result_value = self._base ** a_value
         return math.log(self._base) * result_value * a_partial
 
     def _compute_all_partials_at(
         self: Exponential,
         all_partials: AllPartials,
-        variable_values: VariableValues,
+        point: Point,
         accumulated: real_number
     ) -> None:
-        self_value = self._evaluate(variable_values)
+        self_value = self._evaluate(point)
         next_accumulated = accumulated * math.log(self._base) * self_value
-        self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated)
+        self._a._compute_all_partials_at(all_partials, point, next_accumulated)
 
     def _synthetic_partial(
         self: Exponential,

@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath.errors import DomainError
-from smoothmath.variable_values import VariableValues
+from smoothmath.point import Point
 from smoothmath.expressions import Constant, Variable, Reciprocal
 
 
@@ -9,34 +9,34 @@ def test_Reciprocal():
     z = Reciprocal(x)
     synthetic = z.synthetic()
     # at x = 2
-    variable_values = VariableValues({x: 2})
-    assert z.evaluate(variable_values) == approx(0.5)
-    assert z.partial_at(variable_values, x) == approx(-0.25)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.25)
-    assert synthetic.partial_at(variable_values, x) == approx(-0.25)
+    point = Point({x: 2})
+    assert z.evaluate(point) == approx(0.5)
+    assert z.partial_at(point, x) == approx(-0.25)
+    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-0.25)
+    assert synthetic.partial_at(point, x) == approx(-0.25)
     # at x = 0
-    variable_values = VariableValues({x: 0})
+    point = Point({x: 0})
     with raises(DomainError):
-        z.evaluate(variable_values)
+        z.evaluate(point)
     with raises(DomainError):
-        z.partial_at(variable_values, x)
+        z.partial_at(point, x)
     with raises(DomainError):
-        z.all_partials_at(variable_values)
+        z.all_partials_at(point)
     with raises(DomainError):
-        synthetic.partial_at(variable_values, x)
+        synthetic.partial_at(point, x)
     # at x = -1
-    variable_values = VariableValues({x: -1})
-    assert z.evaluate(variable_values) == approx(-1)
-    assert z.partial_at(variable_values, x) == approx(-1)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-1)
-    assert synthetic.partial_at(variable_values, x) == approx(-1)
+    point = Point({x: -1})
+    assert z.evaluate(point) == approx(-1)
+    assert z.partial_at(point, x) == approx(-1)
+    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-1)
+    assert synthetic.partial_at(point, x) == approx(-1)
 
 
 def test_Reciprocal_composition():
     x = Variable("x")
     z = Reciprocal(Constant(2) * x - Constant(4))
-    variable_values = VariableValues({x: 3})
-    assert z.evaluate(variable_values) == approx(0.5)
-    assert z.partial_at(variable_values, x) == approx(-0.5)
-    assert z.all_partials_at(variable_values).partial_with_respect_to(x) == approx(-0.5)
-    assert z.synthetic().partial_at(variable_values, x) == approx(-0.5)
+    point = Point({x: 3})
+    assert z.evaluate(point) == approx(0.5)
+    assert z.partial_at(point, x) == approx(-0.5)
+    assert z.all_partials_at(point).partial_with_respect_to(x) == approx(-0.5)
+    assert z.synthetic().partial_at(point, x) == approx(-0.5)

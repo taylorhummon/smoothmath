@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 from smoothmath.expression import BinaryExpression
 from smoothmath.errors import DomainError
-from smoothmath.variable_values import VariableValues
+from smoothmath.point import Point
 import smoothmath.expressions as ex
 
 
@@ -35,41 +35,41 @@ class Divide(BinaryExpression):
 
     def _evaluate(
         self: Divide,
-        variable_values: VariableValues
+        point: Point
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self._a._evaluate(variable_values)
-        b_value = self._b._evaluate(variable_values)
+        a_value = self._a._evaluate(point)
+        b_value = self._b._evaluate(point)
         self._verify_domain_constraints(a_value, b_value)
         self._value = a_value / b_value
         return self._value
 
     def _partial_at(
         self: Divide,
-        variable_values: VariableValues,
+        point: Point,
         with_respect_to: str
     ) -> real_number:
-        a_value = self._a._evaluate(variable_values)
-        b_value = self._b._evaluate(variable_values)
+        a_value = self._a._evaluate(point)
+        b_value = self._b._evaluate(point)
         self._verify_domain_constraints(a_value, b_value)
-        a_partial = self._a._partial_at(variable_values, with_respect_to)
-        b_partial = self._b._partial_at(variable_values, with_respect_to)
+        a_partial = self._a._partial_at(point, with_respect_to)
+        b_partial = self._b._partial_at(point, with_respect_to)
         return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
     def _compute_all_partials_at(
         self: Divide,
         all_partials: AllPartials,
-        variable_values: VariableValues,
+        point: Point,
         accumulated: real_number
     ) -> None:
-        a_value = self._a._evaluate(variable_values)
-        b_value = self._b._evaluate(variable_values)
+        a_value = self._a._evaluate(point)
+        b_value = self._b._evaluate(point)
         self._verify_domain_constraints(a_value, b_value)
         next_accumulated_a = accumulated / b_value
         next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
-        self._a._compute_all_partials_at(all_partials, variable_values, next_accumulated_a)
-        self._b._compute_all_partials_at(all_partials, variable_values, next_accumulated_b)
+        self._a._compute_all_partials_at(all_partials, point, next_accumulated_a)
+        self._b._compute_all_partials_at(all_partials, point, next_accumulated_b)
 
     def _synthetic_partial(
         self: Divide,

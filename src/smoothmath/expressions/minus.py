@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.variable_values import VariableValues
+    from smoothmath.point import Point
     from smoothmath.all_partials import AllPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
@@ -23,32 +23,32 @@ class Minus(BinaryExpression):
 
     def _evaluate(
         self: Minus,
-        variable_values: VariableValues
+        point: Point
     ) -> real_number:
         if self._value is not None:
             return self._value
-        a_value = self._a._evaluate(variable_values)
-        b_value = self._b._evaluate(variable_values)
+        a_value = self._a._evaluate(point)
+        b_value = self._b._evaluate(point)
         self._value = a_value - b_value
         return self._value
 
     def _partial_at(
         self: Minus,
-        variable_values: VariableValues,
+        point: Point,
         with_respect_to: str
     ) -> real_number:
-        a_partial = self._a._partial_at(variable_values, with_respect_to)
-        b_partial = self._b._partial_at(variable_values, with_respect_to)
+        a_partial = self._a._partial_at(point, with_respect_to)
+        b_partial = self._b._partial_at(point, with_respect_to)
         return a_partial - b_partial
 
     def _compute_all_partials_at(
         self: Minus,
         all_partials: AllPartials,
-        variable_values: VariableValues,
+        point: Point,
         accumulated: real_number
     ) -> None:
-        self._a._compute_all_partials_at(all_partials, variable_values, accumulated)
-        self._b._compute_all_partials_at(all_partials, variable_values, - accumulated)
+        self._a._compute_all_partials_at(all_partials, point, accumulated)
+        self._b._compute_all_partials_at(all_partials, point, - accumulated)
 
     def _synthetic_partial(
         self: Minus,

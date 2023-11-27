@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.variable_values import VariableValues
+    from smoothmath.point import Point
     from smoothmath.all_partials import AllPartials
     from smoothmath.synthetic import Synthetic
     from smoothmath.expression import Expression
@@ -42,13 +42,13 @@ class Constant(NullaryExpression):
 
     def _evaluate(
         self: Constant,
-        variable_values: VariableValues
+        point: Point
     ) -> real_number:
         return self._value
 
     def _partial_at(
         self: Constant,
-        variable_values: VariableValues,
+        point: Point,
         with_respect_to: str
     ) -> real_number:
         return 0
@@ -56,7 +56,7 @@ class Constant(NullaryExpression):
     def _compute_all_partials_at(
         self: Constant,
         all_partials: AllPartials,
-        variable_values: VariableValues,
+        point: Point,
         accumulated: real_number
     ) -> None:
         pass

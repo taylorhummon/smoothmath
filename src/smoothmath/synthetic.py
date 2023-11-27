@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.variable_values import VariableValues
+    from smoothmath.point import Point
     from smoothmath.expression import Expression
     from smoothmath.expressions import Variable
 
@@ -22,15 +22,15 @@ class Synthetic:
 
     def partial_at(
         self: Synthetic,
-        variable_values: VariableValues,
+        point: Point,
         variable: Variable | str
     ) -> real_number:
         # We evaluate the original expression to check for DomainErrors.
         # e.g. (ln(x))' = 1 / x
         # Naively, the RHS is defined for negative x, but ln(x) isn't defined there!
-        self.original_expression.evaluate(variable_values)
+        self.original_expression.evaluate(point)
         synthetic_partial = self._lookup(utilities.get_variable_name(variable))
-        return synthetic_partial.evaluate(variable_values)
+        return synthetic_partial.evaluate(point)
 
     def _add_to(
         self: Synthetic,
