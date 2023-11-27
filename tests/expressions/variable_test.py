@@ -10,9 +10,9 @@ def test_variable():
     assert y.partial_at(point, x) == 0
     assert y.partial_at(point, y) == 1
     point = Point({x: 2, y: 3})
-    computed_local_partials = y.compute_local_partials(point)
-    assert computed_local_partials.partial_with_respect_to(x) == 0
-    assert computed_local_partials.partial_with_respect_to(y) == 1
-    computed_global_partials = y.compute_global_partials()
-    assert computed_global_partials.partial_at(point, x) == 0
-    assert computed_global_partials.partial_at(point, y) == 1
+    local_differential = y.compute_local_partials(point)
+    assert local_differential.partial_with_respect_to(x) == 0
+    assert local_differential.partial_with_respect_to(y) == 1
+    global_differential = y.compute_global_partials()
+    assert global_differential.partial_at(point, x) == 0
+    assert global_differential.partial_at(point, y) == 1

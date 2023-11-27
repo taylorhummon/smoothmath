@@ -11,12 +11,12 @@ def test_Multiply():
     assert z.evaluate(point) == approx(6)
     assert z.partial_at(point, x) == approx(3)
     assert z.partial_at(point, y) == approx(2)
-    computed_local_partials = z.compute_local_partials(point)
-    assert computed_local_partials.partial_with_respect_to(x) == approx(3)
-    assert computed_local_partials.partial_with_respect_to(y) == approx(2)
-    computed_global_partials = z.compute_global_partials()
-    assert computed_global_partials.partial_at(point, x) == approx(3)
-    assert computed_global_partials.partial_at(point, y) == approx(2)
+    local_differential = z.compute_local_partials(point)
+    assert local_differential.partial_with_respect_to(x) == approx(3)
+    assert local_differential.partial_with_respect_to(y) == approx(2)
+    global_differential = z.compute_global_partials()
+    assert global_differential.partial_at(point, x) == approx(3)
+    assert global_differential.partial_at(point, y) == approx(2)
 
 
 def test_Multiply_composition():
@@ -27,12 +27,12 @@ def test_Multiply_composition():
     assert z.evaluate(point) == approx(20)
     assert z.partial_at(point, x) == approx(10)
     assert z.partial_at(point, y) == approx(10)
-    computed_local_partials = z.compute_local_partials(point)
-    assert computed_local_partials.partial_with_respect_to(x) == approx(10)
-    assert computed_local_partials.partial_with_respect_to(y) == approx(10)
-    computed_global_partials = z.compute_global_partials()
-    assert computed_global_partials.partial_at(point, x) == approx(10)
-    assert computed_global_partials.partial_at(point, y) == approx(10)
+    local_differential = z.compute_local_partials(point)
+    assert local_differential.partial_with_respect_to(x) == approx(10)
+    assert local_differential.partial_with_respect_to(y) == approx(10)
+    global_differential = z.compute_global_partials()
+    assert global_differential.partial_at(point, x) == approx(10)
+    assert global_differential.partial_at(point, y) == approx(10)
 
 
 def test_Multiply_by_zero():

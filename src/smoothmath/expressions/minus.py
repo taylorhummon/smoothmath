@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.computed_global_partials import ComputedGlobalPartials
+    from smoothmath.local_differential import LocalDifferential
+    from smoothmath.global_differential import GlobalDifferential
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
@@ -51,17 +51,17 @@ class Minus(BinaryExpression):
 
     def _compute_local_partials(
         self: Minus,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
-        self._a._compute_local_partials(computed_local_partials, point, accumulated)
-        self._b._compute_local_partials(computed_local_partials, point, - accumulated)
+        self._a._compute_local_partials(local_differential, point, accumulated)
+        self._b._compute_local_partials(local_differential, point, - accumulated)
 
     def _compute_global_partials(
         self: Minus,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
-        self._a._compute_global_partials(computed_global_partials, accumulated)
-        self._b._compute_global_partials(computed_global_partials, ex.Negation(accumulated))
+        self._a._compute_global_partials(global_differential, accumulated)
+        self._b._compute_global_partials(global_differential, ex.Negation(accumulated))

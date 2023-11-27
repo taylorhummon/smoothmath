@@ -71,12 +71,12 @@ def test_polynomial_of_two_variables():
     assert z.evaluate(point) == approx(-35)
     assert z.partial_at(point, x) == approx(7)
     assert z.partial_at(point, y) == approx(-28)
-    computed_local_partials = z.compute_local_partials(point)
-    assert computed_local_partials.partial_with_respect_to(x) == approx(7)
-    assert computed_local_partials.partial_with_respect_to(y) == approx(-28)
-    computed_global_partials = z.compute_global_partials()
-    assert computed_global_partials.partial_at(point, x) == approx(7)
-    assert computed_global_partials.partial_at(point, y) == approx(-28)
+    local_differential = z.compute_local_partials(point)
+    assert local_differential.partial_with_respect_to(x) == approx(7)
+    assert local_differential.partial_with_respect_to(y) == approx(-28)
+    global_differential = z.compute_global_partials()
+    assert global_differential.partial_at(point, x) == approx(7)
+    assert global_differential.partial_at(point, y) == approx(-28)
 
 
 def test_polynomial_of_three_variables():
@@ -89,14 +89,14 @@ def test_polynomial_of_three_variables():
     assert z.partial_at(point, w) == approx(37)
     assert z.partial_at(point, x) == approx(52)
     assert z.partial_at(point, y) == approx(-6)
-    computed_local_partials = z.compute_local_partials(point)
-    assert computed_local_partials.partial_with_respect_to(w) == approx(37)
-    assert computed_local_partials.partial_with_respect_to(x) == approx(52)
-    assert computed_local_partials.partial_with_respect_to(y) == approx(-6)
-    computed_global_partials = z.compute_global_partials()
-    assert computed_global_partials.partial_at(point, w) == approx(37)
-    assert computed_global_partials.partial_at(point, x) == approx(52)
-    assert computed_global_partials.partial_at(point, y) == approx(-6)
+    local_differential = z.compute_local_partials(point)
+    assert local_differential.partial_with_respect_to(w) == approx(37)
+    assert local_differential.partial_with_respect_to(x) == approx(52)
+    assert local_differential.partial_with_respect_to(y) == approx(-6)
+    global_differential = z.compute_global_partials()
+    assert global_differential.partial_at(point, w) == approx(37)
+    assert global_differential.partial_at(point, x) == approx(52)
+    assert global_differential.partial_at(point, y) == approx(-6)
 
 
 def test_composite_function():
@@ -119,6 +119,6 @@ def test_indeterminate_form():
         z.partial_at(point, t)
     with raises(DomainError):
         z.compute_local_partials(point)
-    computed_global_partials = z.compute_global_partials()
+    global_differential = z.compute_global_partials()
     with raises(DomainError):
-        computed_global_partials.partial_at(point, t)
+        global_differential.partial_at(point, t)

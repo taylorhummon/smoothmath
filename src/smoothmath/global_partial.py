@@ -6,9 +6,9 @@ if TYPE_CHECKING:
     from smoothmath.expression import Expression
 
 
-class ComputedGlobalPartial:
+class GlobalPartial:
     def __init__(
-        self: ComputedGlobalPartial,
+        self: GlobalPartial,
         original_expression: Expression,
         global_partial: Expression
     ) -> None:
@@ -18,7 +18,7 @@ class ComputedGlobalPartial:
         self._global_partial = global_partial
 
     def partial_at(
-        self: ComputedGlobalPartial,
+        self: GlobalPartial,
         point: Point
     ) -> real_number:
         # We evaluate the original expression to check for DomainErrors.

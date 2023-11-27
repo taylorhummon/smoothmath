@@ -7,22 +7,22 @@ if TYPE_CHECKING:
 import smoothmath.utilities as utilities
 
 
-class ComputedLocalPartials:
+class LocalDifferential:
     def __init__(
-        self: ComputedLocalPartials
+        self: LocalDifferential
     ) -> None:
         self._partial_by_variable_name: dict[str, real_number]
         self._partial_by_variable_name = {}
 
     def partial_with_respect_to(
-        self: ComputedLocalPartials,
+        self: LocalDifferential,
         variable: Variable | str
     ) -> real_number:
         variable_name = utilities.get_variable_name(variable)
         return self._partial_by_variable_name.get(variable_name, 0)
 
     def _add_to(
-        self: ComputedLocalPartials,
+        self: LocalDifferential,
         variable: Variable,
         accumulated: real_number
     ) -> None:

@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.computed_global_partials import ComputedGlobalPartials
+    from smoothmath.local_differential import LocalDifferential
+    from smoothmath.global_differential import GlobalDifferential
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
@@ -72,7 +72,7 @@ class Divide(BinaryExpression):
 
     def _compute_local_partials(
         self: Divide,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -81,12 +81,12 @@ class Divide(BinaryExpression):
         self._verify_domain_constraints(a_value, b_value)
         next_accumulated_a = accumulated / b_value
         next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
-        self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
-        self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
+        self._a._compute_local_partials(local_differential, point, next_accumulated_a)
+        self._b._compute_local_partials(local_differential, point, next_accumulated_b)
 
     def _compute_global_partials(
         self: Divide,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
         next_accumulated_a = ex.Divide(accumulated, self._b)
@@ -94,5 +94,5 @@ class Divide(BinaryExpression):
             accumulated,
             ex.Negation(ex.Divide(self._a, ex.Power(self._b, ex.Constant(2))))
         )
-        self._a._compute_global_partials(computed_global_partials, next_accumulated_a)
-        self._b._compute_global_partials(computed_global_partials, next_accumulated_b)
+        self._a._compute_global_partials(global_differential, next_accumulated_a)
+        self._b._compute_global_partials(global_differential, next_accumulated_b)

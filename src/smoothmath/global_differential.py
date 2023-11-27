@@ -10,9 +10,9 @@ import smoothmath.utilities as utilities
 import smoothmath.expressions as ex
 
 
-class ComputedGlobalPartials:
+class GlobalDifferential:
     def __init__(
-        self: ComputedGlobalPartials,
+        self: GlobalDifferential,
         original_expression: Expression
     ) -> None:
         self.original_expression: Expression
@@ -21,7 +21,7 @@ class ComputedGlobalPartials:
         self._partial_by_variable_name = {}
 
     def partial_at(
-        self: ComputedGlobalPartials,
+        self: GlobalDifferential,
         point: Point,
         variable: Variable | str
     ) -> real_number:
@@ -33,7 +33,7 @@ class ComputedGlobalPartials:
         return global_partial.evaluate(point)
 
     def _add_to(
-        self: ComputedGlobalPartials,
+        self: GlobalDifferential,
         variable: Variable,
         expression: Expression
     ) -> None:
@@ -41,7 +41,7 @@ class ComputedGlobalPartials:
         self._partial_by_variable_name[variable.name] = ex.Plus(existing, expression)
 
     def _lookup(
-        self: ComputedGlobalPartials,
+        self: GlobalDifferential,
         variable_name: str
     ) -> Expression:
         existing_or_none = self._partial_by_variable_name.get(variable_name, None)

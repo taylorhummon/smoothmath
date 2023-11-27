@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.computed_global_partials import ComputedGlobalPartials
+    from smoothmath.local_differential import LocalDifferential
+    from smoothmath.global_differential import GlobalDifferential
     from smoothmath.expression import Expression
 
 import math
@@ -52,18 +52,18 @@ class Sine(UnaryExpression):
 
     def _compute_local_partials(
         self: Sine,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(point)
         next_accumulated = accumulated * math.cos(a_value)
-        self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
+        self._a._compute_local_partials(local_differential, point, next_accumulated)
 
     def _compute_global_partials(
         self: Sine,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
         next_accumulated = ex.Multiply(accumulated, ex.Cosine(self._a))
-        self._a._compute_global_partials(computed_global_partials, next_accumulated)
+        self._a._compute_global_partials(global_differential, next_accumulated)

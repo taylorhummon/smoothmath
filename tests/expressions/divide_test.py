@@ -8,17 +8,17 @@ def test_Divide():
     x = Variable("x")
     y = Variable("y")
     z = Divide(x, y)
-    computed_global_partials = z.compute_global_partials()
+    global_differential = z.compute_global_partials()
     # at (x, y) = (5, 2)
     point = Point({x: 5, y: 2})
     assert z.evaluate(point) == approx(2.5)
     assert z.partial_at(point, x) == approx(0.5)
     assert z.partial_at(point, y) == approx(-1.25)
-    computed_local_partials = z.compute_local_partials(point)
-    assert computed_local_partials.partial_with_respect_to(x) == approx(0.5)
-    assert computed_local_partials.partial_with_respect_to(y) == approx(-1.25)
-    assert computed_global_partials.partial_at(point, x) == approx(0.5)
-    assert computed_global_partials.partial_at(point, y) == approx(-1.25)
+    local_differential = z.compute_local_partials(point)
+    assert local_differential.partial_with_respect_to(x) == approx(0.5)
+    assert local_differential.partial_with_respect_to(y) == approx(-1.25)
+    assert global_differential.partial_at(point, x) == approx(0.5)
+    assert global_differential.partial_at(point, y) == approx(-1.25)
     # at (x, y) = (3, 0)
     point = Point({x: 3, y: 0})
     with raises(DomainError):
@@ -30,9 +30,9 @@ def test_Divide():
     with raises(DomainError):
         z.compute_local_partials(point)
     with raises(DomainError):
-        computed_global_partials.partial_at(point, x)
+        global_differential.partial_at(point, x)
     with raises(DomainError):
-        computed_global_partials.partial_at(point, y)
+        global_differential.partial_at(point, y)
     # at (x, y) = (0, 0)
     point = Point({x: 0, y: 0})
     with raises(DomainError):
@@ -44,9 +44,9 @@ def test_Divide():
     with raises(DomainError):
         z.compute_local_partials(point)
     with raises(DomainError):
-        computed_global_partials.partial_at(point, x)
+        global_differential.partial_at(point, x)
     with raises(DomainError):
-        computed_global_partials.partial_at(point, y)
+        global_differential.partial_at(point, y)
 
 
 def test_Divide_composition():
@@ -57,24 +57,24 @@ def test_Divide_composition():
     assert z.evaluate(point) == approx(2)
     assert z.partial_at(point, x) == approx(0.4)
     assert z.partial_at(point, y) == approx(-2)
-    computed_local_partials = z.compute_local_partials(point)
-    assert computed_local_partials.partial_with_respect_to(x) == approx(0.4)
-    assert computed_local_partials.partial_with_respect_to(y) == approx(-2)
-    computed_global_partials = z.compute_global_partials()
-    assert computed_global_partials.partial_at(point, x) == approx(0.4)
-    assert computed_global_partials.partial_at(point, y) == approx(-2)
+    local_differential = z.compute_local_partials(point)
+    assert local_differential.partial_with_respect_to(x) == approx(0.4)
+    assert local_differential.partial_with_respect_to(y) == approx(-2)
+    global_differential = z.compute_global_partials()
+    assert global_differential.partial_at(point, x) == approx(0.4)
+    assert global_differential.partial_at(point, y) == approx(-2)
 
 
 def test_Divide_with_constant_numerator_zero():
     y = Variable("y")
     z = Divide(Constant(0), y)
-    computed_global_partials = z.compute_global_partials()
+    global_differential = z.compute_global_partials()
     # at y = 3
     point = Point({y: 3})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, y) == approx(0)
     assert z.compute_local_partials(point).partial_with_respect_to(y) == approx(0)
-    assert computed_global_partials.partial_at(point, y) == approx(0)
+    assert global_differential.partial_at(point, y) == approx(0)
     # at y = 0
     point = Point({y: 0})
     with raises(DomainError):
@@ -84,7 +84,7 @@ def test_Divide_with_constant_numerator_zero():
     with raises(DomainError):
         z.compute_local_partials(point)
     with raises(DomainError):
-        computed_global_partials.partial_at(point, y)
+        global_differential.partial_at(point, y)
 
 
 def test_Divide_with_constant_numerator_zero_composition():
@@ -107,33 +107,33 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
         z.partial_at(point, y)
     with raises(DomainError):
         z.compute_local_partials(point)
-    computed_global_partials = z.compute_global_partials()
+    global_differential = z.compute_global_partials()
     with raises(DomainError):
-        computed_global_partials.partial_at(point, y)
+        global_differential.partial_at(point, y)
 
 
 def test_Divide_with_constant_denominator_one():
     x = Variable("x")
     z = Divide(x, Constant(1))
-    computed_global_partials = z.compute_global_partials()
+    global_differential = z.compute_global_partials()
     # at x = 3
     point = Point({x: 3})
     assert z.evaluate(point) == approx(3)
     assert z.partial_at(point, x) == approx(1)
     assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
-    assert computed_global_partials.partial_at(point, x) == approx(1)
+    assert global_differential.partial_at(point, x) == approx(1)
     # at x = 0
     point = Point({x: 0})
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, x) == approx(1)
     assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
-    assert computed_global_partials.partial_at(point, x) == approx(1)
+    assert global_differential.partial_at(point, x) == approx(1)
 
 
 def test_divide_with_constant_denominator_zero():
     x = Variable("x")
     z = Divide(x, Constant(0))
-    computed_global_partials = z.compute_global_partials()
+    global_differential = z.compute_global_partials()
     # at x = 3
     point = Point({x: 3})
     with raises(DomainError):
@@ -143,7 +143,7 @@ def test_divide_with_constant_denominator_zero():
     with raises(DomainError):
         z.compute_local_partials(point)
     with raises(DomainError):
-        computed_global_partials.partial_at(point, x)
+        global_differential.partial_at(point, x)
     # at x = 0
     point = Point({x: 0})
     with raises(DomainError):
@@ -153,4 +153,4 @@ def test_divide_with_constant_denominator_zero():
     with raises(DomainError):
         z.compute_local_partials(point)
     with raises(DomainError):
-        computed_global_partials.partial_at(point, x)
+        global_differential.partial_at(point, x)

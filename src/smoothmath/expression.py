@@ -7,9 +7,9 @@ if TYPE_CHECKING:
 from abc import ABC, abstractmethod
 import smoothmath.utilities as utilities
 from smoothmath.point import Point
-from smoothmath.computed_global_partial import ComputedGlobalPartial
-from smoothmath.computed_local_partials import ComputedLocalPartials
-from smoothmath.computed_global_partials import ComputedGlobalPartials
+from smoothmath.global_partial import GlobalPartial
+from smoothmath.local_differential import LocalDifferential
+from smoothmath.global_differential import GlobalDifferential
 import smoothmath.expressions as ex
 
 
@@ -44,28 +44,28 @@ class Expression(ABC):
     def compute_global_partial(
         self: Expression,
         with_respect_to: Variable | str
-    ) -> ComputedGlobalPartial:
+    ) -> GlobalPartial:
         variable_name = utilities.get_variable_name(with_respect_to)
         global_partial = self._global_partial(variable_name)
-        return ComputedGlobalPartial(self, global_partial)
+        return GlobalPartial(self, global_partial)
 
     def compute_local_partials(
         self: Expression,
         point: Point
-    ) -> ComputedLocalPartials:
+    ) -> LocalDifferential:
         if not isinstance(point, Point):
             raise Exception("Must provide a Point to compute_local_partials()")
         self._reset_evaluation_cache()
-        computed_local_partials = ComputedLocalPartials()
-        self._compute_local_partials(computed_local_partials, point, 1)
-        return computed_local_partials
+        local_differential = LocalDifferential()
+        self._compute_local_partials(local_differential, point, 1)
+        return local_differential
 
     def compute_global_partials(
         self: Expression
-    ) -> ComputedGlobalPartials:
-        computed_global_partials = ComputedGlobalPartials(self)
-        self._compute_global_partials(computed_global_partials, ex.Constant(1))
-        return computed_global_partials
+    ) -> GlobalDifferential:
+        global_differential = GlobalDifferential(self)
+        self._compute_global_partials(global_differential, ex.Constant(1))
+        return global_differential
 
 
     ## Abstract methods ##
@@ -101,18 +101,18 @@ class Expression(ABC):
     @abstractmethod
     def _compute_local_partials(
         self: Expression,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
-    ) -> None: # instead of returning a value, we mutate the computed_local_partials argument
+    ) -> None: # instead of returning a value, we mutate the local_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_partials()")
 
     @abstractmethod
     def _compute_global_partials(
         self: Expression,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
-    ) -> None: # instead of returning a value, we mutate the computed_global_partials argument
+    ) -> None: # instead of returning a value, we mutate the global_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_global_partials()")
 
 

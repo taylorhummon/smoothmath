@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.computed_global_partials import ComputedGlobalPartials
+    from smoothmath.local_differential import LocalDifferential
+    from smoothmath.global_differential import GlobalDifferential
     from smoothmath.expression import Expression
 
 import math
@@ -68,22 +68,22 @@ class Logarithm(UnaryExpression):
 
     def _compute_local_partials(
         self: Logarithm,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
         a_value = self._a._evaluate(point)
         self._verify_domain_constraints(a_value)
         next_accumulated = accumulated / (math.log(self._base) * a_value)
-        self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
+        self._a._compute_local_partials(local_differential, point, next_accumulated)
 
     def _compute_global_partials(
         self: Logarithm,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
         next_accumulated = self._global_partial_helper(accumulated)
-        self._a._compute_global_partials(computed_global_partials, next_accumulated)
+        self._a._compute_global_partials(global_differential, next_accumulated)
 
     def _global_partial_helper(
         self: Logarithm,

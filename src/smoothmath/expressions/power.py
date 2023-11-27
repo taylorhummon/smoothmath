@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.computed_global_partials import ComputedGlobalPartials
+    from smoothmath.local_differential import LocalDifferential
+    from smoothmath.global_differential import GlobalDifferential
     from smoothmath.expression import Expression
 
 import math
@@ -68,24 +68,24 @@ class Power(BinaryExpression):
 
     def _compute_local_partials(
         self: Power,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_local_partials_case_i(computed_local_partials, point, accumulated)
+            self._compute_local_partials_case_i(local_differential, point, accumulated)
         else:
-            self._compute_local_partials_case_ii(computed_local_partials, point, accumulated)
+            self._compute_local_partials_case_ii(local_differential, point, accumulated)
 
     def _compute_global_partials(
         self: Power,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_global_partials_case_i(computed_global_partials, accumulated)
+            self._compute_global_partials_case_i(global_differential, accumulated)
         else:
-            self._compute_global_partials_case_ii(computed_global_partials, accumulated)
+            self._compute_global_partials_case_ii(global_differential, accumulated)
 
     ### CASE i ###
 
@@ -151,7 +151,7 @@ class Power(BinaryExpression):
 
     def _compute_local_partials_case_i(
         self: Power,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -163,15 +163,15 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_local_partials(computed_local_partials, point, accumulated)
+            self._a._compute_local_partials(local_differential, point, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
             next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
-            self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
+            self._a._compute_local_partials(local_differential, point, next_accumulated)
 
     def _compute_global_partials_case_i(
         self: Power,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
         b_value = self._b._evaluate(Point({})) # b_value is an integer (this is case i)
@@ -180,10 +180,10 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_global_partials(computed_global_partials, accumulated)
+            self._a._compute_global_partials(global_differential, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
-            self._a._compute_global_partials(computed_global_partials, self._term_1(accumulated))
+            self._a._compute_global_partials(global_differential, self._term_1(accumulated))
 
     ### CASE ii ###
 
@@ -248,7 +248,7 @@ class Power(BinaryExpression):
 
     def _compute_local_partials_case_ii(
         self: Power,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -262,16 +262,16 @@ class Power(BinaryExpression):
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_accumulated_a = accumulated * b_value * a_value ** (b_value - 1)
             next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
-            self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
-            self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
+            self._a._compute_local_partials(local_differential, point, next_accumulated_a)
+            self._b._compute_local_partials(local_differential, point, next_accumulated_b)
 
     def _compute_global_partials_case_ii(
         self: Power,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
-        self._a._compute_global_partials(computed_global_partials, self._term_1(accumulated))
-        self._b._compute_global_partials(computed_global_partials, self._term_2(accumulated))
+        self._a._compute_global_partials(global_differential, self._term_1(accumulated))
+        self._b._compute_global_partials(global_differential, self._term_2(accumulated))
 
     def _term_1(
         self: Power,

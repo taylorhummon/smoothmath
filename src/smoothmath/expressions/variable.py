@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.computed_global_partials import ComputedGlobalPartials
+    from smoothmath.local_differential import LocalDifferential
+    from smoothmath.global_differential import GlobalDifferential
     from smoothmath.expression import Expression
 
 from smoothmath.expression import NullaryExpression
@@ -69,15 +69,15 @@ class Variable(NullaryExpression):
 
     def _compute_local_partials(
         self: Variable,
-        computed_local_partials: ComputedLocalPartials,
+        local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
-        computed_local_partials._add_to(self, accumulated)
+        local_differential._add_to(self, accumulated)
 
     def _compute_global_partials(
         self: Variable,
-        computed_global_partials: ComputedGlobalPartials,
+        global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
-        computed_global_partials._add_to(self, accumulated)
+        global_differential._add_to(self, accumulated)
