@@ -13,6 +13,6 @@ def test_variable():
     computed_local_partials = y.compute_local_partials(point)
     assert computed_local_partials.partial_with_respect_to(x) == 0
     assert computed_local_partials.partial_with_respect_to(y) == 1
-    synthetic = y.synthetic()
-    assert synthetic.partial_at(point, x) == 0
-    assert synthetic.partial_at(point, y) == 1
+    computed_global_partials = y.compute_global_partials()
+    assert computed_global_partials.partial_at(point, x) == 0
+    assert computed_global_partials.partial_at(point, y) == 1

@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 import math
@@ -70,22 +70,22 @@ class Logarithm(UnaryExpression):
         next_accumulated = accumulated / (math.log(self._base) * a_value)
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Logarithm,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        return self._synthetic_partial_helper(a_partial)
+        a_partial = self._a._global_partial(with_respect_to)
+        return self._global_partial_helper(a_partial)
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Logarithm,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
-        next_accumulated = self._synthetic_partial_helper(accumulated)
-        self._a._compute_all_synthetic_partials(synthetic, next_accumulated)
+        next_accumulated = self._global_partial_helper(accumulated)
+        self._a._compute_global_partials(computed_global_partials, next_accumulated)
 
-    def _synthetic_partial_helper(
+    def _global_partial_helper(
         self: Logarithm,
         multiplier: Expression
     ) -> Expression:

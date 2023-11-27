@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 import math
@@ -50,20 +50,20 @@ class Sine(UnaryExpression):
         next_accumulated = accumulated * math.cos(a_value)
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Sine,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
+        a_partial = self._a._global_partial(with_respect_to)
         return ex.Multiply(
             ex.Cosine(self._a),
             a_partial
         )
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Sine,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
         next_accumulated = ex.Multiply(accumulated, ex.Cosine(self._a))
-        self._a._compute_all_synthetic_partials(synthetic, next_accumulated)
+        self._a._compute_global_partials(computed_global_partials, next_accumulated)

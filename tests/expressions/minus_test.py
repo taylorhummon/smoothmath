@@ -14,9 +14,9 @@ def test_Minus():
     computed_local_partials = z.compute_local_partials(point)
     assert computed_local_partials.partial_with_respect_to(x) == approx(1)
     assert computed_local_partials.partial_with_respect_to(y) == approx(-1)
-    synthetic = z.synthetic()
-    assert synthetic.partial_at(point, x) == approx(1)
-    assert synthetic.partial_at(point, y) == approx(-1)
+    computed_global_partials = z.compute_global_partials()
+    assert computed_global_partials.partial_at(point, x) == approx(1)
+    assert computed_global_partials.partial_at(point, y) == approx(-1)
 
 
 def test_Minus_composition():
@@ -30,6 +30,6 @@ def test_Minus_composition():
     computed_local_partials = z.compute_local_partials(point)
     assert computed_local_partials.partial_with_respect_to(x) == approx(5)
     assert computed_local_partials.partial_with_respect_to(y) == approx(-4)
-    synthetic = z.synthetic()
-    assert synthetic.partial_at(point, x) == approx(5)
-    assert synthetic.partial_at(point, y) == approx(-4)
+    computed_global_partials = z.compute_global_partials()
+    assert computed_global_partials.partial_at(point, x) == approx(5)
+    assert computed_global_partials.partial_at(point, y) == approx(-4)

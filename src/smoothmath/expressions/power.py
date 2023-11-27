@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 import math
@@ -68,24 +68,24 @@ class Power(BinaryExpression):
         else:
             self._compute_local_partials_case_ii(computed_local_partials, point, accumulated)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Power,
         with_respect_to: str
     ) -> Expression:
         if _is_case_i(self._b):
-            return self._synthetic_partial_case_i(with_respect_to)
+            return self._global_partial_case_i(with_respect_to)
         else:
-            return self._synthetic_partial_case_ii(with_respect_to)
+            return self._global_partial_case_ii(with_respect_to)
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Power,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_all_synthetic_partials_case_i(synthetic, accumulated)
+            self._compute_global_partials_case_i(computed_global_partials, accumulated)
         else:
-            self._compute_all_synthetic_partials_case_ii(synthetic, accumulated)
+            self._compute_global_partials_case_ii(computed_global_partials, accumulated)
 
     ### CASE i ###
 
@@ -154,7 +154,7 @@ class Power(BinaryExpression):
             next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
             self._a._compute_local_partials(computed_local_partials, point, next_accumulated)
 
-    def _synthetic_partial_case_i(
+    def _global_partial_case_i(
         self: Power,
         with_respect_to: str
     ) -> Expression:
@@ -163,14 +163,14 @@ class Power(BinaryExpression):
             return ex.Constant(0)
         elif b_value == 1:
             # d(a ** 1) = 1 * da
-            return self._a._synthetic_partial(with_respect_to)
+            return self._a._global_partial(with_respect_to)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
-            return self._term_1(self._a._synthetic_partial(with_respect_to))
+            return self._term_1(self._a._global_partial(with_respect_to))
 
-    def _compute_all_synthetic_partials_case_i(
+    def _compute_global_partials_case_i(
         self: Power,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
         b_value = self._b._evaluate(Point({})) # b_value is an integer (this is case i)
@@ -179,10 +179,10 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_all_synthetic_partials(synthetic, accumulated)
+            self._a._compute_global_partials(computed_global_partials, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
-            self._a._compute_all_synthetic_partials(synthetic, self._term_1(accumulated))
+            self._a._compute_global_partials(computed_global_partials, self._term_1(accumulated))
 
     ### CASE ii ###
 
@@ -256,22 +256,22 @@ class Power(BinaryExpression):
             self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
             self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
 
-    def _synthetic_partial_case_ii(
+    def _global_partial_case_ii(
         self: Power,
         with_respect_to: str
     ) -> Expression:
         return ex.Plus(
-            self._term_1(self._a._synthetic_partial(with_respect_to)),
-            self._term_2(self._b._synthetic_partial(with_respect_to))
+            self._term_1(self._a._global_partial(with_respect_to)),
+            self._term_2(self._b._global_partial(with_respect_to))
         )
 
-    def _compute_all_synthetic_partials_case_ii(
+    def _compute_global_partials_case_ii(
         self: Power,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
-        self._a._compute_all_synthetic_partials(synthetic, self._term_1(accumulated))
-        self._b._compute_all_synthetic_partials(synthetic, self._term_2(accumulated))
+        self._a._compute_global_partials(computed_global_partials, self._term_1(accumulated))
+        self._b._compute_global_partials(computed_global_partials, self._term_2(accumulated))
 
     def _term_1(
         self: Power,

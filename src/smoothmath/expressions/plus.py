@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.computed_local_partials import ComputedLocalPartials
     from smoothmath.expression import Expression
 
@@ -50,18 +50,18 @@ class Plus(BinaryExpression):
         self._a._compute_local_partials(computed_local_partials, point, accumulated)
         self._b._compute_local_partials(computed_local_partials, point, accumulated)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Plus,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
+        a_partial = self._a._global_partial(with_respect_to)
+        b_partial = self._b._global_partial(with_respect_to)
         return ex.Plus(a_partial, b_partial)
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Plus,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
-        self._a._compute_all_synthetic_partials(synthetic, accumulated)
-        self._b._compute_all_synthetic_partials(synthetic, accumulated)
+        self._a._compute_global_partials(computed_global_partials, accumulated)
+        self._b._compute_global_partials(computed_global_partials, accumulated)

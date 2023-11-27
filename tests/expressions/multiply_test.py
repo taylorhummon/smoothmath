@@ -14,9 +14,9 @@ def test_Multiply():
     computed_local_partials = z.compute_local_partials(point)
     assert computed_local_partials.partial_with_respect_to(x) == approx(3)
     assert computed_local_partials.partial_with_respect_to(y) == approx(2)
-    synthetic = z.synthetic()
-    assert synthetic.partial_at(point, x) == approx(3)
-    assert synthetic.partial_at(point, y) == approx(2)
+    computed_global_partials = z.compute_global_partials()
+    assert computed_global_partials.partial_at(point, x) == approx(3)
+    assert computed_global_partials.partial_at(point, y) == approx(2)
 
 
 def test_Multiply_composition():
@@ -30,9 +30,9 @@ def test_Multiply_composition():
     computed_local_partials = z.compute_local_partials(point)
     assert computed_local_partials.partial_with_respect_to(x) == approx(10)
     assert computed_local_partials.partial_with_respect_to(y) == approx(10)
-    synthetic = z.synthetic()
-    assert synthetic.partial_at(point, x) == approx(10)
-    assert synthetic.partial_at(point, y) == approx(10)
+    computed_global_partials = z.compute_global_partials()
+    assert computed_global_partials.partial_at(point, x) == approx(10)
+    assert computed_global_partials.partial_at(point, y) == approx(10)
 
 
 def test_Multiply_by_zero():
@@ -42,7 +42,7 @@ def test_Multiply_by_zero():
     assert z.evaluate(point) == approx(0)
     assert z.partial_at(point, x) == approx(0)
     assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0)
-    assert z.synthetic().partial_at(point, x) == approx(0)
+    assert z.compute_global_partials().partial_at(point, x) == approx(0)
 
 
 def test_Multiply_by_one():
@@ -52,4 +52,4 @@ def test_Multiply_by_one():
     assert z.evaluate(point) == approx(2)
     assert z.partial_at(point, x) == approx(1)
     assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1)
-    assert z.synthetic().partial_at(point, x) == approx(1)
+    assert z.compute_global_partials().partial_at(point, x) == approx(1)

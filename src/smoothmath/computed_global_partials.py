@@ -10,9 +10,9 @@ import smoothmath.utilities as utilities
 import smoothmath.expressions as ex
 
 
-class Synthetic:
+class ComputedGlobalPartials:
     def __init__(
-        self: Synthetic,
+        self: ComputedGlobalPartials,
         original_expression: Expression
     ) -> None:
         self.original_expression: Expression
@@ -21,19 +21,19 @@ class Synthetic:
         self._partial_by_variable_name = {}
 
     def partial_at(
-        self: Synthetic,
+        self: ComputedGlobalPartials,
         point: Point,
         variable: Variable | str
     ) -> real_number:
         # We evaluate the original expression to check for DomainErrors.
         # e.g. (ln(x))' = 1 / x
-        # Naively, the RHS is defined for negative x, but ln(x) isn't defined there!
+        # Notice that the RHS appears defined for negative x, but ln(x) isn't defined there!
         self.original_expression.evaluate(point)
-        synthetic_partial = self._lookup(utilities.get_variable_name(variable))
-        return synthetic_partial.evaluate(point)
+        global_partial = self._lookup(utilities.get_variable_name(variable))
+        return global_partial.evaluate(point)
 
     def _add_to(
-        self: Synthetic,
+        self: ComputedGlobalPartials,
         variable: Variable,
         expression: Expression
     ) -> None:
@@ -41,7 +41,7 @@ class Synthetic:
         self._partial_by_variable_name[variable.name] = ex.Plus(existing, expression)
 
     def _lookup(
-        self: Synthetic,
+        self: ComputedGlobalPartials,
         variable_name: str
     ) -> Expression:
         existing_or_none = self._partial_by_variable_name.get(variable_name, None)

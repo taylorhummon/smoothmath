@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
@@ -50,18 +50,18 @@ class Minus(BinaryExpression):
         self._a._compute_local_partials(computed_local_partials, point, accumulated)
         self._b._compute_local_partials(computed_local_partials, point, - accumulated)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Minus,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
+        a_partial = self._a._global_partial(with_respect_to)
+        b_partial = self._b._global_partial(with_respect_to)
         return ex.Minus(a_partial, b_partial)
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Minus,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
-        self._a._compute_all_synthetic_partials(synthetic, accumulated)
-        self._b._compute_all_synthetic_partials(synthetic, ex.Negation(accumulated))
+        self._a._compute_global_partials(computed_global_partials, accumulated)
+        self._b._compute_global_partials(computed_global_partials, ex.Negation(accumulated))

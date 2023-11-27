@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 import smoothmath.utilities as utilities
 from smoothmath.point import Point
 from smoothmath.computed_local_partials import ComputedLocalPartials
-from smoothmath.synthetic import Synthetic
+from smoothmath.computed_global_partials import ComputedGlobalPartials
 import smoothmath.expressions as ex
 
 
@@ -51,12 +51,12 @@ class Expression(ABC):
         self._compute_local_partials(computed_local_partials, point, 1)
         return computed_local_partials
 
-    def synthetic(
+    def compute_global_partials(
         self: Expression
-    ) -> Synthetic:
-        synthetic = Synthetic(original_expression = self)
-        self._compute_all_synthetic_partials(synthetic, ex.Constant(1))
-        return synthetic
+    ) -> ComputedGlobalPartials:
+        computed_global_partials = ComputedGlobalPartials(original_expression = self)
+        self._compute_global_partials(computed_global_partials, ex.Constant(1))
+        return computed_global_partials
 
 
     ## Abstract methods ##
@@ -88,23 +88,23 @@ class Expression(ABC):
         computed_local_partials: ComputedLocalPartials,
         point: Point,
         accumulated: real_number
-    ) -> None:
+    ) -> None: # instead of returning a value, we mutate the computed_local_partials argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_partials()")
 
     @abstractmethod
-    def _synthetic_partial(
+    def _global_partial(
         self: Expression,
         with_respect_to: str
     ) -> Expression:
-        raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
+        raise Exception("Concrete classes derived from Expression must implement _global_partial()")
 
     @abstractmethod
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Expression,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
-    ) -> None:
-        raise Exception("Concrete classes derived from Expression must implement _compute_all_synthetic_partials()")
+    ) -> None: # instead of returning a value, we mutate the computed_global_partials argument
+        raise Exception("Concrete classes derived from Expression must implement _compute_global_partials()")
 
 
     ## Operations ##

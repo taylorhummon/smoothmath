@@ -10,7 +10,7 @@ def test_Negation():
     assert z.evaluate(point) == approx(-2)
     assert z.partial_at(point, x) == approx(-1)
     assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-1)
-    assert z.synthetic().partial_at(point, x) == approx(-1)
+    assert z.compute_global_partials().partial_at(point, x) == approx(-1)
 
 
 def test_Negation_composition():
@@ -20,4 +20,4 @@ def test_Negation_composition():
     assert z.evaluate(point) == approx(-7)
     assert z.partial_at(point, x) == approx(-2)
     assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-2)
-    assert z.synthetic().partial_at(point, x) == approx(-2)
+    assert z.compute_global_partials().partial_at(point, x) == approx(-2)

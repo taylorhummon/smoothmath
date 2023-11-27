@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 from smoothmath.expression import UnaryExpression
@@ -46,16 +46,16 @@ class Negation(UnaryExpression):
     ) -> None:
         self._a._compute_local_partials(computed_local_partials, point, - accumulated)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Negation,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
+        a_partial = self._a._global_partial(with_respect_to)
         return ex.Negation(a_partial)
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Negation,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
-        self._a._compute_all_synthetic_partials(synthetic, ex.Negation(accumulated))
+        self._a._compute_global_partials(computed_global_partials, ex.Negation(accumulated))

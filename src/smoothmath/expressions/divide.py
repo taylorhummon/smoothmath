@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
@@ -71,12 +71,12 @@ class Divide(BinaryExpression):
         self._a._compute_local_partials(computed_local_partials, point, next_accumulated_a)
         self._b._compute_local_partials(computed_local_partials, point, next_accumulated_b)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Divide,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
+        a_partial = self._a._global_partial(with_respect_to)
+        b_partial = self._b._global_partial(with_respect_to)
         numerator = ex.Minus(
             ex.Multiply(self._b, a_partial),
             ex.Multiply(self._a, b_partial)
@@ -84,9 +84,9 @@ class Divide(BinaryExpression):
         denominator = ex.Power(self._b, ex.Constant(2))
         return ex.Divide(numerator, denominator)
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Divide,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
         next_accumulated_a = ex.Divide(accumulated, self._b)
@@ -94,5 +94,5 @@ class Divide(BinaryExpression):
             accumulated,
             ex.Negation(ex.Divide(self._a, ex.Power(self._b, ex.Constant(2))))
         )
-        self._a._compute_all_synthetic_partials(synthetic, next_accumulated_a)
-        self._b._compute_all_synthetic_partials(synthetic, next_accumulated_b)
+        self._a._compute_global_partials(computed_global_partials, next_accumulated_a)
+        self._b._compute_global_partials(computed_global_partials, next_accumulated_b)

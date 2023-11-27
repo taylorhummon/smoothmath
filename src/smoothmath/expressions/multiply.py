@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
@@ -62,24 +62,24 @@ class Multiply(BinaryExpression):
             self._a._compute_local_partials(computed_local_partials, point, accumulated * b_value)
             self._b._compute_local_partials(computed_local_partials, point, accumulated * a_value)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Multiply,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
+        a_partial = self._a._global_partial(with_respect_to)
+        b_partial = self._b._global_partial(with_respect_to)
         return ex.Plus(
             ex.Multiply(self._b, a_partial),
             ex.Multiply(self._a, b_partial)
         )
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Multiply,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
-        self._a._compute_all_synthetic_partials(synthetic, ex.Multiply(accumulated, self._b))
-        self._b._compute_all_synthetic_partials(synthetic, ex.Multiply(accumulated, self._a))
+        self._a._compute_global_partials(computed_global_partials, ex.Multiply(accumulated, self._b))
+        self._b._compute_global_partials(computed_global_partials, ex.Multiply(accumulated, self._a))
 
     # the following method is used to allow shirt-circuiting of either a * 0 or 0 * b
     def _get_a_and_b_values_or_none(

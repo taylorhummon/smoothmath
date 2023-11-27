@@ -4,7 +4,7 @@ if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
     from smoothmath.computed_local_partials import ComputedLocalPartials
-    from smoothmath.synthetic import Synthetic
+    from smoothmath.computed_global_partials import ComputedGlobalPartials
     from smoothmath.expression import Expression
 
 from smoothmath.expression import NullaryExpression
@@ -66,7 +66,7 @@ class Variable(NullaryExpression):
     ) -> None:
         computed_local_partials._add_to(self, accumulated)
 
-    def _synthetic_partial(
+    def _global_partial(
         self: Variable,
         with_respect_to: str
     ) -> Expression:
@@ -75,9 +75,9 @@ class Variable(NullaryExpression):
         else:
             return ex.Constant(0)
 
-    def _compute_all_synthetic_partials(
+    def _compute_global_partials(
         self: Variable,
-        synthetic: Synthetic,
+        computed_global_partials: ComputedGlobalPartials,
         accumulated: Expression
     ) -> None:
-        synthetic._add_to(self, accumulated)
+        computed_global_partials._add_to(self, accumulated)

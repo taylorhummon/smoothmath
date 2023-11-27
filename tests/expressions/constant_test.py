@@ -10,4 +10,4 @@ def test_Constant():
     point = Point({x: 2})
     assert c.partial_at(point, x) == 0
     assert c.compute_local_partials(point).partial_with_respect_to(x) == 0
-    assert c.synthetic().partial_at(point, x) == 0
+    assert c.compute_global_partials().partial_at(point, x) == 0
