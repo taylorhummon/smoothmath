@@ -41,27 +41,27 @@ class Plus(BinaryExpression):
         b_partial = self._b._local_partial(point, with_respect_to)
         return a_partial + b_partial
 
-    def _global_partial(
+    def _synthetic_partial(
         self: Plus,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        b_partial = self._b._global_partial(with_respect_to)
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        b_partial = self._b._synthetic_partial(with_respect_to)
         return ex.Plus(a_partial, b_partial)
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Plus,
         local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
-        self._a._compute_local_partials(local_differential, point, accumulated)
-        self._b._compute_local_partials(local_differential, point, accumulated)
+        self._a._compute_local_differential(local_differential, point, accumulated)
+        self._b._compute_local_differential(local_differential, point, accumulated)
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Plus,
         global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
-        self._a._compute_global_partials(global_differential, accumulated)
-        self._b._compute_global_partials(global_differential, accumulated)
+        self._a._compute_global_differential(global_differential, accumulated)
+        self._b._compute_global_differential(global_differential, accumulated)

@@ -8,6 +8,8 @@ if TYPE_CHECKING:
 
 import smoothmath.utilities as utilities
 import smoothmath.expressions as ex
+from smoothmath.global_partial import GlobalPartial
+from smoothmath.local_differential import LocalDifferential
 
 
 class GlobalDifferential:
@@ -17,35 +19,84 @@ class GlobalDifferential:
     ) -> None:
         self.original_expression: Expression
         self.original_expression = original_expression
-        self._partial_by_variable_name: dict[str, Expression]
-        self._partial_by_variable_name = {}
+        self._synthetic_partials: dict[str, Expression]
+        self._synthetic_partials = {}
+        self._is_frozen = False
 
-    def partial_at(
+    def component_at(
         self: GlobalDifferential,
         point: Point,
         variable: Variable | str
     ) -> real_number:
-        # We evaluate the original expression to check for DomainErrors.
-        # e.g. (ln(x))' = 1 / x
-        # Notice that the RHS appears defined for negative x, but ln(x) isn't defined there!
+        if not self._is_frozen:
+            raise Exception("Cannot take the component_at() of a GlobalDifferential until frozen")
+        return self.component(variable).at(point)
+
+    def component(
+        self: GlobalDifferential,
+        variable: Variable | str
+    ) -> GlobalPartial:
+        if not self._is_frozen:
+            raise Exception("Cannot take the component() of a GlobalDifferential until frozen")
+        synthetic_partial = self._look_up_synthetic_partial(variable)
+        return GlobalPartial(self.original_expression, synthetic_partial)
+
+    def at(
+        self: GlobalDifferential,
+        point: Point
+    ) -> LocalDifferential:
+        if not self._is_frozen:
+            raise Exception("Cannot take at() of a GlobalDifferential until frozen")
         self.original_expression.evaluate(point)
-        global_partial = self._lookup(utilities.get_variable_name(variable))
-        return global_partial.evaluate(point)
+        local_differential = LocalDifferential(self.original_expression)
+        for variable_name, synthetic_partial in self._synthetic_partials.items():
+            local_partial = synthetic_partial.evaluate(point)
+            local_differential._add_to(variable_name, local_partial)
+        local_differential._freeze()
+        return local_differential
 
     def _add_to(
         self: GlobalDifferential,
-        variable: Variable,
-        expression: Expression
+        variable: Variable | str,
+        contribution: Expression
     ) -> None:
-        existing = self._lookup(variable.name)
-        self._partial_by_variable_name[variable.name] = ex.Plus(existing, expression)
+        if self._is_frozen:
+            raise Exception("Cannot add to a frozen GlobalDifferential until frozen")
+        synthetic_partial = self._look_up_synthetic_partial(variable)
+        self._save_synthetic_partial(variable, synthetic_partial + contribution)
 
-    def _lookup(
+    def _look_up_synthetic_partial(
         self: GlobalDifferential,
-        variable_name: str
+        variable: Variable | str
     ) -> Expression:
-        existing_or_none = self._partial_by_variable_name.get(variable_name, None)
-        if existing_or_none is None:
+        variable_name = utilities.get_variable_name(variable)
+        synthetic_partial = self._synthetic_partials.get(variable_name, None)
+        if synthetic_partial is None:
             return ex.Constant(0)
         else:
-            return existing_or_none
+            return synthetic_partial
+
+    def _save_synthetic_partial(
+        self: GlobalDifferential,
+        variable: Variable | str,
+        synthetic_partial: Expression
+    ) -> None:
+        variable_name = utilities.get_variable_name(variable)
+        self._synthetic_partials[variable_name] = synthetic_partial
+
+    def _freeze(
+        self: GlobalDifferential
+    ) -> None:
+        self._is_frozen = True
+
+    def __eq__(
+        self: GlobalDifferential,
+        other: GlobalDifferential
+    ) -> bool:
+        # We'll assume correctness of the synthetic partials, so it suffices to compare
+        # the original expressions once the global differentials have been frozen.
+        return (
+            self._is_frozen and
+            other._is_frozen and
+            (self.original_expression == other.original_expression)
+        )

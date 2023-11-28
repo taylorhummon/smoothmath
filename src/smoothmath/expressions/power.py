@@ -57,35 +57,35 @@ class Power(BinaryExpression):
         else:
             return self._local_partial_case_ii(point, with_respect_to)
 
-    def _global_partial(
+    def _synthetic_partial(
         self: Power,
         with_respect_to: str
     ) -> Expression:
         if _is_case_i(self._b):
-            return self._global_partial_case_i(with_respect_to)
+            return self._synthetic_partial_case_i(with_respect_to)
         else:
-            return self._global_partial_case_ii(with_respect_to)
+            return self._synthetic_partial_case_ii(with_respect_to)
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Power,
         local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_local_partials_case_i(local_differential, point, accumulated)
+            self._compute_local_differential_case_i(local_differential, point, accumulated)
         else:
-            self._compute_local_partials_case_ii(local_differential, point, accumulated)
+            self._compute_local_differential_case_ii(local_differential, point, accumulated)
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Power,
         global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_global_partials_case_i(global_differential, accumulated)
+            self._compute_global_differential_case_i(global_differential, accumulated)
         else:
-            self._compute_global_partials_case_ii(global_differential, accumulated)
+            self._compute_global_differential_case_ii(global_differential, accumulated)
 
     ### CASE i ###
 
@@ -134,7 +134,7 @@ class Power(BinaryExpression):
             # d(a ** C) = C * a ** (C - 1) * da
             return b_value * (a_value ** (b_value - 1)) * a_partial
 
-    def _global_partial_case_i(
+    def _synthetic_partial_case_i(
         self: Power,
         with_respect_to: str
     ) -> Expression:
@@ -143,13 +143,13 @@ class Power(BinaryExpression):
             return ex.Constant(0)
         elif b_value == 1:
             # d(a ** 1) = 1 * da
-            return self._a._global_partial(with_respect_to)
+            return self._a._synthetic_partial(with_respect_to)
         else: # b_value >= 2 or b_value <= -1
-            a_partial = self._a._global_partial(with_respect_to)
+            a_partial = self._a._synthetic_partial(with_respect_to)
             # d(a ** C) = C * a ** (C - 1) * da
             return self._term_1(a_partial)
 
-    def _compute_local_partials_case_i(
+    def _compute_local_differential_case_i(
         self: Power,
         local_differential: LocalDifferential,
         point: Point,
@@ -163,13 +163,13 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_local_partials(local_differential, point, accumulated)
+            self._a._compute_local_differential(local_differential, point, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
             next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
-            self._a._compute_local_partials(local_differential, point, next_accumulated)
+            self._a._compute_local_differential(local_differential, point, next_accumulated)
 
-    def _compute_global_partials_case_i(
+    def _compute_global_differential_case_i(
         self: Power,
         global_differential: GlobalDifferential,
         accumulated: Expression
@@ -180,10 +180,10 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_global_partials(global_differential, accumulated)
+            self._a._compute_global_differential(global_differential, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
-            self._a._compute_global_partials(global_differential, self._term_1(accumulated))
+            self._a._compute_global_differential(global_differential, self._term_1(accumulated))
 
     ### CASE ii ###
 
@@ -238,15 +238,15 @@ class Power(BinaryExpression):
                 math.log(a_value) * (a_value ** b_value) * b_partial
             )
 
-    def _global_partial_case_ii(
+    def _synthetic_partial_case_ii(
         self: Power,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        b_partial = self._b._global_partial(with_respect_to)
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        b_partial = self._b._synthetic_partial(with_respect_to)
         return ex.Plus(self._term_1(a_partial), self._term_2(b_partial))
 
-    def _compute_local_partials_case_ii(
+    def _compute_local_differential_case_ii(
         self: Power,
         local_differential: LocalDifferential,
         point: Point,
@@ -262,16 +262,16 @@ class Power(BinaryExpression):
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_accumulated_a = accumulated * b_value * a_value ** (b_value - 1)
             next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
-            self._a._compute_local_partials(local_differential, point, next_accumulated_a)
-            self._b._compute_local_partials(local_differential, point, next_accumulated_b)
+            self._a._compute_local_differential(local_differential, point, next_accumulated_a)
+            self._b._compute_local_differential(local_differential, point, next_accumulated_b)
 
-    def _compute_global_partials_case_ii(
+    def _compute_global_differential_case_ii(
         self: Power,
         global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
-        self._a._compute_global_partials(global_differential, self._term_1(accumulated))
-        self._b._compute_global_partials(global_differential, self._term_2(accumulated))
+        self._a._compute_global_differential(global_differential, self._term_1(accumulated))
+        self._b._compute_global_differential(global_differential, self._term_2(accumulated))
 
     def _term_1(
         self: Power,

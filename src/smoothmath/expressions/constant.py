@@ -53,13 +53,13 @@ class Constant(NullaryExpression):
     ) -> real_number:
         return 0
 
-    def _global_partial(
+    def _synthetic_partial(
         self: Constant,
         with_respect_to: str
     ) -> Expression:
         return ex.Constant(0)
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Constant,
         local_differential: LocalDifferential,
         point: Point,
@@ -67,7 +67,7 @@ class Constant(NullaryExpression):
     ) -> None:
         pass
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Constant,
         global_differential: GlobalDifferential,
         accumulated: Expression

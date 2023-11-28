@@ -10,14 +10,14 @@ class GlobalPartial:
     def __init__(
         self: GlobalPartial,
         original_expression: Expression,
-        global_partial: Expression
+        synthetic_partial: Expression
     ) -> None:
         self.original_expression: Expression
         self.original_expression = original_expression
-        self._global_partial: Expression # !!! decide on different name
-        self._global_partial = global_partial
+        self._synthetic_partial: Expression
+        self._synthetic_partial = synthetic_partial
 
-    def partial_at(
+    def at(
         self: GlobalPartial,
         point: Point
     ) -> real_number:
@@ -25,4 +25,12 @@ class GlobalPartial:
         # e.g. (ln(x))' = 1 / x
         # Notice that the RHS appears defined for negative x, but ln(x) isn't defined there!
         self.original_expression.evaluate(point)
-        return self._global_partial.evaluate(point)
+        return self._synthetic_partial.evaluate(point)
+
+    def __eq__(
+        self: GlobalPartial,
+        other: GlobalPartial
+    ) -> bool:
+        # We'll assume correctness of the synthetic partial, so it suffices to compare
+        # the original expressions.
+        return self.original_expression == other.original_expression

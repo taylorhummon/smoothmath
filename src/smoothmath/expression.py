@@ -30,41 +30,43 @@ class Expression(ABC):
         self._reset_evaluation_cache()
         return self._evaluate(point)
 
-    def partial_at(
+    def local_partial(
         self: Expression,
         point: Point,
         with_respect_to: Variable | str
     ) -> real_number:
         if not isinstance(point, Point):
-            raise Exception("Must provide a Point to partial_at()")
+            raise Exception("Must provide a Point to local_partial()")
         self._reset_evaluation_cache()
         variable_name = utilities.get_variable_name(with_respect_to)
         return self._local_partial(point, variable_name)
 
-    def compute_global_partial(
+    def global_partial(
         self: Expression,
         with_respect_to: Variable | str
     ) -> GlobalPartial:
         variable_name = utilities.get_variable_name(with_respect_to)
-        global_partial = self._global_partial(variable_name)
-        return GlobalPartial(self, global_partial)
+        synthetic_partial = self._synthetic_partial(variable_name)
+        return GlobalPartial(self, synthetic_partial)
 
-    def compute_local_partials(
+    def local_differential(
         self: Expression,
         point: Point
     ) -> LocalDifferential:
         if not isinstance(point, Point):
-            raise Exception("Must provide a Point to compute_local_partials()")
+            raise Exception("Must provide a Point to local_differential()")
         self._reset_evaluation_cache()
-        local_differential = LocalDifferential()
-        self._compute_local_partials(local_differential, point, 1)
+        local_differential = LocalDifferential(self)
+        self._compute_local_differential(local_differential, point, 1)
+        local_differential._freeze()
         return local_differential
 
-    def compute_global_partials(
+    def global_differential(
         self: Expression
     ) -> GlobalDifferential:
         global_differential = GlobalDifferential(self)
-        self._compute_global_partials(global_differential, ex.Constant(1))
+        self._compute_global_differential(global_differential, ex.Constant(1))
+        global_differential._freeze()
         return global_differential
 
 
@@ -92,28 +94,28 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 
     @abstractmethod
-    def _global_partial(
+    def _synthetic_partial(
         self: Expression,
         with_respect_to: str
     ) -> Expression:
-        raise Exception("Concrete classes derived from Expression must implement _global_partial()")
+        raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
 
     @abstractmethod
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Expression,
         local_differential: LocalDifferential,
         point: Point,
         accumulated: real_number
     ) -> None: # instead of returning a value, we mutate the local_differential argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_local_partials()")
+        raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
 
     @abstractmethod
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Expression,
         global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None: # instead of returning a value, we mutate the global_differential argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_global_partials()")
+        raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
 
 
     ## Operations ##

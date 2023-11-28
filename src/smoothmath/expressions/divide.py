@@ -57,12 +57,12 @@ class Divide(BinaryExpression):
         b_partial = self._b._local_partial(point, with_respect_to)
         return (b_value * a_partial - a_value * b_partial) / b_value ** 2
 
-    def _global_partial(
+    def _synthetic_partial(
         self: Divide,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        b_partial = self._b._global_partial(with_respect_to)
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        b_partial = self._b._synthetic_partial(with_respect_to)
         numerator = ex.Minus(
             ex.Multiply(self._b, a_partial),
             ex.Multiply(self._a, b_partial)
@@ -70,7 +70,7 @@ class Divide(BinaryExpression):
         denominator = ex.Power(self._b, ex.Constant(2))
         return ex.Divide(numerator, denominator)
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Divide,
         local_differential: LocalDifferential,
         point: Point,
@@ -81,10 +81,10 @@ class Divide(BinaryExpression):
         self._verify_domain_constraints(a_value, b_value)
         next_accumulated_a = accumulated / b_value
         next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
-        self._a._compute_local_partials(local_differential, point, next_accumulated_a)
-        self._b._compute_local_partials(local_differential, point, next_accumulated_b)
+        self._a._compute_local_differential(local_differential, point, next_accumulated_a)
+        self._b._compute_local_differential(local_differential, point, next_accumulated_b)
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Divide,
         global_differential: GlobalDifferential,
         accumulated: Expression
@@ -94,5 +94,5 @@ class Divide(BinaryExpression):
             accumulated,
             ex.Negation(ex.Divide(self._a, ex.Power(self._b, ex.Constant(2))))
         )
-        self._a._compute_global_partials(global_differential, next_accumulated_a)
-        self._b._compute_global_partials(global_differential, next_accumulated_b)
+        self._a._compute_global_differential(global_differential, next_accumulated_a)
+        self._b._compute_global_differential(global_differential, next_accumulated_b)

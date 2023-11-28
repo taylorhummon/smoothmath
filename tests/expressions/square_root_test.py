@@ -7,33 +7,39 @@ from smoothmath.expressions import Constant, Variable, SquareRoot
 def test_SquareRoot():
     x = Variable("x")
     z = SquareRoot(x)
-    global_differential = z.compute_global_partials()
+    global_x_partial = z.global_partial(x)
+    global_differential = z.global_differential()
     # at x = 4
     point = Point({x: 4})
     assert z.evaluate(point) == approx(2)
-    assert z.partial_at(point, x) == approx(0.25)
-    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(0.25)
-    assert global_differential.partial_at(point, x) == approx(0.25)
+    assert z.local_partial(point, x) == approx(0.25)
+    assert global_x_partial.at(point) == approx(0.25)
+    assert z.local_differential(point).component(x) == approx(0.25)
+    assert global_differential.component_at(point, x) == approx(0.25)
     # at x = 0
     point = Point({x: 0})
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
-        z.partial_at(point, x)
+        z.local_partial(point, x)
     with raises(DomainError):
-        z.compute_local_partials(point)
+        global_x_partial.at(point)
     with raises(DomainError):
-        global_differential.partial_at(point, x)
+        z.local_differential(point)
+    with raises(DomainError):
+        global_differential.component_at(point, x)
     # at x = -1
     point = Point({x: -1})
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
-        z.partial_at(point, x)
+        z.local_partial(point, x)
     with raises(DomainError):
-        z.compute_local_partials(point)
+        global_x_partial.at(point)
     with raises(DomainError):
-        global_differential.partial_at(point, x)
+        z.local_differential(point)
+    with raises(DomainError):
+        global_differential.component_at(point, x)
 
 
 def test_SquareRoot_composition():
@@ -41,6 +47,7 @@ def test_SquareRoot_composition():
     z = SquareRoot(Constant(2) * x + Constant(7))
     point = Point({x: 1})
     assert z.evaluate(point) == approx(3)
-    assert z.partial_at(point, x) == approx(1 / 3)
-    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(1 / 3)
-    assert z.compute_global_partials().partial_at(point, x) == approx(1 / 3)
+    assert z.local_partial(point, x) == approx(1 / 3)
+    assert z.global_partial(x).at(point) == approx(1 / 3)
+    assert z.local_differential(point).component(x) == approx(1 / 3)
+    assert z.global_differential().component_at(point, x) == approx(1 / 3)

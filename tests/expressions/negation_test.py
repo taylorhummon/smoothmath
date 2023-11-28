@@ -8,9 +8,10 @@ def test_Negation():
     z = Negation(x)
     point = Point({x: 2})
     assert z.evaluate(point) == approx(-2)
-    assert z.partial_at(point, x) == approx(-1)
-    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-1)
-    assert z.compute_global_partials().partial_at(point, x) == approx(-1)
+    assert z.local_partial(point, x) == approx(-1)
+    assert z.global_partial(x).at(point) == approx(-1)
+    assert z.local_differential(point).component(x) == approx(-1)
+    assert z.global_differential().component_at(point, x) == approx(-1)
 
 
 def test_Negation_composition():
@@ -18,6 +19,7 @@ def test_Negation_composition():
     z = Negation(Constant(2) * x + Constant(1))
     point = Point({x: 3})
     assert z.evaluate(point) == approx(-7)
-    assert z.partial_at(point, x) == approx(-2)
-    assert z.compute_local_partials(point).partial_with_respect_to(x) == approx(-2)
-    assert z.compute_global_partials().partial_at(point, x) == approx(-2)
+    assert z.local_partial(point, x) == approx(-2)
+    assert z.global_partial(x).at(point) == approx(-2)
+    assert z.local_differential(point).component(x) == approx(-2)
+    assert z.global_differential().component_at(point, x) == approx(-2)

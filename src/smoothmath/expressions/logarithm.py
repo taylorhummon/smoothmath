@@ -59,14 +59,14 @@ class Logarithm(UnaryExpression):
         a_partial = self._a._local_partial(point, with_respect_to)
         return a_partial / (math.log(self._base) * a_value)
 
-    def _global_partial(
+    def _synthetic_partial(
         self: Logarithm,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        return self._global_partial_helper(a_partial)
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        return self._synthetic_partial_helper(a_partial)
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Logarithm,
         local_differential: LocalDifferential,
         point: Point,
@@ -75,17 +75,17 @@ class Logarithm(UnaryExpression):
         a_value = self._a._evaluate(point)
         self._verify_domain_constraints(a_value)
         next_accumulated = accumulated / (math.log(self._base) * a_value)
-        self._a._compute_local_partials(local_differential, point, next_accumulated)
+        self._a._compute_local_differential(local_differential, point, next_accumulated)
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Logarithm,
         global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
-        next_accumulated = self._global_partial_helper(accumulated)
-        self._a._compute_global_partials(global_differential, next_accumulated)
+        next_accumulated = self._synthetic_partial_helper(accumulated)
+        self._a._compute_global_differential(global_differential, next_accumulated)
 
-    def _global_partial_helper(
+    def _synthetic_partial_helper(
         self: Logarithm,
         multiplier: Expression
     ) -> Expression:

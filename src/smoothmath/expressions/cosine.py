@@ -40,17 +40,17 @@ class Cosine(UnaryExpression):
         a_partial = self._a._local_partial(point, with_respect_to)
         return - math.sin(a_value) * a_partial
 
-    def _global_partial(
+    def _synthetic_partial(
         self: Cosine,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
+        a_partial = self._a._synthetic_partial(with_respect_to)
         return ex.Multiply(
             ex.Negation(ex.Sine(self._a)),
             a_partial
         )
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Cosine,
         local_differential: LocalDifferential,
         point: Point,
@@ -58,12 +58,12 @@ class Cosine(UnaryExpression):
     ) -> None:
         a_value = self._a._evaluate(point)
         next_accumulated = - accumulated * math.sin(a_value)
-        self._a._compute_local_partials(local_differential, point, next_accumulated)
+        self._a._compute_local_differential(local_differential, point, next_accumulated)
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Cosine,
         global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
         next_accumulated = ex.Multiply(accumulated, ex.Negation(ex.Sine(self._a)))
-        self._a._compute_global_partials(global_differential, next_accumulated)
+        self._a._compute_global_differential(global_differential, next_accumulated)

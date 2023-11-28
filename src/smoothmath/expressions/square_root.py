@@ -52,14 +52,14 @@ class SquareRoot(UnaryExpression):
         a_partial = self._a._local_partial(point, with_respect_to)
         return a_partial / (2 * math.sqrt(a_value))
 
-    def _global_partial(
+    def _synthetic_partial(
         self: SquareRoot,
         with_respect_to: str
     ) -> Expression:
-        a_partial = self._a._global_partial(with_respect_to)
-        return self._global_partial_helper(a_partial)
+        a_partial = self._a._synthetic_partial(with_respect_to)
+        return self._synthetic_partial_helper(a_partial)
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: SquareRoot,
         local_differential: LocalDifferential,
         point: Point,
@@ -69,17 +69,17 @@ class SquareRoot(UnaryExpression):
         self._verify_domain_constraints(a_value)
         self_value = self._evaluate(point)
         next_accumulated = accumulated / (2 * self_value)
-        self._a._compute_local_partials(local_differential, point, next_accumulated)
+        self._a._compute_local_differential(local_differential, point, next_accumulated)
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: SquareRoot,
         global_differential: GlobalDifferential,
         accumulated: Expression
     ) -> None:
-        next_accumulated = self._global_partial_helper(accumulated)
-        self._a._compute_global_partials(global_differential, next_accumulated)
+        next_accumulated = self._synthetic_partial_helper(accumulated)
+        self._a._compute_global_differential(global_differential, next_accumulated)
 
-    def _global_partial_helper(
+    def _synthetic_partial_helper(
         self: SquareRoot,
         multiplier: Expression
     ) -> Expression:

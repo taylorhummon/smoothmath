@@ -58,7 +58,7 @@ class Variable(NullaryExpression):
         else:
             return 0
 
-    def _global_partial(
+    def _synthetic_partial(
         self: Variable,
         with_respect_to: str
     ) -> Expression:
@@ -67,7 +67,7 @@ class Variable(NullaryExpression):
         else:
             return ex.Constant(0)
 
-    def _compute_local_partials(
+    def _compute_local_differential(
         self: Variable,
         local_differential: LocalDifferential,
         point: Point,
@@ -75,7 +75,7 @@ class Variable(NullaryExpression):
     ) -> None:
         local_differential._add_to(self, accumulated)
 
-    def _compute_global_partials(
+    def _compute_global_differential(
         self: Variable,
         global_differential: GlobalDifferential,
         accumulated: Expression
