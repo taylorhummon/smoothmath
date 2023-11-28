@@ -14,4 +14,6 @@ def test_LocalDifferential():
     assert local_differential.component(w) == 0
     assert local_differential.component(x) == 3
     assert local_differential.component(y) == 6
+    assert local_differential.component("w") == 0
+    assert local_differential.component("x") == 3
     assert local_differential.component("y") == 6
