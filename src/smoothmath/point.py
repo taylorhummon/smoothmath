@@ -29,3 +29,15 @@ class Point:
         if value is None:
             raise Exception(f"No value provided for variable: {name}")
         return value
+
+    def __str__(
+        self: Point
+    ) -> str:
+        return (
+            "(" +
+            ", ".join([
+                variable_name + " = " + str(value)
+                for variable_name, value in self._value_by_variable_name.items()
+            ]) +
+            ")"
+        )
