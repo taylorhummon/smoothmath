@@ -35,8 +35,8 @@ class GlobalDifferential:
         variable: Variable | str
     ) -> GlobalPartial:
         variable_name = utilities.get_variable_name(variable)
-        synthetic_partial_or_none = self._synthetic_partials.get(variable_name, None)
-        synthetic_partial = ex.Constant(0) if synthetic_partial_or_none is None else synthetic_partial_or_none
+        existing = self._synthetic_partials.get(variable_name, None)
+        synthetic_partial = existing if existing is not None else ex.Constant(0)
         return GlobalPartial(self.original_expression, synthetic_partial)
 
     def at(
@@ -84,7 +84,7 @@ class GlobalDifferentialBuilder:
     ) -> None:
         variable_name = utilities.get_variable_name(variable)
         existing = self._synthetic_partials.get(variable_name, None)
-        next = contribution if existing is None else existing + contribution
+        next = existing + contribution if existing is not None else contribution
         self._synthetic_partials[variable_name] = next
 
     def build(
