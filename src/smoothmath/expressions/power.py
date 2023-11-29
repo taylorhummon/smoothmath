@@ -2,8 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
-    from smoothmath.local_differential import LocalDifferential
-    from smoothmath.global_differential import GlobalDifferential
+    from smoothmath.local_differential import LocalDifferentialBuilder
+    from smoothmath.global_differential import GlobalDifferentialBuilder
     from smoothmath.expression import Expression
 
 import math
@@ -68,24 +68,24 @@ class Power(BinaryExpression):
 
     def _compute_local_differential(
         self: Power,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_local_differential_case_i(local_differential, point, accumulated)
+            self._compute_local_differential_case_i(builder, point, accumulated)
         else:
-            self._compute_local_differential_case_ii(local_differential, point, accumulated)
+            self._compute_local_differential_case_ii(builder, point, accumulated)
 
     def _compute_global_differential(
         self: Power,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_global_differential_case_i(global_differential, accumulated)
+            self._compute_global_differential_case_i(builder, accumulated)
         else:
-            self._compute_global_differential_case_ii(global_differential, accumulated)
+            self._compute_global_differential_case_ii(builder, accumulated)
 
     ### CASE i ###
 
@@ -151,7 +151,7 @@ class Power(BinaryExpression):
 
     def _compute_local_differential_case_i(
         self: Power,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -163,15 +163,15 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_local_differential(local_differential, point, accumulated)
+            self._a._compute_local_differential(builder, point, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
             next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
-            self._a._compute_local_differential(local_differential, point, next_accumulated)
+            self._a._compute_local_differential(builder, point, next_accumulated)
 
     def _compute_global_differential_case_i(
         self: Power,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
         b_value = self._b._evaluate(Point({})) # b_value is an integer (this is case i)
@@ -180,10 +180,10 @@ class Power(BinaryExpression):
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_global_differential(global_differential, accumulated)
+            self._a._compute_global_differential(builder, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
-            self._a._compute_global_differential(global_differential, self._term_1(accumulated))
+            self._a._compute_global_differential(builder, self._term_1(accumulated))
 
     ### CASE ii ###
 
@@ -248,7 +248,7 @@ class Power(BinaryExpression):
 
     def _compute_local_differential_case_ii(
         self: Power,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -262,16 +262,16 @@ class Power(BinaryExpression):
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_accumulated_a = accumulated * b_value * a_value ** (b_value - 1)
             next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
-            self._a._compute_local_differential(local_differential, point, next_accumulated_a)
-            self._b._compute_local_differential(local_differential, point, next_accumulated_b)
+            self._a._compute_local_differential(builder, point, next_accumulated_a)
+            self._b._compute_local_differential(builder, point, next_accumulated_b)
 
     def _compute_global_differential_case_ii(
         self: Power,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
-        self._a._compute_global_differential(global_differential, self._term_1(accumulated))
-        self._b._compute_global_differential(global_differential, self._term_2(accumulated))
+        self._a._compute_global_differential(builder, self._term_1(accumulated))
+        self._b._compute_global_differential(builder, self._term_2(accumulated))
 
     def _term_1(
         self: Power,

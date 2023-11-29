@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.local_differential import LocalDifferential
-    from smoothmath.global_differential import GlobalDifferential
+    from smoothmath.local_differential import LocalDifferentialBuilder
+    from smoothmath.global_differential import GlobalDifferentialBuilder
     from smoothmath.expression import Expression
 
 from smoothmath.expression import NullaryExpression
@@ -61,7 +61,7 @@ class Constant(NullaryExpression):
 
     def _compute_local_differential(
         self: Constant,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -69,7 +69,7 @@ class Constant(NullaryExpression):
 
     def _compute_global_differential(
         self: Constant,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
         pass

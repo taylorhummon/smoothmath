@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.local_differential import LocalDifferential
-    from smoothmath.global_differential import GlobalDifferential
+    from smoothmath.local_differential import LocalDifferentialBuilder
+    from smoothmath.global_differential import GlobalDifferentialBuilder
     from smoothmath.expression import Expression
 
 import math
@@ -55,21 +55,21 @@ class Exponential(UnaryExpression):
 
     def _compute_local_differential(
         self: Exponential,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
         self_value = self._evaluate(point)
         next_accumulated = accumulated * math.log(self._base) * self_value
-        self._a._compute_local_differential(local_differential, point, next_accumulated)
+        self._a._compute_local_differential(builder, point, next_accumulated)
 
     def _compute_global_differential(
         self: Exponential,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
         next_accumulated = self._synthetic_partial_helper(accumulated)
-        self._a._compute_global_differential(global_differential, next_accumulated)
+        self._a._compute_global_differential(builder, next_accumulated)
 
     def _synthetic_partial_helper(
         self: Exponential,

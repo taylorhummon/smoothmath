@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.local_differential import LocalDifferential
-    from smoothmath.global_differential import GlobalDifferential
+    from smoothmath.local_differential import LocalDifferentialBuilder
+    from smoothmath.global_differential import GlobalDifferentialBuilder
     from smoothmath.expression import Expression
 
 from smoothmath.expression import UnaryExpression
@@ -59,7 +59,7 @@ class Reciprocal(UnaryExpression):
 
     def _compute_local_differential(
         self: Reciprocal,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -67,15 +67,15 @@ class Reciprocal(UnaryExpression):
         self._verify_domain_constraints(a_value)
         self_value = self._evaluate(point)
         next_accumulated = - accumulated * (self_value ** 2)
-        self._a._compute_local_differential(local_differential, point, next_accumulated)
+        self._a._compute_local_differential(builder, point, next_accumulated)
 
     def _compute_global_differential(
         self: Reciprocal,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
         next_accumulated = self._synthetic_partial_helper(accumulated)
-        self._a._compute_global_differential(global_differential, next_accumulated)
+        self._a._compute_global_differential(builder, next_accumulated)
 
     def _synthetic_partial_helper(
         self: Reciprocal,

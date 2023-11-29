@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.local_differential import LocalDifferential
-    from smoothmath.global_differential import GlobalDifferential
+    from smoothmath.local_differential import LocalDifferentialBuilder
+    from smoothmath.global_differential import GlobalDifferentialBuilder
     from smoothmath.expression import Expression
 
 from smoothmath.expression import UnaryExpression
@@ -47,15 +47,15 @@ class Negation(UnaryExpression):
 
     def _compute_local_differential(
         self: Negation,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
-        self._a._compute_local_differential(local_differential, point, - accumulated)
+        self._a._compute_local_differential(builder, point, - accumulated)
 
     def _compute_global_differential(
         self: Negation,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
-        self._a._compute_global_differential(global_differential, ex.Negation(accumulated))
+        self._a._compute_global_differential(builder, ex.Negation(accumulated))

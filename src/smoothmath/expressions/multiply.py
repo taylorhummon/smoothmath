@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from smoothmath.types import real_number
     from smoothmath.point import Point
-    from smoothmath.local_differential import LocalDifferential
-    from smoothmath.global_differential import GlobalDifferential
+    from smoothmath.local_differential import LocalDifferentialBuilder
+    from smoothmath.global_differential import GlobalDifferentialBuilder
     from smoothmath.expression import Expression
 
 from smoothmath.expression import BinaryExpression
@@ -61,7 +61,7 @@ class Multiply(BinaryExpression):
 
     def _compute_local_differential(
         self: Multiply,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None:
@@ -70,16 +70,16 @@ class Multiply(BinaryExpression):
             return
         else: # pair_or_none is the pair (a_value, b_value)
             a_value, b_value = pair_or_none
-            self._a._compute_local_differential(local_differential, point, accumulated * b_value)
-            self._b._compute_local_differential(local_differential, point, accumulated * a_value)
+            self._a._compute_local_differential(builder, point, accumulated * b_value)
+            self._b._compute_local_differential(builder, point, accumulated * a_value)
 
     def _compute_global_differential(
         self: Multiply,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None:
-        self._a._compute_global_differential(global_differential, ex.Multiply(accumulated, self._b))
-        self._b._compute_global_differential(global_differential, ex.Multiply(accumulated, self._a))
+        self._a._compute_global_differential(builder, ex.Multiply(accumulated, self._b))
+        self._b._compute_global_differential(builder, ex.Multiply(accumulated, self._a))
 
     # the following method is used to allow shirt-circuiting of either a * 0 or 0 * b
     def _get_a_and_b_values_or_none(

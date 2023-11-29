@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from smoothmath.expression import Expression
+    from smoothmath.local_differential import LocalDifferential
 
 from pytest import approx, raises
 from smoothmath.errors import DomainError
@@ -9,18 +9,7 @@ from smoothmath.point import Point
 from smoothmath.expressions import Variable, Constant, Logarithm, Reciprocal
 from smoothmath.global_partial import GlobalPartial
 from smoothmath.local_differential import LocalDifferential
-from smoothmath.global_differential import GlobalDifferential
-
-
-def desired_local_differential(
-    original_expression: Expression
-) -> LocalDifferential:
-    local_differential = LocalDifferential(original_expression)
-    local_differential._add_to("w", 4)
-    local_differential._add_to("x", 125)
-    local_differential._add_to("y", 300)
-    local_differential._freeze()
-    return local_differential
+from smoothmath.global_differential import GlobalDifferentialBuilder
 
 
 def test_GlobalDifferential():
@@ -31,11 +20,11 @@ def test_GlobalDifferential():
     synthetic_w_partial = Constant(4)
     synthetic_x_partial = y ** Constant(3)
     synthetic_y_partial = Constant(3) * x * y ** Constant(2)
-    global_differential = GlobalDifferential(original_expression)
-    global_differential._add_to(w, synthetic_w_partial)
-    global_differential._add_to(x, synthetic_x_partial)
-    global_differential._add_to(y, synthetic_y_partial)
-    global_differential._freeze()
+    builder = GlobalDifferentialBuilder(original_expression)
+    builder.add_to(w, synthetic_w_partial)
+    builder.add_to(x, synthetic_x_partial)
+    builder.add_to(y, synthetic_y_partial)
+    global_differential = builder.build()
     point = Point({w: 7, x: 4, y: 5})
     # component_at() method
     assert global_differential.component_at(point, w) == approx(4)
@@ -60,16 +49,17 @@ def test_GlobalDifferential():
     assert local_differential.component(x) == approx(125)
     assert local_differential.component(y) == approx(300)
     assert local_differential.original_expression == original_expression
-    assert local_differential == desired_local_differential(original_expression)
+    desired = LocalDifferential(original_expression, {"w": 4, "x": 125, "y": 300})
+    assert local_differential == desired
 
 
 def test_GlobalDifferential_raises():
     x = Variable("x")
     original_expression = Logarithm(x)
     synthetic_x_partial = Reciprocal(x)
-    global_differential = GlobalDifferential(original_expression)
-    global_differential._add_to(x, synthetic_x_partial)
-    global_differential._freeze()
+    builder = GlobalDifferentialBuilder(original_expression)
+    builder.add_to(x, synthetic_x_partial)
+    global_differential = builder.build()
     point = Point({x: -1})
     with raises(DomainError):
         global_differential.component_at(point, x)

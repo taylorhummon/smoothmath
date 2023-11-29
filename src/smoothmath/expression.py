@@ -2,14 +2,16 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from smoothmath.types import real_number
+    from smoothmath.local_differential import LocalDifferential
+    from smoothmath.global_differential import GlobalDifferential
     from smoothmath.expressions import Variable
 
 from abc import ABC, abstractmethod
 import smoothmath.utilities as utilities
 from smoothmath.point import Point
 from smoothmath.global_partial import GlobalPartial
-from smoothmath.local_differential import LocalDifferential
-from smoothmath.global_differential import GlobalDifferential
+from smoothmath.local_differential import LocalDifferentialBuilder
+from smoothmath.global_differential import GlobalDifferentialBuilder
 import smoothmath.expressions as ex
 
 
@@ -56,18 +58,16 @@ class Expression(ABC):
         if not isinstance(point, Point):
             raise Exception("Must provide a Point to local_differential()")
         self._reset_evaluation_cache()
-        local_differential = LocalDifferential(self)
-        self._compute_local_differential(local_differential, point, 1)
-        local_differential._freeze()
-        return local_differential
+        builder = LocalDifferentialBuilder(self)
+        self._compute_local_differential(builder, point, 1)
+        return builder.build()
 
     def global_differential(
         self: Expression
     ) -> GlobalDifferential:
-        global_differential = GlobalDifferential(self)
-        self._compute_global_differential(global_differential, ex.Constant(1))
-        global_differential._freeze()
-        return global_differential
+        builder = GlobalDifferentialBuilder(self)
+        self._compute_global_differential(builder, ex.Constant(1))
+        return builder.build()
 
 
     ## Abstract methods ##
@@ -103,7 +103,7 @@ class Expression(ABC):
     @abstractmethod
     def _compute_local_differential(
         self: Expression,
-        local_differential: LocalDifferential,
+        builder: LocalDifferentialBuilder,
         point: Point,
         accumulated: real_number
     ) -> None: # instead of returning a value, we mutate the local_differential argument
@@ -112,7 +112,7 @@ class Expression(ABC):
     @abstractmethod
     def _compute_global_differential(
         self: Expression,
-        global_differential: GlobalDifferential,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None: # instead of returning a value, we mutate the global_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
