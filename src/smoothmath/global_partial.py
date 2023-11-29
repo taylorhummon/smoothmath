@@ -34,3 +34,8 @@ class GlobalPartial:
         # We'll assume correctness of the synthetic partial, so it suffices to compare
         # the original expressions.
         return self.original_expression == other.original_expression
+
+    def __str__(
+        self: GlobalPartial
+    ) -> str:
+        return str(self._synthetic_partial)

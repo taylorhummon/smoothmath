@@ -100,3 +100,11 @@ class GlobalDifferential:
             other._is_frozen and
             (self.original_expression == other.original_expression)
         )
+
+    def __str__(
+        self: GlobalDifferential
+    ) -> str:
+        return " + ".join([
+            "(" + str(synthetic_partial) + ") d" + variable_name
+            for variable_name, synthetic_partial in self._synthetic_partials.items()
+        ])

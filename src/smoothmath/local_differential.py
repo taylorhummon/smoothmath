@@ -55,3 +55,11 @@ class LocalDifferential:
             other._is_frozen and
             (self.original_expression == other.original_expression)
         )
+
+    def __str__(
+        self: LocalDifferential
+    ) -> str:
+        return " + ".join([
+            "(" + str(local_partial) + ") d" + variable_name
+            for variable_name, local_partial in self._local_partials.items()
+        ])
