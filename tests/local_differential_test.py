@@ -1,5 +1,5 @@
-from smoothmath.local_differential import LocalDifferential, LocalDifferentialBuilder
-from smoothmath.expressions import Variable, Constant
+from smoothmath.expression import Constant, Variable
+from smoothmath._private.local_differential import LocalDifferentialBuilder
 
 
 def test_LocalDifferential():

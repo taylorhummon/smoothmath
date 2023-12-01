@@ -1,6 +1,6 @@
 from pytest import raises
-from smoothmath.expressions import Variable
-from smoothmath.point import Point
+from smoothmath import Point
+from smoothmath.expression import Variable
 
 
 def test_Point():

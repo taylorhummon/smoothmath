@@ -1,8 +1,6 @@
 from pytest import approx, raises
-from smoothmath.errors import DomainError
-from smoothmath.point import Point
-from smoothmath.expressions import Variable, Constant, Logarithm, Reciprocal
-from smoothmath.global_partial import GlobalPartial
+from smoothmath import Point, DomainError, GlobalPartial
+from smoothmath.expression import Variable, Constant, Logarithm, Reciprocal
 
 
 def test_GlobalPartial():

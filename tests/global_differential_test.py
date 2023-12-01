@@ -1,15 +1,7 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from smoothmath.local_differential import LocalDifferential
-
 from pytest import approx, raises
-from smoothmath.errors import DomainError
-from smoothmath.point import Point
-from smoothmath.expressions import Variable, Constant, Logarithm, Reciprocal
-from smoothmath.global_partial import GlobalPartial
-from smoothmath.local_differential import LocalDifferential
-from smoothmath.global_differential import GlobalDifferentialBuilder
+from smoothmath import Point, DomainError, GlobalPartial, LocalDifferential
+from smoothmath.expression import Variable, Constant, Logarithm, Reciprocal
+from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
 def test_GlobalDifferential():
