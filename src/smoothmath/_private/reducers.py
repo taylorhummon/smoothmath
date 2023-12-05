@@ -185,10 +185,10 @@ def _reduce_product_of_exponentials(
         expression._a._base == expression._b._base
     ):
         inner = _apply_reducers(
-            ex.Plus(expression._a, expression._b)
+            ex.Plus(expression._a._a, expression._b._a)
         )
         return _apply_reducers(
-            ex.Exponential(inner)
+            ex.Exponential(inner, base = expression._a._base)
         )
     else:
         return None
@@ -205,10 +205,10 @@ def _reduce_sum_of_logarithms(
         expression._a._base == expression._b._base
     ):
         inner = _apply_reducers(
-            ex.Multiply(expression._a, expression._b)
+            ex.Multiply(expression._a._a, expression._b._a)
         )
         return _apply_reducers(
-            ex.Logarithm(inner)
+            ex.Logarithm(inner, base = expression._a._base)
         )
     else:
         return None
@@ -260,7 +260,7 @@ def _reduce_by_associating_plus_right(
         return None
 
 
-# Plus(Constant(u), v) => Plus(v, Constant(u))
+# Plus(Constant(c), u) => Plus(u, Constant(c))
 def _reduce_by_commuting_constants_right_for_plus(
     expression: sm.Expression
 ) -> sm.Expression | None:
@@ -352,7 +352,7 @@ def _reduce_by_associating_multiply_left(
         return None
 
 
-# Multiply(u, Constant(v)) => Multiply(Constant(v), u)
+# Multiply(u, Constant(c)) => Multiply(Constant(c), u)
 def _reduce_by_commuting_constants_left_for_multiply(
     expression: sm.Expression
 ) -> sm.Expression | None:

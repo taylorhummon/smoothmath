@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
@@ -22,6 +22,21 @@ class Exponential(base.UnaryExpression):
             raise Exception("Exponentials must have a positive base")
         self._base: sm.real_number
         self._base = base
+
+    def __eq__(
+        self: Exponential,
+        other: Any
+    ) -> bool:
+        return (
+            (other.__class__ == self.__class__) and
+            (other._a == self._a) and
+            (other._base == self._base)
+        )
+
+    def __str__(
+        self: Exponential
+    ) -> str:
+        return f"Exponential({self._a}, base = {self._base})"
 
     def _rebuild(
         self: Exponential,

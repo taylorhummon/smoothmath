@@ -175,6 +175,21 @@ class UnaryExpression(Expression):
         self._value: sm.real_number | None
         self._value = None
 
+    def __eq__(
+        self: UnaryExpression,
+        other: Any
+    ) -> bool:
+        return (
+            (other.__class__ == self.__class__) and
+            (other._a == self._a)
+        )
+
+    def __str__(
+        self: UnaryExpression
+    ) -> str:
+        class_name = type(self).__name__
+        return f"{class_name}({self._a})"
+
     def _reset_evaluation_cache(
         self: UnaryExpression
     ) -> None:
@@ -186,18 +201,6 @@ class UnaryExpression(Expression):
         a: sm.Expression
     ) -> UnaryExpression:
         return self.__class__(a)
-
-    def __eq__(
-        self: UnaryExpression,
-        other: Any
-    ) -> bool:
-        return other.__class__ == self.__class__ and (other._a == self._a)
-
-    def __str__(
-        self: UnaryExpression
-    ) -> str:
-        class_name = type(self).__name__
-        return f"{class_name}({self._a})"
 
 
 class BinaryExpression(Expression):
@@ -218,20 +221,6 @@ class BinaryExpression(Expression):
         self._value: sm.real_number | None
         self._value = None
 
-    def _reset_evaluation_cache(
-        self: BinaryExpression
-    ) -> None:
-        self._value = None
-        self._a._reset_evaluation_cache()
-        self._b._reset_evaluation_cache()
-
-    def _rebuild(
-        self: BinaryExpression,
-        a: sm.Expression,
-        b: sm.Expression
-    ) -> BinaryExpression:
-        return self.__class__(a, b)
-
     def __eq__(
         self: BinaryExpression,
         other: Any
@@ -247,3 +236,17 @@ class BinaryExpression(Expression):
     ) -> str:
         class_name = type(self).__name__
         return f"{class_name}({self._a}, {self._b})"
+
+    def _reset_evaluation_cache(
+        self: BinaryExpression
+    ) -> None:
+        self._value = None
+        self._a._reset_evaluation_cache()
+        self._b._reset_evaluation_cache()
+
+    def _rebuild(
+        self: BinaryExpression,
+        a: sm.Expression,
+        b: sm.Expression
+    ) -> BinaryExpression:
+        return self.__class__(a, b)

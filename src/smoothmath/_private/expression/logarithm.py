@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
@@ -24,6 +24,21 @@ class Logarithm(base.UnaryExpression):
             raise Exception("Logarithms cannot have base = 1")
         self._base: sm.real_number
         self._base = base
+
+    def __eq__(
+        self: Logarithm,
+        other: Any
+    ) -> bool:
+        return (
+            (other.__class__ == self.__class__) and
+            (other._a == self._a) and
+            (other._base == self._base)
+        )
+
+    def __str__(
+        self: Logarithm
+    ) -> str:
+        return f"Logarithm({self._a}, base = {self._base})"
 
     def _rebuild(
         self: Logarithm,
