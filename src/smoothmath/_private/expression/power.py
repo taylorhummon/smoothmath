@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
-from smoothmath._private.expression.base import BinaryExpression
+import smoothmath._private.expression.base as base
 from smoothmath._private.utilities import is_integer
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
@@ -26,7 +26,7 @@ def _is_case_i(
 
 # differential rule: d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
 
-class Power(BinaryExpression):
+class Power(base.BinaryExpression):
     def __init__(
         self: Power,
         a: sm.Expression,

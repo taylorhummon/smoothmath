@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import smoothmath as sm
 import smoothmath.expression as ex
-from smoothmath._private.expression.base import NullaryExpression
+import smoothmath._private.expression.base as base
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 # differential rule: d(C) = 0
 
-class Constant(NullaryExpression):
+class Constant(base.NullaryExpression):
     def __init__(
         self: Constant,
         value: sm.real_number

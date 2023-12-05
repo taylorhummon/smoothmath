@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
-from smoothmath._private.expression.base import UnaryExpression
+import smoothmath._private.expression.base as base
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 # differential rule: d(cos(a)) = - sin(a) * da
 
-class Cosine(UnaryExpression):
+class Cosine(base.UnaryExpression):
     def __init__(
         self: Cosine,
         a: sm.Expression
