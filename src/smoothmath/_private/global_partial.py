@@ -1,8 +1,17 @@
 from __future__ import annotations
 import smoothmath as sm
+from smoothmath._private.reducers import reduce_synthetic
 
 
 class GlobalPartial:
+    @classmethod
+    def build(
+        cls,
+        original_expression: sm.Expression,
+        synthetic_partial: sm.Expression
+    ):
+        return cls(original_expression, reduce_synthetic(synthetic_partial))
+
     def __init__(
         self: GlobalPartial,
         original_expression: sm.Expression,

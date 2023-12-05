@@ -42,7 +42,7 @@ class Expression(ABC):
     ) -> sm.GlobalPartial:
         variable_name = get_variable_name(with_respect_to)
         synthetic_partial = self._synthetic_partial(variable_name)
-        return sm.GlobalPartial(self, synthetic_partial)
+        return sm.GlobalPartial.build(self, synthetic_partial)
 
     def local_differential(
         self: Expression,
@@ -181,6 +181,12 @@ class UnaryExpression(Expression):
         self._value = None
         self._a._reset_evaluation_cache()
 
+    def _rebuild(
+        self: UnaryExpression,
+        a: sm.Expression
+    ) -> UnaryExpression:
+        return self.__class__(a)
+
     def __eq__(
         self: UnaryExpression,
         other: Any
@@ -218,6 +224,13 @@ class BinaryExpression(Expression):
         self._value = None
         self._a._reset_evaluation_cache()
         self._b._reset_evaluation_cache()
+
+    def _rebuild(
+        self: BinaryExpression,
+        a: sm.Expression,
+        b: sm.Expression
+    ) -> BinaryExpression:
+        return self.__class__(a, b)
 
     def __eq__(
         self: BinaryExpression,

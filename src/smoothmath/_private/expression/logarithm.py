@@ -25,6 +25,12 @@ class Logarithm(UnaryExpression):
         self._base: sm.real_number
         self._base = base
 
+    def _rebuild(
+        self: Logarithm,
+        a: sm.Expression
+    ) -> Logarithm:
+        return Logarithm(a, self._base)
+
     def _verify_domain_constraints(
         self: Logarithm,
         a_value: sm.real_number

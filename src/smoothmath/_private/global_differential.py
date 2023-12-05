@@ -2,6 +2,7 @@ from __future__ import annotations
 import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.local_differential import LocalDifferentialBuilder
+from smoothmath._private.reducers import reduce_synthetic
 from smoothmath._private.utilities import get_variable_name
 
 
@@ -83,4 +84,14 @@ class GlobalDifferentialBuilder:
     def build(
         self: GlobalDifferentialBuilder
     ) -> GlobalDifferential:
-        return GlobalDifferential(self._original_expression, self._synthetic_partials)
+        reduced_synthetic_partials = _reduce_synthetic_partials(self._synthetic_partials)
+        return GlobalDifferential(self._original_expression, reduced_synthetic_partials)
+
+
+def _reduce_synthetic_partials(
+    synthetic_partials: dict[str, sm.Expression]
+) -> dict[str, sm.Expression]:
+    reduced_synthetic_partials = {}
+    for variable_name, synthetic_partial in synthetic_partials.items():
+        reduced_synthetic_partials[variable_name] = reduce_synthetic(synthetic_partial)
+    return reduced_synthetic_partials

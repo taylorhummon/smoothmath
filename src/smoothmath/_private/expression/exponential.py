@@ -23,6 +23,12 @@ class Exponential(UnaryExpression):
         self._base: sm.real_number
         self._base = base
 
+    def _rebuild(
+        self: Exponential,
+        a: sm.Expression
+    ) -> Exponential:
+        return Exponential(a, self._base)
+
     def _evaluate(
         self: Exponential,
         point: sm.Point
