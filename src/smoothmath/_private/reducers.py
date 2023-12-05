@@ -27,14 +27,14 @@ def _apply_reducers(
     for reducer in reducers:
         reduced_or_none = reducer(expression)
         if reduced_or_none is not None:
-            return _apply_reducers(reduced_or_none)
+            return reduced_or_none
     return expression
 
 
 ### Reducers ###
 
 
-def reduce_lacks_variables(
+def _reduce_expressions_that_lack_variables(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -51,7 +51,7 @@ def reduce_lacks_variables(
 
 
 # Negation(Negation(u)) => u
-def reduce_negation_of_negation_of_u(
+def _reduce_negation_of_negation_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -64,7 +64,7 @@ def reduce_negation_of_negation_of_u(
 
 
 # Reciprocal(Reciprocal(u)) => u
-def reduce_reciprocal_of_reciprocal_of_u(
+def _reduce_reciprocal_of_reciprocal_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -77,7 +77,7 @@ def reduce_reciprocal_of_reciprocal_of_u(
 
 
 # Multiply(Reciprocal(u), Reciprocal(v)) => Reciprocal(Multiply(u, v))
-def reduce_product_of_reciprocals(
+def _reduce_product_of_reciprocals(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -85,26 +85,33 @@ def reduce_product_of_reciprocals(
         isinstance(expression._a, ex.Reciprocal) and
         isinstance(expression._b, ex.Reciprocal)
     ):
-        return ex.Reciprocal(ex.Multiply(expression._a._a, expression._b._a))
+        inner = _apply_reducers(
+            ex.Multiply(expression._a._a, expression._b._a)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(inner)
+        )
     else:
         return None
 
 
 # Square(Negation(u)) => Square(u)
-def reduce_square_of_negation_of_u(
+def _reduce_square_of_negation_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Square) and
         isinstance(expression._a, ex.Negation)
     ):
-        return ex.Square(expression._a._a)
+        return _apply_reducers(
+            ex.Square(expression._a._a)
+        )
     else:
         return None
 
 
 # Multiply(Square(u), Square(v)) => Square(Multiply(u, v))
-def reduce_product_of_squares(
+def _reduce_product_of_squares(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -112,13 +119,18 @@ def reduce_product_of_squares(
         isinstance(expression._a, ex.Square) and
         isinstance(expression._b, ex.Square)
     ):
-        return ex.Square(ex.Multiply(expression._a._a, expression._b._a))
+        inner = _apply_reducers(
+            ex.Multiply(expression._a._a, expression._b._a)
+        )
+        return _apply_reducers(
+            ex.Square(inner)
+        )
     else:
         return None
 
 
 # Multiply(SquareRoot(u), SquareRoot(v)) => SquareRoot(Multiply(u, v))
-def reduce_product_of_square_roots(
+def _reduce_product_of_square_roots(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -126,13 +138,18 @@ def reduce_product_of_square_roots(
         isinstance(expression._a, ex.SquareRoot) and
         isinstance(expression._b, ex.SquareRoot)
     ):
-        return ex.SquareRoot(ex.Multiply(expression._a._a, expression._b._a))
+        inner = _apply_reducers(
+            ex.Multiply(expression._a._a, expression._b._a)
+        )
+        return _apply_reducers(
+            ex.SquareRoot(inner)
+        )
     else:
         return None
 
 
 # Square(SquareRoot(u)) => u
-def reduce_square_of_square_root_of_u(
+def _reduce_square_of_square_root_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -145,7 +162,7 @@ def reduce_square_of_square_root_of_u(
 
 
 # SquareRoot(Square(u)) => u
-def reduce_square_root_of_square_of_u(
+def _reduce_square_root_of_square_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -158,7 +175,7 @@ def reduce_square_root_of_square_of_u(
 
 
 # Multiply(Exponential(u), Exponential(v)) => Exponential(Plus(u, v))
-def reduce_product_of_exponentials(
+def _reduce_product_of_exponentials(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -167,13 +184,18 @@ def reduce_product_of_exponentials(
         isinstance(expression._b, ex.Exponential) and
         expression._a._base == expression._b._base
     ):
-        return ex.Exponential(ex.Plus(expression._a, expression._b))
+        inner = _apply_reducers(
+            ex.Plus(expression._a, expression._b)
+        )
+        return _apply_reducers(
+            ex.Exponential(inner)
+        )
     else:
         return None
 
 
 # Plus(Logarithm(u), Logarithm(v)) => Logarithm(Multiply(u, v))
-def reduce_sum_of_logarithms(
+def _reduce_sum_of_logarithms(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -182,13 +204,18 @@ def reduce_sum_of_logarithms(
         isinstance(expression._b, ex.Logarithm) and
         expression._a._base == expression._b._base
     ):
-        return ex.Logarithm(ex.Multiply(expression._a, expression._b))
+        inner = _apply_reducers(
+            ex.Multiply(expression._a, expression._b)
+        )
+        return _apply_reducers(
+            ex.Logarithm(inner)
+        )
     else:
         return None
 
 
 # Logarithm(Exponential(u)) => u
-def reduce_logarithm_of_exponential_of_u(
+def _reduce_logarithm_of_exponential_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -202,7 +229,7 @@ def reduce_logarithm_of_exponential_of_u(
 
 
 # Exponential(Logarithm(u)) => u
-def reduce_exponential_of_logarithm_of_u(
+def _reduce_exponential_of_logarithm_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -216,20 +243,25 @@ def reduce_exponential_of_logarithm_of_u(
 
 
 # Plus(Plus(u, v), w) => Plus(u, Plus(v, w))
-def reduce_by_associating_plus_right(
+def _reduce_by_associating_plus_right(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Plus) and
         isinstance(expression._a, ex.Plus)
     ):
-        return ex.Plus(expression._a._a, ex.Plus(expression._a._b, expression._b))
+        inner = _apply_reducers(
+            ex.Plus(expression._a._b, expression._b)
+        )
+        return _apply_reducers(
+            ex.Plus(expression._a._a, inner)
+        )
     else:
         return None
 
 
 # Plus(Constant(u), v) => Plus(v, Constant(u))
-def reduce_by_commuting_constants_right_for_plus(
+def _reduce_by_commuting_constants_right_for_plus(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -237,13 +269,15 @@ def reduce_by_commuting_constants_right_for_plus(
         isinstance(expression._a, ex.Constant) and
         not isinstance(expression._b, ex.Constant) # ensure we make progress
     ):
-        return ex.Plus(expression._b, expression._a)
+        return _apply_reducers(
+            ex.Plus(expression._b, expression._a)
+        )
     else:
         return None
 
 
 # Plus(u, Constant(0)) => u
-def reduce_u_plus_zero(
+def _reduce_u_plus_zero(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -257,7 +291,7 @@ def reduce_u_plus_zero(
 
 
 # Minus(u, Constant(0)) => u
-def reduce_u_minus_zero(
+def _reduce_u_minus_zero(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -271,7 +305,7 @@ def reduce_u_minus_zero(
 
 
 # Minus(Constant(0), u) => Negation(u)
-def reduce_zero_minus_u(
+def _reduce_zero_minus_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -279,39 +313,47 @@ def reduce_zero_minus_u(
         isinstance(expression._a, ex.Constant) and
         expression._a._value == 0
     ):
-        return ex.Negation(expression._b)
+        return _apply_reducers(
+            ex.Negation(expression._b)
+        )
     else:
         return None
 
 
 # Negation(Minus(u, v)) => Minus(v, u)
-def reduce_negation_of_u_minus_v(
+def _reduce_negation_of_u_minus_v(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Negation) and
         isinstance(expression._a, ex.Minus)
     ):
-        return ex.Minus(expression._a._b, expression._a._a)
+        return _apply_reducers(
+            ex.Minus(expression._a._b, expression._a._a)
+        )
     else:
         return None
 
 
 # Multiply(u, Multiply(v, w)) => Multiply(Multiply(u, v), w)
-def reduce_by_associating_multiply_left(
+def _reduce_by_associating_multiply_left(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Multiply) and
         isinstance(expression._b, ex.Multiply)
     ):
-        return ex.Multiply(ex.Multiply(expression._a, expression._b._a), expression._b._b)
+        inner = ex.Multiply(expression._a, expression._b._a)
+        reduced_inner = _apply_reducers(inner)
+        return _apply_reducers(
+            ex.Multiply(reduced_inner, expression._b._b)
+        )
     else:
         return None
 
 
 # Multiply(u, Constant(v)) => Multiply(Constant(v), u)
-def reduce_by_commuting_constants_left_for_multiply(
+def _reduce_by_commuting_constants_left_for_multiply(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -319,13 +361,15 @@ def reduce_by_commuting_constants_left_for_multiply(
         isinstance(expression._b, ex.Constant) and
         not isinstance(expression._a, ex.Constant) # ensure we make progress
     ):
-        return ex.Multiply(expression._b, expression._a)
+        return _apply_reducers(
+            ex.Multiply(expression._b, expression._a)
+        )
     else:
         return None
 
 
 # Multiply(Constant(1), u) => u
-def reduce_one_times_u(
+def _reduce_one_times_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -339,7 +383,7 @@ def reduce_one_times_u(
 
 
 # Multiply(Constant(0), u) => Constant(0)
-def reduce_zero_times_u(
+def _reduce_zero_times_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -353,7 +397,7 @@ def reduce_zero_times_u(
 
 
 # Multiply(Constant(-1), u) => Negation(u)
-def reduce_negative_one_times_u(
+def _reduce_negative_one_times_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -361,13 +405,15 @@ def reduce_negative_one_times_u(
         isinstance(expression._a, ex.Constant) and
         expression._a._value == -1
     ):
-        return ex.Negation(expression._b)
+        return _apply_reducers(
+            ex.Negation(expression._b)
+        )
     else:
         return None
 
 
 # Divide(u, Constant(1)) => u
-def reduce_u_over_one(
+def _reduce_u_over_one(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -381,7 +427,7 @@ def reduce_u_over_one(
 
 
 # Divide(Constant(1), u) => Reciprocal(u)
-def reduce_one_over_u(
+def _reduce_one_over_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -389,26 +435,30 @@ def reduce_one_over_u(
         isinstance(expression._a, ex.Constant) and
         expression._a._value == 1
     ):
-        return ex.Reciprocal(expression._b)
+        return _apply_reducers(
+            ex.Reciprocal(expression._b)
+        )
     else:
         return None
 
 
 # Reciprocal(Divide(u, v)) = Divide(v, u)
-def reduce_reciprocal_of_u_over_v(
+def _reduce_reciprocal_of_u_over_v(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Reciprocal) and
         isinstance(expression._a, ex.Divide)
     ):
-        return ex.Divide(expression._a._b, expression._a._a)
+        return _apply_reducers(
+            ex.Divide(expression._a._b, expression._a._a)
+        )
     else:
         return None
 
 
 # Power(Constant(1), u) => Constant(1)
-def reduce_one_to_the_u(
+def _reduce_one_to_the_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -422,7 +472,7 @@ def reduce_one_to_the_u(
 
 
 # Power(u, Constant(2)) => Square(u)
-def reduce_u_to_the_two(
+def _reduce_u_to_the_two(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -430,13 +480,15 @@ def reduce_u_to_the_two(
         isinstance(expression._b, ex.Constant) and
         expression._b._value == 2
     ):
-        return ex.Square(expression._a)
+        return _apply_reducers(
+            ex.Square(expression._a)
+        )
     else:
         return None
 
 
 # Power(u, Constant(1)) => u
-def reduce_u_to_the_one(
+def _reduce_u_to_the_one(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -450,7 +502,7 @@ def reduce_u_to_the_one(
 
 
 # Power(u, Constant(0)) => Constant(1)
-def reduce_u_to_the_zero(
+def _reduce_u_to_the_zero(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -464,7 +516,7 @@ def reduce_u_to_the_zero(
 
 
 # Power(u, Constant(-1)) => Reciprocal(u)
-def reduce_u_to_the_negative_one(
+def _reduce_u_to_the_negative_one(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -472,13 +524,15 @@ def reduce_u_to_the_negative_one(
         isinstance(expression._b, ex.Constant) and
         expression._b._value == -1
     ):
-        return ex.Reciprocal(expression._a)
+        return _apply_reducers(
+            ex.Reciprocal(expression._a)
+        )
     else:
         return None
 
 
 # Power(u, Constant(0.5)) => Reciprocal(u)
-def reduce_u_to_the_one_half(
+def _reduce_u_to_the_one_half(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -486,13 +540,15 @@ def reduce_u_to_the_one_half(
         isinstance(expression._b, ex.Constant) and
         expression._b._value == 0.5
     ):
-        return ex.SquareRoot(expression._a)
+        return _apply_reducers(
+            ex.SquareRoot(expression._a)
+        )
     else:
         return None
 
 
 # Power(Constant(C), u) => Exponential(u, base = C)
-def reduce_power_with_constant_base(
+def _reduce_power_with_constant_base(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
@@ -501,59 +557,66 @@ def reduce_power_with_constant_base(
         expression._a._value > 0 and
         expression._a._value != 1
     ):
-        return ex.Exponential(expression._b, base = expression._a._value)
+        return _apply_reducers(
+            ex.Exponential(expression._b, base = expression._a._value)
+        )
     else:
         return None
 
 
 # Power(Power(u, v), w) => Power(u, Multiply(v, w))
-def reduce_power_of_power(
+def _reduce_power_of_power(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Power) and
         isinstance(expression._a, ex.Power)
     ):
-        return ex.Power(expression._a._a, ex.Multiply(expression._a._b, expression._b))
+        inner = _apply_reducers(
+            ex.Multiply(expression._a._b, expression._b)
+        )
+        return _apply_reducers(
+            ex.Power(expression._a._a, inner)
+        )
     else:
         return None
 
 
 reducers: list[Callable[[sm.Expression], sm.Expression | None]]
 reducers = [
-    reduce_lacks_variables,
-    reduce_negation_of_negation_of_u,
-    reduce_reciprocal_of_reciprocal_of_u,
-    reduce_product_of_reciprocals,
-    reduce_square_of_negation_of_u,
-    reduce_product_of_squares,
-    reduce_product_of_square_roots,
-    reduce_square_of_square_root_of_u,
-    reduce_square_root_of_square_of_u,
-    reduce_product_of_exponentials,
-    reduce_sum_of_logarithms,
-    reduce_logarithm_of_exponential_of_u,
-    reduce_exponential_of_logarithm_of_u,
-    reduce_by_associating_plus_right,
-    reduce_by_commuting_constants_right_for_plus,
-    reduce_u_plus_zero,
-    reduce_u_minus_zero,
-    reduce_zero_minus_u,
-    reduce_negation_of_u_minus_v,
-    reduce_by_associating_multiply_left,
-    reduce_by_commuting_constants_left_for_multiply,
-    reduce_one_times_u,
-    reduce_zero_times_u,
-    reduce_negative_one_times_u,
-    reduce_u_over_one,
-    reduce_one_over_u,
-    reduce_reciprocal_of_u_over_v,
-    reduce_one_to_the_u,
-    reduce_u_to_the_two,
-    reduce_u_to_the_one,
-    reduce_u_to_the_zero,
-    reduce_u_to_the_negative_one,
-    reduce_u_to_the_one_half,
-    reduce_power_with_constant_base,
-    reduce_power_of_power
+    _reduce_expressions_that_lack_variables,
+    _reduce_negation_of_negation_of_u,
+    _reduce_reciprocal_of_reciprocal_of_u,
+    _reduce_product_of_reciprocals,
+    _reduce_square_of_negation_of_u,
+    _reduce_product_of_squares,
+    _reduce_product_of_square_roots,
+    _reduce_square_of_square_root_of_u,
+    _reduce_square_root_of_square_of_u,
+    _reduce_product_of_exponentials,
+    _reduce_sum_of_logarithms,
+    _reduce_logarithm_of_exponential_of_u,
+    _reduce_exponential_of_logarithm_of_u,
+    _reduce_by_associating_plus_right,
+    _reduce_by_commuting_constants_right_for_plus,
+    _reduce_u_plus_zero,
+    _reduce_u_minus_zero,
+    _reduce_zero_minus_u,
+    _reduce_negation_of_u_minus_v,
+    _reduce_by_associating_multiply_left,
+    _reduce_by_commuting_constants_left_for_multiply,
+    _reduce_one_times_u,
+    _reduce_zero_times_u,
+    _reduce_negative_one_times_u,
+    _reduce_u_over_one,
+    _reduce_one_over_u,
+    _reduce_reciprocal_of_u_over_v,
+    _reduce_one_to_the_u,
+    _reduce_u_to_the_two,
+    _reduce_u_to_the_one,
+    _reduce_u_to_the_zero,
+    _reduce_u_to_the_negative_one,
+    _reduce_u_to_the_one_half,
+    _reduce_power_with_constant_base,
+    _reduce_power_of_power
 ]
