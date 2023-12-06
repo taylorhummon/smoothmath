@@ -110,6 +110,24 @@ def _reduce_square_of_negation_of_u(
         return None
 
 
+# Square(Reciprocal(u)) => Reciprocal(Square(u))
+def _reduce_square_of_reciprocal_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Square) and
+        isinstance(expression._a, ex.Reciprocal)
+    ):
+        inner = _apply_reducers(
+            ex.Square(expression._a._a)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(inner)
+        )
+    else:
+        return None
+
+
 # Multiply(Square(u), Square(v)) => Square(Multiply(u, v))
 def _reduce_product_of_squares(
     expression: sm.Expression
@@ -124,25 +142,6 @@ def _reduce_product_of_squares(
         )
         return _apply_reducers(
             ex.Square(inner)
-        )
-    else:
-        return None
-
-
-# Multiply(SquareRoot(u), SquareRoot(v)) => SquareRoot(Multiply(u, v))
-def _reduce_product_of_square_roots(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Multiply) and
-        isinstance(expression._a, ex.SquareRoot) and
-        isinstance(expression._b, ex.SquareRoot)
-    ):
-        inner = _apply_reducers(
-            ex.Multiply(expression._a._a, expression._b._a)
-        )
-        return _apply_reducers(
-            ex.SquareRoot(inner)
         )
     else:
         return None
@@ -170,6 +169,43 @@ def _reduce_square_root_of_square_of_u(
         isinstance(expression._a, ex.Square)
     ):
         return expression._a._a
+    else:
+        return None
+
+
+# SquareRoot(Reciprocal(u)) => Reciprocal(SquareRoot(u))
+def _reduce_square_root_of_reciprocal_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.SquareRoot) and
+        isinstance(expression._a, ex.Reciprocal)
+    ):
+        inner = _apply_reducers(
+            ex.SquareRoot(expression._a._a)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(inner)
+        )
+    else:
+        return None
+
+
+# Multiply(SquareRoot(u), SquareRoot(v)) => SquareRoot(Multiply(u, v))
+def _reduce_product_of_square_roots(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Multiply) and
+        isinstance(expression._a, ex.SquareRoot) and
+        isinstance(expression._b, ex.SquareRoot)
+    ):
+        inner = _apply_reducers(
+            ex.Multiply(expression._a._a, expression._b._a)
+        )
+        return _apply_reducers(
+            ex.SquareRoot(inner)
+        )
     else:
         return None
 
@@ -589,10 +625,12 @@ reducers = [
     _reduce_reciprocal_of_reciprocal_of_u,
     _reduce_product_of_reciprocals,
     _reduce_square_of_negation_of_u,
+    _reduce_square_of_reciprocal_of_u,
     _reduce_product_of_squares,
-    _reduce_product_of_square_roots,
     _reduce_square_of_square_root_of_u,
     _reduce_square_root_of_square_of_u,
+    _reduce_square_root_of_reciprocal_of_u,
+    _reduce_product_of_square_roots,
     _reduce_product_of_exponentials,
     _reduce_sum_of_logarithms,
     _reduce_logarithm_of_exponential_of_u,

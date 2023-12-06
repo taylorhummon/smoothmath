@@ -20,10 +20,12 @@ from smoothmath._private.reducers import (
     _reduce_reciprocal_of_reciprocal_of_u,
     _reduce_product_of_reciprocals,
     _reduce_square_of_negation_of_u,
+    _reduce_square_of_reciprocal_of_u,
     _reduce_product_of_squares,
-    _reduce_product_of_square_roots,
     _reduce_square_of_square_root_of_u,
     _reduce_square_root_of_square_of_u,
+    _reduce_square_root_of_reciprocal_of_u,
+    _reduce_product_of_square_roots,
     _reduce_product_of_exponentials,
     _reduce_sum_of_logarithms,
     _reduce_logarithm_of_exponential_of_u,
@@ -56,13 +58,20 @@ from smoothmath._private.reducers import (
 def test_reduce_synthetic():
     x = Variable("x")
     y = Variable("y")
-    assert reduce_synthetic(Constant(0) + x) == x
-    assert reduce_synthetic(x * Constant(1)) == x
-    assert reduce_synthetic(x * Constant(0)) == Constant(0)
-    assert reduce_synthetic(x + Square(Plus(Constant(1), Constant(2)))) == x + Constant(9)
-    assert reduce_synthetic(Multiply(Reciprocal(Constant(1)), Reciprocal(x))) == Reciprocal(x)
-    assert reduce_synthetic(Multiply(Constant(1) + x + Constant(-1), Constant(2))) == Multiply(Constant(2), x)
-    assert reduce_synthetic(Multiply(Square(Reciprocal(x)), Square(Reciprocal(y)))) == Square(Reciprocal(Multiply(x, y)))
+    z = Constant(0) + x
+    assert reduce_synthetic(z) == x
+    z = x * Constant(1)
+    assert reduce_synthetic(z) == x
+    z = x * Constant(0)
+    assert reduce_synthetic(z) == Constant(0)
+    z = x + Square(Plus(Constant(1), Constant(2)))
+    assert reduce_synthetic(z) == x + Constant(9)
+    z = Reciprocal(Square(Reciprocal(x)))
+    assert reduce_synthetic(z) == Square(x)
+    z = Multiply(Square(Reciprocal(x)), Square(Reciprocal(y)))
+    assert reduce_synthetic(z) == Reciprocal(Square(Multiply(x, y)))
+    z = Multiply(Constant(1) + x + Constant(-1), Constant(2))
+    assert reduce_synthetic(z) == Multiply(Constant(2), x)
 
 
 def test_reduce_expressions_that_lack_variables():
@@ -97,18 +106,17 @@ def test_reduce_square_of_negation_of_u():
     assert _reduce_square_of_negation_of_u(z) == Square(u)
 
 
+def test_reduce_square_of_reciprocal_of_u():
+    u = Variable("u")
+    z = Square(Reciprocal(u))
+    assert _reduce_square_of_reciprocal_of_u(z) == Reciprocal(Square(u))
+
+
 def test_reduce_product_of_squares():
     u = Variable("u")
     v = Variable("v")
     z = Multiply(Square(u), Square(v))
     assert _reduce_product_of_squares(z) == Square(Multiply(u, v))
-
-
-def test_reduce_product_of_square_roots():
-    u = Variable("u")
-    v = Variable("v")
-    z = Multiply(SquareRoot(u), SquareRoot(v))
-    assert _reduce_product_of_square_roots(z) == SquareRoot(Multiply(u, v))
 
 
 def test_reduce_square_of_square_root_of_u():
@@ -121,6 +129,19 @@ def test_reduce_square_root_of_square_of_u():
     u = Variable("u")
     z = SquareRoot(Square(u))
     assert _reduce_square_root_of_square_of_u(z) == u
+
+
+def test_reduce_square_root_of_reciprocal_of_u():
+    u = Variable("u")
+    z = SquareRoot(Reciprocal(u))
+    assert _reduce_square_root_of_reciprocal_of_u(z) == Reciprocal(SquareRoot(u))
+
+
+def test_reduce_product_of_square_roots():
+    u = Variable("u")
+    v = Variable("v")
+    z = Multiply(SquareRoot(u), SquareRoot(v))
+    assert _reduce_product_of_square_roots(z) == SquareRoot(Multiply(u, v))
 
 
 def test_reduce_product_of_exponentials():
