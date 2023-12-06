@@ -4,6 +4,7 @@ import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
+from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -24,21 +25,6 @@ class Logarithm(base.UnaryExpression):
             raise Exception("Logarithms cannot have base = 1")
         self._base: sm.real_number
         self._base = base
-
-    def __eq__(
-        self: Logarithm,
-        other: Any
-    ) -> bool:
-        return (
-            (other.__class__ == self.__class__) and
-            (other._a == self._a) and
-            (other._base == self._base)
-        )
-
-    def __str__(
-        self: Logarithm
-    ) -> str:
-        return f"Logarithm({self._a}, base = {self._base})"
 
     def _rebuild(
         self: Logarithm,
@@ -116,3 +102,28 @@ class Logarithm(base.UnaryExpression):
                     self._a,
                 )
             )
+
+    def __eq__(
+        self: Logarithm,
+        other: Any
+    ) -> bool:
+        return (
+            (type(other) == type(self)) and
+            (other._a == self._a) and
+            (other._base == self._base)
+        )
+
+    def __hash__(
+        self: Logarithm
+    ) -> int:
+        return hash((get_class_name(self), hash(self._a), self._base))
+
+    def __str__(
+        self: Logarithm
+    ) -> str:
+        return f"{get_class_name(self)}({self._a}, base = {self._base})"
+
+    def __repr__(
+        self: Logarithm
+    ) -> str:
+        return f"{get_class_name(self)}({self._a}, base = {self._base})"

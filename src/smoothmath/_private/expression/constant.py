@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
+from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -18,24 +19,6 @@ class Constant(base.NullaryExpression):
         super().__init__(lacks_variables = True)
         self._value: sm.real_number
         self._value = value
-
-    def __eq__(
-        self: Constant,
-        other: Any
-    ) -> bool:
-        return isinstance(other, Constant) and (other._value == self._value)
-
-    def __hash__(
-        self: Constant
-    ) -> int:
-        if self._cached_hash is None:
-            self._cached_hash = hash(self._value)
-        return self._cached_hash
-
-    def __str__(
-        self: Constant
-    ) -> str:
-        return f"Constant({self._value})"
 
     def _evaluate(
         self: Constant,
@@ -70,3 +53,24 @@ class Constant(base.NullaryExpression):
         accumulated: sm.Expression
     ) -> None:
         pass
+
+    def __eq__(
+        self: Constant,
+        other: Any
+    ) -> bool:
+        return isinstance(other, Constant) and (other._value == self._value)
+
+    def __hash__(
+        self: Constant
+    ) -> int:
+        return hash((get_class_name(self), self._value))
+
+    def __str__(
+        self: Constant
+    ) -> str:
+        return f"{get_class_name(self)}({self._value})"
+
+    def __repr__(
+        self: Constant
+    ) -> str:
+        return f"{get_class_name(self)}({self._value})"

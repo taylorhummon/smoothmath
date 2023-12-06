@@ -1,25 +1,20 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, Exponential
+from smoothmath.expression import Constant, Variable, Reciprocal, Exponential, Multiply
 
 
-def test_equality():
-    c = Constant(7)
-    assert c == c
-    assert c == Constant(7)
-    assert c == Constant(7.0)
-    assert c != Constant(8)
+def test_unary_expression_equality():
     x = Variable("x")
-    assert x == x
-    assert x != Variable("y")
-    assert x == Variable("x")
-    assert x != c
-    z = x ** c
-    assert z == z
-    assert z == x ** c
-    assert z != c
-    assert z != x
-    assert z != x ** c + Constant(1)
+    y = Variable("y")
+    assert Reciprocal(x) == Reciprocal(x)
+    assert Reciprocal(x) != Reciprocal(y)
+
+
+def test_binary_expression_equality():
+    x = Variable("x")
+    y = Variable("y")
+    assert Multiply(x, y) == Multiply(x, y)
+    assert Multiply(x, y) != Multiply(y, x)
 
 
 def test_expression_reuse():

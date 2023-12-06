@@ -1,5 +1,5 @@
 from smoothmath import Point
-from smoothmath.expression import Variable
+from smoothmath.expression import Constant, Variable
 
 
 def test_variable():
@@ -18,3 +18,10 @@ def test_variable():
     global_differential = y.global_differential()
     assert global_differential.component_at(point, x) == 0
     assert global_differential.component_at(point, y) == 1
+
+
+def test_Variable_equality():
+    assert Variable("x") == Variable("x")
+    assert Variable("x") != Variable("y")
+    assert Variable("x") != Variable("X")
+    assert Variable("x") != Constant(3)

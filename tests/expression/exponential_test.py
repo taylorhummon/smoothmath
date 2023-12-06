@@ -80,3 +80,13 @@ def test_base_two_Exponential_composition():
     assert z.global_partial(x).at(point) == approx(2.77258872223)
     assert z.local_differential(point).component(x) == approx(2.77258872223)
     assert z.global_differential().component_at(point, x) == approx(2.77258872223)
+
+
+def test_Exponential_equality():
+    x = Variable("x")
+    y = Variable("y")
+    assert Exponential(x) == Exponential(x)
+    assert Exponential(x) != Exponential(y)
+    assert Exponential(x, base = math.e) == Exponential(x)
+    assert Exponential(x, base = 2) != Exponential(x)
+    assert Exponential(x, base = 2) == Exponential(x, base = 2)

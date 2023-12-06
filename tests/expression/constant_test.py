@@ -12,3 +12,10 @@ def test_Constant():
     assert c.global_partial(x).at(point) == 0
     assert c.local_differential(point).component(x) == 0
     assert c.global_differential().component_at(point, x) == 0
+
+
+def test_Constant_equality():
+    assert Constant(3) == Constant(3)
+    assert Constant(3) == Constant(3.0)
+    assert Constant(3) != Constant(4)
+    assert Constant(3) != Variable("x")

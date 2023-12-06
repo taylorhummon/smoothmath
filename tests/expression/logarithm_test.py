@@ -114,3 +114,13 @@ def test_base_two_Logarithm_composition():
     assert z.global_partial(x).at(point) == approx(0.3606737602222)
     assert z.local_differential(point).component(x) == approx(0.3606737602222)
     assert z.global_differential().component_at(point, x) == approx(0.3606737602222)
+
+
+def test_Logarithm_equality():
+    x = Variable("x")
+    y = Variable("y")
+    assert Logarithm(x) == Logarithm(x)
+    assert Logarithm(x) != Logarithm(y)
+    assert Logarithm(x, base = math.e) == Logarithm(x)
+    assert Logarithm(x, base = 2) != Logarithm(x)
+    assert Logarithm(x, base = 2) == Logarithm(x, base = 2)

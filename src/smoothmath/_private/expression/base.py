@@ -5,7 +5,7 @@ import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.local_differential import LocalDifferentialBuilder
 from smoothmath._private.global_differential import GlobalDifferentialBuilder
-from smoothmath._private.utilities import get_variable_name
+from smoothmath._private.utilities import get_class_name, get_variable_name
 
 
 class Expression(ABC):
@@ -175,21 +175,6 @@ class UnaryExpression(Expression):
         self._value: sm.real_number | None
         self._value = None
 
-    def __eq__(
-        self: UnaryExpression,
-        other: Any
-    ) -> bool:
-        return (
-            (other.__class__ == self.__class__) and
-            (other._a == self._a)
-        )
-
-    def __str__(
-        self: UnaryExpression
-    ) -> str:
-        class_name = type(self).__name__
-        return f"{class_name}({self._a})"
-
     def _reset_evaluation_cache(
         self: UnaryExpression
     ) -> None:
@@ -200,7 +185,31 @@ class UnaryExpression(Expression):
         self: UnaryExpression,
         a: sm.Expression
     ) -> UnaryExpression:
-        return self.__class__(a)
+        return type(self)(a)
+
+    def __eq__(
+        self: UnaryExpression,
+        other: Any
+    ) -> bool:
+        return (
+            (type(other) == type(self)) and
+            (other._a == self._a)
+        )
+
+    def __hash__(
+        self: UnaryExpression
+    ) -> int:
+        return hash((get_class_name(self), hash(self._a)))
+
+    def __str__(
+        self: UnaryExpression
+    ) -> str:
+        return f"{get_class_name(self)}({self._a})"
+
+    def __repr__(
+        self: UnaryExpression
+    ) -> str:
+        return f"{get_class_name(self)}({self._a})"
 
 
 class BinaryExpression(Expression):
@@ -221,22 +230,6 @@ class BinaryExpression(Expression):
         self._value: sm.real_number | None
         self._value = None
 
-    def __eq__(
-        self: BinaryExpression,
-        other: Any
-    ) -> bool:
-        return (
-            (other.__class__ == self.__class__) and
-            (other._a == self._a) and
-            (other._b == self._b)
-        )
-
-    def __str__(
-        self: BinaryExpression
-    ) -> str:
-        class_name = type(self).__name__
-        return f"{class_name}({self._a}, {self._b})"
-
     def _reset_evaluation_cache(
         self: BinaryExpression
     ) -> None:
@@ -249,4 +242,29 @@ class BinaryExpression(Expression):
         a: sm.Expression,
         b: sm.Expression
     ) -> BinaryExpression:
-        return self.__class__(a, b)
+        return type(self)(a, b)
+
+    def __eq__(
+        self: BinaryExpression,
+        other: Any
+    ) -> bool:
+        return (
+            (type(other) == type(self)) and
+            (other._a == self._a) and
+            (other._b == self._b)
+        )
+
+    def __hash__(
+        self: BinaryExpression
+    ) -> int:
+        return hash((get_class_name(self), hash(self._a), hash(self._b)))
+
+    def __str__(
+        self: BinaryExpression
+    ) -> str:
+        return f"{get_class_name(self)}({self._a}, {self._b})"
+
+    def __repr__(
+        self: BinaryExpression
+    ) -> str:
+        return f"{get_class_name(self)}({self._a}, {self._b})"

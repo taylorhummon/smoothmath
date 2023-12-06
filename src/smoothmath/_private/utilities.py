@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 import smoothmath as sm
 import smoothmath.expression as ex
 
@@ -11,6 +12,12 @@ def is_integer(
     value: sm.real_number
 ) -> bool:
     return isinstance(value, int) or value.is_integer()
+
+
+def get_class_name(
+    any: Any
+) -> str:
+    return type(any).__name__
 
 
 def get_variable_name(

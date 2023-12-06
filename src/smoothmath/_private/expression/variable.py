@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Any
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
+from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -20,24 +21,6 @@ class Variable(base.NullaryExpression):
         self.name = name
         self._cached_hash: int | None
         self._cached_hash = None
-
-    def __eq__(
-        self: Variable,
-        other: Any
-    ) -> bool:
-        return isinstance(other, Variable) and (other.name == self.name)
-
-    def __hash__(
-        self: Variable
-    ) -> int:
-        if self._cached_hash is None:
-            self._cached_hash = hash(self.name)
-        return self._cached_hash
-
-    def __str__(
-        self: Variable
-    ) -> str:
-        return f"Variable(\"{self.name}\")"
 
     def _evaluate(
         self: Variable,
@@ -78,3 +61,24 @@ class Variable(base.NullaryExpression):
         accumulated: sm.Expression
     ) -> None:
         builder.add_to(self, accumulated)
+
+    def __eq__(
+        self: Variable,
+        other: Any
+    ) -> bool:
+        return isinstance(other, Variable) and (other.name == self.name)
+
+    def __hash__(
+        self: Variable
+    ) -> int:
+        return hash((get_class_name(self), self.name))
+
+    def __str__(
+        self: Variable
+    ) -> str:
+        return f"{get_class_name(self)}(\"{self.name}\")"
+
+    def __repr__(
+        self: Variable
+    ) -> str:
+        return f"{get_class_name(self)}(\"{self.name}\")"
