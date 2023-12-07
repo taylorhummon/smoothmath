@@ -50,7 +50,6 @@ class Variable(base.NullaryExpression):
     def _compute_local_differential(
         self: Variable,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
         builder.add_to(self, accumulated)

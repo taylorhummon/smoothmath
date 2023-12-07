@@ -69,16 +69,15 @@ class Divide(base.BinaryExpression):
     def _compute_local_differential(
         self: Divide,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        a_value = self._a._evaluate(point)
-        b_value = self._b._evaluate(point)
+        a_value = self._a._evaluate(builder.point)
+        b_value = self._b._evaluate(builder.point)
         self._verify_domain_constraints(a_value, b_value)
         next_accumulated_a = accumulated / b_value
         next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
-        self._a._compute_local_differential(builder, point, next_accumulated_a)
-        self._b._compute_local_differential(builder, point, next_accumulated_b)
+        self._a._compute_local_differential(builder, next_accumulated_a)
+        self._b._compute_local_differential(builder, next_accumulated_b)
 
     def _compute_global_differential(
         self: Divide,

@@ -46,12 +46,11 @@ class Square(base.UnaryExpression):
     def _compute_local_differential(
         self: Square,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        a_value = self._a._evaluate(point)
+        a_value = self._a._evaluate(builder.point)
         next_accumulated = accumulated * 2 * a_value
-        self._a._compute_local_differential(builder, point, next_accumulated)
+        self._a._compute_local_differential(builder, next_accumulated)
 
     def _compute_global_differential(
         self: Square,

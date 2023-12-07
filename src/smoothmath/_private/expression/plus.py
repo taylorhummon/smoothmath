@@ -49,11 +49,10 @@ class Plus(base.BinaryExpression):
     def _compute_local_differential(
         self: Plus,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        self._a._compute_local_differential(builder, point, accumulated)
-        self._b._compute_local_differential(builder, point, accumulated)
+        self._a._compute_local_differential(builder, accumulated)
+        self._b._compute_local_differential(builder, accumulated)
 
     def _compute_global_differential(
         self: Plus,

@@ -42,7 +42,6 @@ class Constant(base.NullaryExpression):
     def _compute_local_differential(
         self: Constant,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
         pass

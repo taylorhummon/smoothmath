@@ -65,13 +65,12 @@ class Power(base.BinaryExpression):
     def _compute_local_differential(
         self: Power,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
         if _is_case_i(self._b):
-            self._compute_local_differential_case_i(builder, point, accumulated)
+            self._compute_local_differential_case_i(builder, accumulated)
         else:
-            self._compute_local_differential_case_ii(builder, point, accumulated)
+            self._compute_local_differential_case_ii(builder, accumulated)
 
     def _compute_global_differential(
         self: Power,
@@ -148,22 +147,21 @@ class Power(base.BinaryExpression):
     def _compute_local_differential_case_i(
         self: Power,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        a_value = self._a._evaluate(point)
-        b_value = self._b._evaluate(point) # b_value is an integer (this is case i)
+        a_value = self._a._evaluate(builder.point)
+        b_value = self._b._evaluate(builder.point) # b_value is an integer (this is case i)
         self._verify_domain_constraints_case_i(a_value, b_value)
         if b_value == 0:
             # d(a ** 0) = 0 * da
             return
         elif b_value == 1:
             # d(a ** 1) = da
-            self._a._compute_local_differential(builder, point, accumulated)
+            self._a._compute_local_differential(builder, accumulated)
         else: # b_value >= 2 or b_value <= -1
             # d(a ** C) = C * a ** (C - 1) * da
             next_accumulated = accumulated * b_value * (a_value ** (b_value - 1))
-            self._a._compute_local_differential(builder, point, next_accumulated)
+            self._a._compute_local_differential(builder, next_accumulated)
 
     def _compute_global_differential_case_i(
         self: Power,
@@ -245,21 +243,20 @@ class Power(base.BinaryExpression):
     def _compute_local_differential_case_ii(
         self: Power,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        if self._a._lacks_variables and self._a._evaluate(point) == 1:
+        if self._a._lacks_variables and self._a._evaluate(builder.point) == 1:
             # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
             pass
         else:
-            a_value = self._a._evaluate(point)
-            b_value = self._b._evaluate(point)
+            a_value = self._a._evaluate(builder.point)
+            b_value = self._b._evaluate(builder.point)
             self._verify_domain_constraints_case_ii(a_value, b_value)
             # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
             next_accumulated_a = accumulated * b_value * a_value ** (b_value - 1)
             next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
-            self._a._compute_local_differential(builder, point, next_accumulated_a)
-            self._b._compute_local_differential(builder, point, next_accumulated_b)
+            self._a._compute_local_differential(builder, next_accumulated_a)
+            self._b._compute_local_differential(builder, next_accumulated_b)
 
     def _compute_global_differential_case_ii(
         self: Power,

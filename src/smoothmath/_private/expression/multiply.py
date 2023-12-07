@@ -58,16 +58,15 @@ class Multiply(base.BinaryExpression):
     def _compute_local_differential(
         self: Multiply,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        pair_or_none = self._get_a_and_b_values_or_none(point)
+        pair_or_none = self._get_a_and_b_values_or_none(builder.point)
         if pair_or_none == None:
             return
         else: # pair_or_none is the pair (a_value, b_value)
             a_value, b_value = pair_or_none
-            self._a._compute_local_differential(builder, point, accumulated * b_value)
-            self._b._compute_local_differential(builder, point, accumulated * a_value)
+            self._a._compute_local_differential(builder, accumulated * b_value)
+            self._b._compute_local_differential(builder, accumulated * a_value)
 
     def _compute_global_differential(
         self: Multiply,

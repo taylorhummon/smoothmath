@@ -52,7 +52,7 @@ class Expression(ABC):
             raise Exception("Must provide a Point to local_differential()")
         self._reset_evaluation_cache()
         builder = LocalDifferentialBuilder(self, point)
-        self._compute_local_differential(builder, point, 1)
+        self._compute_local_differential(builder, 1)
         return builder.build()
 
     def global_differential(
@@ -97,7 +97,6 @@ class Expression(ABC):
     def _compute_local_differential(
         self: Expression,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None: # instead of returning a value, we mutate the local_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")

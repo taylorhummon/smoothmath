@@ -41,7 +41,7 @@ def test_GlobalDifferential():
     assert local_differential.component(x) == approx(125)
     assert local_differential.component(y) == approx(300)
     assert local_differential.original_expression == original_expression
-    desired = LocalDifferential(original_expression, {"w": 4, "x": 125, "y": 300})
+    desired = LocalDifferential(original_expression, point, {"w": 4, "x": 125, "y": 300})
     assert local_differential == desired
 
 

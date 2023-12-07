@@ -60,12 +60,11 @@ class Exponential(base.UnaryExpression):
     def _compute_local_differential(
         self: Exponential,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        self_value = self._evaluate(point)
+        self_value = self._evaluate(builder.point)
         next_accumulated = accumulated * math.log(self._base) * self_value
-        self._a._compute_local_differential(builder, point, next_accumulated)
+        self._a._compute_local_differential(builder, next_accumulated)
 
     def _compute_global_differential(
         self: Exponential,

@@ -45,10 +45,9 @@ class Negation(base.UnaryExpression):
     def _compute_local_differential(
         self: Negation,
         builder: LocalDifferentialBuilder,
-        point: sm.Point,
         accumulated: sm.real_number
     ) -> None:
-        self._a._compute_local_differential(builder, point, - accumulated)
+        self._a._compute_local_differential(builder, - accumulated)
 
     def _compute_global_differential(
         self: Negation,

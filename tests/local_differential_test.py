@@ -1,3 +1,4 @@
+from smoothmath import Point
 from smoothmath.expression import Constant, Variable
 from smoothmath._private.local_differential import LocalDifferentialBuilder
 
@@ -6,7 +7,7 @@ def test_LocalDifferential():
     w = Variable("w")
     x = Variable("x")
     y = Variable("y")
-    builder = LocalDifferentialBuilder(Constant(17))
+    builder = LocalDifferentialBuilder(Constant(17), Point({w: 7, x: 8, y: 9}))
     builder.add_to(x, 3)
     builder.add_to(y, 4)
     builder.add_to(y, 2)
