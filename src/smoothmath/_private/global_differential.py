@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.local_differential import LocalDifferentialBuilder
@@ -46,11 +47,19 @@ class GlobalDifferential:
 
     def __eq__(
         self: GlobalDifferential,
-        other: GlobalDifferential
+        other: Any
     ) -> bool:
-        # We'll assume correctness of the synthetic partials, so it suffices to compare
-        # the original expressions.
-        return self.original_expression == other.original_expression
+        return (
+            (type(other) == type(self)) and
+            (self.original_expression == other.original_expression) and
+            (self._synthetic_partials == other._synthetic_partials)
+        )
+
+    def __hash__(
+        self: GlobalDifferential
+    ) -> int:
+        data = tuple(sorted(self._synthetic_partials.items()))
+        return hash((self.original_expression, data))
 
     def __str__(
         self: GlobalDifferential

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Mapping
+from typing import Any, Mapping
 import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.utilities import get_variable_name
@@ -27,6 +27,21 @@ class Point:
         if value is None:
             raise Exception(f"No value provided for variable: {variable_name}")
         return value
+
+    def __eq__(
+        self: Point,
+        other: Any
+    ) -> bool:
+        return (
+            (type(other) == type(self)) and
+            (other._value_by_variable_name == self._value_by_variable_name)
+        )
+
+    def __hash__(
+        self: Point
+    ) -> int:
+        data = tuple(sorted(self._value_by_variable_name.items()))
+        return hash(data)
 
     def __str__(
         self: Point

@@ -102,7 +102,7 @@ class Exponential(base.UnaryExpression):
     def __hash__(
         self: Exponential
     ) -> int:
-        return hash((get_class_name(self), hash(self._a), self._base))
+        return hash((get_class_name(self), self._a, self._base))
 
     def __str__(
         self: Exponential

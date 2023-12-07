@@ -198,7 +198,7 @@ class UnaryExpression(Expression):
     def __hash__(
         self: UnaryExpression
     ) -> int:
-        return hash((get_class_name(self), hash(self._a)))
+        return hash((get_class_name(self), self._a))
 
     def __str__(
         self: UnaryExpression
@@ -256,7 +256,7 @@ class BinaryExpression(Expression):
     def __hash__(
         self: BinaryExpression
     ) -> int:
-        return hash((get_class_name(self), hash(self._a), hash(self._b)))
+        return hash((get_class_name(self), self._a, self._b))
 
     def __str__(
         self: BinaryExpression

@@ -57,7 +57,7 @@ class Constant(base.NullaryExpression):
         self: Constant,
         other: Any
     ) -> bool:
-        return isinstance(other, Constant) and (other._value == self._value)
+        return (type(other) == type(self)) and (other._value == self._value)
 
     def __hash__(
         self: Constant

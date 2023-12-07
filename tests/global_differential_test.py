@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import Point, DomainError, GlobalPartial, LocalDifferential
-from smoothmath.expression import Variable, Constant, Logarithm, Reciprocal
+from smoothmath.expression import Variable, Constant, Reciprocal, Square, Logarithm
 from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
@@ -11,7 +11,7 @@ def test_GlobalDifferential():
     original_expression = Constant(4) * w + x * y ** Constant(3)
     synthetic_w_partial = Constant(4)
     synthetic_x_partial = y ** Constant(3)
-    synthetic_y_partial = Constant(3) * x * y ** Constant(2)
+    synthetic_y_partial = Constant(3) * x * Square(y)
     builder = GlobalDifferentialBuilder(original_expression)
     builder.add_to(w, synthetic_w_partial)
     builder.add_to(x, synthetic_x_partial)
@@ -60,3 +60,36 @@ def test_GlobalDifferential_raises():
         global_x_partial.at(point)
     with raises(DomainError):
         global_differential.at(point)
+
+
+def test_LocalDifferential_equality():
+    x = Variable("x")
+    y = Variable("y")
+    builder_a = GlobalDifferentialBuilder(Constant(23))
+    builder_a.add_to(x, Constant(3))
+    builder_a.add_to(y, Constant(4))
+    global_differential_a = builder_a.build()
+    builder_b = GlobalDifferentialBuilder(Constant(23))
+    builder_b.add_to(y, Constant(4))
+    builder_b.add_to(x, Constant(3))
+    global_differential_b = builder_b.build()
+    assert global_differential_a == global_differential_b
+    builder_c = GlobalDifferentialBuilder(Constant(23))
+    builder_c.add_to(x, Constant(4))
+    builder_c.add_to(y, Constant(3))
+    global_differential_c = builder_c.build()
+    assert global_differential_a != global_differential_c
+
+
+def test_LocalDifferential_hashing():
+    x = Variable("x")
+    y = Variable("y")
+    builder_a = GlobalDifferentialBuilder(Constant(23))
+    builder_a.add_to(x, Constant(3))
+    builder_a.add_to(y, Constant(4))
+    global_differential_a = builder_a.build()
+    builder_b = GlobalDifferentialBuilder(Constant(23))
+    builder_b.add_to(y, Constant(4))
+    builder_b.add_to(x, Constant(3))
+    global_differential_b = builder_b.build()
+    assert hash(global_differential_a) == hash(global_differential_b)

@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 import smoothmath as sm
 from smoothmath._private.reducers import reduce_synthetic
 
@@ -34,11 +35,18 @@ class GlobalPartial:
 
     def __eq__(
         self: GlobalPartial,
-        other: GlobalPartial
+        other: Any
     ) -> bool:
-        # We'll assume correctness of the synthetic partial, so it suffices to compare
-        # the original expressions.
-        return self.original_expression == other.original_expression
+        return (
+            (type(other) == type(self)) and
+            (self.original_expression == other.original_expression) and
+            (self._synthetic_partial == other._synthetic_partial)
+        )
+
+    def __hash__(
+        self: GlobalPartial
+    ) -> int:
+        return hash((self.original_expression, self._synthetic_partial))
 
     def __str__(
         self: GlobalPartial

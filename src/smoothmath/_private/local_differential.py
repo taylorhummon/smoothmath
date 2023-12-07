@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.utilities import get_variable_name
@@ -27,11 +28,20 @@ class LocalDifferential:
 
     def __eq__(
         self: LocalDifferential,
-        other: LocalDifferential
+        other: Any
     ) -> bool:
-        # We'll assume correctness of the local partials, so it suffices to compare
-        # the original expressions.
-        return self.original_expression == other.original_expression
+        return (
+            (type(other) == type(self)) and
+            (self.original_expression == other.original_expression) and
+            (self.point == other.point) and
+            (self._local_partials == other._local_partials)
+        )
+
+    def __hash__(
+        self: LocalDifferential
+    ) -> int:
+        data = tuple(sorted(self._local_partials.items()))
+        return hash((self.original_expression, self.point, data))
 
     def __str__(
         self: LocalDifferential
@@ -41,12 +51,12 @@ class LocalDifferential:
     def __repr__(
         self: LocalDifferential
     ) -> str:
-        data = {
+        dictionary = {
             "original": self.original_expression,
             "point": self.point,
             "partials": self._partials_string()
         }
-        inner = "; ".join(f"{key}: {value}" for key, value in data.items())
+        inner = "; ".join(f"{key}: {value}" for key, value in dictionary.items())
         return f"({inner})"
 
     def _partials_string(

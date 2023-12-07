@@ -31,3 +31,19 @@ def test_Point_when_providing_the_same_variable_twice():
     y = Variable("y")
     with raises(Exception):
         Point({x: 3, y: 4, "x": 5})
+
+
+def test_Point_equality():
+    x = Variable("x")
+    y = Variable("y")
+    assert Point({x: 3, y: 4}) == Point({x: 3, y: 4})
+    assert Point({x: 3, y: 4}) == Point({y: 4, x: 3})
+    assert Point({x: 3, y: 4}) != Point({x: 4, y: 3})
+    assert Point({x: 3, y: 4}) != Point({x: 3})
+
+
+def test_Point_hashing():
+    x = Variable("x")
+    y = Variable("y")
+    assert hash(Point({x: 3, y: 4})) == hash(Point({x: 3, y: 4}))
+    assert hash(Point({x: 3, y: 4})) == hash(Point({y: 4, x: 3}))

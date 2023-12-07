@@ -65,7 +65,7 @@ class Variable(base.NullaryExpression):
         self: Variable,
         other: Any
     ) -> bool:
-        return isinstance(other, Variable) and (other.name == self.name)
+        return (type(other) == type(self)) and (other.name == self.name)
 
     def __hash__(
         self: Variable

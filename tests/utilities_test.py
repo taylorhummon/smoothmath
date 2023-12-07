@@ -1,4 +1,4 @@
-from smoothmath.expression import Variable, Constant
+from smoothmath.expression import Constant, Variable
 from smoothmath._private.utilities import is_integer, get_class_name, get_variable_name
 
 
