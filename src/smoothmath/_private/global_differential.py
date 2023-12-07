@@ -38,7 +38,7 @@ class GlobalDifferential:
         point: sm.Point
     ) -> sm.LocalDifferential:
         self.original_expression.evaluate(point)
-        builder = LocalDifferentialBuilder(self.original_expression)
+        builder = LocalDifferentialBuilder(self.original_expression, point)
         for variable_name, synthetic_partial in self._synthetic_partials.items():
             local_partial = synthetic_partial.evaluate(point)
             builder.add_to(variable_name, local_partial)
@@ -55,10 +55,20 @@ class GlobalDifferential:
     def __str__(
         self: GlobalDifferential
     ) -> str:
-        return " + ".join([
-            "(" + str(synthetic_partial) + ") d" + variable_name
+        return f"({self._partials_string()})"
+
+    def __repr__(
+        self: GlobalDifferential
+    ) -> str:
+        return f"(original: {self.original_expression}; partials: {self._partials_string()})"
+
+    def _partials_string(
+        self: GlobalDifferential
+    ) -> str:
+        return ", ".join(
+            f"{variable_name}-partial = {synthetic_partial}"
             for variable_name, synthetic_partial in self._synthetic_partials.items()
-        ])
+        )
 
 
 class GlobalDifferentialBuilder:
@@ -66,8 +76,8 @@ class GlobalDifferentialBuilder:
         self: GlobalDifferentialBuilder,
         original_expression: sm.Expression
     ) -> None:
-        self._original_expression: sm.Expression
-        self._original_expression = original_expression
+        self.original_expression: sm.Expression
+        self.original_expression = original_expression
         self._synthetic_partials: dict[str, sm.Expression]
         self._synthetic_partials = {}
 
@@ -85,7 +95,7 @@ class GlobalDifferentialBuilder:
         self: GlobalDifferentialBuilder
     ) -> GlobalDifferential:
         reduced_synthetic_partials = _reduce_synthetic_partials(self._synthetic_partials)
-        return GlobalDifferential(self._original_expression, reduced_synthetic_partials)
+        return GlobalDifferential(self.original_expression, reduced_synthetic_partials)
 
 
 def _reduce_synthetic_partials(

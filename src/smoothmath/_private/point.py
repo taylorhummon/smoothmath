@@ -31,8 +31,18 @@ class Point:
     def __str__(
         self: Point
     ) -> str:
+        return self._to_string()
+
+    def __repr__(
+        self: Point
+    ) -> str:
+        return self._to_string()
+
+    def _to_string(
+        self: Point
+    ) -> str:
         inner = ", ".join(
-            variable_name + " = " + str(value)
+            f"{variable_name} = {value}"
             for variable_name, value in self._value_by_variable_name.items()
         )
-        return "(" + inner + ")"
+        return f"({inner})"

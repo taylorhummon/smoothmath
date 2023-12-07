@@ -44,3 +44,8 @@ class GlobalPartial:
         self: GlobalPartial
     ) -> str:
         return str(self._synthetic_partial)
+
+    def __repr__(
+        self: GlobalPartial
+    ) -> str:
+        return f"(original: {self.original_expression}; partial: {self._synthetic_partial})"

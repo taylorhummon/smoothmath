@@ -51,7 +51,7 @@ class Expression(ABC):
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to local_differential()")
         self._reset_evaluation_cache()
-        builder = LocalDifferentialBuilder(self)
+        builder = LocalDifferentialBuilder(self, point)
         self._compute_local_differential(builder, point, 1)
         return builder.build()
 

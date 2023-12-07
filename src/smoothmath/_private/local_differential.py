@@ -8,10 +8,13 @@ class LocalDifferential:
     def __init__(
         self: LocalDifferential,
         original_expression: sm.Expression,
+        point: sm.Point,
         local_partials: dict[str, sm.real_number]
     ) -> None:
         self.original_expression: sm.Expression
         self.original_expression = original_expression
+        self.point: sm.Point
+        self.point = point
         self._local_partials: dict[str, sm.real_number]
         self._local_partials = local_partials.copy()
 
@@ -33,19 +36,38 @@ class LocalDifferential:
     def __str__(
         self: LocalDifferential
     ) -> str:
-        return " + ".join([
-            "(" + str(local_partial) + ") d" + variable_name
+        return f"({self._partials_string()})"
+
+    def __repr__(
+        self: LocalDifferential
+    ) -> str:
+        data = {
+            "original": self.original_expression,
+            "point": self.point,
+            "partials": self._partials_string()
+        }
+        inner = "; ".join(f"{key}: {value}" for key, value in data.items())
+        return f"({inner})"
+
+    def _partials_string(
+        self: LocalDifferential
+    ) -> str:
+        return ", ".join(
+            f"{variable_name}-partial = {local_partial}"
             for variable_name, local_partial in self._local_partials.items()
-        ])
+        )
 
 
 class LocalDifferentialBuilder:
     def __init__(
         self: LocalDifferentialBuilder,
-        original_expression: sm.Expression
+        original_expression: sm.Expression,
+        point: sm.Point
     ) -> None:
         self._original_expression: sm.Expression
         self._original_expression = original_expression
+        self.point: sm.Point
+        self.point = point
         self._local_partials: dict[str, sm.real_number]
         self._local_partials = {}
 
@@ -61,4 +83,4 @@ class LocalDifferentialBuilder:
     def build(
         self: LocalDifferentialBuilder
     ) -> LocalDifferential:
-        return LocalDifferential(self._original_expression, self._local_partials)
+        return LocalDifferential(self._original_expression, self.point, self._local_partials)
