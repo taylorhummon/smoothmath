@@ -56,8 +56,8 @@ class Point:
     def _to_string(
         self: Point
     ) -> str:
-        inner = ", ".join(
+        equations_string = ", ".join(
             f"{variable_name} = {value}"
             for variable_name, value in self._value_by_variable_name.items()
         )
-        return f"({inner})"
+        return f"({equations_string})"

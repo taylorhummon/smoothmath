@@ -176,27 +176,27 @@ class NullaryExpression(Expression):
 class UnaryExpression(Expression):
     def __init__(
         self: UnaryExpression,
-        expression: Expression
+        inner: Expression
     ) -> None:
-        if not isinstance(expression, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {expression}")
-        super().__init__(expression._lacks_variables)
-        self._a: Expression
-        self._a = expression
+        if not isinstance(inner, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {inner}")
+        super().__init__(inner._lacks_variables)
+        self._inner: Expression
+        self._inner = inner
         self._value: sm.real_number | None
         self._value = None
 
     def _rebuild(
         self: UnaryExpression,
-        expression: sm.Expression
+        inner: sm.Expression
     ) -> UnaryExpression:
-        return self.__class__(expression)
+        return self.__class__(inner)
 
     def _reset_evaluation_cache(
         self: UnaryExpression
     ) -> None:
         self._value = None
-        self._a._reset_evaluation_cache()
+        self._inner._reset_evaluation_cache()
 
     def __eq__(
         self: UnaryExpression,
@@ -204,42 +204,42 @@ class UnaryExpression(Expression):
     ) -> bool:
         return (
             (other.__class__ == self.__class__) and
-            (other._a == self._a)
+            (other._inner == self._inner)
         )
 
     def __hash__(
         self: UnaryExpression
     ) -> int:
-        return hash((get_class_name(self), self._a))
+        return hash((get_class_name(self), self._inner))
 
     def __str__(
         self: UnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._a})"
+        return f"{get_class_name(self)}({self._inner})"
 
     def __repr__(
         self: UnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._a})"
+        return f"{get_class_name(self)}({self._inner})"
 
 
 class ParameterizedUnaryExpression(Expression):
     def __init__(
         self: ParameterizedUnaryExpression,
-        expression: Expression
+        inner: Expression
     ) -> None:
-        if not isinstance(expression, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {expression}")
-        super().__init__(expression._lacks_variables)
-        self._a: Expression
-        self._a = expression
+        if not isinstance(inner, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {inner}")
+        super().__init__(inner._lacks_variables)
+        self._inner: Expression
+        self._inner = inner
         self._value: sm.real_number | None
         self._value = None
 
     @abstractmethod
     def _rebuild(
         self: ParameterizedUnaryExpression,
-        expression: Expression
+        inner: Expression
     ) -> ParameterizedUnaryExpression:
         raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _rebuild()")
 
@@ -253,7 +253,7 @@ class ParameterizedUnaryExpression(Expression):
         self: ParameterizedUnaryExpression
     ) -> None:
         self._value = None
-        self._a._reset_evaluation_cache()
+        self._inner._reset_evaluation_cache()
 
     def __eq__(
         self: ParameterizedUnaryExpression,
@@ -262,23 +262,23 @@ class ParameterizedUnaryExpression(Expression):
         return (
             (other.__class__ == self.__class__) and
             (other._parameter() == self._parameter()) and
-            (other._a == self._a)
+            (other._inner == self._inner)
         )
 
     def __hash__(
         self: ParameterizedUnaryExpression
     ) -> int:
-        return hash((get_class_name(self), self._parameter(), self._a))
+        return hash((get_class_name(self), self._parameter(), self._inner))
 
     def __str__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._parameter()}, {self._a})"
+        return f"{get_class_name(self)}({self._parameter()}, {self._inner})"
 
     def __repr__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._parameter()}, {self._a})"
+        return f"{get_class_name(self)}({self._parameter()}, {self._inner})"
 
 
 class BinaryExpression(Expression):

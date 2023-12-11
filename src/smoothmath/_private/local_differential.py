@@ -56,8 +56,8 @@ class LocalDifferential:
             "point": self.point,
             "partials": self._partials_string()
         }
-        inner = "; ".join(f"{key}: {value}" for key, value in dictionary.items())
-        return f"({inner})"
+        pairs_string = "; ".join(f"{key}: {value}" for key, value in dictionary.items())
+        return f"({pairs_string})"
 
     def _partials_string(
         self: LocalDifferential

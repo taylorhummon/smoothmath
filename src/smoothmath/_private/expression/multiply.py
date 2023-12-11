@@ -85,20 +85,20 @@ class Multiply(base.BinaryExpression):
             a_value = self._a._evaluate(point)
         except sm.DomainError as error:
             try:
-                b_value_inner = self._b._evaluate(point)
+                _b_value = self._b._evaluate(point)
             except sm.DomainError:
                 raise error
-            if b_value_inner == 0:
+            if _b_value == 0:
                 return None
             raise
         try:
             b_value = self._b._evaluate(point)
         except sm.DomainError as error:
             try:
-                a_value_inner = self._a._evaluate(point)
+                _a_value = self._a._evaluate(point)
             except sm.DomainError:
                 raise error
-            if a_value_inner == 0:
+            if _a_value == 0:
                 return None
             raise
         return (a_value, b_value)
