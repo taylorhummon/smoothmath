@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, SquareRoot, Power
+from smoothmath.expression import Constant, Variable, Power
 
 
 def test_Power():

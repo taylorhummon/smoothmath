@@ -1,7 +1,7 @@
 from pytest import approx, raises
 import math
 from smoothmath import Point, DomainError, GlobalPartial
-from smoothmath.expression import Variable, Constant, Reciprocal, Square, Logarithm
+from smoothmath.expression import Variable, Constant, Reciprocal, NthPower, Logarithm
 
 
 def test_GlobalPartial():
@@ -27,10 +27,14 @@ def test_GlobalPartial_raises():
 def test_GlobalPartial_equality():
     x = Variable("x")
     y = Variable("y")
-    assert GlobalPartial(Square(x), Constant(2) * x) == GlobalPartial(Square(x), Constant(2) * x)
-    assert GlobalPartial(Square(x), Constant(2) * x) != GlobalPartial(Square(y), Constant(2) * y)
+    global_partial = GlobalPartial(NthPower(2, x), Constant(2) * x)
+    assert global_partial == GlobalPartial(NthPower(2, x), Constant(2) * x)
+    assert global_partial != GlobalPartial(NthPower(2, y), Constant(2) * y)
 
 
 def test_GlobalPartial_hashing():
     x = Variable("x")
-    assert hash(GlobalPartial(Square(x), Constant(2) * x)) == hash(GlobalPartial(Square(x), Constant(2) * x))
+    global_partial_a = GlobalPartial(NthPower(2, x), Constant(2) * x)
+    global_partial_b = GlobalPartial(NthPower(2, x), Constant(2) * x)
+    assert global_partial_a == global_partial_b
+    assert hash(global_partial_a) == hash(global_partial_b)

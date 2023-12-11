@@ -4,8 +4,8 @@ from smoothmath.expression import (
     Variable,
     Negation,
     Reciprocal,
-    Square,
-    SquareRoot,
+    NthPower,
+    NthRoot,
     Exponential,
     Logarithm,
     Plus,
@@ -20,13 +20,14 @@ from smoothmath._private.reducers import (
     _reduce_negation_of_negation_of_u,
     _reduce_reciprocal_of_reciprocal_of_u,
     _reduce_product_of_reciprocals,
-    _reduce_square_of_negation_of_u,
-    _reduce_square_of_reciprocal_of_u,
-    _reduce_product_of_squares,
-    _reduce_square_of_square_root_of_u,
-    _reduce_square_root_of_square_of_u,
-    _reduce_square_root_of_reciprocal_of_u,
-    _reduce_product_of_square_roots,
+    _reduce_even_nth_power_of_negation_of_u,
+    _reduce_odd_nth_power_of_negation_of_u,
+    _reduce_nth_power_of_reciprocal_of_u,
+    _reduce_product_of_nth_powers,
+    _reduce_nth_power_of_nth_root_of_u,
+    _reduce_nth_root_of_nth_power_of_u,
+    _reduce_nth_root_of_reciprocal_of_u,
+    _reduce_product_of_nth_roots,
     _reduce_product_of_exponentials,
     _reduce_sum_of_logarithms,
     _reduce_logarithm_of_exponential_of_u,
@@ -46,7 +47,7 @@ from smoothmath._private.reducers import (
     _reduce_one_over_u,
     _reduce_reciprocal_of_u_over_v,
     _reduce_one_to_the_u,
-    _reduce_u_to_the_two,
+    _reduce_u_to_the_n_at_least_two,
     _reduce_u_to_the_one,
     _reduce_u_to_the_zero,
     _reduce_u_to_the_negative_one,
@@ -65,18 +66,18 @@ def test_reduce_synthetic():
     assert reduce_synthetic(z) == x
     z = x * Constant(0)
     assert reduce_synthetic(z) == Constant(0)
-    z = x + Square(Plus(Constant(1), Constant(2)))
+    z = x + NthPower(2, Plus(Constant(1), Constant(2)))
     assert reduce_synthetic(z) == x + Constant(9)
-    z = Reciprocal(Square(Reciprocal(x)))
-    assert reduce_synthetic(z) == Square(x)
-    z = Multiply(Square(Reciprocal(x)), Square(Reciprocal(y)))
-    assert reduce_synthetic(z) == Reciprocal(Square(Multiply(x, y)))
+    z = Reciprocal(NthPower(2, Reciprocal(x)))
+    assert reduce_synthetic(z) == NthPower(2, x)
+    z = Multiply(NthPower(2, Reciprocal(x)), NthPower(2, Reciprocal(y)))
+    assert reduce_synthetic(z) == Reciprocal(NthPower(2, Multiply(x, y)))
     z = Multiply(Constant(1) + x + Constant(-1), Constant(2))
     assert reduce_synthetic(z) == Multiply(Constant(2), x)
 
 
 def test_reduce_expressions_that_lack_variables():
-    z = Minus(Square(Plus(Constant(2), Constant(1))), Constant(1))
+    z = Minus(NthPower(2, Plus(Constant(2), Constant(1))), Constant(1))
     assert _reduce_expressions_that_lack_variables(z) == Constant(8)
     z = Logarithm(math.e, Constant(-1))
     assert _reduce_expressions_that_lack_variables(z) == None
@@ -101,48 +102,54 @@ def test_reduce_product_of_reciprocals():
     assert _reduce_product_of_reciprocals(z) == Reciprocal(Multiply(u, v))
 
 
-def test_reduce_square_of_negation_of_u():
+def test_reduce_even_nth_power_of_negation_of_u():
     u = Variable("u")
-    z = Square(Negation(u))
-    assert _reduce_square_of_negation_of_u(z) == Square(u)
+    z = NthPower(2, Negation(u))
+    assert _reduce_even_nth_power_of_negation_of_u(z) == NthPower(2, u)
 
 
-def test_reduce_square_of_reciprocal_of_u():
+def test_reduce_odd_nth_power_of_negation_of_u():
     u = Variable("u")
-    z = Square(Reciprocal(u))
-    assert _reduce_square_of_reciprocal_of_u(z) == Reciprocal(Square(u))
+    z = NthPower(3, Negation(u))
+    assert _reduce_odd_nth_power_of_negation_of_u(z) == Negation(NthPower(3, u))
 
 
-def test_reduce_product_of_squares():
+def test_reduce_nth_power_of_reciprocal_of_u():
     u = Variable("u")
-    v = Variable("v")
-    z = Multiply(Square(u), Square(v))
-    assert _reduce_product_of_squares(z) == Square(Multiply(u, v))
+    z = NthPower(2, Reciprocal(u))
+    assert _reduce_nth_power_of_reciprocal_of_u(z) == Reciprocal(NthPower(2, u))
 
 
-def test_reduce_square_of_square_root_of_u():
-    u = Variable("u")
-    z = Square(SquareRoot(u))
-    assert _reduce_square_of_square_root_of_u(z) == u
-
-
-def test_reduce_square_root_of_square_of_u():
-    u = Variable("u")
-    z = SquareRoot(Square(u))
-    assert _reduce_square_root_of_square_of_u(z) == u
-
-
-def test_reduce_square_root_of_reciprocal_of_u():
-    u = Variable("u")
-    z = SquareRoot(Reciprocal(u))
-    assert _reduce_square_root_of_reciprocal_of_u(z) == Reciprocal(SquareRoot(u))
-
-
-def test_reduce_product_of_square_roots():
+def test_reduce_product_of_nth_powers():
     u = Variable("u")
     v = Variable("v")
-    z = Multiply(SquareRoot(u), SquareRoot(v))
-    assert _reduce_product_of_square_roots(z) == SquareRoot(Multiply(u, v))
+    z = Multiply(NthPower(2, u), NthPower(2, v))
+    assert _reduce_product_of_nth_powers(z) == NthPower(2, Multiply(u, v))
+
+
+def test_reduce_nth_power_of_nth_root_of_u():
+    u = Variable("u")
+    z = NthPower(2, NthRoot(2, u))
+    assert _reduce_nth_power_of_nth_root_of_u(z) == u
+
+
+def test_reduce_nth_root_of_nth_power_of_u():
+    u = Variable("u")
+    z = NthRoot(2, NthPower(2, u))
+    assert _reduce_nth_root_of_nth_power_of_u(z) == u
+
+
+def test_reduce_nth_root_of_reciprocal_of_u():
+    u = Variable("u")
+    z = NthRoot(2, Reciprocal(u))
+    assert _reduce_nth_root_of_reciprocal_of_u(z) == Reciprocal(NthRoot(2, u))
+
+
+def test_reduce_product_of_nth_roots():
+    u = Variable("u")
+    v = Variable("v")
+    z = Multiply(NthRoot(2, u), NthRoot(2, v))
+    assert _reduce_product_of_nth_roots(z) == NthRoot(2, Multiply(u, v))
 
 
 def test_reduce_product_of_exponentials():
@@ -271,10 +278,12 @@ def test_reduce_one_to_the_u():
     assert _reduce_one_to_the_u(z) == Constant(1)
 
 
-def test_reduce_u_to_the_two():
+def test_reduce_u_to_the_n_at_least_two():
     u = Variable("u")
     z = Power(u, Constant(2))
-    assert _reduce_u_to_the_two(z) == Square(u)
+    assert _reduce_u_to_the_n_at_least_two(z) == NthPower(2, u)
+    z = Power(u, Constant(3))
+    assert _reduce_u_to_the_n_at_least_two(z) == NthPower(3, u)
 
 
 def test_reduce_u_to_the_one():
@@ -298,7 +307,7 @@ def test_reduce_u_to_the_negative_one():
 def test_reduce_u_to_the_one_half():
     u = Variable("u")
     z = Power(u, Constant(0.5))
-    assert _reduce_u_to_the_one_half(z) == SquareRoot(u)
+    assert _reduce_u_to_the_one_half(z) == NthRoot(2, u)
 
 
 def test_reduce_power_with_constant_base():

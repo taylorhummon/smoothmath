@@ -3,6 +3,7 @@ from typing import Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
+from smoothmath._private.utilities import integer_from_integral_real_number
 
 
 def reduce_synthetic(
@@ -13,12 +14,14 @@ def reduce_synthetic(
         reduced_b = reduce_synthetic(expression._b)
         rebuilt = expression._rebuild(reduced_a, reduced_b)
         return _apply_reducers(rebuilt)
-    elif isinstance(expression, base.UnaryExpression):
+    elif isinstance(expression, (base.UnaryExpression, base.ParameterizedUnaryExpression)):
         reduced_a = reduce_synthetic(expression._a)
         rebuilt = expression._rebuild(reduced_a)
         return _apply_reducers(rebuilt)
-    else: # expression is an instance of base.NullaryExpression
+    elif isinstance(expression, base.NullaryExpression):
         return expression
+    else:
+        raise Exception("internal error: unknown expression kind")
 
 
 def _apply_reducers(
@@ -95,31 +98,51 @@ def _reduce_product_of_reciprocals(
         return None
 
 
-# Square(Negation(u)) => Square(u)
-def _reduce_square_of_negation_of_u(
+# NthPower_n(Negation(u)) => NthPower_n(u) where n is even
+def _reduce_even_nth_power_of_negation_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.Square) and
-        isinstance(expression._a, ex.Negation)
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._a, ex.Negation) and
+        expression._n % 2 == 0
     ):
         return _apply_reducers(
-            ex.Square(expression._a._a)
+            ex.NthPower(expression._n, expression._a._a)
         )
     else:
         return None
 
 
-# Square(Reciprocal(u)) => Reciprocal(Square(u))
-def _reduce_square_of_reciprocal_of_u(
+# NthPower_n(Negation(u)) => Negation(NthPower_n(u)) where n is odd
+def _reduce_odd_nth_power_of_negation_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.Square) and
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._a, ex.Negation) and
+        expression._n % 2 == 1
+    ):
+        inner = _apply_reducers(
+            ex.NthPower(expression._n, expression._a._a)
+        )
+        return _apply_reducers(
+            ex.Negation(inner)
+        )
+    else:
+        return None
+
+
+# NthPower_n(Reciprocal(u)) => Reciprocal(NthPower_n(u))
+def _reduce_nth_power_of_reciprocal_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthPower) and
         isinstance(expression._a, ex.Reciprocal)
     ):
         inner = _apply_reducers(
-            ex.Square(expression._a._a)
+            ex.NthPower(expression._n, expression._a._a)
         )
         return _apply_reducers(
             ex.Reciprocal(inner)
@@ -128,61 +151,64 @@ def _reduce_square_of_reciprocal_of_u(
         return None
 
 
-# Multiply(Square(u), Square(v)) => Square(Multiply(u, v))
-def _reduce_product_of_squares(
+# Multiply(NthPower_n(u), NthPower_n(v)) => NthPower_n(Multiply(u, v))
+def _reduce_product_of_nth_powers(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Multiply) and
-        isinstance(expression._a, ex.Square) and
-        isinstance(expression._b, ex.Square)
+        isinstance(expression._a, ex.NthPower) and
+        isinstance(expression._b, ex.NthPower) and
+        expression._a._n == expression._b._n
     ):
         inner = _apply_reducers(
             ex.Multiply(expression._a._a, expression._b._a)
         )
         return _apply_reducers(
-            ex.Square(inner)
+            ex.NthPower(expression._a._n, inner)
         )
     else:
         return None
 
 
-# Square(SquareRoot(u)) => u
-def _reduce_square_of_square_root_of_u(
+# NthPower(NthRoot(u)) => u
+def _reduce_nth_power_of_nth_root_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.Square) and
-        isinstance(expression._a, ex.SquareRoot)
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._a, ex.NthRoot) and
+        expression._n == expression._a._n
     ):
         return expression._a._a
     else:
         return None
 
 
-# SquareRoot(Square(u)) => u
-def _reduce_square_root_of_square_of_u(
+# NthRoot_n(NthPower_n(u)) => u
+def _reduce_nth_root_of_nth_power_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.SquareRoot) and
-        isinstance(expression._a, ex.Square)
+        isinstance(expression, ex.NthRoot) and
+        isinstance(expression._a, ex.NthPower) and
+        expression._n == expression._a._n
     ):
         return expression._a._a
     else:
         return None
 
 
-# SquareRoot(Reciprocal(u)) => Reciprocal(SquareRoot(u))
-def _reduce_square_root_of_reciprocal_of_u(
+# NthRoot_n(Reciprocal(u)) => Reciprocal(NthRoot_n(u))
+def _reduce_nth_root_of_reciprocal_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.SquareRoot) and
+        isinstance(expression, ex.NthRoot) and
         isinstance(expression._a, ex.Reciprocal)
     ):
         inner = _apply_reducers(
-            ex.SquareRoot(expression._a._a)
+            ex.NthRoot(expression._n, expression._a._a)
         )
         return _apply_reducers(
             ex.Reciprocal(inner)
@@ -191,20 +217,21 @@ def _reduce_square_root_of_reciprocal_of_u(
         return None
 
 
-# Multiply(SquareRoot(u), SquareRoot(v)) => SquareRoot(Multiply(u, v))
-def _reduce_product_of_square_roots(
+# Multiply(NthRoot_n(u), NthRoot_n(v)) => NthRoot_n(Multiply(u, v))
+def _reduce_product_of_nth_roots(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Multiply) and
-        isinstance(expression._a, ex.SquareRoot) and
-        isinstance(expression._b, ex.SquareRoot)
+        isinstance(expression._a, ex.NthRoot) and
+        isinstance(expression._b, ex.NthRoot) and
+        expression._a._n == expression._b._n
     ):
         inner = _apply_reducers(
             ex.Multiply(expression._a._a, expression._b._a)
         )
         return _apply_reducers(
-            ex.SquareRoot(inner)
+            ex.NthRoot(expression._a._n, inner)
         )
     else:
         return None
@@ -507,20 +534,20 @@ def _reduce_one_to_the_u(
         return None
 
 
-# Power(u, Constant(2)) => Square(u)
-def _reduce_u_to_the_two(
+# Power(u, Constant(n)) => NthPower(n, u) when n >= 2
+def _reduce_u_to_the_n_at_least_two(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Power) and
-        isinstance(expression._b, ex.Constant) and
-        expression._b._value == 2
+        isinstance(expression._b, ex.Constant)
     ):
-        return _apply_reducers(
-            ex.Square(expression._a)
-        )
-    else:
-        return None
+        n = integer_from_integral_real_number(expression._b._value)
+        if n is not None and n >= 2:
+            return _apply_reducers(
+                ex.NthPower(n, expression._a)
+            )
+    return None
 
 
 # Power(u, Constant(1)) => u
@@ -577,7 +604,7 @@ def _reduce_u_to_the_one_half(
         expression._b._value == 0.5
     ):
         return _apply_reducers(
-            ex.SquareRoot(expression._a)
+            ex.NthRoot(2, expression._a)
         )
     else:
         return None
@@ -624,13 +651,14 @@ reducers = [
     _reduce_negation_of_negation_of_u,
     _reduce_reciprocal_of_reciprocal_of_u,
     _reduce_product_of_reciprocals,
-    _reduce_square_of_negation_of_u,
-    _reduce_square_of_reciprocal_of_u,
-    _reduce_product_of_squares,
-    _reduce_square_of_square_root_of_u,
-    _reduce_square_root_of_square_of_u,
-    _reduce_square_root_of_reciprocal_of_u,
-    _reduce_product_of_square_roots,
+    _reduce_even_nth_power_of_negation_of_u,
+    _reduce_odd_nth_power_of_negation_of_u,
+    _reduce_nth_power_of_reciprocal_of_u,
+    _reduce_product_of_nth_powers,
+    _reduce_nth_power_of_nth_root_of_u,
+    _reduce_nth_root_of_nth_power_of_u,
+    _reduce_nth_root_of_reciprocal_of_u,
+    _reduce_product_of_nth_roots,
     _reduce_product_of_exponentials,
     _reduce_sum_of_logarithms,
     _reduce_logarithm_of_exponential_of_u,
@@ -650,7 +678,7 @@ reducers = [
     _reduce_one_over_u,
     _reduce_reciprocal_of_u_over_v,
     _reduce_one_to_the_u,
-    _reduce_u_to_the_two,
+    _reduce_u_to_the_n_at_least_two,
     _reduce_u_to_the_one,
     _reduce_u_to_the_zero,
     _reduce_u_to_the_negative_one,

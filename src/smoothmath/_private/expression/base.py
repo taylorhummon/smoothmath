@@ -237,10 +237,17 @@ class ParameterizedUnaryExpression(Expression):
         self._value = None
 
     @abstractmethod
+    def _rebuild(
+        self: ParameterizedUnaryExpression,
+        expression: Expression
+    ) -> ParameterizedUnaryExpression:
+        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _rebuild()")
+
+    @abstractmethod
     def _parameter(
         self: ParameterizedUnaryExpression
     ) -> Any:
-        Exception("Concrete classes derived from Expression must implement _parameter()")
+        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _parameter()")
 
     def _reset_evaluation_cache(
         self: ParameterizedUnaryExpression

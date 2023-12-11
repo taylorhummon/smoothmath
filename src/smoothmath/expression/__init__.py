@@ -4,8 +4,6 @@ from smoothmath._private.expression.variable import Variable
 # Unary
 from smoothmath._private.expression.negation import Negation
 from smoothmath._private.expression.reciprocal import Reciprocal
-from smoothmath._private.expression.square import Square
-from smoothmath._private.expression.square_root import SquareRoot
 from smoothmath._private.expression.nth_power import NthPower
 from smoothmath._private.expression.nth_root import NthRoot
 from smoothmath._private.expression.exponential import Exponential
@@ -25,8 +23,6 @@ __all__ = [
     "Variable",
     "Negation",
     "Reciprocal",
-    "Square",
-    "SquareRoot",
     "NthPower",
     "NthRoot",
     "Exponential",

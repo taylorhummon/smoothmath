@@ -1,7 +1,7 @@
 from pytest import approx, raises
 import math
 from smoothmath import Point, DomainError, GlobalPartial, LocalDifferential
-from smoothmath.expression import Variable, Constant, Reciprocal, Square, Logarithm
+from smoothmath.expression import Variable, Constant, Reciprocal, NthPower, Logarithm
 from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
@@ -12,7 +12,7 @@ def test_GlobalDifferential():
     original_expression = Constant(4) * w + x * y ** 3
     synthetic_w_partial = Constant(4)
     synthetic_x_partial = y ** 3
-    synthetic_y_partial = Constant(3) * x * Square(y)
+    synthetic_y_partial = Constant(3) * x * NthPower(2, y)
     builder = GlobalDifferentialBuilder(original_expression)
     builder.add_to(w, synthetic_w_partial)
     builder.add_to(x, synthetic_x_partial)

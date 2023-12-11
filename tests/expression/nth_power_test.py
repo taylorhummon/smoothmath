@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, NthPower, SquareRoot
+from smoothmath.expression import Constant, Variable, NthPower, NthRoot
 
 
 def test_NthPower_with_n_equal_two():
@@ -127,7 +127,7 @@ def test_NthPower_with_n_equal_zero_composition():
 
 def test_NthPower_with_n_equal_zero_doesnt_short_circuit():
     x = Variable("x")
-    z = NthPower(0, SquareRoot(x))
+    z = NthPower(0, NthRoot(2, x))
     point = Point({x: -1})
     with raises(DomainError):
         z.evaluate(point)
