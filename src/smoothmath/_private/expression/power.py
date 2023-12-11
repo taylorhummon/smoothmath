@@ -9,29 +9,28 @@ if TYPE_CHECKING:
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
-# differential rule: d(a ** b) = b * a ** (b - 1) * da + log_e(a) * a ** b * db
-
 class Power(base.BinaryExpression):
     def __init__(
         self: Power,
-        expression_a: sm.Expression,
-        expression_b: sm.Expression
+        left: sm.Expression,
+        right: sm.Expression
     ) -> None:
-        super().__init__(expression_a, expression_b)
+        super().__init__(left, right)
 
     def _verify_domain_constraints(
         self: Power,
-        a_value: sm.real_number,
-        b_value: sm.real_number
+        point: sm.Point
     ) -> None:
-        if a_value == 0:
-            if b_value > 0:
+        left_value = self._left._evaluate(point)
+        right_value = self._right._evaluate(point)
+        if left_value == 0:
+            if right_value > 0:
                 raise sm.DomainError("Power(x, y) is not smooth around x = 0 for y > 0")
-            elif b_value == 0:
+            elif right_value == 0:
                 raise sm.DomainError("Power(x, y) is not smooth around (x = 0, y = 0)")
-            else: # b_value < 0
+            else: # right_value < 0
                 raise sm.DomainError("Power(x, y) blows up around x = 0 for y < 0")
-        elif a_value < 0:
+        elif left_value < 0:
             raise sm.DomainError("Power(x, y) is undefined for x < 0")
 
     def _evaluate(
@@ -40,14 +39,14 @@ class Power(base.BinaryExpression):
     ) -> sm.real_number:
         if self._value is not None:
             return self._value
-        if self._a._lacks_variables and self._a._evaluate(point) == 1:
-            # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
+        if self._left._lacks_variables and self._left._evaluate(point) == 1:
+            # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             self._value = 1
         else:
-            a_value = self._a._evaluate(point)
-            b_value = self._b._evaluate(point)
-            self._verify_domain_constraints(a_value, b_value)
-            self._value = a_value ** b_value
+            self._verify_domain_constraints(point)
+            left_value = self._left._evaluate(point)
+            right_value = self._right._evaluate(point)
+            self._value = left_value ** right_value
         return self._value
 
     def _local_partial(
@@ -55,69 +54,83 @@ class Power(base.BinaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        if self._a._lacks_variables and self._a._evaluate(point) == 1:
-            # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
+        if self._left._lacks_variables and self._left._evaluate(point) == 1:
+            # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             return 0
         else:
-            a_value = self._a._evaluate(point)
-            b_value = self._b._evaluate(point)
-            self._verify_domain_constraints(a_value, b_value)
-            a_partial = self._a._local_partial(point, with_respect_to)
-            b_partial = self._b._local_partial(point, with_respect_to)
-            # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
+            self._verify_domain_constraints(point)
+            left_partial = self._left._local_partial(point, with_respect_to)
+            right_partial = self._right._local_partial(point, with_respect_to)
             return (
-                b_value * (a_value ** (b_value - 1)) * a_partial +
-                math.log(a_value) * (a_value ** b_value) * b_partial
+                self._local_partial_formula_left(point, left_partial) +
+                self._local_partial_formula_right(point, right_partial)
             )
 
     def _synthetic_partial(
         self: Power,
         with_respect_to: str
     ) -> sm.Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
-        return ex.Plus(self._term_1(a_partial), self._term_2(b_partial))
+        left_partial = self._left._synthetic_partial(with_respect_to)
+        right_partial = self._right._synthetic_partial(with_respect_to)
+        return ex.Plus(
+            self._synthetic_partial_formula_left(left_partial),
+            self._synthetic_partial_formula_right(right_partial)
+        )
 
     def _compute_local_differential(
         self: Power,
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        if self._a._lacks_variables and self._a._evaluate(builder.point) == 1:
-            # If we find something like, Constant(1) ** Variable("b"), we can short-circuit.
+        if self._left._lacks_variables and self._left._evaluate(builder.point) == 1:
+            # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             pass
         else:
-            a_value = self._a._evaluate(builder.point)
-            b_value = self._b._evaluate(builder.point)
-            self._verify_domain_constraints(a_value, b_value)
-            # d(a ** b) = b * a ** (b - 1) * da + ln(a) * a ** b * db
-            next_accumulated_a = accumulated * b_value * a_value ** (b_value - 1)
-            next_accumulated_b = accumulated * math.log(a_value) * a_value ** b_value
-            self._a._compute_local_differential(builder, next_accumulated_a)
-            self._b._compute_local_differential(builder, next_accumulated_b)
+            self._verify_domain_constraints(builder.point)
+            next_accumulated_left = self._local_partial_formula_left(builder.point, accumulated)
+            next_accumulated_right = self._local_partial_formula_right(builder.point, accumulated)
+            self._left._compute_local_differential(builder, next_accumulated_left)
+            self._right._compute_local_differential(builder, next_accumulated_right)
 
     def _compute_global_differential(
         self: Power,
         builder: GlobalDifferentialBuilder,
         accumulated: sm.Expression
     ) -> None:
-        self._a._compute_global_differential(builder, self._term_1(accumulated))
-        self._b._compute_global_differential(builder, self._term_2(accumulated))
+        next_accumulated_left = self._synthetic_partial_formula_left(accumulated)
+        next_accumulated_right = self._synthetic_partial_formula_right(accumulated)
+        self._left._compute_global_differential(builder, next_accumulated_left)
+        self._right._compute_global_differential(builder, next_accumulated_right)
 
-    def _term_1(
+    def _local_partial_formula_left(
+        self: Power,
+        point: sm.Point,
+        multiplier: sm.real_number
+    ) -> sm.real_number:
+        left_value = self._left._evaluate(point)
+        right_value = self._right._evaluate(point)
+        return right_value * (left_value ** (right_value - 1)) * multiplier
+
+    def _local_partial_formula_right(
+        self: Power,
+        point: sm.Point,
+        multiplier: sm.real_number
+    ) -> sm.real_number:
+        left_value = self._left._evaluate(point)
+        self_value = self._evaluate(point)
+        return math.log(left_value) * self_value * multiplier
+
+    def _synthetic_partial_formula_left(
         self: Power,
         multiplier: sm.Expression
     ) -> sm.Expression:
         return ex.Multiply(
-            ex.Multiply(self._b, ex.Power(self._a, ex.Minus(self._b, ex.Constant(1)))),
+            ex.Multiply(self._right, ex.Power(self._left, ex.Minus(self._right, ex.Constant(1)))),
             multiplier
         )
 
-    def _term_2(
+    def _synthetic_partial_formula_right(
         self: Power,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        return ex.Multiply(
-            ex.Multiply(ex.Logarithm(math.e, self._a), ex.Power(self._a, self._b)),
-            multiplier
-        )
+        return ex.Multiply(ex.Multiply(ex.Logarithm(math.e, self._left), self), multiplier)

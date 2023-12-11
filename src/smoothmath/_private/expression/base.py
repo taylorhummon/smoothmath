@@ -283,34 +283,34 @@ class ParameterizedUnaryExpression(Expression):
 class BinaryExpression(Expression):
     def __init__(
         self: BinaryExpression,
-        expression_a: Expression,
-        expression_b: Expression
+        left: Expression,
+        right: Expression
     ) -> None:
-        if not isinstance(expression_a, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {expression_a}")
-        if not isinstance(expression_b, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {expression_b}")
-        super().__init__(expression_a._lacks_variables and expression_b._lacks_variables)
-        self._a: Expression
-        self._a = expression_a
-        self._b: Expression
-        self._b = expression_b
+        if not isinstance(left, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {left}")
+        if not isinstance(right, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {right}")
+        super().__init__(left._lacks_variables and right._lacks_variables)
+        self._left: Expression
+        self._left = left
+        self._right: Expression
+        self._right = right
         self._value: sm.real_number | None
         self._value = None
 
     def _rebuild(
         self: BinaryExpression,
-        expression_a: sm.Expression,
-        expression_b: sm.Expression
+        left: sm.Expression,
+        right: sm.Expression
     ) -> BinaryExpression:
-        return self.__class__(expression_a, expression_b)
+        return self.__class__(left, right)
 
     def _reset_evaluation_cache(
         self: BinaryExpression
     ) -> None:
         self._value = None
-        self._a._reset_evaluation_cache()
-        self._b._reset_evaluation_cache()
+        self._left._reset_evaluation_cache()
+        self._right._reset_evaluation_cache()
 
     def __eq__(
         self: BinaryExpression,
@@ -318,21 +318,21 @@ class BinaryExpression(Expression):
     ) -> bool:
         return (
             (other.__class__ == self.__class__) and
-            (other._a == self._a) and
-            (other._b == self._b)
+            (other._left == self._left) and
+            (other._right == self._right)
         )
 
     def __hash__(
         self: BinaryExpression
     ) -> int:
-        return hash((get_class_name(self), self._a, self._b))
+        return hash((get_class_name(self), self._left, self._right))
 
     def __str__(
         self: BinaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._a}, {self._b})"
+        return f"{get_class_name(self)}({self._left}, {self._right})"
 
     def __repr__(
         self: BinaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._a}, {self._b})"
+        return f"{get_class_name(self)}({self._left}, {self._right})"

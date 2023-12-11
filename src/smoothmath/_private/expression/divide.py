@@ -3,30 +3,30 @@ from typing import TYPE_CHECKING
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
+from smoothmath._private.expression.nth_power import nth_power
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
-# differential rule: d(a / b) = (1 / b) * da - (a / b ** 2) * db
-
 class Divide(base.BinaryExpression):
     def __init__(
         self: Divide,
-        expression_a: sm.Expression,
-        expression_b: sm.Expression
+        left: sm.Expression,
+        right: sm.Expression
     ) -> None:
-        super().__init__(expression_a, expression_b)
+        super().__init__(left, right)
 
     def _verify_domain_constraints(
         self: Divide,
-        a_value: sm.real_number,
-        b_value: sm.real_number
+        point: sm.Point
     ) -> None:
-        if b_value == 0:
-            if a_value == 0:
+        left_value = self._left._evaluate(point)
+        right_value = self._right._evaluate(point)
+        if right_value == 0:
+            if left_value == 0:
                 raise sm.DomainError("Divide(x, y) is not smooth around (x = 0, y = 0)")
-            else: # a_value != 0
+            else: # left_value != 0
                 raise sm.DomainError("Divide(x, y) blows up around x != 0 and y = 0")
 
     def _evaluate(
@@ -35,10 +35,10 @@ class Divide(base.BinaryExpression):
     ) -> sm.real_number:
         if self._value is not None:
             return self._value
-        a_value = self._a._evaluate(point)
-        b_value = self._b._evaluate(point)
-        self._verify_domain_constraints(a_value, b_value)
-        self._value = a_value / b_value
+        self._verify_domain_constraints(point)
+        left_value = self._left._evaluate(point)
+        right_value = self._right._evaluate(point)
+        self._value = left_value / right_value
         return self._value
 
     def _local_partial(
@@ -46,48 +46,74 @@ class Divide(base.BinaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        a_value = self._a._evaluate(point)
-        b_value = self._b._evaluate(point)
-        self._verify_domain_constraints(a_value, b_value)
-        a_partial = self._a._local_partial(point, with_respect_to)
-        b_partial = self._b._local_partial(point, with_respect_to)
-        return (b_value * a_partial - a_value * b_partial) / b_value ** 2
+        self._verify_domain_constraints(point)
+        left_partial = self._left._local_partial(point, with_respect_to)
+        right_partial = self._right._local_partial(point, with_respect_to)
+        return (
+            self._local_partial_formula_left(point, left_partial) +
+            self._local_partial_formula_right(point, right_partial)
+        )
 
     def _synthetic_partial(
         self: Divide,
         with_respect_to: str
     ) -> sm.Expression:
-        a_partial = self._a._synthetic_partial(with_respect_to)
-        b_partial = self._b._synthetic_partial(with_respect_to)
-        numerator = ex.Minus(
-            ex.Multiply(self._b, a_partial),
-            ex.Multiply(self._a, b_partial)
+        left_partial = self._left._synthetic_partial(with_respect_to)
+        right_partial = self._right._synthetic_partial(with_respect_to)
+        return ex.Plus(
+            self._synthetic_partial_formula_left(left_partial),
+            self._synthetic_partial_formula_right(right_partial)
         )
-        denominator = ex.Power(self._b, ex.Constant(2))
-        return ex.Divide(numerator, denominator)
 
     def _compute_local_differential(
         self: Divide,
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        a_value = self._a._evaluate(builder.point)
-        b_value = self._b._evaluate(builder.point)
-        self._verify_domain_constraints(a_value, b_value)
-        next_accumulated_a = accumulated / b_value
-        next_accumulated_b =  - accumulated * a_value / (b_value ** 2)
-        self._a._compute_local_differential(builder, next_accumulated_a)
-        self._b._compute_local_differential(builder, next_accumulated_b)
+        self._verify_domain_constraints(builder.point)
+        next_accumulated_left = self._local_partial_formula_left(builder.point, accumulated)
+        next_accumulated_right = self._local_partial_formula_right(builder.point, accumulated)
+        self._left._compute_local_differential(builder, next_accumulated_left)
+        self._right._compute_local_differential(builder, next_accumulated_right)
 
     def _compute_global_differential(
         self: Divide,
         builder: GlobalDifferentialBuilder,
         accumulated: sm.Expression
     ) -> None:
-        next_accumulated_a = ex.Divide(accumulated, self._b)
-        next_accumulated_b = ex.Multiply(
-            accumulated,
-            ex.Negation(ex.Divide(self._a, ex.Power(self._b, ex.Constant(2))))
+        next_accumulated_left = self._synthetic_partial_formula_left(accumulated)
+        next_accumulated_right = self._synthetic_partial_formula_right(accumulated)
+        self._left._compute_global_differential(builder, next_accumulated_left)
+        self._right._compute_global_differential(builder, next_accumulated_right)
+
+    def _local_partial_formula_left(
+        self: Divide,
+        point: sm.Point,
+        multiplier: sm.real_number
+    ) -> sm.real_number:
+        right_value = self._right._evaluate(point)
+        return multiplier / right_value
+
+    def _local_partial_formula_right(
+        self: Divide,
+        point: sm.Point,
+        multiplier: sm.real_number
+    ) -> sm.real_number:
+        left_value = self._left._evaluate(point)
+        right_value = self._right._evaluate(point)
+        return (- left_value / nth_power(2, right_value)) * multiplier
+
+    def _synthetic_partial_formula_left(
+        self: Divide,
+        multiplier: sm.Expression
+    ) -> sm.Expression:
+        return ex.Divide(multiplier, self._right)
+
+    def _synthetic_partial_formula_right(
+        self: Divide,
+        multiplier: sm.Expression
+    ) -> sm.Expression:
+        return ex.Multiply(
+            ex.Negation(ex.Divide(self._left, ex.NthPower(2, self._right))),
+            multiplier
         )
-        self._a._compute_global_differential(builder, next_accumulated_a)
-        self._b._compute_global_differential(builder, next_accumulated_b)

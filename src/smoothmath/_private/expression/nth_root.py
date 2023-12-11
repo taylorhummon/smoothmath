@@ -35,8 +35,9 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: NthRoot,
-        inner_value: sm.real_number,
+        point: sm.Point,
     ) -> None:
+        inner_value = self._inner._evaluate(point)
         if self._n >= 2 and inner_value == 0:
             raise sm.DomainError(f"NthRoot(x) is not defined at x = 0 when n = {self._n}")
         if self._n % 2 == 0 and inner_value < 0:
@@ -48,8 +49,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> sm.real_number:
         if self._value is not None:
             return self._value
+        self._verify_domain_constraints(point)
         inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
         self._value = nth_root(self._n, inner_value)
         return self._value
 
@@ -58,6 +59,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
+        self._verify_domain_constraints(point)
         inner_partial = self._inner._local_partial(point, with_respect_to)
         return self._local_partial_formula(point, inner_partial)
 
@@ -73,6 +75,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
+        self._verify_domain_constraints(builder.point)
         next_accumulated = self._local_partial_formula(builder.point, accumulated)
         self._inner._compute_local_differential(builder, next_accumulated)
 
@@ -89,8 +92,6 @@ class NthRoot(base.ParameterizedUnaryExpression):
         point: sm.Point,
         multiplier: sm.real_number
     ) -> sm.real_number:
-        inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
         n = self._n
         if n == 1:
             return multiplier

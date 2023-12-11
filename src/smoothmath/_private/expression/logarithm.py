@@ -30,8 +30,9 @@ class Logarithm(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: Logarithm,
-        inner_value: sm.real_number
+        point: sm.Point
     ) -> None:
+        inner_value = self._inner._evaluate(point)
         if inner_value == 0:
             raise sm.DomainError("Logarithm(x) blows up around x = 0")
         elif inner_value < 0:
@@ -43,8 +44,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
     ) -> sm.real_number:
         if self._value is not None:
             return self._value
+        self._verify_domain_constraints(point)
         inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
         self._value = math.log(inner_value, self._base)
         return self._value
 
@@ -53,6 +54,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
+        self._verify_domain_constraints(point)
         inner_partial = self._inner._local_partial(point, with_respect_to)
         return self._local_partial_formula(point, inner_partial)
 
@@ -68,6 +70,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
+        self._verify_domain_constraints(builder.point)
         next_accumulated = self._local_partial_formula(builder.point, accumulated)
         self._inner._compute_local_differential(builder, next_accumulated)
 
@@ -85,7 +88,6 @@ class Logarithm(base.ParameterizedUnaryExpression):
         multiplier: sm.real_number
     ) -> sm.real_number:
         inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
         if self._base == math.e:
             return multiplier / inner_value
         else:

@@ -31,8 +31,9 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: NthPower,
-        inner_value: sm.real_number,
+        point: sm.Point,
     ) -> None:
+        inner_value = self._inner._evaluate(point)
         if inner_value == 0:
             if self._n == 0:
                 raise sm.DomainError("NthPower(x) is not smooth around x = 0 for n = 0")
@@ -45,12 +46,12 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> sm.real_number:
         if self._value is not None:
             return self._value
-        inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
+        self._verify_domain_constraints(point)
         if self._n == 0:
             self._value = 1
         else: # n is non-zero
-            self._value = inner_value ** self._n
+            inner_value = self._inner._evaluate(point)
+            self._value = nth_power(self._n, inner_value)
         return self._value
 
     def _local_partial(
@@ -58,8 +59,7 @@ class NthPower(base.ParameterizedUnaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
+        self._verify_domain_constraints(point)
         if self._n == 0:
             return 0
         else: # n is non-zero
@@ -81,8 +81,7 @@ class NthPower(base.ParameterizedUnaryExpression):
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        inner_value = self._inner._evaluate(builder.point)
-        self._verify_domain_constraints(inner_value)
+        self._verify_domain_constraints(builder.point)
         if self._n == 0:
             return
         else:
