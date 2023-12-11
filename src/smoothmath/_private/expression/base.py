@@ -236,12 +236,11 @@ class ParameterizedUnaryExpression(Expression):
         self._value: sm.real_number | None
         self._value = None
 
-    @abstractmethod
     def _rebuild(
         self: ParameterizedUnaryExpression,
-        inner: Expression
+        inner: sm.Expression
     ) -> ParameterizedUnaryExpression:
-        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _rebuild()")
+        return self.__class__(self._parameter(), inner) # type: ignore
 
     @abstractmethod
     def _parameter(

@@ -28,12 +28,6 @@ class NthRoot(base.ParameterizedUnaryExpression):
         self._n: int
         self._n = i
 
-    def _rebuild(
-        self: NthRoot,
-        inner: sm.Expression
-    ) -> NthRoot:
-        return ex.NthRoot(self._n, inner)
-
     def _parameter(
         self: NthRoot
     ) -> int:

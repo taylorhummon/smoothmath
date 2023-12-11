@@ -23,12 +23,6 @@ class Logarithm(base.ParameterizedUnaryExpression):
         self._base: sm.real_number
         self._base = base
 
-    def _rebuild(
-        self: Logarithm,
-        inner: sm.Expression
-    ) -> Logarithm:
-        return ex.Logarithm(self._base, inner)
-
     def _parameter(
         self: Logarithm
     ) -> sm.real_number:

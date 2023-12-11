@@ -21,12 +21,6 @@ class Exponential(base.ParameterizedUnaryExpression):
         self._base: sm.real_number
         self._base = base
 
-    def _rebuild(
-        self: Exponential,
-        inner: sm.Expression
-    ) -> Exponential:
-        return ex.Exponential(self._base, inner)
-
     def _parameter(
         self: Exponential
     ) -> sm.real_number:

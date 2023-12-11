@@ -24,12 +24,6 @@ class NthPower(base.ParameterizedUnaryExpression):
         self._n: int
         self._n = i
 
-    def _rebuild(
-        self: NthPower,
-        inner: sm.Expression
-    ) -> NthPower:
-        return ex.NthPower(self._n, inner)
-
     def _parameter(
         self: NthPower
     ) -> int:
