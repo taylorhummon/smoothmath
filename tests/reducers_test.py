@@ -19,17 +19,13 @@ from smoothmath._private.reducers import (
     _reduce_expressions_that_lack_variables,
     _reduce_negation_of_negation_of_u,
     _reduce_reciprocal_of_reciprocal_of_u,
-    _reduce_product_of_reciprocals,
+    _reduce_reciprocal_of_negation_of_u,
     _reduce_even_nth_power_of_negation_of_u,
     _reduce_odd_nth_power_of_negation_of_u,
     _reduce_nth_power_of_reciprocal_of_u,
-    _reduce_product_of_nth_powers,
     _reduce_nth_power_of_nth_root_of_u,
     _reduce_nth_root_of_nth_power_of_u,
     _reduce_nth_root_of_reciprocal_of_u,
-    _reduce_product_of_nth_roots,
-    _reduce_product_of_exponentials,
-    _reduce_sum_of_logarithms,
     _reduce_logarithm_of_exponential_of_u,
     _reduce_exponential_of_logarithm_of_u,
     _reduce_by_associating_plus_right,
@@ -43,6 +39,11 @@ from smoothmath._private.reducers import (
     _reduce_one_times_u,
     _reduce_zero_times_u,
     _reduce_negative_one_times_u,
+    _reduce_product_of_reciprocals,
+    _reduce_product_of_nth_powers,
+    _reduce_product_of_nth_roots,
+    _reduce_product_of_exponentials,
+    _reduce_sum_of_logarithms,
     _reduce_u_over_one,
     _reduce_one_over_u,
     _reduce_reciprocal_of_u_over_v,
@@ -95,11 +96,10 @@ def test_reduce_reciprocal_of_reciprocal_of_u():
     assert _reduce_reciprocal_of_reciprocal_of_u(z) == u
 
 
-def test_reduce_product_of_reciprocals():
+def test_reduce_reciprocal_of_negation_of_u():
     u = Variable("u")
-    v = Variable("v")
-    z = Multiply(Reciprocal(u), Reciprocal(v))
-    assert _reduce_product_of_reciprocals(z) == Reciprocal(Multiply(u, v))
+    z = Reciprocal(Negation(u))
+    assert _reduce_reciprocal_of_negation_of_u(z) == Negation(Reciprocal(u))
 
 
 def test_reduce_even_nth_power_of_negation_of_u():
@@ -120,13 +120,6 @@ def test_reduce_nth_power_of_reciprocal_of_u():
     assert _reduce_nth_power_of_reciprocal_of_u(z) == Reciprocal(NthPower(2, u))
 
 
-def test_reduce_product_of_nth_powers():
-    u = Variable("u")
-    v = Variable("v")
-    z = Multiply(NthPower(2, u), NthPower(2, v))
-    assert _reduce_product_of_nth_powers(z) == NthPower(2, Multiply(u, v))
-
-
 def test_reduce_nth_power_of_nth_root_of_u():
     u = Variable("u")
     z = NthPower(2, NthRoot(2, u))
@@ -143,31 +136,6 @@ def test_reduce_nth_root_of_reciprocal_of_u():
     u = Variable("u")
     z = NthRoot(2, Reciprocal(u))
     assert _reduce_nth_root_of_reciprocal_of_u(z) == Reciprocal(NthRoot(2, u))
-
-
-def test_reduce_product_of_nth_roots():
-    u = Variable("u")
-    v = Variable("v")
-    z = Multiply(NthRoot(2, u), NthRoot(2, v))
-    assert _reduce_product_of_nth_roots(z) == NthRoot(2, Multiply(u, v))
-
-
-def test_reduce_product_of_exponentials():
-    u = Variable("u")
-    v = Variable("v")
-    z = Multiply(Exponential(math.e, u), Exponential(math.e, v))
-    assert _reduce_product_of_exponentials(z) == Exponential(math.e, Plus(u, v))
-    z = Multiply(Exponential(2, u), Exponential(2, v))
-    assert _reduce_product_of_exponentials(z) == Exponential(2, Plus(u, v))
-
-
-def test_reduce_sum_of_logarithms():
-    u = Variable("u")
-    v = Variable("v")
-    z = Plus(Logarithm(math.e, u), Logarithm(math.e, v))
-    assert _reduce_sum_of_logarithms(z) == Logarithm(math.e, Multiply(u, v))
-    z = Plus(Logarithm(10, u), Logarithm(10, v))
-    assert _reduce_sum_of_logarithms(z) == Logarithm(10, Multiply(u, v))
 
 
 def test_reduce_logarithm_of_exponential_of_u():
@@ -251,6 +219,45 @@ def test_reduce_negative_one_times_u():
     u = Variable("u")
     z = Multiply(Constant(-1), u)
     assert _reduce_negative_one_times_u(z) == Negation(u)
+
+
+def test_reduce_product_of_reciprocals():
+    u = Variable("u")
+    v = Variable("v")
+    z = Multiply(Reciprocal(u), Reciprocal(v))
+    assert _reduce_product_of_reciprocals(z) == Reciprocal(Multiply(u, v))
+
+
+def test_reduce_product_of_nth_powers():
+    u = Variable("u")
+    v = Variable("v")
+    z = Multiply(NthPower(2, u), NthPower(2, v))
+    assert _reduce_product_of_nth_powers(z) == NthPower(2, Multiply(u, v))
+
+
+def test_reduce_product_of_nth_roots():
+    u = Variable("u")
+    v = Variable("v")
+    z = Multiply(NthRoot(2, u), NthRoot(2, v))
+    assert _reduce_product_of_nth_roots(z) == NthRoot(2, Multiply(u, v))
+
+
+def test_reduce_product_of_exponentials():
+    u = Variable("u")
+    v = Variable("v")
+    z = Multiply(Exponential(math.e, u), Exponential(math.e, v))
+    assert _reduce_product_of_exponentials(z) == Exponential(math.e, Plus(u, v))
+    z = Multiply(Exponential(2, u), Exponential(2, v))
+    assert _reduce_product_of_exponentials(z) == Exponential(2, Plus(u, v))
+
+
+def test_reduce_sum_of_logarithms():
+    u = Variable("u")
+    v = Variable("v")
+    z = Plus(Logarithm(math.e, u), Logarithm(math.e, v))
+    assert _reduce_sum_of_logarithms(z) == Logarithm(math.e, Multiply(u, v))
+    z = Plus(Logarithm(10, u), Logarithm(10, v))
+    assert _reduce_sum_of_logarithms(z) == Logarithm(10, Multiply(u, v))
 
 
 def test_reduce_u_over_one():
