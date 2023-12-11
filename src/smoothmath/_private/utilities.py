@@ -9,15 +9,24 @@ import smoothmath.expression as ex
 
 
 def is_integer(
-    value: sm.real_number
+    number: sm.real_number
 ) -> bool:
-    return isinstance(value, int) or value.is_integer()
+    return isinstance(number, int) or (isinstance(number, float) and number.is_integer())
+
+
+def integer_from_integral_real_number(
+    number: sm.real_number
+) -> int | None:
+    if is_integer(number):
+        return round(number)
+    else:
+        return None
 
 
 def get_class_name(
     any: Any
 ) -> str:
-    return type(any).__name__
+    return any.__class__.__name__
 
 
 def get_variable_name(

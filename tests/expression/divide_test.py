@@ -1,4 +1,5 @@
 from pytest import approx, raises
+import math
 from smoothmath import DomainError, Point
 from smoothmath.expression import Constant, Variable, Logarithm, Divide
 
@@ -117,7 +118,7 @@ def test_Divide_with_constant_numerator_zero_composition():
 
 def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     y = Variable("y")
-    z = Divide(Constant(0), Logarithm(y))
+    z = Divide(Constant(0), Logarithm(math.e, y))
     point = Point({y: 0})
     with raises(DomainError):
         z.evaluate(point)

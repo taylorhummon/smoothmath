@@ -13,10 +13,10 @@ if TYPE_CHECKING:
 class Multiply(base.BinaryExpression):
     def __init__(
         self: Multiply,
-        a: sm.Expression,
-        b: sm.Expression
+        expression_a: sm.Expression,
+        expression_b: sm.Expression
     ) -> None:
-        super().__init__(a, b)
+        super().__init__(expression_a, expression_b)
 
     def _evaluate(
         self: Multiply,

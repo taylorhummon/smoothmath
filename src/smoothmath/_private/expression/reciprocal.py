@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 class Reciprocal(base.UnaryExpression):
     def __init__(
         self: Reciprocal,
-        a: sm.Expression
+        expression: sm.Expression
     ) -> None:
-        super().__init__(a)
+        super().__init__(expression)
 
     def _verify_domain_constraints(
         self: Reciprocal,
@@ -43,8 +43,8 @@ class Reciprocal(base.UnaryExpression):
         a_value = self._a._evaluate(point)
         self._verify_domain_constraints(a_value)
         a_partial = self._a._local_partial(point, with_respect_to)
-        result_value = self._evaluate(point)
-        return - (result_value ** 2) * a_partial
+        self_value = self._evaluate(point)
+        return - (self_value ** 2) * a_partial
 
     def _synthetic_partial(
         self: Reciprocal,

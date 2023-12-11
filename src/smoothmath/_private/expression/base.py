@@ -5,7 +5,11 @@ import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.local_differential import LocalDifferentialBuilder
 from smoothmath._private.global_differential import GlobalDifferentialBuilder
-from smoothmath._private.utilities import get_class_name, get_variable_name
+from smoothmath._private.utilities import (
+  integer_from_integral_real_number,
+  get_class_name,
+  get_variable_name
+)
 
 
 class Expression(ABC):
@@ -143,9 +147,17 @@ class Expression(ABC):
 
     def __pow__(
         self: Expression,
-        other: Expression
-    ) -> ex.Power:
-        return ex.Power(self, other)
+        exponent: int | Expression
+    ) -> ex.NthPower | ex.Power:
+        if isinstance(exponent, Expression):
+            return ex.Power(self, exponent)
+        # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
+        # even though that wouldn't pass type checking.
+        integer = integer_from_integral_real_number(exponent)
+        if integer is None:
+            raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")
+        else:
+            return ex.NthPower(integer, self)
 
 
 class NullaryExpression(Expression):
@@ -164,15 +176,21 @@ class NullaryExpression(Expression):
 class UnaryExpression(Expression):
     def __init__(
         self: UnaryExpression,
-        a: Expression
+        expression: Expression
     ) -> None:
-        if not isinstance(a, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {a}")
-        super().__init__(lacks_variables = a._lacks_variables)
+        if not isinstance(expression, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {expression}")
+        super().__init__(expression._lacks_variables)
         self._a: Expression
-        self._a = a
+        self._a = expression
         self._value: sm.real_number | None
         self._value = None
+
+    def _rebuild(
+        self: UnaryExpression,
+        expression: sm.Expression
+    ) -> UnaryExpression:
+        return self.__class__(expression)
 
     def _reset_evaluation_cache(
         self: UnaryExpression
@@ -180,18 +198,12 @@ class UnaryExpression(Expression):
         self._value = None
         self._a._reset_evaluation_cache()
 
-    def _rebuild(
-        self: UnaryExpression,
-        a: sm.Expression
-    ) -> UnaryExpression:
-        return type(self)(a)
-
     def __eq__(
         self: UnaryExpression,
         other: Any
     ) -> bool:
         return (
-            (type(other) == type(self)) and
+            (other.__class__ == self.__class__) and
             (other._a == self._a)
         )
 
@@ -211,23 +223,81 @@ class UnaryExpression(Expression):
         return f"{get_class_name(self)}({self._a})"
 
 
+class ParameterizedUnaryExpression(Expression):
+    def __init__(
+        self: ParameterizedUnaryExpression,
+        expression: Expression
+    ) -> None:
+        if not isinstance(expression, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {expression}")
+        super().__init__(expression._lacks_variables)
+        self._a: Expression
+        self._a = expression
+        self._value: sm.real_number | None
+        self._value = None
+
+    @abstractmethod
+    def _parameter(
+        self: ParameterizedUnaryExpression
+    ) -> Any:
+        Exception("Concrete classes derived from Expression must implement _parameter()")
+
+    def _reset_evaluation_cache(
+        self: ParameterizedUnaryExpression
+    ) -> None:
+        self._value = None
+        self._a._reset_evaluation_cache()
+
+    def __eq__(
+        self: ParameterizedUnaryExpression,
+        other: Any
+    ) -> bool:
+        return (
+            (other.__class__ == self.__class__) and
+            (other._parameter() == self._parameter()) and
+            (other._a == self._a)
+        )
+
+    def __hash__(
+        self: ParameterizedUnaryExpression
+    ) -> int:
+        return hash((get_class_name(self), self._parameter(), self._a))
+
+    def __str__(
+        self: ParameterizedUnaryExpression
+    ) -> str:
+        return f"{get_class_name(self)}({self._parameter()}, {self._a})"
+
+    def __repr__(
+        self: ParameterizedUnaryExpression
+    ) -> str:
+        return f"{get_class_name(self)}({self._parameter()}, {self._a})"
+
+
 class BinaryExpression(Expression):
     def __init__(
         self: BinaryExpression,
-        a: Expression,
-        b: Expression
+        expression_a: Expression,
+        expression_b: Expression
     ) -> None:
-        if not isinstance(a, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {a}")
-        if not isinstance(b, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {b}")
-        super().__init__(lacks_variables = a._lacks_variables and b._lacks_variables)
+        if not isinstance(expression_a, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {expression_a}")
+        if not isinstance(expression_b, Expression):
+            raise Exception(f"Expressions must be composed of Expressions, found {expression_b}")
+        super().__init__(expression_a._lacks_variables and expression_b._lacks_variables)
         self._a: Expression
-        self._a = a
+        self._a = expression_a
         self._b: Expression
-        self._b = b
+        self._b = expression_b
         self._value: sm.real_number | None
         self._value = None
+
+    def _rebuild(
+        self: BinaryExpression,
+        expression_a: sm.Expression,
+        expression_b: sm.Expression
+    ) -> BinaryExpression:
+        return self.__class__(expression_a, expression_b)
 
     def _reset_evaluation_cache(
         self: BinaryExpression
@@ -236,19 +306,12 @@ class BinaryExpression(Expression):
         self._a._reset_evaluation_cache()
         self._b._reset_evaluation_cache()
 
-    def _rebuild(
-        self: BinaryExpression,
-        a: sm.Expression,
-        b: sm.Expression
-    ) -> BinaryExpression:
-        return type(self)(a, b)
-
     def __eq__(
         self: BinaryExpression,
         other: Any
     ) -> bool:
         return (
-            (type(other) == type(self)) and
+            (other.__class__ == self.__class__) and
             (other._a == self._a) and
             (other._b == self._b)
         )

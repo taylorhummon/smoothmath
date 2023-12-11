@@ -38,7 +38,7 @@ class GlobalPartial:
         other: Any
     ) -> bool:
         return (
-            (type(other) == type(self)) and
+            (other.__class__ == self.__class__) and
             (self.original_expression == other.original_expression) and
             (self._synthetic_partial == other._synthetic_partial)
         )

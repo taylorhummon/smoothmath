@@ -10,25 +10,30 @@ if TYPE_CHECKING:
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
-# differential rule: d(C ** a) = ln(C) * (C ** a) * da
+# differential rule: d(C ** a) = log_e(C) * (C ** a) * da
 
-class Exponential(base.UnaryExpression):
+class Exponential(base.ParameterizedUnaryExpression):
     def __init__(
         self: Exponential,
-        exponent: sm.Expression,
-        base: sm.real_number = math.e
+        base: sm.real_number,
+        expression: sm.Expression
     ) -> None:
-        super().__init__(exponent)
+        super().__init__(expression)
         if base <= 0:
-            raise Exception("Exponentials must have a positive base")
+            raise Exception(f"Exponentials must have a positive base, found: {base}")
         self._base: sm.real_number
         self._base = base
 
     def _rebuild(
         self: Exponential,
-        a: sm.Expression
+        expression: sm.Expression
     ) -> Exponential:
-        return Exponential(a, self._base)
+        return ex.Exponential(self._base, expression)
+
+    def _parameter(
+        self: Exponential
+    ) -> sm.real_number:
+        return self._base
 
     def _evaluate(
         self: Exponential,
@@ -45,10 +50,9 @@ class Exponential(base.UnaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        a_value = self._a._evaluate(point)
+        self_value = self._evaluate(point)
         a_partial = self._a._local_partial(point, with_respect_to)
-        result_value = self._base ** a_value
-        return math.log(self._base) * result_value * a_partial
+        return math.log(self._base) * self_value * a_partial
 
     def _synthetic_partial(
         self: Exponential,
@@ -78,38 +82,15 @@ class Exponential(base.UnaryExpression):
         self: Exponential,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        if self._base == math.e:
-            return ex.Multiply(multiplier, ex.Exponential(self._a, base = self._base))
+        if self._base == 1:
+            return ex.Constant(0)
+        elif self._base == math.e:
+            return ex.Multiply(multiplier, ex.Exponential(self._base, self._a))
         else:
             return ex.Multiply(
                 multiplier,
                 ex.Multiply(
-                    ex.Logarithm(ex.Constant(self._base), base = math.e),
-                    ex.Exponential(self._a, base = self._base)
+                    ex.Logarithm(math.e, ex.Constant(self._base)),
+                    ex.Exponential(self._base, self._a)
                 )
             )
-
-    def __eq__(
-        self: Exponential,
-        other: Any
-    ) -> bool:
-        return (
-            (type(other) == type(self)) and
-            (other._a == self._a) and
-            (other._base == self._base)
-        )
-
-    def __hash__(
-        self: Exponential
-    ) -> int:
-        return hash((get_class_name(self), self._a, self._base))
-
-    def __str__(
-        self: Exponential
-    ) -> str:
-        return f"{get_class_name(self)}({self._a}, base = {self._base})"
-
-    def __repr__(
-        self: Exponential
-    ) -> str:
-        return f"{get_class_name(self)}({self._a}, base = {self._base})"

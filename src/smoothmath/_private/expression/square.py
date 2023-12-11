@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 class Square(base.UnaryExpression):
     def __init__(
         self: Square,
-        a: sm.Expression
+        expression: sm.Expression
     ) -> None:
-        super().__init__(a)
+        super().__init__(expression)
 
     def _evaluate(
         self: Square,

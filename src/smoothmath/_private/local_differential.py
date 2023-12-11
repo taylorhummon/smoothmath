@@ -31,7 +31,7 @@ class LocalDifferential:
         other: Any
     ) -> bool:
         return (
-            (type(other) == type(self)) and
+            (other.__class__ == self.__class__) and
             (self.original_expression == other.original_expression) and
             (self.point == other.point) and
             (self._local_partials == other._local_partials)

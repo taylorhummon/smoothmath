@@ -1,11 +1,24 @@
 from smoothmath.expression import Constant, Variable
-from smoothmath._private.utilities import is_integer, get_class_name, get_variable_name
+from smoothmath._private.utilities import (
+    is_integer,
+    integer_from_integral_real_number,
+    get_class_name,
+    get_variable_name
+)
 
 
 def test_is_integer():
     assert is_integer(3) == True
     assert is_integer(3.0) == True
     assert is_integer(3.7) == False
+    assert is_integer("3") == False # type: ignore
+
+
+def test_integer_from_integral_real_number():
+    assert integer_from_integral_real_number(3) == 3
+    assert integer_from_integral_real_number(3.0) == 3
+    assert integer_from_integral_real_number(3.7) == None
+    assert integer_from_integral_real_number("3") == None # type: ignore
 
 
 def test_get_class_name():

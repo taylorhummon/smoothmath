@@ -14,9 +14,9 @@ if TYPE_CHECKING:
 class Sine(base.UnaryExpression):
     def __init__(
         self: Sine,
-        a: sm.Expression
+        expression: sm.Expression
     ) -> None:
-        super().__init__(a)
+        super().__init__(expression)
 
     def _evaluate(
         self: Sine,

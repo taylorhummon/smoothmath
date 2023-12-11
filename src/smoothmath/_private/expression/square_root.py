@@ -14,9 +14,9 @@ if TYPE_CHECKING:
 class SquareRoot(base.UnaryExpression):
     def __init__(
         self: SquareRoot,
-        a: sm.Expression
+        expression: sm.Expression
     ) -> None:
-        super().__init__(a)
+        super().__init__(expression)
 
     def _verify_domain_constraints(
         self: SquareRoot,
@@ -43,10 +43,9 @@ class SquareRoot(base.UnaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        a_value = self._a._evaluate(point)
-        self._verify_domain_constraints(a_value)
+        self_value = self._evaluate(point)
         a_partial = self._a._local_partial(point, with_respect_to)
-        return a_partial / (2 * math.sqrt(a_value))
+        return a_partial / (2 * self_value)
 
     def _synthetic_partial(
         self: SquareRoot,

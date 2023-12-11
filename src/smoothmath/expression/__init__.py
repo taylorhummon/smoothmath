@@ -6,6 +6,8 @@ from smoothmath._private.expression.negation import Negation
 from smoothmath._private.expression.reciprocal import Reciprocal
 from smoothmath._private.expression.square import Square
 from smoothmath._private.expression.square_root import SquareRoot
+from smoothmath._private.expression.nth_power import NthPower
+from smoothmath._private.expression.nth_root import NthRoot
 from smoothmath._private.expression.exponential import Exponential
 from smoothmath._private.expression.logarithm import Logarithm
 from smoothmath._private.expression.sine import Sine
@@ -25,6 +27,8 @@ __all__ = [
     "Reciprocal",
     "Square",
     "SquareRoot",
+    "NthPower",
+    "NthRoot",
     "Exponential",
     "Logarithm",
     "Sine",

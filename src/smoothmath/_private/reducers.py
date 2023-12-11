@@ -224,7 +224,7 @@ def _reduce_product_of_exponentials(
             ex.Plus(expression._a._a, expression._b._a)
         )
         return _apply_reducers(
-            ex.Exponential(inner, base = expression._a._base)
+            ex.Exponential(expression._a._base, inner)
         )
     else:
         return None
@@ -244,7 +244,7 @@ def _reduce_sum_of_logarithms(
             ex.Multiply(expression._a._a, expression._b._a)
         )
         return _apply_reducers(
-            ex.Logarithm(inner, base = expression._a._base)
+            ex.Logarithm(expression._a._base, inner)
         )
     else:
         return None
@@ -594,7 +594,7 @@ def _reduce_power_with_constant_base(
         expression._a._value != 1
     ):
         return _apply_reducers(
-            ex.Exponential(expression._b, base = expression._a._value)
+            ex.Exponential(expression._a._value, expression._b)
         )
     else:
         return None

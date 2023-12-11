@@ -33,7 +33,7 @@ class Point:
         other: Any
     ) -> bool:
         return (
-            (type(other) == type(self)) and
+            (other.__class__ == self.__class__) and
             (other._value_by_variable_name == self._value_by_variable_name)
         )
 

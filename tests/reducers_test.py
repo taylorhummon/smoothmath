@@ -1,3 +1,4 @@
+import math
 from smoothmath.expression import (
     Constant,
     Variable,
@@ -77,7 +78,7 @@ def test_reduce_synthetic():
 def test_reduce_expressions_that_lack_variables():
     z = Minus(Square(Plus(Constant(2), Constant(1))), Constant(1))
     assert _reduce_expressions_that_lack_variables(z) == Constant(8)
-    z = Logarithm(Constant(-1))
+    z = Logarithm(math.e, Constant(-1))
     assert _reduce_expressions_that_lack_variables(z) == None
 
 
@@ -147,30 +148,30 @@ def test_reduce_product_of_square_roots():
 def test_reduce_product_of_exponentials():
     u = Variable("u")
     v = Variable("v")
-    z = Multiply(Exponential(u), Exponential(v))
-    assert _reduce_product_of_exponentials(z) == Exponential(Plus(u, v))
-    z = Multiply(Exponential(u, base = 2), Exponential(v, base = 2))
-    assert _reduce_product_of_exponentials(z) == Exponential(Plus(u, v), base = 2)
+    z = Multiply(Exponential(math.e, u), Exponential(math.e, v))
+    assert _reduce_product_of_exponentials(z) == Exponential(math.e, Plus(u, v))
+    z = Multiply(Exponential(2, u), Exponential(2, v))
+    assert _reduce_product_of_exponentials(z) == Exponential(2, Plus(u, v))
 
 
 def test_reduce_sum_of_logarithms():
     u = Variable("u")
     v = Variable("v")
-    z = Plus(Logarithm(u), Logarithm(v))
-    assert _reduce_sum_of_logarithms(z) == Logarithm(Multiply(u, v))
-    z = Plus(Logarithm(u, base = 10), Logarithm(v, base = 10))
-    assert _reduce_sum_of_logarithms(z) == Logarithm(Multiply(u, v), base = 10)
+    z = Plus(Logarithm(math.e, u), Logarithm(math.e, v))
+    assert _reduce_sum_of_logarithms(z) == Logarithm(math.e, Multiply(u, v))
+    z = Plus(Logarithm(10, u), Logarithm(10, v))
+    assert _reduce_sum_of_logarithms(z) == Logarithm(10, Multiply(u, v))
 
 
 def test_reduce_logarithm_of_exponential_of_u():
     u = Variable("u")
-    z = Logarithm(Exponential(u))
+    z = Logarithm(math.e, Exponential(math.e, u))
     assert _reduce_logarithm_of_exponential_of_u(z) == u
 
 
 def test_reduce_exponential_of_logarithm_of_u():
     u = Variable("u")
-    z = Exponential(Logarithm(u))
+    z = Exponential(math.e, Logarithm(math.e, u))
     assert _reduce_exponential_of_logarithm_of_u(z) == u
 
 
@@ -303,7 +304,7 @@ def test_reduce_u_to_the_one_half():
 def test_reduce_power_with_constant_base():
     u = Variable("u")
     z = Power(Constant(2), u)
-    assert _reduce_power_with_constant_base(z) == Exponential(u, base = 2)
+    assert _reduce_power_with_constant_base(z) == Exponential(2, u)
 
 
 def test_reduce_power_of_power():

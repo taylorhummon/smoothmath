@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 class Negation(base.UnaryExpression):
     def __init__(
         self: Negation,
-        a: sm.Expression
+        expression: sm.Expression
     ) -> None:
-        super().__init__(a)
+        super().__init__(expression)
 
     def _evaluate(
         self: Negation,

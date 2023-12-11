@@ -4,7 +4,6 @@ import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
-from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -12,13 +11,13 @@ if TYPE_CHECKING:
 
 # differential rule: d(log_C(a)) = (1 / (log_e(C) * a)) * da
 
-class Logarithm(base.UnaryExpression):
+class Logarithm(base.ParameterizedUnaryExpression):
     def __init__(
         self: Logarithm,
-        a: sm.Expression,
-        base: sm.real_number = math.e
+        base: sm.real_number,
+        expression: sm.Expression
     ) -> None:
-        super().__init__(a)
+        super().__init__(expression)
         if base <= 0:
             raise Exception("Logarithms must have a positive base")
         elif base == 1:
@@ -28,9 +27,14 @@ class Logarithm(base.UnaryExpression):
 
     def _rebuild(
         self: Logarithm,
-        a: sm.Expression
+        expression: sm.Expression
     ) -> Logarithm:
-        return Logarithm(a, self._base)
+        return ex.Logarithm(self._base, expression)
+
+    def _parameter(
+        self: Logarithm
+    ) -> sm.real_number:
+        return self._base
 
     def _verify_domain_constraints(
         self: Logarithm,
@@ -97,32 +101,7 @@ class Logarithm(base.UnaryExpression):
             return ex.Divide(
                 multiplier,
                 ex.Multiply(
-                    ex.Logarithm(ex.Constant(self._base), base = math.e),
+                    ex.Logarithm(math.e, ex.Constant(self._base)),
                     self._a,
                 )
             )
-
-    def __eq__(
-        self: Logarithm,
-        other: Any
-    ) -> bool:
-        return (
-            (type(other) == type(self)) and
-            (other._a == self._a) and
-            (other._base == self._base)
-        )
-
-    def __hash__(
-        self: Logarithm
-    ) -> int:
-        return hash((get_class_name(self), self._a, self._base))
-
-    def __str__(
-        self: Logarithm
-    ) -> str:
-        return f"{get_class_name(self)}({self._a}, base = {self._base})"
-
-    def __repr__(
-        self: Logarithm
-    ) -> str:
-        return f"{get_class_name(self)}({self._a}, base = {self._base})"

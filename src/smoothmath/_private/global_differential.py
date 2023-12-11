@@ -50,7 +50,7 @@ class GlobalDifferential:
         other: Any
     ) -> bool:
         return (
-            (type(other) == type(self)) and
+            (other.__class__ == self.__class__) and
             (self.original_expression == other.original_expression) and
             (self._synthetic_partials == other._synthetic_partials)
         )

@@ -1,4 +1,5 @@
 from pytest import approx, raises
+import math
 from smoothmath import DomainError, Point
 from smoothmath.expression import Constant, Variable, Reciprocal, Exponential, Multiply
 
@@ -19,7 +20,7 @@ def test_binary_expression_equality():
 
 def test_expression_reuse():
     x = Variable("x")
-    w = x ** Constant(2)
+    w = x ** 2
     z = (w + Constant(1)) / w
     point = Point({x: 2})
     assert z.evaluate(point) == approx(1.25)
@@ -31,7 +32,7 @@ def test_expression_reuse():
 
 def test_taking_partials_using_string_variable_name():
     x = Variable("x")
-    z = x ** Constant(2)
+    z = x ** 2
     global_x_partial = z.global_partial("x")
     global_differential = z.global_differential()
     # at x = 3
@@ -51,7 +52,7 @@ def test_taking_partials_using_string_variable_name():
 def test_unrelated_variable():
     x = Variable("x")
     y = Variable("y")
-    z = x ** Constant(2)
+    z = x ** 2
     point = Point({x: 2})
     assert z.evaluate(point) == approx(4)
     assert z.local_partial(point, y) == approx(0)
@@ -74,7 +75,7 @@ def test_polynomial_of_one_variable():
 def test_polynomial_of_two_variables():
     x = Variable("x")
     y = Variable("y")
-    z = x * (x + y) - Constant(5) * y * y
+    z = x * (x + y) - Constant(5) * y ** 2
     point = Point({x: 2, y: 3})
     assert z.evaluate(point) == approx(-35)
     assert z.local_partial(point, x) == approx(7)
@@ -93,7 +94,7 @@ def test_polynomial_of_three_variables():
     w = Variable("w")
     x = Variable("x")
     y = Variable("y")
-    z = w * w + Constant(5) * w * x * x - w * x * y
+    z = w * w + Constant(5) * w * x ** 2 - w * x * y
     point = Point({w: 2, x: 3, y: 4})
     assert z.evaluate(point) == approx(70)
     assert z.local_partial(point, w) == approx(37)
@@ -114,7 +115,7 @@ def test_polynomial_of_three_variables():
 
 def test_composite_function():
     x = Variable("x")
-    z = Exponential(x ** Constant(2))
+    z = Exponential(math.e, x ** 2)
     point = Point({x: 2})
     assert z.evaluate(point) == approx(54.598150033)
     assert z.local_partial(point, x) == approx(218.392600132)
