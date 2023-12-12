@@ -1,12 +1,15 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
+import re
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
-from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
+
+
+alphanumeric_pattern = re.compile(r"\A\w*\Z")
 
 
 class Variable(base.NullaryExpression):
@@ -15,12 +18,10 @@ class Variable(base.NullaryExpression):
         name: str
     ) -> None:
         super().__init__(lacks_variables = False)
-        if not name:
-            raise Exception("Variables must be given a non-blank name")
+        if (not name) or (alphanumeric_pattern.match(name) is None):
+            raise Exception(f"Illegal variable name: {name}")
         self.name: str
         self.name = name
-        self._cached_hash: int | None
-        self._cached_hash = None
 
     def _evaluate(
         self: Variable,
@@ -70,14 +71,14 @@ class Variable(base.NullaryExpression):
     def __hash__(
         self: Variable
     ) -> int:
-        return hash((get_class_name(self), self.name))
+        return hash(("Variable", self.name))
 
     def __str__(
         self: Variable
     ) -> str:
-        return f"{get_class_name(self)}(\"{self.name}\")"
+        return f"Variable(\"{self.name}\")"
 
     def __repr__(
         self: Variable
     ) -> str:
-        return f"{get_class_name(self)}(\"{self.name}\")"
+        return f"Variable(\"{self.name}\")"
