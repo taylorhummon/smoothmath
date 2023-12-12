@@ -66,6 +66,50 @@ class Expression(ABC):
         self._compute_global_differential(builder, ex.Constant(1))
         return builder.build()
 
+    ## Operations ##
+
+    def __neg__(
+        self: Expression
+    ) -> ex.Negation:
+        return ex.Negation(self)
+
+    def __add__(
+        self: Expression,
+        other: Expression
+    ) -> ex.Plus:
+        return ex.Plus(self, other)
+
+    def __sub__(
+        self: Expression,
+        other: Expression
+    ) -> ex.Minus:
+        return ex.Minus(self, other)
+
+    def __mul__(
+        self: Expression,
+        other: Expression
+    ) -> ex.Multiply:
+        return ex.Multiply(self, other)
+
+    def __truediv__(
+        self: Expression,
+        other: Expression
+    ) -> ex.Divide:
+        return ex.Divide(self, other)
+
+    def __pow__(
+        self: Expression,
+        exponent: int | Expression
+    ) -> ex.NthPower | ex.Power:
+        if isinstance(exponent, Expression):
+            return ex.Power(self, exponent)
+        # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
+        # even though that wouldn't pass type checking.
+        integer = integer_from_integral_real_number(exponent)
+        if integer is None:
+            raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")
+        else:
+            return ex.NthPower(integer, self)
 
     ## Abstract methods ##
 
@@ -114,52 +158,6 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
 
 
-    ## Operations ##
-
-    def __neg__(
-        self: Expression
-    ) -> ex.Negation:
-        return ex.Negation(self)
-
-    def __add__(
-        self: Expression,
-        other: Expression
-    ) -> ex.Plus:
-        return ex.Plus(self, other)
-
-    def __sub__(
-        self: Expression,
-        other: Expression
-    ) -> ex.Minus:
-        return ex.Minus(self, other)
-
-    def __mul__(
-        self: Expression,
-        other: Expression
-    ) -> ex.Multiply:
-        return ex.Multiply(self, other)
-
-    def __truediv__(
-        self: Expression,
-        other: Expression
-    ) -> ex.Divide:
-        return ex.Divide(self, other)
-
-    def __pow__(
-        self: Expression,
-        exponent: int | Expression
-    ) -> ex.NthPower | ex.Power:
-        if isinstance(exponent, Expression):
-            return ex.Power(self, exponent)
-        # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
-        # even though that wouldn't pass type checking.
-        integer = integer_from_integral_real_number(exponent)
-        if integer is None:
-            raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")
-        else:
-            return ex.NthPower(integer, self)
-
-
 class NullaryExpression(Expression):
     def __init__(
         self: NullaryExpression,
@@ -198,14 +196,24 @@ class UnaryExpression(Expression):
         self._value = None
         self._inner._reset_evaluation_cache()
 
+    def _evaluate(
+        self: UnaryExpression,
+        point: sm.Point
+    ) -> sm.real_number:
+        if self._value is not None:
+            return self._value
+        inner_value = self._inner._evaluate(point)
+        self._verify_domain_constraints(inner_value)
+        self._value = self._value_formula(inner_value)
+        return self._value
+
+    ## Operations ##
+
     def __eq__(
         self: UnaryExpression,
         other: Any
     ) -> bool:
-        return (
-            (other.__class__ == self.__class__) and
-            (other._inner == self._inner)
-        )
+        return (other.__class__ == self.__class__) and (other._inner == self._inner)
 
     def __hash__(
         self: UnaryExpression
@@ -221,6 +229,22 @@ class UnaryExpression(Expression):
         self: UnaryExpression
     ) -> str:
         return f"{get_class_name(self)}({self._inner})"
+
+    ## Abstract methods ##
+
+    @abstractmethod
+    def _verify_domain_constraints(
+        self: UnaryExpression,
+        inner_value: sm.real_number
+    ) -> None:
+        raise Exception("Concrete classes derived from UnaryExpression must implement _verify_domain_constraints()")
+
+    @abstractmethod
+    def _value_formula(
+        self: UnaryExpression,
+        inner_value: sm.real_number
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
 
 
 class ParameterizedUnaryExpression(Expression):
@@ -242,17 +266,24 @@ class ParameterizedUnaryExpression(Expression):
     ) -> ParameterizedUnaryExpression:
         return self.__class__(self._parameter(), inner) # type: ignore
 
-    @abstractmethod
-    def _parameter(
-        self: ParameterizedUnaryExpression
-    ) -> Any:
-        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _parameter()")
-
     def _reset_evaluation_cache(
         self: ParameterizedUnaryExpression
     ) -> None:
         self._value = None
         self._inner._reset_evaluation_cache()
+
+    def _evaluate(
+        self: ParameterizedUnaryExpression,
+        point: sm.Point
+    ) -> sm.real_number:
+        if self._value is not None:
+            return self._value
+        inner_value = self._inner._evaluate(point)
+        self._verify_domain_constraints(inner_value)
+        self._value = self._value_formula(inner_value)
+        return self._value
+
+    ## Operations ##
 
     def __eq__(
         self: ParameterizedUnaryExpression,
@@ -278,6 +309,28 @@ class ParameterizedUnaryExpression(Expression):
         self: ParameterizedUnaryExpression
     ) -> str:
         return f"{get_class_name(self)}({self._parameter()}, {self._inner})"
+
+    ## Abstract methods ##
+
+    @abstractmethod
+    def _parameter(
+        self: ParameterizedUnaryExpression
+    ) -> Any:
+        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _parameter()")
+
+    @abstractmethod
+    def _verify_domain_constraints(
+        self: ParameterizedUnaryExpression,
+        inner_value: sm.real_number
+    ) -> None:
+        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _verify_domain_constraints()")
+
+    @abstractmethod
+    def _value_formula(
+        self: ParameterizedUnaryExpression,
+        inner_value: sm.real_number
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _value_formula()")
 
 
 class BinaryExpression(Expression):
@@ -312,6 +365,20 @@ class BinaryExpression(Expression):
         self._left._reset_evaluation_cache()
         self._right._reset_evaluation_cache()
 
+    def _evaluate(
+        self: BinaryExpression,
+        point: sm.Point
+    ) -> sm.real_number:
+        if self._value is not None:
+            return self._value
+        left_value = self._left._evaluate(point)
+        right_value = self._right._evaluate(point)
+        self._verify_domain_constraints(left_value, right_value)
+        self._value = self._value_formula(left_value, right_value)
+        return self._value
+
+    ## Operations ##
+
     def __eq__(
         self: BinaryExpression,
         other: Any
@@ -336,3 +403,21 @@ class BinaryExpression(Expression):
         self: BinaryExpression
     ) -> str:
         return f"{get_class_name(self)}({self._left}, {self._right})"
+
+    ## Abstract methods ##
+
+    @abstractmethod
+    def _verify_domain_constraints(
+        self: BinaryExpression,
+        left_value: sm.real_number,
+        right_value: sm.real_number
+    ) -> None:
+        raise Exception("Concrete classes derived from BinaryExpression must implement _verify_domain_constraints()")
+
+    @abstractmethod
+    def _value_formula(
+        self: BinaryExpression,
+        left_value: sm.real_number,
+        right_value: sm.real_number
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from BinaryExpression must implement _value_formula()")

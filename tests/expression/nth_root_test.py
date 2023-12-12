@@ -6,13 +6,13 @@ from smoothmath._private.expression.nth_root import nth_root
 
 def test_nth_root():
     # n = -2
-    with raises(Exception):
+    with raises(DomainError):
         nth_root(-2, 12)
     # n = -1
-    with raises(Exception):
+    with raises(DomainError):
         nth_root(-1, 12)
     # n = 0
-    with raises(Exception):
+    with raises(DomainError):
         nth_root(0, 12)
     # n = 1
     assert nth_root(1, 0.5) == approx(0.5)

@@ -16,6 +16,20 @@ class Multiply(base.BinaryExpression):
     ) -> None:
         super().__init__(left, right)
 
+    def _verify_domain_constraints(
+        self: Multiply,
+        left_value: sm.real_number,
+        right_value: sm.real_number
+    ) -> None:
+        pass
+
+    def _value_formula(
+        self: Multiply,
+        left_value: sm.real_number,
+        right_value: sm.real_number
+    ) -> sm.real_number:
+        return left_value * right_value
+
     def _evaluate(
         self: Multiply,
         point: sm.Point

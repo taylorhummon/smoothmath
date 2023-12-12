@@ -19,10 +19,9 @@ class Power(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Power,
-        point: sm.Point
+        left_value: sm.real_number,
+        right_value: sm.real_number
     ) -> None:
-        left_value = self._left._evaluate(point)
-        right_value = self._right._evaluate(point)
         if left_value == 0:
             if right_value > 0:
                 raise sm.DomainError("Power(x, y) is not smooth around x = 0 for y > 0")
@@ -33,21 +32,12 @@ class Power(base.BinaryExpression):
         elif left_value < 0:
             raise sm.DomainError("Power(x, y) is undefined for x < 0")
 
-    def _evaluate(
+    def _value_formula(
         self: Power,
-        point: sm.Point
+        left_value: sm.real_number,
+        right_value: sm.real_number
     ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        if self._left._lacks_variables and self._left._evaluate(point) == 1:
-            # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
-            self._value = 1
-        else:
-            self._verify_domain_constraints(point)
-            left_value = self._left._evaluate(point)
-            right_value = self._right._evaluate(point)
-            self._value = left_value ** right_value
-        return self._value
+        return left_value ** right_value
 
     def _local_partial(
         self: Power,
@@ -58,7 +48,9 @@ class Power(base.BinaryExpression):
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             return 0
         else:
-            self._verify_domain_constraints(point)
+            left_value = self._left._evaluate(point)
+            right_value = self._right._evaluate(point)
+            self._verify_domain_constraints(left_value, right_value)
             left_partial = self._left._local_partial(point, with_respect_to)
             right_partial = self._right._local_partial(point, with_respect_to)
             return (
@@ -86,7 +78,9 @@ class Power(base.BinaryExpression):
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             pass
         else:
-            self._verify_domain_constraints(builder.point)
+            left_value = self._left._evaluate(builder.point)
+            right_value = self._right._evaluate(builder.point)
+            self._verify_domain_constraints(left_value, right_value)
             next_accumulated_left = self._local_partial_formula_left(builder.point, accumulated)
             next_accumulated_right = self._local_partial_formula_right(builder.point, accumulated)
             self._left._compute_local_differential(builder, next_accumulated_left)

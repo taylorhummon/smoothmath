@@ -5,10 +5,30 @@ import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
 from smoothmath._private.expression.nth_power import nth_power
-from smoothmath._private.utilities import is_integer, integer_from_integral_real_number
+from smoothmath._private.utilities import integer_from_integral_real_number
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
+
+
+def nth_root(
+    n: int,
+    x: sm.real_number
+) -> sm.real_number:
+    if n <= 0:
+        raise sm.DomainError(f"nth_root(x) is not defined when n = {n}")
+    if n >= 2 and x == 0:
+        raise sm.DomainError(f"nth_root(x) is not defined at x = 0 when n = {n}")
+    if n % 2 == 0 and x < 0:
+        raise sm.DomainError(f"nth_root(x) is not defined for negative x when n = {n}")
+    if n == 1:
+        return x
+    if n == 2:
+        return math.sqrt(x)
+    elif n == 3:
+        return math.cbrt(x)
+    else:
+        return x ** (1 / n)
 
 
 class NthRoot(base.ParameterizedUnaryExpression):
@@ -35,31 +55,26 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: NthRoot,
-        point: sm.Point,
+        inner_value: sm.real_number
     ) -> None:
-        inner_value = self._inner._evaluate(point)
         if self._n >= 2 and inner_value == 0:
             raise sm.DomainError(f"NthRoot(x) is not defined at x = 0 when n = {self._n}")
         if self._n % 2 == 0 and inner_value < 0:
             raise sm.DomainError(f"NthRoot(x) is not defined for negative x when n = {self._n}")
 
-    def _evaluate(
+    def _value_formula(
         self: NthRoot,
-        point: sm.Point
-    ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        self._verify_domain_constraints(point)
-        inner_value = self._inner._evaluate(point)
-        self._value = nth_root(self._n, inner_value)
-        return self._value
+        inner_value: sm.real_number
+    ):
+        return nth_root(self._n, inner_value)
 
     def _local_partial(
         self: NthRoot,
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        self._verify_domain_constraints(point)
+        inner_value = self._inner._evaluate(point)
+        self._verify_domain_constraints(inner_value)
         inner_partial = self._inner._local_partial(point, with_respect_to)
         return self._local_partial_formula(point, inner_partial)
 
@@ -75,7 +90,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        self._verify_domain_constraints(builder.point)
+        inner_value = self._inner._evaluate(builder.point)
+        self._verify_domain_constraints(inner_value)
         next_accumulated = self._local_partial_formula(builder.point, accumulated)
         self._inner._compute_local_differential(builder, next_accumulated)
 
@@ -108,44 +124,3 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return multiplier
         else: # n >= 2
             return ex.Divide(multiplier, ex.Multiply(ex.Constant(n), ex.NthPower(n - 1, self)))
-
-
-# TODO: consider using another implementation of nth_root()
-def nth_root(
-    n: int,
-    x: sm.real_number
-) -> sm.real_number:
-    if n >= 2 and x == 0:
-        raise sm.DomainError(f"nth_root(x) is not defined at x = 0 when n = {n}")
-    if n % 2 == 0 and x < 0:
-        raise sm.DomainError(f"nth_root(x) is not defined for negative x when n = {n}")
-    root = _nth_root_helper(n, x)
-    return _repair_integer(n, x, root)
-
-
-def _nth_root_helper(
-    n: int,
-    x: sm.real_number
-) -> sm.real_number:
-    if n == 1:
-        return x
-    if n == 2:
-        return math.sqrt(x)
-    elif n == 3:
-        return math.cbrt(x)
-    else:
-        return x ** (1 / n)
-
-
-def _repair_integer(
-    n: int,
-    x: sm.real_number,
-    root: sm.real_number
-) -> sm.real_number:
-    if not is_integer(x):
-        return root
-    integral_root = round(root)
-    if integral_root ** n == x:
-        return integral_root
-    else:
-        return root

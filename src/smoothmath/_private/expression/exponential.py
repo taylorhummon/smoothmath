@@ -26,15 +26,17 @@ class Exponential(base.ParameterizedUnaryExpression):
     ) -> sm.real_number:
         return self._base
 
-    def _evaluate(
+    def _verify_domain_constraints(
         self: Exponential,
-        point: sm.Point
-    ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        inner_value = self._inner._evaluate(point)
-        self._value = self._base ** inner_value
-        return self._value
+        inner_value: sm.real_number
+    ) -> None:
+        pass
+
+    def _value_formula(
+        self: Exponential,
+        inner_value: sm.real_number
+    ):
+        return self._base ** inner_value
 
     def _local_partial(
         self: Exponential,

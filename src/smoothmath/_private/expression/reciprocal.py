@@ -18,29 +18,24 @@ class Reciprocal(base.UnaryExpression):
 
     def _verify_domain_constraints(
         self: Reciprocal,
-        point: sm.Point
+        inner_value: sm.real_number
     ) -> None:
-        inner_value = self._inner._evaluate(point)
         if inner_value == 0:
             raise sm.DomainError("Reciprocal(x) blows up around x = 0")
 
-    def _evaluate(
+    def _value_formula(
         self: Reciprocal,
-        point: sm.Point
-    ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        self._verify_domain_constraints(point)
-        inner_value = self._inner._evaluate(point)
-        self._value = 1 / inner_value
-        return self._value
+        inner_value: sm.real_number
+    ):
+        return 1 / inner_value
 
     def _local_partial(
         self: Reciprocal,
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        self._verify_domain_constraints(point)
+        inner_value = self._inner._evaluate(point)
+        self._verify_domain_constraints(inner_value)
         inner_partial = self._inner._local_partial(point, with_respect_to)
         return self._local_partial_formula(point, inner_partial)
 
@@ -56,7 +51,8 @@ class Reciprocal(base.UnaryExpression):
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        self._verify_domain_constraints(builder.point)
+        inner_value = self._inner._evaluate(builder.point)
+        self._verify_domain_constraints(inner_value)
         next_accumulated = self._local_partial_formula(builder.point, accumulated)
         self._inner._compute_local_differential(builder, next_accumulated)
 

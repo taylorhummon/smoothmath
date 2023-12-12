@@ -1,6 +1,38 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
 from smoothmath.expression import Constant, Variable, NthPower, NthRoot
+from smoothmath._private.expression.nth_power import nth_power
+
+
+def test_nth_power():
+    # n = 0
+    with raises(DomainError):
+        nth_power(0, 0)
+    assert nth_power(0, 3) == 1
+    assert nth_power(0, -3) == 1
+    assert nth_power(0, 0.5) == 1
+    # n = 1
+    assert nth_power(1, 0) == 0
+    assert nth_power(1, 3) == 3
+    assert nth_power(1, -3) == -3
+    assert nth_power(1, 0.5) == 0.5
+    # n = 2
+    assert nth_power(2, 0) == 0
+    assert nth_power(2, 3) == 9
+    assert nth_power(2, -3) == 9
+    assert nth_power(2, 0.5) == 0.25
+    # n = -1
+    with raises(DomainError):
+        nth_power(-1, 0)
+    assert nth_power(-1, 3) == approx(1 / 3)
+    assert nth_power(-1, -3) == approx(- 1 / 3)
+    assert nth_power(-1, 0.5) == approx(2)
+    # n = -2
+    with raises(DomainError):
+        nth_power(-2, 0)
+    assert nth_power(-2, 3) == approx(1 / 9)
+    assert nth_power(-2, -3) == approx(1 / 9)
+    assert nth_power(-2, 0.5) == approx(4)
 
 
 def test_NthPower_with_n_equal_two():

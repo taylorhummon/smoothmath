@@ -15,15 +15,17 @@ class Negation(base.UnaryExpression):
     ) -> None:
         super().__init__(inner)
 
-    def _evaluate(
+    def _verify_domain_constraints(
         self: Negation,
-        point: sm.Point
+        inner_value: sm.real_number
+    ) -> None:
+        pass
+
+    def _value_formula(
+        self: Negation,
+        inner_value: sm.real_number
     ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        inner_value = self._inner._evaluate(point)
-        self._value = - inner_value
-        return self._value
+        return - inner_value
 
     def _local_partial(
         self: Negation,

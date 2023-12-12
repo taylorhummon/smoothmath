@@ -16,16 +16,19 @@ class Plus(base.BinaryExpression):
     ) -> None:
         super().__init__(left, right)
 
-    def _evaluate(
+    def _verify_domain_constraints(
         self: Plus,
-        point: sm.Point
+        left_value: sm.real_number,
+        right_value: sm.real_number
+    ) -> None:
+        pass
+
+    def _value_formula(
+        self: Plus,
+        left_value: sm.real_number,
+        right_value: sm.real_number
     ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        left_value = self._left._evaluate(point)
-        right_value = self._right._evaluate(point)
-        self._value = left_value + right_value
-        return self._value
+        return left_value + right_value
 
     def _local_partial(
         self: Plus,

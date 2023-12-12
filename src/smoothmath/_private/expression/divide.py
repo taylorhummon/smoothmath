@@ -19,34 +19,30 @@ class Divide(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Divide,
-        point: sm.Point
+        left_value: sm.real_number,
+        right_value: sm.real_number
     ) -> None:
-        left_value = self._left._evaluate(point)
-        right_value = self._right._evaluate(point)
         if right_value == 0:
             if left_value == 0:
                 raise sm.DomainError("Divide(x, y) is not smooth around (x = 0, y = 0)")
             else: # left_value != 0
                 raise sm.DomainError("Divide(x, y) blows up around x != 0 and y = 0")
 
-    def _evaluate(
+    def _value_formula(
         self: Divide,
-        point: sm.Point
+        left_value: sm.real_number,
+        right_value: sm.real_number
     ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        self._verify_domain_constraints(point)
-        left_value = self._left._evaluate(point)
-        right_value = self._right._evaluate(point)
-        self._value = left_value / right_value
-        return self._value
+        return left_value / right_value
 
     def _local_partial(
         self: Divide,
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        self._verify_domain_constraints(point)
+        left_value = self._left._evaluate(point)
+        right_value = self._right._evaluate(point)
+        self._verify_domain_constraints(left_value, right_value)
         left_partial = self._left._local_partial(point, with_respect_to)
         right_partial = self._right._local_partial(point, with_respect_to)
         return (
@@ -70,7 +66,9 @@ class Divide(base.BinaryExpression):
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        self._verify_domain_constraints(builder.point)
+        left_value = self._left._evaluate(builder.point)
+        right_value = self._right._evaluate(builder.point)
+        self._verify_domain_constraints(left_value, right_value)
         next_accumulated_left = self._local_partial_formula_left(builder.point, accumulated)
         next_accumulated_right = self._local_partial_formula_right(builder.point, accumulated)
         self._left._compute_local_differential(builder, next_accumulated_left)
