@@ -20,12 +20,15 @@ from smoothmath._private.reducers import (
     _reduce_negation_of_negation_of_u,
     _reduce_reciprocal_of_reciprocal_of_u,
     _reduce_reciprocal_of_negation_of_u,
+    _reduce_mth_power_of_nth_power_of_u,
     _reduce_even_nth_power_of_negation_of_u,
     _reduce_odd_nth_power_of_negation_of_u,
     _reduce_nth_power_of_reciprocal_of_u,
+    _reduce_mth_root_of_nth_root_of_u,
+    _reduce_odd_nth_root_of_negation_of_u,
+    _reduce_nth_root_of_reciprocal_of_u,
     _reduce_nth_power_of_nth_root_of_u,
     _reduce_nth_root_of_nth_power_of_u,
-    _reduce_nth_root_of_reciprocal_of_u,
     _reduce_logarithm_of_exponential_of_u,
     _reduce_exponential_of_logarithm_of_u,
     _reduce_by_associating_plus_right,
@@ -102,6 +105,12 @@ def test_reduce_reciprocal_of_negation_of_u():
     assert _reduce_reciprocal_of_negation_of_u(z) == Negation(Reciprocal(u))
 
 
+def test_reduce_mth_power_of_nth_power_of_u():
+    u = Variable("u")
+    z = NthPower(2, NthPower(3, u))
+    assert _reduce_mth_power_of_nth_power_of_u(z) == NthPower(6, u)
+
+
 def test_reduce_even_nth_power_of_negation_of_u():
     u = Variable("u")
     z = NthPower(2, Negation(u))
@@ -120,6 +129,24 @@ def test_reduce_nth_power_of_reciprocal_of_u():
     assert _reduce_nth_power_of_reciprocal_of_u(z) == Reciprocal(NthPower(2, u))
 
 
+def test_reduce_mth_root_of_nth_root_of_u():
+    u = Variable("u")
+    z = NthRoot(2, NthRoot(3, u))
+    assert _reduce_mth_root_of_nth_root_of_u(z) == NthRoot(6, u)
+
+
+def test_reduce_odd_nth_root_of_negation_of_u():
+    u = Variable("u")
+    z = NthRoot(3, Negation(u))
+    assert _reduce_odd_nth_root_of_negation_of_u(z) == Negation(NthRoot(3, u))
+
+
+def test_reduce_nth_root_of_reciprocal_of_u():
+    u = Variable("u")
+    z = NthRoot(2, Reciprocal(u))
+    assert _reduce_nth_root_of_reciprocal_of_u(z) == Reciprocal(NthRoot(2, u))
+
+
 def test_reduce_nth_power_of_nth_root_of_u():
     u = Variable("u")
     z = NthPower(2, NthRoot(2, u))
@@ -130,12 +157,6 @@ def test_reduce_nth_root_of_nth_power_of_u():
     u = Variable("u")
     z = NthRoot(2, NthPower(2, u))
     assert _reduce_nth_root_of_nth_power_of_u(z) == u
-
-
-def test_reduce_nth_root_of_reciprocal_of_u():
-    u = Variable("u")
-    z = NthRoot(2, Reciprocal(u))
-    assert _reduce_nth_root_of_reciprocal_of_u(z) == Reciprocal(NthRoot(2, u))
 
 
 def test_reduce_logarithm_of_exponential_of_u():
