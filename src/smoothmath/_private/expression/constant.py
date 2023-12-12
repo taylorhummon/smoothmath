@@ -3,13 +3,10 @@ from typing import TYPE_CHECKING, Any
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
-from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
-
-# differential rule: d(C) = 0
 
 class Constant(base.NullaryExpression):
     def __init__(
@@ -17,14 +14,14 @@ class Constant(base.NullaryExpression):
         value: sm.real_number
     ) -> None:
         super().__init__(lacks_variables = True)
-        self._value: sm.real_number
-        self._value = value
+        self.value: sm.real_number
+        self.value = value
 
     def _evaluate(
         self: Constant,
         point: sm.Point
     ) -> sm.real_number:
-        return self._value
+        return self.value
 
     def _local_partial(
         self: Constant,
@@ -57,19 +54,19 @@ class Constant(base.NullaryExpression):
         self: Constant,
         other: Any
     ) -> bool:
-        return (other.__class__ == self.__class__) and (other._value == self._value)
+        return (other.__class__ == self.__class__) and (other.value == self.value)
 
     def __hash__(
         self: Constant
     ) -> int:
-        return hash((get_class_name(self), self._value))
+        return hash(("Constant", self.value))
 
     def __str__(
         self: Constant
     ) -> str:
-        return f"{get_class_name(self)}({self._value})"
+        return f"Constant({self.value})"
 
     def __repr__(
         self: Constant
     ) -> str:
-        return f"{get_class_name(self)}({self._value})"
+        return f"Constant({self.value})"

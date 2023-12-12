@@ -339,7 +339,7 @@ def _reduce_u_plus_zero(
     if (
         isinstance(expression, ex.Plus) and
         isinstance(expression._right, ex.Constant) and
-        expression._right._value == 0
+        expression._right.value == 0
     ):
         return expression._left
     else:
@@ -356,7 +356,7 @@ def _reduce_u_minus_zero(
     if (
         isinstance(expression, ex.Minus) and
         isinstance(expression._right, ex.Constant) and
-        expression._right._value == 0
+        expression._right.value == 0
     ):
         return expression._left
     else:
@@ -370,7 +370,7 @@ def _reduce_zero_minus_u(
     if (
         isinstance(expression, ex.Minus) and
         isinstance(expression._left, ex.Constant) and
-        expression._left._value == 0
+        expression._left.value == 0
     ):
         return _apply_reducers(
             ex.Negation(expression._right)
@@ -438,7 +438,7 @@ def _reduce_one_times_u(
     if (
         isinstance(expression, ex.Multiply) and
         isinstance(expression._left, ex.Constant) and
-        expression._left._value == 1
+        expression._left.value == 1
     ):
         return expression._right
     else:
@@ -452,7 +452,7 @@ def _reduce_zero_times_u(
     if (
         isinstance(expression, ex.Multiply) and
         isinstance(expression._left, ex.Constant) and
-        expression._left._value == 0
+        expression._left.value == 0
     ):
         return ex.Constant(0)
     else:
@@ -466,7 +466,7 @@ def _reduce_negative_one_times_u(
     if (
         isinstance(expression, ex.Multiply) and
         isinstance(expression._left, ex.Constant) and
-        expression._left._value == -1
+        expression._left.value == -1
     ):
         return _apply_reducers(
             ex.Negation(expression._right)
@@ -584,7 +584,7 @@ def _reduce_u_over_one(
     if (
         isinstance(expression, ex.Divide) and
         isinstance(expression._right, ex.Constant) and
-        expression._right._value == 1
+        expression._right.value == 1
     ):
         return expression._left
     else:
@@ -598,7 +598,7 @@ def _reduce_one_over_u(
     if (
         isinstance(expression, ex.Divide) and
         isinstance(expression._left, ex.Constant) and
-        expression._left._value == 1
+        expression._left.value == 1
     ):
         return _apply_reducers(
             ex.Reciprocal(expression._right)
@@ -632,7 +632,7 @@ def _reduce_one_to_the_u(
     if (
         isinstance(expression, ex.Power) and
         isinstance(expression._left, ex.Constant) and
-        expression._left._value == 1
+        expression._left.value == 1
     ):
         return ex.Constant(1)
     else:
@@ -647,7 +647,7 @@ def _reduce_u_to_the_n_at_least_two(
         isinstance(expression, ex.Power) and
         isinstance(expression._right, ex.Constant)
     ):
-        n = integer_from_integral_real_number(expression._right._value)
+        n = integer_from_integral_real_number(expression._right.value)
         if n is not None and n >= 2:
             return _apply_reducers(
                 ex.NthPower(n, expression._left)
@@ -662,7 +662,7 @@ def _reduce_u_to_the_one(
     if (
         isinstance(expression, ex.Power) and
         isinstance(expression._right, ex.Constant) and
-        expression._right._value == 1
+        expression._right.value == 1
     ):
         return expression._left
     else:
@@ -676,7 +676,7 @@ def _reduce_u_to_the_zero(
     if (
         isinstance(expression, ex.Power) and
         isinstance(expression._right, ex.Constant) and
-        expression._right._value == 0
+        expression._right.value == 0
     ):
         return ex.Constant(1)
     else:
@@ -690,7 +690,7 @@ def _reduce_u_to_the_negative_one(
     if (
         isinstance(expression, ex.Power) and
         isinstance(expression._right, ex.Constant) and
-        expression._right._value == -1
+        expression._right.value == -1
     ):
         return _apply_reducers(
             ex.Reciprocal(expression._left)
@@ -706,7 +706,7 @@ def _reduce_u_to_the_one_half(
     if (
         isinstance(expression, ex.Power) and
         isinstance(expression._right, ex.Constant) and
-        expression._right._value == 0.5
+        expression._right.value == 0.5
     ):
         return _apply_reducers(
             ex.NthRoot(2, expression._left)
@@ -722,11 +722,11 @@ def _reduce_power_with_constant_base(
     if (
         isinstance(expression, ex.Power) and
         isinstance(expression._left, ex.Constant) and
-        expression._left._value > 0 and
-        expression._left._value != 1
+        expression._left.value > 0 and
+        expression._left.value != 1
     ):
         return _apply_reducers(
-            ex.Exponential(expression._left._value, expression._right)
+            ex.Exponential(expression._left.value, expression._right)
         )
     else:
         return None
