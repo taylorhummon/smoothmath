@@ -48,6 +48,8 @@ from smoothmath._private.reducers import (
     _reduce_sum_of_logarithms,
     _reduce_u_over_one,
     _reduce_one_over_u,
+    _reduce_negated_numerator,
+    _reduce_negated_denominator,
     _reduce_reciprocal_of_u_over_v,
     _reduce_one_to_the_u,
     _reduce_u_to_the_n_at_least_two,
@@ -292,6 +294,20 @@ def test_reduce_one_over_u():
     u = Variable("u")
     z = Divide(Constant(1), u)
     assert _reduce_one_over_u(z) == Reciprocal(u)
+
+
+def test_reduce_negated_numerator():
+    u = Variable("u")
+    v = Variable("v")
+    z = Divide(Negation(u), v)
+    assert _reduce_negated_numerator(z) == Negation(Divide(u, v))
+
+
+def test_reduce_negated_denominator():
+    u = Variable("u")
+    v = Variable("v")
+    z = Divide(u, Negation(v))
+    assert _reduce_negated_denominator(z) == Negation(Divide(u, v))
 
 
 def test_reduce_reciprocal_of_u_over_v():

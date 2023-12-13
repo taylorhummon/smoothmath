@@ -607,7 +607,43 @@ def _reduce_one_over_u(
         return None
 
 
-# Reciprocal(Divide(u, v)) = Divide(v, u)
+# Divide(Negation(u), v) => Negation(Divide(u, v))
+def _reduce_negated_numerator(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Divide) and
+        isinstance(expression._left, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.Divide(expression._left._inner, expression._right)
+        )
+        return _apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
+# Divide(u, Negation(v)) => Negation(Divide(u, v))
+def _reduce_negated_denominator(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Divide) and
+        isinstance(expression._right, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.Divide(expression._left, expression._right._inner)
+        )
+        return _apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
+# Reciprocal(Divide(u, v)) => Divide(v, u)
 def _reduce_reciprocal_of_u_over_v(
     expression: sm.Expression
 ) -> sm.Expression | None:
@@ -797,6 +833,8 @@ reducers = [
     # Divide() OK
     _reduce_u_over_one,
     _reduce_one_over_u,
+    _reduce_negated_numerator,
+    _reduce_negated_denominator,
     _reduce_reciprocal_of_u_over_v,
     # Power() OK
     _reduce_one_to_the_u,
