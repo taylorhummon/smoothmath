@@ -41,9 +41,9 @@ class NthRoot(base.ParameterizedUnaryExpression):
         # even though that wouldn't pass type checking.
         i = integer_from_integral_real_number(n)
         if i is None:
-            raise Exception(f"NthRoot() requires n to be an int, found: {n}")
+            raise Exception(f"NthRoot() requires parameter n to be an int, found: {n}")
         elif i <= 0:
-            raise Exception(f"NthRoot() requires n to be positive, found: {i}")
+            raise Exception(f"NthRoot() requires paramater n to be positive, found: {i}")
         super().__init__(inner, i)
 
     @property

@@ -7,6 +7,8 @@ from smoothmath.expression import (
     NthRoot,
     Exponential,
     Logarithm,
+    Cosine,
+    Sine,
     Plus,
     Minus,
     Multiply,
@@ -19,17 +21,22 @@ from smoothmath._private.reducers import (
     _reduce_negation_of_negation_of_u,
     _reduce_reciprocal_of_reciprocal_of_u,
     _reduce_reciprocal_of_negation_of_u,
+    _reduce_nth_power_where_n_is_one,
     _reduce_nth_power_of_mth_power_of_u,
-    _reduce_even_nth_power_of_negation_of_u,
-    _reduce_odd_nth_power_of_negation_of_u,
+    _reduce_nth_power_of_negation_of_u,
     _reduce_nth_power_of_reciprocal_of_u,
+    _reduce_nth_root_where_n_is_one,
     _reduce_nth_root_of_mth_root_of_u,
     _reduce_odd_nth_root_of_negation_of_u,
     _reduce_nth_root_of_reciprocal_of_u,
-    _reduce_nth_power_of_nth_root_of_u,
-    _reduce_nth_root_of_nth_power_of_u,
+    _reduce_nth_root_of_mth_power_of_u,
+    _reduce_nth_power_of_mth_root_of_u,
+    _reduce_exponential_of_negation_of_u,
+    _reduce_logarithm_of_reciprocal_of_u,
     _reduce_logarithm_of_exponential_of_u,
     _reduce_exponential_of_logarithm_of_u,
+    _reduce_cosine_of_negation_of_u,
+    _reduce_sine_of_negation_of_u,
     _reduce_by_associating_plus_right,
     _reduce_by_commuting_constants_right_for_plus,
     _reduce_u_plus_zero,
@@ -106,28 +113,36 @@ def test_reduce_reciprocal_of_negation_of_u():
     assert _reduce_reciprocal_of_negation_of_u(z) == Negation(Reciprocal(u))
 
 
+def test_reduce_nth_power_where_n_is_one():
+    u = Variable("u")
+    z = NthPower(u, n = 1)
+    assert _reduce_nth_power_where_n_is_one(z) == u
+
+
 def test_reduce_nth_power_of_mth_power_of_u():
     u = Variable("u")
     z = NthPower(NthPower(u, n = 3), n = 2)
     assert _reduce_nth_power_of_mth_power_of_u(z) == NthPower(u, n = 6)
 
 
-def test_reduce_even_nth_power_of_negation_of_u():
+def test_reduce_nth_power_of_negation_of_u():
     u = Variable("u")
     z = NthPower(Negation(u), n = 2)
-    assert _reduce_even_nth_power_of_negation_of_u(z) == NthPower(u, n = 2)
-
-
-def test_reduce_odd_nth_power_of_negation_of_u():
-    u = Variable("u")
+    assert _reduce_nth_power_of_negation_of_u(z) == NthPower(u, n = 2)
     z = NthPower(Negation(u), n = 3)
-    assert _reduce_odd_nth_power_of_negation_of_u(z) == Negation(NthPower(u, n = 3))
+    assert _reduce_nth_power_of_negation_of_u(z) == Negation(NthPower(u, n = 3))
 
 
 def test_reduce_nth_power_of_reciprocal_of_u():
     u = Variable("u")
     z = NthPower(Reciprocal(u), n = 2)
     assert _reduce_nth_power_of_reciprocal_of_u(z) == Reciprocal(NthPower(u, n = 2))
+
+
+def test_reduce_nth_root_where_n_is_one():
+    u = Variable("u")
+    z = NthRoot(u, n = 1)
+    assert _reduce_nth_root_where_n_is_one(z) == u
 
 
 def test_reduce_nth_root_of_mth_root_of_u():
@@ -148,16 +163,40 @@ def test_reduce_nth_root_of_reciprocal_of_u():
     assert _reduce_nth_root_of_reciprocal_of_u(z) == Reciprocal(NthRoot(u, n = 2))
 
 
-def test_reduce_nth_power_of_nth_root_of_u():
+def test_reduce_nth_root_of_mth_power_of_u():
+    u = Variable("u")
+    z = NthRoot(NthPower(u, n = 2), n = 3)
+    assert _reduce_nth_root_of_mth_power_of_u(z) == NthPower(NthRoot(u, n = 3), n = 2)
+
+
+def test_reduce_nth_power_of_mth_root_of_u():
     u = Variable("u")
     z = NthPower(NthRoot(u, n = 2), n = 2)
-    assert _reduce_nth_power_of_nth_root_of_u(z) == u
+    assert _reduce_nth_power_of_mth_root_of_u(z) == u
+    z = NthPower(NthRoot(u, n = 6), n = 2)
+    assert _reduce_nth_power_of_mth_root_of_u(z) == NthRoot(u, n = 3)
+    z = NthPower(NthRoot(u, n = 2), n = 6)
+    assert _reduce_nth_power_of_mth_root_of_u(z) == NthPower(u, n = 3)
+    z = NthPower(NthRoot(u, n = 6), n = 4)
+    assert _reduce_nth_power_of_mth_root_of_u(z) == NthPower(NthRoot(u, n = 3), n = 2)
+    z = NthPower(NthRoot(u, n = 4), n = 6)
+    assert _reduce_nth_power_of_mth_root_of_u(z) == NthPower(NthRoot(u, n = 2), n = 3)
 
 
-def test_reduce_nth_root_of_nth_power_of_u():
+def test_reduce_exponential_of_negation_of_u():
     u = Variable("u")
-    z = NthRoot(NthPower(u, n = 2), n = 2)
-    assert _reduce_nth_root_of_nth_power_of_u(z) == u
+    z = Exponential(Negation(u))
+    assert _reduce_exponential_of_negation_of_u(z) == Reciprocal(Exponential(u))
+    z = Exponential(Negation(u), base = 2)
+    assert _reduce_exponential_of_negation_of_u(z) == Reciprocal(Exponential(u, base = 2))
+
+
+def test_reduce_logarithm_of_reciprocal_of_u():
+    u = Variable("u")
+    z = Logarithm(Reciprocal(u))
+    assert _reduce_logarithm_of_reciprocal_of_u(z) == Negation(Logarithm(u))
+    z = Logarithm(Reciprocal(u), base = 2)
+    assert _reduce_logarithm_of_reciprocal_of_u(z) == Negation(Logarithm(u, base = 2))
 
 
 def test_reduce_logarithm_of_exponential_of_u():
@@ -167,12 +206,26 @@ def test_reduce_logarithm_of_exponential_of_u():
     z = Logarithm(Exponential(u, base = 2), base = 2)
     assert _reduce_logarithm_of_exponential_of_u(z) == u
 
+
 def test_reduce_exponential_of_logarithm_of_u():
     u = Variable("u")
     z = Exponential(Logarithm(u))
     assert _reduce_exponential_of_logarithm_of_u(z) == u
     z = Exponential(Logarithm(u, base = 2), base = 2)
     assert _reduce_exponential_of_logarithm_of_u(z) == u
+
+
+def test_reduce_cosine_of_negation_of_u():
+    u = Variable("u")
+    z = Cosine(Negation(u))
+    assert _reduce_cosine_of_negation_of_u(z) == Cosine(u)
+
+
+def test_reduce_sine_of_negation_of_u():
+    u = Variable("u")
+    z = Sine(Negation(u))
+    assert _reduce_sine_of_negation_of_u(z) == Negation(Sine(u))
+
 
 def test_reduce_by_associating_plus_right():
     u = Variable("u")

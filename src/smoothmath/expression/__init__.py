@@ -8,8 +8,8 @@ from smoothmath._private.expression.nth_power import NthPower
 from smoothmath._private.expression.nth_root import NthRoot
 from smoothmath._private.expression.exponential import Exponential
 from smoothmath._private.expression.logarithm import Logarithm
-from smoothmath._private.expression.sine import Sine
 from smoothmath._private.expression.cosine import Cosine
+from smoothmath._private.expression.sine import Sine
 # Binary
 from smoothmath._private.expression.plus import Plus
 from smoothmath._private.expression.minus import Minus
@@ -27,8 +27,8 @@ __all__ = [
     "NthRoot",
     "Exponential",
     "Logarithm",
-    "Sine",
     "Cosine",
+    "Sine",
     "Plus",
     "Minus",
     "Multiply",
