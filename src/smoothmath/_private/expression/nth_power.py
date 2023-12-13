@@ -13,11 +13,8 @@ def nth_power(
     x: sm.real_number,
     n: int
 ) -> sm.real_number:
-    if x == 0:
-        if n == 0:
-            raise sm.DomainError("nth_power(x, n) is not smooth around x = 0 for n = 0")
-        elif n <= -1:
-            raise sm.DomainError("nth_power(x, n) blows up around x = 0 when n is negative")
+    if n <= 0:
+        raise sm.DomainError(f"nth_power(x, n) is not defined for n = {n}")
     return x ** n
 
 
@@ -31,7 +28,9 @@ class NthPower(base.ParameterizedUnaryExpression):
         # even though that wouldn't pass type checking.
         i = integer_from_integral_real_number(n)
         if i is None:
-            raise Exception(f"NthPower requires n to be an int, found: {n}")
+            raise Exception(f"NthPower() requires n to be an int, found: {n}")
+        elif i <= 0:
+            raise Exception(f"NthPower() requires n to be positive, found: {i}")
         super().__init__(inner, i)
 
     @property
@@ -44,11 +43,7 @@ class NthPower(base.ParameterizedUnaryExpression):
         self: NthPower,
         inner_value: sm.real_number
     ) -> None:
-        if inner_value == 0:
-            if self.n == 0:
-                raise sm.DomainError("NthPower(x, n) is not smooth around x = 0 for n = 0")
-            elif self.n <= -1:
-                raise sm.DomainError("NthPower(x, n) blows up around x = 0 when n is negative")
+        pass
 
     def _value_formula(
         self: NthPower,
@@ -63,21 +58,15 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> sm.real_number:
         inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
-        if self.n == 0:
-            return 0
-        else: # n is non-zero
-            inner_partial = self._inner._local_partial(point, with_respect_to)
-            return self._local_partial_formula(point, inner_partial)
+        inner_partial = self._inner._local_partial(point, with_respect_to)
+        return self._local_partial_formula(point, inner_partial)
 
     def _synthetic_partial(
         self: NthPower,
         with_respect_to: str
     ) -> sm.Expression:
-        if self.n == 0:
-            return ex.Constant(0)
-        else: # n is non-zero
-            inner_partial = self._inner._synthetic_partial(with_respect_to)
-            return self._synthetic_partial_formula(inner_partial)
+        inner_partial = self._inner._synthetic_partial(with_respect_to)
+        return self._synthetic_partial_formula(inner_partial)
 
     def _compute_local_differential(
         self: NthPower,
@@ -86,22 +75,16 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> None:
         inner_value = self._inner._evaluate(builder.point)
         self._verify_domain_constraints(inner_value)
-        if self.n == 0:
-            return
-        else:
-            next_accumulated = self._local_partial_formula(builder.point, accumulated)
-            self._inner._compute_local_differential(builder, next_accumulated)
+        next_accumulated = self._local_partial_formula(builder.point, accumulated)
+        self._inner._compute_local_differential(builder, next_accumulated)
 
     def _compute_global_differential(
         self: NthPower,
         builder: GlobalDifferentialBuilder,
         accumulated: sm.Expression
     ) -> None:
-        if self.n == 0:
-            return
-        else:
-            next_accumulated = self._synthetic_partial_formula(accumulated)
-            self._inner._compute_global_differential(builder, next_accumulated)
+        next_accumulated = self._synthetic_partial_formula(accumulated)
+        self._inner._compute_global_differential(builder, next_accumulated)
 
     def _local_partial_formula(
         self: NthPower,
@@ -109,11 +92,9 @@ class NthPower(base.ParameterizedUnaryExpression):
         multiplier: sm.real_number
     ) -> sm.real_number:
         n = self.n
-        if n == 0:
-            raise Exception("internal error: n should not be zero here")
-        elif n == 1:
+        if n == 1:
             return multiplier
-        else:
+        else: # n >= 2
             inner_value = self._inner._evaluate(point)
             return n * nth_power(inner_value, n - 1) * multiplier
 
@@ -122,11 +103,9 @@ class NthPower(base.ParameterizedUnaryExpression):
         multiplier: sm.Expression
     ) -> sm.Expression:
         n = self.n
-        if n == 0:
-            raise Exception("internal error: n should not be zero here")
-        elif n == 1:
+        if n == 1:
             return multiplier
-        else:
+        else: # n >= 2
             return ex.Multiply(
                 ex.Multiply(ex.Constant(n), ex.NthPower(self._inner, n - 1)),
                 multiplier

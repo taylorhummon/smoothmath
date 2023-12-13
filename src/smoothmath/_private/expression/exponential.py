@@ -17,7 +17,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
-            raise Exception(f"Exponentials must have a positive base, found: {base}")
+            raise Exception(f"Exponential must have a positive base, found: {base}")
 
     @property
     def base(

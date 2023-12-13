@@ -177,7 +177,7 @@ class UnaryExpression(Expression):
         inner: Expression
     ) -> None:
         if not isinstance(inner, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {inner}")
+            raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
         super().__init__(inner._lacks_variables)
         self._inner: Expression
         self._inner = inner
@@ -294,9 +294,9 @@ class BinaryExpression(Expression):
         right: Expression
     ) -> None:
         if not isinstance(left, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {left}")
+            raise Exception(f"Expressions must be composed of Expressions, found: {left}")
         if not isinstance(right, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {right}")
+            raise Exception(f"Expressions must be composed of Expressions, found: {right}")
         super().__init__(left._lacks_variables and right._lacks_variables)
         self._left: Expression
         self._left = left

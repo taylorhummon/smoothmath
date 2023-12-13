@@ -16,11 +16,11 @@ def nth_root(
     n: int
 ) -> sm.real_number:
     if n <= 0:
-        raise sm.DomainError(f"nth_root(x, n) is not defined when n = {n}")
+        raise sm.DomainError(f"nth_root(x, n) is not defined for n = {n}")
     if n >= 2 and x == 0:
-        raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 when n = {n}")
+        raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = {n}")
     if n % 2 == 0 and x < 0:
-        raise sm.DomainError(f"nth_root(x, n) is not defined for negative x when n = {n}")
+        raise sm.DomainError(f"nth_root(x, n) is not defined for negative x for n = {n}")
     if n == 1:
         return x
     if n == 2:
@@ -43,7 +43,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
         if i is None:
             raise Exception(f"NthRoot() requires n to be an int, found: {n}")
         elif i <= 0:
-            raise Exception(f"NthRoot() needs n to be positive, found {i}")
+            raise Exception(f"NthRoot() requires n to be positive, found: {i}")
         super().__init__(inner, i)
 
     @property
