@@ -9,13 +9,6 @@ if TYPE_CHECKING:
 
 
 class Multiply(base.BinaryExpression):
-    def __init__(
-        self: Multiply,
-        left: sm.Expression,
-        right: sm.Expression
-    ) -> None:
-        super().__init__(left, right)
-
     def _verify_domain_constraints(
         self: Multiply,
         left_value: sm.real_number,

@@ -9,13 +9,6 @@ if TYPE_CHECKING:
 
 
 class Minus(base.BinaryExpression):
-    def __init__(
-        self: Minus,
-        left: sm.Expression,
-        right: sm.Expression
-    ) -> None:
-        super().__init__(left, right)
-
     def _verify_domain_constraints(
         self: Minus,
         left_value: sm.real_number,

@@ -10,12 +10,6 @@ if TYPE_CHECKING:
 
 
 class Cosine(base.UnaryExpression):
-    def __init__(
-        self: Cosine,
-        inner: sm.Expression
-    ) -> None:
-        super().__init__(inner)
-
     def _verify_domain_constraints(
         self: Cosine,
         inner_value: sm.real_number

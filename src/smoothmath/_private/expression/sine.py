@@ -10,12 +10,6 @@ if TYPE_CHECKING:
 
 
 class Sine(base.UnaryExpression):
-    def __init__(
-        self: Sine,
-        inner: sm.Expression
-    ) -> None:
-        super().__init__(inner)
-
     def _verify_domain_constraints(
         self: Sine,
         inner_value: sm.real_number

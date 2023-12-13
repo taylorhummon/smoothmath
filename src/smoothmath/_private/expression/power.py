@@ -10,13 +10,6 @@ if TYPE_CHECKING:
 
 
 class Power(base.BinaryExpression):
-    def __init__(
-        self: Power,
-        left: sm.Expression,
-        right: sm.Expression
-    ) -> None:
-        super().__init__(left, right)
-
     def _verify_domain_constraints(
         self: Power,
         left_value: sm.real_number,

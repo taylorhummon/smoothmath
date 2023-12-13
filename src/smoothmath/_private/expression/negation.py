@@ -9,12 +9,6 @@ if TYPE_CHECKING:
 
 
 class Negation(base.UnaryExpression):
-    def __init__(
-        self: Negation,
-        inner: sm.Expression
-    ) -> None:
-        super().__init__(inner)
-
     def _verify_domain_constraints(
         self: Negation,
         inner_value: sm.real_number

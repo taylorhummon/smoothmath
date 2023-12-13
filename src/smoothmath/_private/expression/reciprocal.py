@@ -10,12 +10,6 @@ if TYPE_CHECKING:
 
 
 class Reciprocal(base.UnaryExpression):
-    def __init__(
-        self: Reciprocal,
-        inner: sm.Expression
-    ) -> None:
-        super().__init__(inner)
-
     def _verify_domain_constraints(
         self: Reciprocal,
         inner_value: sm.real_number
