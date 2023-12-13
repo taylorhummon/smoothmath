@@ -27,11 +27,11 @@ class Multiply(base.BinaryExpression):
         self: Multiply,
         point: sm.Point
     ) -> sm.real_number:
-        pair_or_none = self._get_inner_values_or_none(point)
-        if pair_or_none == None:
+        inner_pair_or_none = self._get_inner_inner_pair_or_none(point)
+        if inner_pair_or_none == None:
             self._value = 0
-        else: # pair_or_none is the pair (left_value, right_value)
-            left_value, right_value = pair_or_none
+        else: # inner_pair_or_none is the pair (left_value, right_value)
+            left_value, right_value = inner_pair_or_none
             self._value = left_value * right_value
         return self._value
 
@@ -40,11 +40,11 @@ class Multiply(base.BinaryExpression):
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        pair_or_none = self._get_inner_values_or_none(point)
-        if pair_or_none == None:
+        inner_pair_or_none = self._get_inner_inner_pair_or_none(point)
+        if inner_pair_or_none == None:
             return 0
-        else: # pair_or_none is the pair (left_value, right_value)
-            left_value, right_value = pair_or_none
+        else: # inner_pair_or_none is the pair (left_value, right_value)
+            left_value, right_value = inner_pair_or_none
             left_partial = self._left._local_partial(point, with_respect_to)
             right_partial = self._right._local_partial(point, with_respect_to)
             return right_value * left_partial + left_value * right_partial
@@ -65,11 +65,11 @@ class Multiply(base.BinaryExpression):
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        pair_or_none = self._get_inner_values_or_none(builder.point)
-        if pair_or_none == None:
+        inner_pair_or_none = self._get_inner_inner_pair_or_none(builder.point)
+        if inner_pair_or_none == None:
             return
-        else: # pair_or_none is the pair (left_value, right_value)
-            left_value, right_value = pair_or_none
+        else: # inner_pair_or_none is the pair (left_value, right_value)
+            left_value, right_value = inner_pair_or_none
             self._left._compute_local_differential(builder, right_value * accumulated)
             self._right._compute_local_differential(builder, left_value * accumulated)
 
@@ -82,7 +82,7 @@ class Multiply(base.BinaryExpression):
         self._right._compute_global_differential(builder, ex.Multiply(self._left, accumulated))
 
     # the following method is used to allow shirt-circuiting of either left * 0 or 0 * right
-    def _get_inner_values_or_none(
+    def _get_inner_inner_pair_or_none(
         self: Multiply,
         point: sm.Point
     ) -> tuple[sm.real_number, sm.real_number] | None:
