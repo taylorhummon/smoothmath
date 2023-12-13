@@ -247,21 +247,15 @@ class UnaryExpression(Expression):
         raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
 
 
-class ParameterizedUnaryExpression(Expression):
+class ParameterizedUnaryExpression(UnaryExpression):
     def __init__(
         self: ParameterizedUnaryExpression,
         inner: Expression,
         parameter: Any
     ) -> None:
-        if not isinstance(inner, Expression):
-            raise Exception(f"Expressions must be composed of Expressions, found {inner}")
-        super().__init__(inner._lacks_variables)
-        self._inner: Expression
-        self._inner = inner
+        super().__init__(inner)
         self._parameter: Any
         self._parameter = parameter
-        self._value: sm.real_number | None
-        self._value = None
 
     def _rebuild(
         self: ParameterizedUnaryExpression,
@@ -269,34 +263,13 @@ class ParameterizedUnaryExpression(Expression):
     ) -> ParameterizedUnaryExpression:
         return self.__class__(inner, self._parameter)
 
-    def _reset_evaluation_cache(
-        self: ParameterizedUnaryExpression
-    ) -> None:
-        self._value = None
-        self._inner._reset_evaluation_cache()
-
-    def _evaluate(
-        self: ParameterizedUnaryExpression,
-        point: sm.Point
-    ) -> sm.real_number:
-        if self._value is not None:
-            return self._value
-        inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
-        self._value = self._value_formula(inner_value)
-        return self._value
-
     ## Operations ##
 
     def __eq__(
         self: ParameterizedUnaryExpression,
         other: Any
     ) -> bool:
-        return (
-            (other.__class__ == self.__class__) and
-            (other._inner == self._inner) and
-            (other._parameter == self._parameter)
-        )
+        return super().__eq__(other) and (other._parameter == self._parameter)
 
     def __hash__(
         self: ParameterizedUnaryExpression
@@ -312,22 +285,6 @@ class ParameterizedUnaryExpression(Expression):
         self: ParameterizedUnaryExpression
     ) -> str:
         return f"{get_class_name(self)}({self._inner}, {self._parameter})"
-
-    ## Abstract methods ##
-
-    @abstractmethod
-    def _verify_domain_constraints(
-        self: ParameterizedUnaryExpression,
-        inner_value: sm.real_number
-    ) -> None:
-        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _verify_domain_constraints()")
-
-    @abstractmethod
-    def _value_formula(
-        self: ParameterizedUnaryExpression,
-        inner_value: sm.real_number
-    ) -> sm.real_number:
-        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _value_formula()")
 
 
 class BinaryExpression(Expression):
