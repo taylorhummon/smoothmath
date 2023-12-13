@@ -99,7 +99,7 @@ class Divide(base.BinaryExpression):
     ) -> sm.real_number:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
-        return (- left_value / nth_power(2, right_value)) * multiplier
+        return (- left_value / nth_power(right_value, n = 2)) * multiplier
 
     def _synthetic_partial_formula_left(
         self: Divide,
@@ -112,6 +112,6 @@ class Divide(base.BinaryExpression):
         multiplier: sm.Expression
     ) -> sm.Expression:
         return ex.Multiply(
-            ex.Negation(ex.Divide(self._left, ex.NthPower(2, self._right))),
+            ex.Negation(ex.Divide(self._left, ex.NthPower(self._right, n = 2))),
             multiplier
         )

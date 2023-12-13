@@ -17,7 +17,7 @@ def test_GlobalPartial():
 
 def test_GlobalPartial_raises():
     x = Variable("x")
-    original_expression = Logarithm(math.e, x)
+    original_expression = Logarithm(x, base = math.e)
     synthetic_x_partial = Reciprocal(x)
     global_x_partial = GlobalPartial(original_expression, synthetic_x_partial)
     with raises(DomainError):
@@ -27,14 +27,14 @@ def test_GlobalPartial_raises():
 def test_GlobalPartial_equality():
     x = Variable("x")
     y = Variable("y")
-    global_partial = GlobalPartial(NthPower(2, x), Constant(2) * x)
-    assert global_partial == GlobalPartial(NthPower(2, x), Constant(2) * x)
-    assert global_partial != GlobalPartial(NthPower(2, y), Constant(2) * y)
+    global_partial = GlobalPartial(NthPower(x, n = 2), Constant(2) * x)
+    assert global_partial == GlobalPartial(NthPower(x, n = 2), Constant(2) * x)
+    assert global_partial != GlobalPartial(NthPower(y, n = 2), Constant(2) * y)
 
 
 def test_GlobalPartial_hashing():
     x = Variable("x")
-    global_partial_a = GlobalPartial(NthPower(2, x), Constant(2) * x)
-    global_partial_b = GlobalPartial(NthPower(2, x), Constant(2) * x)
+    global_partial_a = GlobalPartial(NthPower(x, n = 2), Constant(2) * x)
+    global_partial_b = GlobalPartial(NthPower(x, n = 2), Constant(2) * x)
     assert global_partial_a == global_partial_b
     assert hash(global_partial_a) == hash(global_partial_b)

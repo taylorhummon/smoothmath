@@ -6,7 +6,7 @@ from smoothmath.expression import Constant, Variable, Exponential
 
 def test_exponential():
     x = Variable("x")
-    z = Exponential(math.e, x)
+    z = Exponential(x, base = math.e)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 0
@@ -34,7 +34,7 @@ def test_exponential():
 
 def test_Exponential_composition():
     x = Variable("x")
-    z = Exponential(math.e, Constant(2) * x - Constant(6))
+    z = Exponential(Constant(2) * x - Constant(6), base = math.e)
     point = Point({x: 3})
     assert z.evaluate(point) == approx(1)
     assert z.local_partial(point, x) == approx(2)
@@ -45,7 +45,7 @@ def test_Exponential_composition():
 
 def test_base_two_Exponential():
     x = Variable("x")
-    z = Exponential(2, x)
+    z = Exponential(x, base = 2)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 0
@@ -73,7 +73,7 @@ def test_base_two_Exponential():
 
 def test_base_two_Exponential_composition():
     x = Variable("x")
-    z = Exponential(2, Constant(2) * x - Constant(5))
+    z = Exponential(Constant(2) * x - Constant(5), base = 2)
     point = Point({x: 3})
     assert z.evaluate(point) == approx(2)
     assert z.local_partial(point, x) == approx(2.77258872223)
@@ -85,7 +85,7 @@ def test_base_two_Exponential_composition():
 def test_Exponential_equality():
     x = Variable("x")
     y = Variable("y")
-    assert Exponential(math.e, x) == Exponential(math.e, x)
-    assert Exponential(math.e, x) != Exponential(math.e, y)
-    assert Exponential(2, x) == Exponential(2, x)
-    assert Exponential(2, x) != Exponential(math.e, x)
+    assert Exponential(x, base = math.e) == Exponential(x, base = math.e)
+    assert Exponential(x, base = math.e) != Exponential(y, base = math.e)
+    assert Exponential(x, base = 2) == Exponential(x, base = 2)
+    assert Exponential(x, base = 2) != Exponential(x, base = math.e)

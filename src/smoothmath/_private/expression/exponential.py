@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 class Exponential(base.ParameterizedUnaryExpression):
     def __init__(
         self: Exponential,
-        base: sm.real_number,
-        inner: sm.Expression
+        inner: sm.Expression,
+        base: sm.real_number
     ) -> None:
         super().__init__(inner)
         if base <= 0:
@@ -89,12 +89,12 @@ class Exponential(base.ParameterizedUnaryExpression):
         if self._base == 1:
             return ex.Constant(0)
         elif self._base == math.e:
-            return ex.Multiply(ex.Exponential(self._base, self._inner), multiplier)
+            return ex.Multiply(ex.Exponential(self._inner, self._base), multiplier)
         else:
             return ex.Multiply(
                 ex.Multiply(
-                    ex.Logarithm(math.e, ex.Constant(self._base)),
-                    ex.Exponential(self._base, self._inner)
+                    ex.Logarithm(ex.Constant(self._base), base = math.e),
+                    ex.Exponential(self._inner, self._base)
                 ),
                 multiplier
             )

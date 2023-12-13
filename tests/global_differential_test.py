@@ -12,7 +12,7 @@ def test_GlobalDifferential():
     original_expression = Constant(4) * w + x * y ** 3
     synthetic_w_partial = Constant(4)
     synthetic_x_partial = y ** 3
-    synthetic_y_partial = Constant(3) * x * NthPower(2, y)
+    synthetic_y_partial = Constant(3) * x * NthPower(y, n = 2)
     builder = GlobalDifferentialBuilder(original_expression)
     builder.add_to(w, synthetic_w_partial)
     builder.add_to(x, synthetic_x_partial)
@@ -48,7 +48,7 @@ def test_GlobalDifferential():
 
 def test_GlobalDifferential_raises():
     x = Variable("x")
-    original_expression = Logarithm(math.e, x)
+    original_expression = Logarithm(x, base = math.e)
     synthetic_x_partial = Reciprocal(x)
     builder = GlobalDifferentialBuilder(original_expression)
     builder.add_to(x, synthetic_x_partial)

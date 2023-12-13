@@ -118,7 +118,7 @@ def test_Divide_with_constant_numerator_zero_composition():
 
 def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     y = Variable("y")
-    z = Divide(Constant(0), Logarithm(math.e, y))
+    z = Divide(Constant(0), Logarithm(y, base = math.e))
     point = Point({y: 0})
     with raises(DomainError):
         z.evaluate(point)

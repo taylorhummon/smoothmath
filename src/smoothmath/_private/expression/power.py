@@ -127,4 +127,4 @@ class Power(base.BinaryExpression):
         self: Power,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        return ex.Multiply(ex.Multiply(ex.Logarithm(math.e, self._left), self), multiplier)
+        return ex.Multiply(ex.Multiply(ex.Logarithm(self._left, base = math.e), self), multiplier)

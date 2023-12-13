@@ -12,8 +12,8 @@ if TYPE_CHECKING:
 class Logarithm(base.ParameterizedUnaryExpression):
     def __init__(
         self: Logarithm,
-        base: sm.real_number,
-        inner: sm.Expression
+        inner: sm.Expression,
+        base: sm.real_number
     ) -> None:
         super().__init__(inner)
         if base <= 0:
@@ -99,7 +99,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
             return ex.Divide(
                 multiplier,
                 ex.Multiply(
-                    ex.Logarithm(math.e, ex.Constant(self._base)),
+                    ex.Logarithm(ex.Constant(self._base), base = math.e),
                     self._inner,
                 )
             )

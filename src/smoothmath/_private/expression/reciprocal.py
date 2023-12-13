@@ -70,10 +70,10 @@ class Reciprocal(base.UnaryExpression):
         multiplier: sm.real_number
     ) -> sm.real_number:
         inner_value = self._inner._evaluate(point)
-        return - nth_power(-2, inner_value) * multiplier
+        return - nth_power(inner_value, n = -2) * multiplier
 
     def _synthetic_partial_formula(
         self: Reciprocal,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        return ex.Multiply(ex.Negation(ex.NthPower(-2, self._inner)), multiplier)
+        return ex.Multiply(ex.Negation(ex.NthPower(self._inner, n = -2)), multiplier)

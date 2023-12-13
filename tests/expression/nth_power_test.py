@@ -8,36 +8,36 @@ def test_nth_power():
     # n = 0
     with raises(DomainError):
         nth_power(0, 0)
-    assert nth_power(0, 3) == 1
-    assert nth_power(0, -3) == 1
-    assert nth_power(0, 0.5) == 1
+    assert nth_power(3, 0) == 1
+    assert nth_power(-3, 0) == 1
+    assert nth_power(0.5, 0) == 1
     # n = 1
-    assert nth_power(1, 0) == 0
-    assert nth_power(1, 3) == 3
-    assert nth_power(1, -3) == -3
-    assert nth_power(1, 0.5) == 0.5
+    assert nth_power(0, 1) == 0
+    assert nth_power(3, 1) == 3
+    assert nth_power(-3, 1) == -3
+    assert nth_power(0.5, 1) == 0.5
     # n = 2
-    assert nth_power(2, 0) == 0
-    assert nth_power(2, 3) == 9
-    assert nth_power(2, -3) == 9
-    assert nth_power(2, 0.5) == 0.25
+    assert nth_power(0, 2) == 0
+    assert nth_power(3, 2) == 9
+    assert nth_power(-3, 2) == 9
+    assert nth_power(0.5, 2) == 0.25
     # n = -1
     with raises(DomainError):
-        nth_power(-1, 0)
-    assert nth_power(-1, 3) == approx(1 / 3)
-    assert nth_power(-1, -3) == approx(- 1 / 3)
-    assert nth_power(-1, 0.5) == approx(2)
+        nth_power(0, -1)
+    assert nth_power(3, -1) == approx(1 / 3)
+    assert nth_power(-3, -1) == approx(- 1 / 3)
+    assert nth_power(0.5, -1) == approx(2)
     # n = -2
     with raises(DomainError):
-        nth_power(-2, 0)
-    assert nth_power(-2, 3) == approx(1 / 9)
-    assert nth_power(-2, -3) == approx(1 / 9)
-    assert nth_power(-2, 0.5) == approx(4)
+        nth_power(0, -2)
+    assert nth_power(3, -2) == approx(1 / 9)
+    assert nth_power(-3, -2) == approx(1 / 9)
+    assert nth_power(0.5, -2) == approx(4)
 
 
 def test_NthPower_with_n_equal_two():
     x = Variable("x")
-    z = NthPower(2, x)
+    z = NthPower(x, n = 2)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 3
@@ -65,7 +65,7 @@ def test_NthPower_with_n_equal_two():
 
 def test_NthPower_with_n_equal_two_composition():
     x = Variable("x")
-    z = NthPower(2, Constant(3) * x - Constant(1))
+    z = NthPower(Constant(3) * x - Constant(1), n = 2)
     point = Point({x: 1})
     assert z.evaluate(point) == approx(4)
     assert z.local_partial(point, x) == approx(12)
@@ -76,7 +76,7 @@ def test_NthPower_with_n_equal_two_composition():
 
 def test_NthPower_with_n_equal_one():
     x = Variable("x")
-    z = NthPower(1, x)
+    z = NthPower(x, n = 1)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 3
@@ -104,7 +104,7 @@ def test_NthPower_with_n_equal_one():
 
 def test_NthPower_with_n_equal_one_composition():
     x = Variable("x")
-    z = NthPower(1, Constant(3) * x - Constant(1))
+    z = NthPower(Constant(3) * x - Constant(1), n = 1)
     point = Point({x: 1})
     assert z.evaluate(point) == approx(2)
     assert z.local_partial(point, x) == approx(3)
@@ -115,7 +115,7 @@ def test_NthPower_with_n_equal_one_composition():
 
 def test_NthPower_with_n_equal_zero():
     x = Variable("x")
-    z = NthPower(0, x)
+    z = NthPower(x, n = 0)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 3
@@ -148,7 +148,7 @@ def test_NthPower_with_n_equal_zero():
 
 def test_NthPower_with_n_equal_zero_composition():
     x = Variable("x")
-    z = NthPower(0, Constant(3) * x - Constant(1))
+    z = NthPower(Constant(3) * x - Constant(1), n = 0)
     point = Point({x: 1})
     assert z.evaluate(point) == approx(1)
     assert z.local_partial(point, x) == approx(0)
@@ -159,7 +159,7 @@ def test_NthPower_with_n_equal_zero_composition():
 
 def test_NthPower_with_n_equal_zero_doesnt_short_circuit():
     x = Variable("x")
-    z = NthPower(0, NthRoot(2, x))
+    z = NthPower(NthRoot(x, n = 2), n = 0)
     point = Point({x: -1})
     with raises(DomainError):
         z.evaluate(point)
@@ -177,7 +177,7 @@ def test_NthPower_with_n_equal_zero_doesnt_short_circuit():
 
 def test_NthPower_with_n_equal_negative_one():
     x = Variable("x")
-    z = NthPower(-1, x)
+    z = NthPower(x, n = -1)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 2
@@ -210,7 +210,7 @@ def test_NthPower_with_n_equal_negative_one():
 
 def test_NthPower_with_n_equal_negative_one_composition():
     x = Variable("x")
-    z = NthPower(-1, Constant(3) * x - Constant(1))
+    z = NthPower(Constant(3) * x - Constant(1), n = -1)
     point = Point({x: 1})
     assert z.evaluate(point) == approx(0.5)
     assert z.local_partial(point, x) == approx(-0.75)
@@ -221,7 +221,7 @@ def test_NthPower_with_n_equal_negative_one_composition():
 
 def test_NthPower_with_n_equal_negative_two():
     x = Variable("x")
-    z = NthPower(-2, x)
+    z = NthPower(x, n = -2)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 2
@@ -254,7 +254,7 @@ def test_NthPower_with_n_equal_negative_two():
 
 def test_NthPower_with_n_equal_negative_two_composition():
     x = Variable("x")
-    z = NthPower(-2, Constant(3) * x - Constant(1))
+    z = NthPower(Constant(3) * x - Constant(1), n = -2)
     point = Point({x: 1})
     assert z.evaluate(point) == approx(0.25)
     assert z.local_partial(point, x) == approx(-0.75)
@@ -265,7 +265,7 @@ def test_NthPower_with_n_equal_negative_two_composition():
 
 def test_NthPower_where_exponent_is_an_integer_represented_as_a_float():
     x = Variable("x")
-    z = NthPower(2.0, x) # type: ignore
+    z = NthPower(x, n = 2.0) # type: ignore
     point = Point({x: -5})
     assert z.evaluate(point) == approx(25)
     assert z.local_partial(point, x) == approx(-10)

@@ -6,7 +6,7 @@ from smoothmath.expression import Constant, Variable, Logarithm
 
 def test_Logarithm():
     x = Variable("x")
-    z = Logarithm(math.e, x)
+    z = Logarithm(x, math.e)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 1
@@ -51,7 +51,7 @@ def test_Logarithm():
 
 def test_Logarithm_composition():
     x = Variable("x")
-    z = Logarithm(math.e, Constant(2) * x - Constant(3))
+    z = Logarithm(Constant(2) * x - Constant(3), base = math.e)
     point = Point({x: 2})
     assert z.evaluate(point) == approx(0)
     assert z.local_partial(point, x) == approx(2)
@@ -62,7 +62,7 @@ def test_Logarithm_composition():
 
 def test_base_two_Logarithm():
     x = Variable("x")
-    z = Logarithm(2, x)
+    z = Logarithm(x, base = 2)
     global_x_partial = z.global_partial(x)
     global_differential = z.global_differential()
     # at x = 1
@@ -107,7 +107,7 @@ def test_base_two_Logarithm():
 
 def test_base_two_Logarithm_composition():
     x = Variable("x")
-    z = Logarithm(2, Constant(2) * x - Constant(6))
+    z = Logarithm(Constant(2) * x - Constant(6), base = 2)
     point = Point({x: 7})
     assert z.evaluate(point) == approx(3)
     assert z.local_partial(point, x) == approx(0.3606737602222)
@@ -119,7 +119,7 @@ def test_base_two_Logarithm_composition():
 def test_Logarithm_equality():
     x = Variable("x")
     y = Variable("y")
-    assert Logarithm(math.e, x) == Logarithm(math.e, x)
-    assert Logarithm(math.e, x) != Logarithm(math.e, y)
-    assert Logarithm(2, x) == Logarithm(2, x)
-    assert Logarithm(2, x) != Logarithm(math.e, x)
+    assert Logarithm(x, base = math.e) == Logarithm(x, base = math.e)
+    assert Logarithm(x, base = math.e) != Logarithm(y, base = math.e)
+    assert Logarithm(x, base = 2) == Logarithm(x, base = 2)
+    assert Logarithm(x, base = 2) != Logarithm(x, base = math.e)

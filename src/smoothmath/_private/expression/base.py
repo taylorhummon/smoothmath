@@ -105,11 +105,11 @@ class Expression(ABC):
             return ex.Power(self, exponent)
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
         # even though that wouldn't pass type checking.
-        integer = integer_from_integral_real_number(exponent)
-        if integer is None:
+        n = integer_from_integral_real_number(exponent)
+        if n is None:
             raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")
         else:
-            return ex.NthPower(integer, self)
+            return ex.NthPower(self, n)
 
     ## Abstract methods ##
 
@@ -264,7 +264,7 @@ class ParameterizedUnaryExpression(Expression):
         self: ParameterizedUnaryExpression,
         inner: sm.Expression
     ) -> ParameterizedUnaryExpression:
-        return self.__class__(self._parameter(), inner) # type: ignore
+        return self.__class__(inner, self._parameter()) # type: ignore
 
     def _reset_evaluation_cache(
         self: ParameterizedUnaryExpression

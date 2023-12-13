@@ -12,15 +12,15 @@ if TYPE_CHECKING:
 
 
 def nth_root(
-    n: int,
-    x: sm.real_number
+    x: sm.real_number,
+    n: int
 ) -> sm.real_number:
     if n <= 0:
-        raise sm.DomainError(f"nth_root(x) is not defined when n = {n}")
+        raise sm.DomainError(f"nth_root(x, n) is not defined when n = {n}")
     if n >= 2 and x == 0:
-        raise sm.DomainError(f"nth_root(x) is not defined at x = 0 when n = {n}")
+        raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 when n = {n}")
     if n % 2 == 0 and x < 0:
-        raise sm.DomainError(f"nth_root(x) is not defined for negative x when n = {n}")
+        raise sm.DomainError(f"nth_root(x, n) is not defined for negative x when n = {n}")
     if n == 1:
         return x
     if n == 2:
@@ -34,17 +34,17 @@ def nth_root(
 class NthRoot(base.ParameterizedUnaryExpression):
     def __init__(
         self: NthRoot,
-        n: int,
-        inner: sm.Expression
+        inner: sm.Expression,
+        n: int
     ) -> None:
         super().__init__(inner)
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
         # even though that wouldn't pass type checking.
         i = integer_from_integral_real_number(n)
         if i is None:
-            raise Exception(f"NthRoot requires n to be an int, found: {n}")
+            raise Exception(f"NthRoot() requires n to be an int, found: {n}")
         elif i <= 0:
-            raise Exception(f"NthRoot needs n to be positive, found {i}")
+            raise Exception(f"NthRoot() needs n to be positive, found {i}")
         self._n: int
         self._n = i
 
@@ -58,15 +58,15 @@ class NthRoot(base.ParameterizedUnaryExpression):
         inner_value: sm.real_number
     ) -> None:
         if self._n >= 2 and inner_value == 0:
-            raise sm.DomainError(f"NthRoot(x) is not defined at x = 0 when n = {self._n}")
+            raise sm.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self._n}")
         if self._n % 2 == 0 and inner_value < 0:
-            raise sm.DomainError(f"NthRoot(x) is not defined for negative x when n = {self._n}")
+            raise sm.DomainError(f"NthRoot(x, n) is not defined for negative x when n = {self._n}")
 
     def _value_formula(
         self: NthRoot,
         inner_value: sm.real_number
     ):
-        return nth_root(self._n, inner_value)
+        return nth_root(inner_value, self._n)
 
     def _local_partial(
         self: NthRoot,
@@ -113,7 +113,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return multiplier
         else:
             self_value = self._evaluate(point)
-            return multiplier / (n * (nth_power(n - 1, self_value)))
+            return multiplier / (n * (nth_power(self_value, n - 1)))
 
     def _synthetic_partial_formula(
         self: NthRoot,
@@ -123,4 +123,4 @@ class NthRoot(base.ParameterizedUnaryExpression):
         if n == 1:
             return multiplier
         else: # n >= 2
-            return ex.Divide(multiplier, ex.Multiply(ex.Constant(n), ex.NthPower(n - 1, self)))
+            return ex.Divide(multiplier, ex.Multiply(ex.Constant(n), ex.NthPower(self, n - 1)))

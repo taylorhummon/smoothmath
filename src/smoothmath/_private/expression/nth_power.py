@@ -10,22 +10,22 @@ if TYPE_CHECKING:
 
 
 def nth_power(
-    n: int,
-    x: sm.real_number
+    x: sm.real_number,
+    n: int
 ) -> sm.real_number:
     if x == 0:
         if n == 0:
-            raise sm.DomainError("nth_power(x) is not smooth around x = 0 for n = 0")
+            raise sm.DomainError("nth_power(x, n) is not smooth around x = 0 for n = 0")
         elif n <= -1:
-            raise sm.DomainError("nth_power(x) blows up around x = 0 when n is negative")
+            raise sm.DomainError("nth_power(x, n) blows up around x = 0 when n is negative")
     return x ** n
 
 
 class NthPower(base.ParameterizedUnaryExpression):
     def __init__(
         self: NthPower,
-        n: int,
-        inner: sm.Expression
+        inner: sm.Expression,
+        n: int
     ) -> None:
         super().__init__(inner)
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
@@ -47,15 +47,15 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> None:
         if inner_value == 0:
             if self._n == 0:
-                raise sm.DomainError("NthPower(x) is not smooth around x = 0 for n = 0")
+                raise sm.DomainError("NthPower(x, n) is not smooth around x = 0 for n = 0")
             elif self._n <= -1:
-                raise sm.DomainError("NthPower(x) blows up around x = 0 when n is negative")
+                raise sm.DomainError("NthPower(x, n) blows up around x = 0 when n is negative")
 
     def _value_formula(
         self: NthPower,
         inner_value: sm.real_number
     ):
-        return nth_power(self._n, inner_value)
+        return nth_power(inner_value, self._n)
 
     def _local_partial(
         self: NthPower,
@@ -116,7 +116,7 @@ class NthPower(base.ParameterizedUnaryExpression):
             return multiplier
         else:
             inner_value = self._inner._evaluate(point)
-            return n * nth_power(n - 1, inner_value) * multiplier
+            return n * nth_power(inner_value, n - 1) * multiplier
 
     def _synthetic_partial_formula(
         self: NthPower,
@@ -129,6 +129,6 @@ class NthPower(base.ParameterizedUnaryExpression):
             return multiplier
         else:
             return ex.Multiply(
-                ex.Multiply(ex.Constant(n), ex.NthPower(n - 1, self._inner)),
+                ex.Multiply(ex.Constant(n), ex.NthPower(self._inner, n - 1)),
                 multiplier
             )
