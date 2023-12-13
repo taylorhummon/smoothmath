@@ -250,13 +250,16 @@ class UnaryExpression(Expression):
 class ParameterizedUnaryExpression(Expression):
     def __init__(
         self: ParameterizedUnaryExpression,
-        inner: Expression
+        inner: Expression,
+        parameter: Any
     ) -> None:
         if not isinstance(inner, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found {inner}")
         super().__init__(inner._lacks_variables)
         self._inner: Expression
         self._inner = inner
+        self._parameter: Any
+        self._parameter = parameter
         self._value: sm.real_number | None
         self._value = None
 
@@ -264,7 +267,7 @@ class ParameterizedUnaryExpression(Expression):
         self: ParameterizedUnaryExpression,
         inner: sm.Expression
     ) -> ParameterizedUnaryExpression:
-        return self.__class__(inner, self._parameter()) # type: ignore
+        return self.__class__(inner, self._parameter)
 
     def _reset_evaluation_cache(
         self: ParameterizedUnaryExpression
@@ -291,32 +294,26 @@ class ParameterizedUnaryExpression(Expression):
     ) -> bool:
         return (
             (other.__class__ == self.__class__) and
-            (other._parameter() == self._parameter()) and
-            (other._inner == self._inner)
+            (other._inner == self._inner) and
+            (other._parameter == self._parameter)
         )
 
     def __hash__(
         self: ParameterizedUnaryExpression
     ) -> int:
-        return hash((get_class_name(self), self._parameter(), self._inner))
+        return hash((get_class_name(self), self._inner, self._parameter))
 
     def __str__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._parameter()}, {self._inner})"
+        return f"{get_class_name(self)}({self._inner}, {self._parameter})"
 
     def __repr__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._parameter()}, {self._inner})"
+        return f"{get_class_name(self)}({self._inner}, {self._parameter})"
 
     ## Abstract methods ##
-
-    @abstractmethod
-    def _parameter(
-        self: ParameterizedUnaryExpression
-    ) -> Any:
-        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _parameter()")
 
     @abstractmethod
     def _verify_domain_constraints(

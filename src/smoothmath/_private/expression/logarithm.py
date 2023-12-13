@@ -15,18 +15,17 @@ class Logarithm(base.ParameterizedUnaryExpression):
         inner: sm.Expression,
         base: sm.real_number
     ) -> None:
-        super().__init__(inner)
+        super().__init__(inner, base)
         if base <= 0:
-            raise Exception("Logarithms must have a positive base")
+            raise Exception("Logarithm must have a positive base")
         elif base == 1:
-            raise Exception("Logarithms cannot have base = 1")
-        self._base: sm.real_number
-        self._base = base
+            raise Exception("Logarithm cannot have base = 1")
 
-    def _parameter(
+    @property
+    def base(
         self: Logarithm
     ) -> sm.real_number:
-        return self._base
+        return self._parameter
 
     def _verify_domain_constraints(
         self: Logarithm,
@@ -41,7 +40,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
         self: Logarithm,
         inner_value: sm.real_number
     ):
-        return math.log(inner_value, self._base)
+        return math.log(inner_value, self.base)
 
     def _local_partial(
         self: Logarithm,
@@ -84,22 +83,19 @@ class Logarithm(base.ParameterizedUnaryExpression):
         multiplier: sm.real_number
     ) -> sm.real_number:
         inner_value = self._inner._evaluate(point)
-        if self._base == math.e:
+        if self.base == math.e:
             return multiplier / inner_value
         else:
-            return multiplier / (math.log(self._base) * inner_value)
+            return multiplier / (math.log(self.base, math.e) * inner_value)
 
     def _synthetic_partial_formula(
         self: Logarithm,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        if self._base == math.e:
+        if self.base == math.e:
             return ex.Divide(multiplier, self._inner)
         else:
             return ex.Divide(
                 multiplier,
-                ex.Multiply(
-                    ex.Logarithm(ex.Constant(self._base), base = math.e),
-                    self._inner,
-                )
+                ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self._inner)
             )

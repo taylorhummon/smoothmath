@@ -119,7 +119,7 @@ def _reduce_nth_power_of_mth_power_of_u(
         isinstance(expression._inner, ex.NthPower)
     ):
         return _apply_reducers(
-            ex.NthPower(expression._inner._inner, expression._n * expression._inner._n)
+            ex.NthPower(expression._inner._inner, expression.n * expression._inner.n)
         )
     else:
         return None
@@ -132,10 +132,10 @@ def _reduce_even_nth_power_of_negation_of_u(
     if (
         isinstance(expression, ex.NthPower) and
         isinstance(expression._inner, ex.Negation) and
-        expression._n % 2 == 0
+        expression.n % 2 == 0
     ):
         return _apply_reducers(
-            ex.NthPower(expression._inner._inner, expression._n)
+            ex.NthPower(expression._inner._inner, expression.n)
         )
     else:
         return None
@@ -148,10 +148,10 @@ def _reduce_odd_nth_power_of_negation_of_u(
     if (
         isinstance(expression, ex.NthPower) and
         isinstance(expression._inner, ex.Negation) and
-        expression._n % 2 == 1
+        expression.n % 2 == 1
     ):
         reduced = _apply_reducers(
-            ex.NthPower(expression._inner._inner, expression._n)
+            ex.NthPower(expression._inner._inner, expression.n)
         )
         return _apply_reducers(
             ex.Negation(reduced)
@@ -169,7 +169,7 @@ def _reduce_nth_power_of_reciprocal_of_u(
         isinstance(expression._inner, ex.Reciprocal)
     ):
         reduced = _apply_reducers(
-            ex.NthPower(expression._inner._inner, expression._n)
+            ex.NthPower(expression._inner._inner, expression.n)
         )
         return _apply_reducers(
             ex.Reciprocal(reduced)
@@ -190,7 +190,7 @@ def _reduce_nth_root_of_mth_root_of_u(
         isinstance(expression._inner, ex.NthRoot)
     ):
         return _apply_reducers(
-            ex.NthRoot(expression._inner._inner, expression._n * expression._inner._n)
+            ex.NthRoot(expression._inner._inner, expression.n * expression._inner.n)
         )
     else:
         return None
@@ -203,10 +203,10 @@ def _reduce_odd_nth_root_of_negation_of_u(
     if (
         isinstance(expression, ex.NthRoot) and
         isinstance(expression._inner, ex.Negation) and
-        expression._n % 2 == 1
+        expression.n % 2 == 1
     ):
         reduced = _apply_reducers(
-            ex.NthRoot(expression._inner._inner, expression._n)
+            ex.NthRoot(expression._inner._inner, expression.n)
         )
         return _apply_reducers(
             ex.Negation(reduced)
@@ -224,7 +224,7 @@ def _reduce_nth_root_of_reciprocal_of_u(
         isinstance(expression._inner, ex.Reciprocal)
     ):
         reduced = _apply_reducers(
-            ex.NthRoot(expression._inner._inner, expression._n)
+            ex.NthRoot(expression._inner._inner, expression.n)
         )
         return _apply_reducers(
             ex.Reciprocal(reduced)
@@ -240,7 +240,7 @@ def _reduce_nth_power_of_nth_root_of_u(
     if (
         isinstance(expression, ex.NthPower) and
         isinstance(expression._inner, ex.NthRoot) and
-        expression._n == expression._inner._n
+        expression.n == expression._inner.n
     ):
         return expression._inner._inner
     else:
@@ -254,7 +254,7 @@ def _reduce_nth_root_of_nth_power_of_u(
     if (
         isinstance(expression, ex.NthRoot) and
         isinstance(expression._inner, ex.NthPower) and
-        expression._n == expression._inner._n
+        expression.n == expression._inner.n
     ):
         return expression._inner._inner
     else:
@@ -274,7 +274,7 @@ def _reduce_logarithm_of_exponential_of_u(
     if (
         isinstance(expression, ex.Logarithm) and
         isinstance(expression._inner, ex.Exponential) and
-        expression._base == expression._inner._base
+        expression.base == expression._inner.base
     ):
         return expression._inner._inner
     else:
@@ -288,7 +288,7 @@ def _reduce_exponential_of_logarithm_of_u(
     if (
         isinstance(expression, ex.Exponential) and
         isinstance(expression._inner, ex.Logarithm) and
-        expression._base == expression._inner._base
+        expression.base == expression._inner.base
     ):
         return expression._inner._inner
     else:
@@ -502,13 +502,13 @@ def _reduce_product_of_nth_powers(
         isinstance(expression, ex.Multiply) and
         isinstance(expression._left, ex.NthPower) and
         isinstance(expression._right, ex.NthPower) and
-        expression._left._n == expression._right._n
+        expression._left.n == expression._right.n
     ):
         reduced = _apply_reducers(
             ex.Multiply(expression._left._inner, expression._right._inner)
         )
         return _apply_reducers(
-            ex.NthPower(reduced, expression._left._n)
+            ex.NthPower(reduced, expression._left.n)
         )
     else:
         return None
@@ -522,13 +522,13 @@ def _reduce_product_of_nth_roots(
         isinstance(expression, ex.Multiply) and
         isinstance(expression._left, ex.NthRoot) and
         isinstance(expression._right, ex.NthRoot) and
-        expression._left._n == expression._right._n
+        expression._left.n == expression._right.n
     ):
         reduced = _apply_reducers(
             ex.Multiply(expression._left._inner, expression._right._inner)
         )
         return _apply_reducers(
-            ex.NthRoot(reduced, expression._left._n)
+            ex.NthRoot(reduced, expression._left.n)
         )
     else:
         return None
@@ -542,13 +542,13 @@ def _reduce_product_of_exponentials(
         isinstance(expression, ex.Multiply) and
         isinstance(expression._left, ex.Exponential) and
         isinstance(expression._right, ex.Exponential) and
-        expression._left._base == expression._right._base
+        expression._left.base == expression._right.base
     ):
         reduced = _apply_reducers(
             ex.Plus(expression._left._inner, expression._right._inner)
         )
         return _apply_reducers(
-            ex.Exponential(reduced, expression._left._base)
+            ex.Exponential(reduced, expression._left.base)
         )
     else:
         return None
@@ -562,13 +562,13 @@ def _reduce_sum_of_logarithms(
         isinstance(expression, ex.Plus) and
         isinstance(expression._left, ex.Logarithm) and
         isinstance(expression._right, ex.Logarithm) and
-        expression._left._base == expression._right._base
+        expression._left.base == expression._right.base
     ):
         reduced = _apply_reducers(
             ex.Multiply(expression._left._inner, expression._right._inner)
         )
         return _apply_reducers(
-            ex.Logarithm(reduced, expression._left._base)
+            ex.Logarithm(reduced, expression._left.base)
         )
     else:
         return None

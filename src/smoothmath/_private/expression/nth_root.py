@@ -37,7 +37,6 @@ class NthRoot(base.ParameterizedUnaryExpression):
         inner: sm.Expression,
         n: int
     ) -> None:
-        super().__init__(inner)
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
         # even though that wouldn't pass type checking.
         i = integer_from_integral_real_number(n)
@@ -45,28 +44,28 @@ class NthRoot(base.ParameterizedUnaryExpression):
             raise Exception(f"NthRoot() requires n to be an int, found: {n}")
         elif i <= 0:
             raise Exception(f"NthRoot() needs n to be positive, found {i}")
-        self._n: int
-        self._n = i
+        super().__init__(inner, i)
 
-    def _parameter(
+    @property
+    def n(
         self: NthRoot
     ) -> int:
-        return self._n
+        return self._parameter
 
     def _verify_domain_constraints(
         self: NthRoot,
         inner_value: sm.real_number
     ) -> None:
-        if self._n >= 2 and inner_value == 0:
-            raise sm.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self._n}")
-        if self._n % 2 == 0 and inner_value < 0:
-            raise sm.DomainError(f"NthRoot(x, n) is not defined for negative x when n = {self._n}")
+        if self.n >= 2 and inner_value == 0:
+            raise sm.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self.n}")
+        if self.n % 2 == 0 and inner_value < 0:
+            raise sm.DomainError(f"NthRoot(x, n) is not defined for negative x when n = {self.n}")
 
     def _value_formula(
         self: NthRoot,
         inner_value: sm.real_number
     ):
-        return nth_root(inner_value, self._n)
+        return nth_root(inner_value, self.n)
 
     def _local_partial(
         self: NthRoot,
@@ -108,7 +107,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
         point: sm.Point,
         multiplier: sm.real_number
     ) -> sm.real_number:
-        n = self._n
+        n = self.n
         if n == 1:
             return multiplier
         else:
@@ -119,8 +118,11 @@ class NthRoot(base.ParameterizedUnaryExpression):
         self: NthRoot,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        n = self._n
+        n = self.n
         if n == 1:
             return multiplier
         else: # n >= 2
-            return ex.Divide(multiplier, ex.Multiply(ex.Constant(n), ex.NthPower(self, n - 1)))
+            return ex.Divide(
+                multiplier,
+                ex.Multiply(ex.Constant(n), ex.NthPower(self, n - 1))
+            )

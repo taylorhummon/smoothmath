@@ -15,16 +15,15 @@ class Exponential(base.ParameterizedUnaryExpression):
         inner: sm.Expression,
         base: sm.real_number
     ) -> None:
-        super().__init__(inner)
+        super().__init__(inner, base)
         if base <= 0:
             raise Exception(f"Exponentials must have a positive base, found: {base}")
-        self._base: sm.real_number
-        self._base = base
 
-    def _parameter(
+    @property
+    def base(
         self: Exponential
     ) -> sm.real_number:
-        return self._base
+        return self._parameter
 
     def _verify_domain_constraints(
         self: Exponential,
@@ -36,7 +35,7 @@ class Exponential(base.ParameterizedUnaryExpression):
         self: Exponential,
         inner_value: sm.real_number
     ):
-        return self._base ** inner_value
+        return self.base ** inner_value
 
     def _local_partial(
         self: Exponential,
@@ -74,27 +73,24 @@ class Exponential(base.ParameterizedUnaryExpression):
         point: sm.Point,
         multiplier: sm.real_number
     ) -> sm.real_number:
-        if self._base == 1:
+        if self.base == 1:
             return 0
         self_value = self._evaluate(point)
-        if self._base == math.e:
+        if self.base == math.e:
             return self_value * multiplier
         else:
-            return math.log(self._base) * self_value * multiplier
+            return math.log(self.base, math.e) * self_value * multiplier
 
     def _synthetic_partial_formula(
         self: Exponential,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        if self._base == 1:
+        if self.base == 1:
             return ex.Constant(0)
-        elif self._base == math.e:
-            return ex.Multiply(ex.Exponential(self._inner, self._base), multiplier)
+        elif self.base == math.e:
+            return ex.Multiply(self, multiplier)
         else:
             return ex.Multiply(
-                ex.Multiply(
-                    ex.Logarithm(ex.Constant(self._base), base = math.e),
-                    ex.Exponential(self._inner, self._base)
-                ),
+                ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self),
                 multiplier
             )
