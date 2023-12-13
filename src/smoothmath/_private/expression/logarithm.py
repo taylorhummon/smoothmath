@@ -13,7 +13,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     def __init__(
         self: Logarithm,
         inner: sm.Expression,
-        base: sm.real_number
+        base: sm.real_number = math.e
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:

@@ -1,5 +1,4 @@
 from pytest import approx, raises
-import math
 from smoothmath import DomainError, Point
 from smoothmath.expression import Constant, Variable, Reciprocal, Exponential, Multiply
 
@@ -115,7 +114,7 @@ def test_polynomial_of_three_variables():
 
 def test_composite_function():
     x = Variable("x")
-    z = Exponential(x ** 2, base = math.e)
+    z = Exponential(x ** 2)
     point = Point({x: 2})
     assert z.evaluate(point) == approx(54.598150033)
     assert z.local_partial(point, x) == approx(218.392600132)

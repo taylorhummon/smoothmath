@@ -1,4 +1,3 @@
-import math
 from smoothmath.expression import (
     Constant,
     Variable,
@@ -83,7 +82,7 @@ def test_reduce_synthetic():
 def test_reduce_expressions_that_lack_variables():
     z = Minus(NthPower(Plus(Constant(2), Constant(1)), n = 2), Constant(1))
     assert _reduce_expressions_that_lack_variables(z) == Constant(8)
-    z = Logarithm(Constant(-1), base = math.e)
+    z = Logarithm(Constant(-1))
     assert _reduce_expressions_that_lack_variables(z) == None
 
 
@@ -161,15 +160,17 @@ def test_reduce_nth_root_of_nth_power_of_u():
 
 def test_reduce_logarithm_of_exponential_of_u():
     u = Variable("u")
-    z = Logarithm(Exponential(u, base = math.e), base = math.e)
+    z = Logarithm(Exponential(u))
     assert _reduce_logarithm_of_exponential_of_u(z) == u
-
+    z = Logarithm(Exponential(u, base = 2), base = 2)
+    assert _reduce_logarithm_of_exponential_of_u(z) == u
 
 def test_reduce_exponential_of_logarithm_of_u():
     u = Variable("u")
-    z = Exponential(Logarithm(u, base = math.e), base = math.e)
+    z = Exponential(Logarithm(u))
     assert _reduce_exponential_of_logarithm_of_u(z) == u
-
+    z = Exponential(Logarithm(u, base = 2), base = 2)
+    assert _reduce_exponential_of_logarithm_of_u(z) == u
 
 def test_reduce_by_associating_plus_right():
     u = Variable("u")
@@ -266,8 +267,8 @@ def test_reduce_product_of_nth_roots():
 def test_reduce_product_of_exponentials():
     u = Variable("u")
     v = Variable("v")
-    z = Multiply(Exponential(u, base = math.e), Exponential(v, base = math.e))
-    assert _reduce_product_of_exponentials(z) == Exponential(Plus(u, v), base = math.e)
+    z = Multiply(Exponential(u), Exponential(v))
+    assert _reduce_product_of_exponentials(z) == Exponential(Plus(u, v))
     z = Multiply(Exponential(u, base = 2), Exponential(v, base = 2))
     assert _reduce_product_of_exponentials(z) == Exponential(Plus(u, v), base = 2)
 
@@ -275,10 +276,10 @@ def test_reduce_product_of_exponentials():
 def test_reduce_sum_of_logarithms():
     u = Variable("u")
     v = Variable("v")
-    z = Plus(Logarithm(u, base = math.e), Logarithm(v, base = math.e))
-    assert _reduce_sum_of_logarithms(z) == Logarithm(Multiply(u, v), base = math.e)
-    z = Plus(Logarithm(u, base = 10), Logarithm(v, base = 10))
-    assert _reduce_sum_of_logarithms(z) == Logarithm(Multiply(u, v), base = 10)
+    z = Plus(Logarithm(u), Logarithm(v))
+    assert _reduce_sum_of_logarithms(z) == Logarithm(Multiply(u, v))
+    z = Plus(Logarithm(u, base = 2), Logarithm(v, base = 2))
+    assert _reduce_sum_of_logarithms(z) == Logarithm(Multiply(u, v), base = 2)
 
 
 def test_reduce_u_over_one():

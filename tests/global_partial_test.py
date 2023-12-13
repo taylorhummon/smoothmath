@@ -1,5 +1,4 @@
 from pytest import approx, raises
-import math
 from smoothmath import Point, DomainError, GlobalPartial
 from smoothmath.expression import Variable, Constant, Reciprocal, NthPower, Logarithm
 
@@ -17,7 +16,7 @@ def test_GlobalPartial():
 
 def test_GlobalPartial_raises():
     x = Variable("x")
-    original_expression = Logarithm(x, base = math.e)
+    original_expression = Logarithm(x)
     synthetic_x_partial = Reciprocal(x)
     global_x_partial = GlobalPartial(original_expression, synthetic_x_partial)
     with raises(DomainError):
