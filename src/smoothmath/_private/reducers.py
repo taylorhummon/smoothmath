@@ -37,7 +37,8 @@ def _apply_reducers(
 
 ###### Reducers ######
 
-### OK to use Constant() below here
+### Constant and Variable Reducers ###
+
 
 def _reduce_expressions_that_lack_variables(
     expression: sm.Expression
@@ -55,10 +56,7 @@ def _reduce_expressions_that_lack_variables(
         return None
 
 
-### OK to use Variable() below here
-
-
-### OK to use Negation() below here
+### Negation and Reciprocal Reducers ###
 
 
 # Negation(Negation(u)) => u
@@ -74,9 +72,6 @@ def _reduce_negation_of_negation_of_u(
         return None
 
 
-### OK to use Reciprocal() below here
-
-
 # Reciprocal(Reciprocal(u)) => u
 def _reduce_reciprocal_of_reciprocal_of_u(
     expression: sm.Expression
@@ -90,7 +85,7 @@ def _reduce_reciprocal_of_reciprocal_of_u(
         return None
 
 
-# Reciprocal(Negation(u)) => u
+# Reciprocal(Negation(u)) => Negation(Reciprocal(u))
 def _reduce_reciprocal_of_negation_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
@@ -108,293 +103,7 @@ def _reduce_reciprocal_of_negation_of_u(
         return None
 
 
-### OK to use NthPower() below here
-
-
-# NthPower(u, 1) => u
-def _reduce_nth_power_where_n_is_one(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthPower) and
-        expression.n == 1
-    ):
-        return expression._inner
-    else:
-        return None
-
-
-# NthPower(NthPower(u, m), n) => NthPower_{m * n}(u))
-def _reduce_nth_power_of_mth_power_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthPower) and
-        isinstance(expression._inner, ex.NthPower)
-    ):
-        return _apply_reducers(
-            ex.NthPower(expression._inner._inner, expression.n * expression._inner.n)
-        )
-    else:
-        return None
-
-
-# NthPower(Negation(u), n) => NthPower(u, n) where n is even
-# NthPower(Negation(u), n) => Negation(NthPower(u, n)) where n is odd
-def _reduce_nth_power_of_negation_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthPower) and
-        isinstance(expression._inner, ex.Negation)
-    ):
-        reduced = _apply_reducers(
-            ex.NthPower(expression._inner._inner, expression.n)
-        )
-        if expression.n % 2 == 0: # n is even
-            return reduced
-        else: # n is odd
-            return _apply_reducers(
-                ex.Negation(reduced)
-            )
-    else:
-        return None
-
-
-# NthPower(Reciprocal(u), n) => Reciprocal(NthPower(u, n))
-def _reduce_nth_power_of_reciprocal_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthPower) and
-        isinstance(expression._inner, ex.Reciprocal)
-    ):
-        reduced = _apply_reducers(
-            ex.NthPower(expression._inner._inner, expression.n)
-        )
-        return _apply_reducers(
-            ex.Reciprocal(reduced)
-        )
-    else:
-        return None
-
-
-### OK to use NthRoot() below here
-
-
-# NthRoot(u, 1) => u
-def _reduce_nth_root_where_n_is_one(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthRoot) and
-        expression.n == 1
-    ):
-        return expression._inner
-    else:
-        return None
-
-
-# NthRoot(NthRoot(u, m), n) => NthRoot(u, m * n))
-def _reduce_nth_root_of_mth_root_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthRoot) and
-        isinstance(expression._inner, ex.NthRoot)
-    ):
-        return _apply_reducers(
-            ex.NthRoot(expression._inner._inner, expression.n * expression._inner.n)
-        )
-    else:
-        return None
-
-
-# NthRoot(Negation(u), n) => Negation(NthRoot(u, n)) where n is odd
-def _reduce_odd_nth_root_of_negation_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthRoot) and
-        isinstance(expression._inner, ex.Negation) and
-        expression.n % 2 == 1
-    ):
-        reduced = _apply_reducers(
-            ex.NthRoot(expression._inner._inner, expression.n)
-        )
-        return _apply_reducers(
-            ex.Negation(reduced)
-        )
-    else:
-        return None
-
-
-# NthRoot(Reciprocal(u), n) => Reciprocal(NthRoot(u, n))
-def _reduce_nth_root_of_reciprocal_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthRoot) and
-        isinstance(expression._inner, ex.Reciprocal)
-    ):
-        reduced = _apply_reducers(
-            ex.NthRoot(expression._inner._inner, expression.n)
-        )
-        return _apply_reducers(
-            ex.Reciprocal(reduced)
-        )
-    else:
-        return None
-
-
-# NthRoot(NthPower(u, m), n) => NthPower(NthRoot(u, n), m)
-def _reduce_nth_root_of_mth_power_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthRoot) and
-        isinstance(expression._inner, ex.NthPower)
-    ):
-        reduced = _apply_reducers(
-            ex.NthRoot(expression._inner._inner, expression.n)
-        )
-        return _apply_reducers(
-            ex.NthPower(reduced, expression._inner.n)
-        )
-    else:
-        return None
-
-
-# NthPower(NthRoot(u, m), n) => ...
-def _reduce_nth_power_of_mth_root_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.NthPower) and
-        isinstance(expression._inner, ex.NthRoot)
-    ):
-        n = expression.n
-        m = expression._inner.n
-        if m == n:
-            return expression._inner._inner
-        greatest_common_divisor = math.gcd(m, n)
-        if greatest_common_divisor != 1:
-            reduced = _apply_reducers(
-                ex.NthRoot(expression._inner._inner, m // greatest_common_divisor)
-            )
-            return _apply_reducers(
-                ex.NthPower(reduced, n // greatest_common_divisor)
-            )
-    else:
-        return None
-
-
-### OK to use Exponential() below here
-
-# Exponential(Negation(u)) => Reciprocal(Exponential(u))
-def _reduce_exponential_of_negation_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Exponential) and
-        isinstance(expression._inner, ex.Negation)
-    ):
-        reduced = _apply_reducers(
-            ex.Exponential(expression._inner._inner, base = expression.base)
-        )
-        return _apply_reducers(
-            ex.Reciprocal(reduced)
-        )
-    else:
-        return None
-
-
-### OK to use Logarithm() below here
-
-# Logarithm(Reciprocal(u)) => Negation(Logarithm(u))
-def _reduce_logarithm_of_reciprocal_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Logarithm) and
-        isinstance(expression._inner, ex.Reciprocal)
-    ):
-        reduced = _apply_reducers(
-            ex.Logarithm(expression._inner._inner, base = expression.base)
-        )
-        return _apply_reducers(
-            ex.Negation(reduced)
-        )
-    else:
-        return None
-
-
-# Logarithm(Exponential(u)) => u
-def _reduce_logarithm_of_exponential_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Logarithm) and
-        isinstance(expression._inner, ex.Exponential) and
-        expression.base == expression._inner.base
-    ):
-        return expression._inner._inner
-    else:
-        return None
-
-
-# Exponential(Logarithm(u)) => u
-def _reduce_exponential_of_logarithm_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Exponential) and
-        isinstance(expression._inner, ex.Logarithm) and
-        expression.base == expression._inner.base
-    ):
-        return expression._inner._inner
-    else:
-        return None
-
-
-### OK to use Cosine() below here
-
-# Cosine(Negation(u)) => Cosine(u)
-def _reduce_cosine_of_negation_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Cosine) and
-        isinstance(expression._inner, ex.Negation)
-    ):
-        return _apply_reducers(
-            ex.Cosine(expression._inner._inner)
-        )
-    else:
-        return None
-
-
-### OK to use Sine() below here
-
-# Sine(Negation(u)) => Sine(u)
-def _reduce_sine_of_negation_of_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Sine) and
-        isinstance(expression._inner, ex.Negation)
-    ):
-        reduced = _apply_reducers(
-            ex.Sine(expression._inner._inner)
-        )
-        return _apply_reducers(
-            ex.Negation(reduced)
-        )
-    else:
-        return None
-
-
-### OK to use Plus() below here
+### Plus Reducers ###
 
 
 # Plus(Plus(u, v), w) => Plus(u, Plus(v, w))
@@ -415,22 +124,6 @@ def _reduce_by_associating_plus_right(
         return None
 
 
-# Plus(Constant(c), u) => Plus(u, Constant(c))
-def _reduce_by_commuting_constants_right_for_plus(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Plus) and
-        isinstance(expression._left, ex.Constant) and
-        not isinstance(expression._right, ex.Constant) # ensure we make progress
-    ):
-        return _apply_reducers(
-            ex.Plus(expression._right, expression._left)
-        )
-    else:
-        return None
-
-
 # Plus(u, Constant(0)) => u
 def _reduce_u_plus_zero(
     expression: sm.Expression
@@ -445,55 +138,39 @@ def _reduce_u_plus_zero(
         return None
 
 
-### OK to use Minus() below here
-
-
-# Minus(u, Constant(0)) => u
-def _reduce_u_minus_zero(
+# Plus(Constant(c), u) => Plus(u, Constant(c))
+def _reduce_by_commuting_constant_right_across_plus(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.Minus) and
-        isinstance(expression._right, ex.Constant) and
-        expression._right.value == 0
-    ):
-        return expression._left
-    else:
-        return None
-
-
-# Minus(Constant(0), u) => Negation(u)
-def _reduce_zero_minus_u(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Minus) and
+        isinstance(expression, ex.Plus) and
         isinstance(expression._left, ex.Constant) and
-        expression._left.value == 0
+        not isinstance(expression._right, ex.Constant)
     ):
         return _apply_reducers(
-            ex.Negation(expression._right)
+            ex.Plus(expression._right, expression._left)
         )
     else:
         return None
 
 
-# Negation(Minus(u, v)) => Minus(v, u)
-def _reduce_negation_of_u_minus_v(
+# Plus(Negation(u), v) => Plus(v, Negation(u))
+def _reduce_by_commuting_negation_right_across_plus(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.Negation) and
-        isinstance(expression._inner, ex.Minus)
+        isinstance(expression, ex.Plus) and
+        isinstance(expression._left, ex.Negation) and
+        not isinstance(expression._right, ex.Negation)
     ):
         return _apply_reducers(
-            ex.Minus(expression._inner._right, expression._inner._left)
+            ex.Plus(expression._right, expression._left)
         )
     else:
         return None
 
 
-### OK to use Multiply() below here
+### Multiply Reducers ###
 
 
 # Multiply(u, Multiply(v, w)) => Multiply(Multiply(u, v), w)
@@ -509,22 +186,6 @@ def _reduce_by_associating_multiply_left(
         )
         return _apply_reducers(
             ex.Multiply(reduced, expression._right._right)
-        )
-    else:
-        return None
-
-
-# Multiply(u, Constant(c)) => Multiply(Constant(c), u)
-def _reduce_by_commuting_constants_left_for_multiply(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Multiply) and
-        isinstance(expression._right, ex.Constant) and
-        not isinstance(expression._left, ex.Constant) # ensure we make progress
-    ):
-        return _apply_reducers(
-            ex.Multiply(expression._right, expression._left)
         )
     else:
         return None
@@ -574,6 +235,74 @@ def _reduce_negative_one_times_u(
         return None
 
 
+# Multiply(u, Constant(c)) => Multiply(Constant(c), u)
+def _reduce_by_commuting_constant_left_across_multiply(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Multiply) and
+        isinstance(expression._right, ex.Constant) and
+        not isinstance(expression._left, ex.Constant)
+    ):
+        return _apply_reducers(
+            ex.Multiply(expression._right, expression._left)
+        )
+    else:
+        return None
+
+
+# Multiply(Negation(u), v) => Negation(Multiply(u, v))
+def _reduce_negation_of_u__times_v(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Multiply) and
+        isinstance(expression._left, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.Multiply(expression._left._inner, expression._right)
+        )
+        return _apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
+# Multiply(u, Negation(v)) => Negation(Multiply(u, v))
+def _reduce_u_times_negation_of_v(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Multiply) and
+        isinstance(expression._right, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.Multiply(expression._left, expression._right._inner)
+        )
+        return _apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
+# Multiply(u, Reciprocal(v)) => Multiply(Reciprocal(v), u)
+def _reduce_by_commuting_reciprocal_left_across_multiply(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Multiply) and
+        isinstance(expression._right, ex.Reciprocal) and
+        not isinstance(expression._left, ex.Reciprocal)
+    ):
+        return _apply_reducers(
+            ex.Multiply(expression._right, expression._left)
+        )
+    else:
+        return None
+
+
 # Multiply(Reciprocal(u), Reciprocal(v)) => Reciprocal(Multiply(u, v))
 def _reduce_product_of_reciprocals(
     expression: sm.Expression
@@ -588,6 +317,113 @@ def _reduce_product_of_reciprocals(
         )
         return _apply_reducers(
             ex.Reciprocal(reduced)
+        )
+    else:
+        return None
+
+
+### Cosine and Sine Reducers ###
+
+
+# Cosine(Negation(u)) => Cosine(u)
+def _reduce_cosine_of_negation_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Cosine) and
+        isinstance(expression._inner, ex.Negation)
+    ):
+        return _apply_reducers(
+            ex.Cosine(expression._inner._inner)
+        )
+    else:
+        return None
+
+
+# Sine(Negation(u)) => Sine(u)
+def _reduce_sine_of_negation_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Sine) and
+        isinstance(expression._inner, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.Sine(expression._inner._inner)
+        )
+        return _apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
+### NthPower and NthRoot Reducers ###
+
+
+# NthPower(u, 1) => u
+def _reduce_nth_power_where_n_is_one(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthPower) and
+        expression.n == 1
+    ):
+        return expression._inner
+    else:
+        return None
+
+
+# NthRoot(u, 1) => u
+def _reduce_nth_root_where_n_is_one(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthRoot) and
+        expression.n == 1
+    ):
+        return expression._inner
+    else:
+        return None
+
+
+# NthPower(NthRoot(u, m), n) => ...
+def _reduce_nth_power_of_mth_root_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._inner, ex.NthRoot)
+    ):
+        n = expression.n
+        m = expression._inner.n
+        if m == n:
+            return expression._inner._inner
+        greatest_common_divisor = math.gcd(m, n)
+        if greatest_common_divisor != 1:
+            reduced = _apply_reducers(
+                ex.NthRoot(expression._inner._inner, m // greatest_common_divisor)
+            )
+            return _apply_reducers(
+                ex.NthPower(reduced, n // greatest_common_divisor)
+            )
+    else:
+        return None
+
+
+# NthRoot(NthPower(u, m), n) => NthPower(NthRoot(u, n), m)
+def _reduce_nth_root_of_mth_power_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthRoot) and
+        isinstance(expression._inner, ex.NthPower)
+    ):
+        reduced = _apply_reducers(
+            ex.NthRoot(expression._inner._inner, expression.n)
+        )
+        return _apply_reducers(
+            ex.NthPower(reduced, expression._inner.n)
         )
     else:
         return None
@@ -633,6 +469,144 @@ def _reduce_product_of_nth_roots(
         return None
 
 
+# NthPower(NthPower(u, m), n) => NthPower(u, m * n))
+def _reduce_nth_power_of_mth_power_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._inner, ex.NthPower)
+    ):
+        return _apply_reducers(
+            ex.NthPower(expression._inner._inner, expression.n * expression._inner.n)
+        )
+    else:
+        return None
+
+
+# NthRoot(NthRoot(u, m), n) => NthRoot(u, m * n))
+def _reduce_nth_root_of_mth_root_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthRoot) and
+        isinstance(expression._inner, ex.NthRoot)
+    ):
+        return _apply_reducers(
+            ex.NthRoot(expression._inner._inner, expression.n * expression._inner.n)
+        )
+    else:
+        return None
+
+
+# NthPower(Negation(u), n) => NthPower(u, n) when n is even
+# NthPower(Negation(u), n) => Negation(NthPower(u, n)) when n is odd
+def _reduce_nth_power_of_negation_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._inner, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.NthPower(expression._inner._inner, expression.n)
+        )
+        if expression.n % 2 == 0: # n is even
+            return reduced
+        else: # n is odd
+            return _apply_reducers(
+                ex.Negation(reduced)
+            )
+    else:
+        return None
+
+
+# NthRoot(Negation(u), n) => Negation(NthRoot(u, n)) where n is odd
+def _reduce_odd_nth_root_of_negation_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthRoot) and
+        isinstance(expression._inner, ex.Negation) and
+        expression.n % 2 == 1
+    ):
+        reduced = _apply_reducers(
+            ex.NthRoot(expression._inner._inner, expression.n)
+        )
+        return _apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
+# NthPower(Reciprocal(u), n) => Reciprocal(NthPower(u, n))
+def _reduce_nth_power_of_reciprocal_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._inner, ex.Reciprocal)
+    ):
+        reduced = _apply_reducers(
+            ex.NthPower(expression._inner._inner, expression.n)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(reduced)
+        )
+    else:
+        return None
+
+
+# NthRoot(Reciprocal(u), n) => Reciprocal(NthRoot(u, n))
+def _reduce_nth_root_of_reciprocal_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthRoot) and
+        isinstance(expression._inner, ex.Reciprocal)
+    ):
+        reduced = _apply_reducers(
+            ex.NthRoot(expression._inner._inner, expression.n)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(reduced)
+        )
+    else:
+        return None
+
+
+### Exponential and Logarithm Reducers ###
+
+
+# Logarithm(Exponential(u)) => u
+def _reduce_logarithm_of_exponential_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Logarithm) and
+        isinstance(expression._inner, ex.Exponential) and
+        expression.base == expression._inner.base
+    ):
+        return expression._inner._inner
+    else:
+        return None
+
+
+# Exponential(Logarithm(u)) => u
+def _reduce_exponential_of_logarithm_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Exponential) and
+        isinstance(expression._inner, ex.Logarithm) and
+        expression.base == expression._inner.base
+    ):
+        return expression._inner._inner
+    else:
+        return None
+
+
 # Multiply(Exponential(u), Exponential(v)) => Exponential(Plus(u, v))
 def _reduce_product_of_exponentials(
     expression: sm.Expression
@@ -647,7 +621,7 @@ def _reduce_product_of_exponentials(
             ex.Plus(expression._left._inner, expression._right._inner)
         )
         return _apply_reducers(
-            ex.Exponential(reduced, expression._left.base)
+            ex.Exponential(reduced, base = expression._left.base)
         )
     else:
         return None
@@ -667,21 +641,93 @@ def _reduce_sum_of_logarithms(
             ex.Multiply(expression._left._inner, expression._right._inner)
         )
         return _apply_reducers(
-            ex.Logarithm(reduced, expression._left.base)
+            ex.Logarithm(reduced, base = expression._left.base)
         )
     else:
         return None
 
 
-### OK to use Divide() below here
-
-
-# Divide(u, Constant(1)) => u
-def _reduce_u_over_one(
+# Exponential(Negation(u)) => Reciprocal(Exponential(u))
+def _reduce_exponential_of_negation_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.Divide) and
+        isinstance(expression, ex.Exponential) and
+        isinstance(expression._inner, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.Exponential(expression._inner._inner, base = expression.base)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(reduced)
+        )
+    else:
+        return None
+
+
+# Logarithm(Reciprocal(u)) => Negation(Logarithm(u))
+def _reduce_logarithm_of_reciprocal_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Logarithm) and
+        isinstance(expression._inner, ex.Reciprocal)
+    ):
+        reduced = _apply_reducers(
+            ex.Logarithm(expression._inner._inner, base = expression.base)
+        )
+        return _apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
+# NthPower(Exponential(u), n) => Exponential(Multiply(Constant(n), u))
+def _reduce_nth_power_of_exponential_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.NthPower) and
+        isinstance(expression._inner, ex.Exponential)
+    ):
+        reduced = _apply_reducers(
+            ex.Multiply(ex.Constant(expression.n), expression._inner._inner)
+        )
+        return _apply_reducers(
+            ex.Exponential(reduced, base = expression._inner.base)
+        )
+    else:
+        return None
+
+
+# Logarithm(NthPower(u, n)) = Multiply(Constant(n), Logarithm(u))
+def _reduce_logarithm_of_nth_power_of_u(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Logarithm) and
+        isinstance(expression._inner, ex.NthPower)
+    ):
+        reduced = _apply_reducers(
+            ex.Logarithm(expression._inner._inner, base = expression.base)
+        )
+        return _apply_reducers(
+            ex.Multiply(ex.Constant(expression._inner.n), reduced)
+        )
+    else:
+        return None
+
+
+### Power Reducers ###
+
+
+# Power(u, Constant(1)) => u
+def _reduce_u_to_the_one(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Power) and
         isinstance(expression._right, ex.Constant) and
         expression._right.value == 1
     ):
@@ -690,74 +736,18 @@ def _reduce_u_over_one(
         return None
 
 
-# Divide(Constant(1), u) => Reciprocal(u)
-def _reduce_one_over_u(
+# Power(u, Constant(0)) => Constant(1)
+def _reduce_u_to_the_zero(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
-        isinstance(expression, ex.Divide) and
-        isinstance(expression._left, ex.Constant) and
-        expression._left.value == 1
+        isinstance(expression, ex.Power) and
+        isinstance(expression._right, ex.Constant) and
+        expression._right.value == 0
     ):
-        return _apply_reducers(
-            ex.Reciprocal(expression._right)
-        )
+        return ex.Constant(1)
     else:
         return None
-
-
-# Divide(Negation(u), v) => Negation(Divide(u, v))
-def _reduce_negated_numerator(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Divide) and
-        isinstance(expression._left, ex.Negation)
-    ):
-        reduced = _apply_reducers(
-            ex.Divide(expression._left._inner, expression._right)
-        )
-        return _apply_reducers(
-            ex.Negation(reduced)
-        )
-    else:
-        return None
-
-
-# Divide(u, Negation(v)) => Negation(Divide(u, v))
-def _reduce_negated_denominator(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Divide) and
-        isinstance(expression._right, ex.Negation)
-    ):
-        reduced = _apply_reducers(
-            ex.Divide(expression._left, expression._right._inner)
-        )
-        return _apply_reducers(
-            ex.Negation(reduced)
-        )
-    else:
-        return None
-
-
-# Reciprocal(Divide(u, v)) => Divide(v, u)
-def _reduce_reciprocal_of_u_over_v(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Reciprocal) and
-        isinstance(expression._inner, ex.Divide)
-    ):
-        return _apply_reducers(
-            ex.Divide(expression._inner._right, expression._inner._left)
-        )
-    else:
-        return None
-
-
-### OK to use Power() below here
 
 
 # Power(Constant(1), u) => Constant(1)
@@ -790,34 +780,6 @@ def _reduce_u_to_the_n_at_least_two(
     return None
 
 
-# Power(u, Constant(1)) => u
-def _reduce_u_to_the_one(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Power) and
-        isinstance(expression._right, ex.Constant) and
-        expression._right.value == 1
-    ):
-        return expression._left
-    else:
-        return None
-
-
-# Power(u, Constant(0)) => Constant(1)
-def _reduce_u_to_the_zero(
-    expression: sm.Expression
-) -> sm.Expression | None:
-    if (
-        isinstance(expression, ex.Power) and
-        isinstance(expression._right, ex.Constant) and
-        expression._right.value == 0
-    ):
-        return ex.Constant(1)
-    else:
-        return None
-
-
 # Power(u, Constant(-1)) => Reciprocal(u)
 def _reduce_u_to_the_negative_one(
     expression: sm.Expression
@@ -834,18 +796,22 @@ def _reduce_u_to_the_negative_one(
         return None
 
 
-# Power(u, Constant(0.5)) => NthRoot(u, n = 2)
-def _reduce_u_to_the_one_half(
+# Power(u, Reciprocal(Constant(n))) => NthRoot(u, n)
+def _reduce_u_to_the_one_over_n(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Power) and
-        isinstance(expression._right, ex.Constant) and
-        expression._right.value == 0.5
+        isinstance(expression._right, ex.Reciprocal) and
+        isinstance(expression._right._inner, ex.Constant)
     ):
-        return _apply_reducers(
-            ex.NthRoot(expression._left, n = 2)
-        )
+        n = integer_from_integral_real_number(expression._right._inner.value)
+        if n is None:
+            return None
+        else:
+            return _apply_reducers(
+                ex.NthRoot(expression._left, n)
+            )
     else:
         return None
 
@@ -861,7 +827,7 @@ def _reduce_power_with_constant_base(
         expression._left.value != 1
     ):
         return _apply_reducers(
-            ex.Exponential(expression._right, expression._left.value)
+            ex.Exponential(expression._right, base = expression._left.value)
         )
     else:
         return None
@@ -885,70 +851,99 @@ def _reduce_power_of_power(
         return None
 
 
+# Power(u, Negation(v)) => Reciprocal(Power(u, v))
+def _reduce_u_to_the_negation_of_v(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Power) and
+        isinstance(expression._right, ex.Negation)
+    ):
+        reduced = _apply_reducers(
+            ex.Power(expression._left, expression._right._inner)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(reduced)
+        )
+    else:
+        return None
+
+
+# Power(Reciprocal(u), v) => Reciprocal(Power(u, v))
+def _reduce_one_over_u__to_the_v(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Power) and
+        isinstance(expression._left, ex.Reciprocal)
+    ):
+        reduced = _apply_reducers(
+            ex.Power(expression._left._inner, expression._right)
+        )
+        return _apply_reducers(
+            ex.Reciprocal(reduced)
+        )
+    else:
+        return None
+
+
 reducers: list[Callable[[sm.Expression], sm.Expression | None]]
 reducers = [
-    # Constant() OK
+    # Constant and Variable
     _reduce_expressions_that_lack_variables,
-    # Variable() OK
-    # Negation() OK
+    # Negation and Reciprocal
     _reduce_negation_of_negation_of_u,
-    # Reciprocal() OK
     _reduce_reciprocal_of_reciprocal_of_u,
     _reduce_reciprocal_of_negation_of_u,
-    # NthPower() OK
-    _reduce_nth_power_where_n_is_one,
-    _reduce_nth_power_of_mth_power_of_u,
-    _reduce_nth_power_of_negation_of_u,
-    _reduce_nth_power_of_reciprocal_of_u,
-    # NthRoot() OK
-    _reduce_nth_root_where_n_is_one,
-    _reduce_nth_root_of_mth_root_of_u,
-    _reduce_odd_nth_root_of_negation_of_u,
-    _reduce_nth_root_of_reciprocal_of_u,
-    _reduce_nth_root_of_mth_power_of_u,
-    _reduce_nth_power_of_mth_root_of_u,
-    # Exponential() OK
-    _reduce_exponential_of_negation_of_u,
-    # Logarithm() OK
-    _reduce_logarithm_of_reciprocal_of_u,
-    _reduce_logarithm_of_exponential_of_u,
-    _reduce_exponential_of_logarithm_of_u,
-    # Cosine() OK
-    _reduce_cosine_of_negation_of_u,
-    # Sine() OK
-    _reduce_sine_of_negation_of_u,
-    # Plus() OK
+    # Plus
     _reduce_by_associating_plus_right,
-    _reduce_by_commuting_constants_right_for_plus,
     _reduce_u_plus_zero,
-    # Minus() OK
-    _reduce_u_minus_zero,
-    _reduce_zero_minus_u,
-    _reduce_negation_of_u_minus_v,
-    # Multiply() OK
+    _reduce_by_commuting_constant_right_across_plus,
+    _reduce_by_commuting_negation_right_across_plus,
+    # Multiply
     _reduce_by_associating_multiply_left,
-    _reduce_by_commuting_constants_left_for_multiply,
     _reduce_one_times_u,
     _reduce_zero_times_u,
     _reduce_negative_one_times_u,
+    _reduce_by_commuting_constant_left_across_multiply,
+    _reduce_negation_of_u__times_v,
+    _reduce_u_times_negation_of_v,
+    _reduce_by_commuting_reciprocal_left_across_multiply,
     _reduce_product_of_reciprocals,
+    # Cosine and Sine
+    _reduce_cosine_of_negation_of_u,
+    _reduce_sine_of_negation_of_u,
+    # NthPower and NthRoot
+    _reduce_nth_power_where_n_is_one,
+    _reduce_nth_root_where_n_is_one,
+    _reduce_nth_power_of_mth_root_of_u,
+    _reduce_nth_root_of_mth_power_of_u,
     _reduce_product_of_nth_powers,
     _reduce_product_of_nth_roots,
+    _reduce_nth_power_of_mth_power_of_u,
+    _reduce_nth_root_of_mth_root_of_u,
+    _reduce_nth_power_of_negation_of_u,
+    _reduce_odd_nth_root_of_negation_of_u,
+    _reduce_nth_power_of_reciprocal_of_u,
+    _reduce_nth_root_of_reciprocal_of_u,
+    # Exponential and Logarithm
+    _reduce_logarithm_of_exponential_of_u,
+    _reduce_exponential_of_logarithm_of_u,
     _reduce_product_of_exponentials,
     _reduce_sum_of_logarithms,
-    # Divide() OK
-    _reduce_u_over_one,
-    _reduce_one_over_u,
-    _reduce_negated_numerator,
-    _reduce_negated_denominator,
-    _reduce_reciprocal_of_u_over_v,
-    # Power() OK
-    _reduce_one_to_the_u,
-    _reduce_u_to_the_n_at_least_two,
+    _reduce_exponential_of_negation_of_u,
+    _reduce_logarithm_of_reciprocal_of_u,
+    _reduce_nth_power_of_exponential_of_u,
+    _reduce_logarithm_of_nth_power_of_u,
+    # Power
     _reduce_u_to_the_one,
     _reduce_u_to_the_zero,
+    _reduce_one_to_the_u,
+    _reduce_u_to_the_n_at_least_two,
     _reduce_u_to_the_negative_one,
-    _reduce_u_to_the_one_half,
+    _reduce_u_to_the_one_over_n,
     _reduce_power_with_constant_base,
-    _reduce_power_of_power
+    _reduce_power_of_power,
+    _reduce_u_to_the_negation_of_v,
+    _reduce_one_over_u__to_the_v
 ]
