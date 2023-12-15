@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any
 import smoothmath as sm
-from smoothmath._private.reducers import reduce_synthetic
+from smoothmath._private.optimize_synthetic import optimize_synthetic
 
 
 class GlobalPartial:
@@ -11,7 +11,7 @@ class GlobalPartial:
         original_expression: sm.Expression,
         synthetic_partial: sm.Expression
     ):
-        return cls(original_expression, reduce_synthetic(synthetic_partial))
+        return cls(original_expression, optimize_synthetic(synthetic_partial))
 
     def __init__(
         self: GlobalPartial,

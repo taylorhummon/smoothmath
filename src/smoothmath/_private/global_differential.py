@@ -3,7 +3,7 @@ from typing import Any
 import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.local_differential import LocalDifferentialBuilder
-from smoothmath._private.reducers import reduce_synthetic
+from smoothmath._private.optimize_synthetic import optimize_synthetic
 from smoothmath._private.utilities import get_variable_name
 
 
@@ -112,5 +112,5 @@ def _reduce_synthetic_partials(
 ) -> dict[str, sm.Expression]:
     reduced_synthetic_partials = {}
     for variable_name, synthetic_partial in synthetic_partials.items():
-        reduced_synthetic_partials[variable_name] = reduce_synthetic(synthetic_partial)
+        reduced_synthetic_partials[variable_name] = optimize_synthetic(synthetic_partial)
     return reduced_synthetic_partials
