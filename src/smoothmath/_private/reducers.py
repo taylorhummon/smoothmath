@@ -125,7 +125,7 @@ def _reduce_by_commuting_constant_right_across_plus(
     if (
         isinstance(expression, ex.Plus) and
         isinstance(expression._left, ex.Constant) and
-        not isinstance(expression._right, ex.Constant)
+        not isinstance(expression._right, (ex.Constant, ex.Negation))
     ):
         return apply_reducers(
             ex.Plus(expression._right, expression._left)
@@ -152,6 +152,9 @@ def _reduce_by_commuting_negation_right_across_plus(
 
 ### Multiply Reducers ###
 
+# u * (v * w) => (u * v) * w
+
+# ((((a * b) * c) * d) * e) * f
 
 # Multiply(u, Multiply(v, w)) => Multiply(Multiply(u, v), w)
 def _reduce_by_associating_multiply_left(
@@ -222,7 +225,7 @@ def _reduce_by_commuting_constant_left_across_multiply(
     if (
         isinstance(expression, ex.Multiply) and
         isinstance(expression._right, ex.Constant) and
-        not isinstance(expression._left, ex.Constant)
+        not isinstance(expression._left, (ex.Constant, ex.Reciprocal))
     ):
         return apply_reducers(
             ex.Multiply(expression._right, expression._left)
