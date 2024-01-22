@@ -779,7 +779,7 @@ def _reduce_u_to_the_negative_one(
         return None
 
 
-# Power(u, Reciprocal(Constant(n))) => NthRoot(u, n)
+# Power(u, Reciprocal(Constant(n))) => NthRoot(u, n) when n >= 1
 def _reduce_u_to_the_one_over_n(
     expression: sm.Expression
 ) -> sm.Expression | None:
@@ -789,9 +789,7 @@ def _reduce_u_to_the_one_over_n(
         isinstance(expression._right._inner, ex.Constant)
     ):
         n = integer_from_integral_real_number(expression._right._inner.value)
-        if n is None:
-            return None
-        else:
+        if n is not None and n >= 1:
             return apply_reducers(
                 ex.NthRoot(expression._left, n)
             )
