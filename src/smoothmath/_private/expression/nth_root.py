@@ -17,18 +17,38 @@ def nth_root(
 ) -> sm.real_number:
     if n <= 0:
         raise sm.DomainError(f"nth_root(x, n) is not defined for n = {n}")
-    if n >= 2 and x == 0:
-        raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = {n}")
-    if n % 2 == 0 and x < 0:
-        raise sm.DomainError(f"nth_root(x, n) is not defined for negative x for n = {n}")
-    if n == 1:
+    elif n == 1:
         return x
-    if n == 2:
-        return math.sqrt(x)
+    elif n == 2:
+        if x > 0:
+            return math.sqrt(x)
+        elif x == 0:
+            raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = 2")
+        else: # x < 0
+            raise sm.DomainError(f"nth_root(x, n) is not defined for negative x for n = 2")
     elif n == 3:
-        return math.cbrt(x)
-    else:
-        return x ** (1 / n)
+        if x > 0:
+            return math.cbrt(x)
+        elif x == 0:
+            raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = 3")
+        else: # x < 0
+            # CAREFUL: math.cbrt can return imaginary values for negative inputs
+            return - math.cbrt(- x)
+    else: # n >= 4
+        if n % 2 == 0: # n is even
+            if x > 0:
+                return x ** (1 / n)
+            elif x == 0:
+                raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = {n}")
+            else: # x < 0
+                raise sm.DomainError(f"nth_root(x, n) is not defined for negative x for n = {n}")
+        else: # n is odd
+            if x > 0:
+                return x ** (1 / n)
+            elif x == 0:
+                raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = {n}")
+            else: # x < 0
+                return - ((- x) ** (1 / n))
 
 
 class NthRoot(base.ParameterizedUnaryExpression):

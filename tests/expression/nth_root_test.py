@@ -16,44 +16,54 @@ def test_nth_root():
         nth_root(0, 12)
     # n = 1
     assert nth_root(0.5, 1) == approx(0.5)
-    assert nth_root(1, 1) == 1
-    assert nth_root(2, 1) == 2
-    assert nth_root(0, 1) == 0
+    assert nth_root(1, 1) == approx(1)
+    assert nth_root(2, 1) == approx(2)
+    assert nth_root(0, 1) == approx(0)
     assert nth_root(-0.5, 1) == approx(-0.5)
-    assert nth_root(-1, 1) == -1
-    assert nth_root(-2, 1) == -2
+    assert nth_root(-1, 1) == approx(-1)
+    assert nth_root(-2, 1) == approx(-2)
     # n = 2 (a.k.a square root)
     assert nth_root(0.25, 2) == approx(0.5)
-    assert nth_root(1, 2) == 1
+    assert nth_root(1, 2) == approx(1)
     assert nth_root(2, 2) == approx(1.4142135623730)
-    assert nth_root(9, 2) == 3
-    assert nth_root(50 ** 2, 2) == 50
+    assert nth_root(9, 2) == approx(3)
+    assert nth_root(50 ** 2, 2) == approx(50)
     with raises(DomainError):
         nth_root(0, 2)
     with raises(DomainError):
         nth_root(-1, 2)
     # n = 3 (a.k.a cube root)
     assert nth_root(0.125, 3) == approx(0.5)
-    assert nth_root(1, 3) == 1
+    assert nth_root(1, 3) == approx(1)
     assert nth_root(2, 3) == approx(1.2599210498948)
-    assert nth_root(8, 3) == 2
-    assert nth_root(50 ** 3, 3) == 50
+    assert nth_root(8, 3) == approx(2)
+    assert nth_root(50 ** 3, 3) == approx(50)
     with raises(DomainError):
         nth_root(0, 3)
     assert nth_root(-0.125, 3) == approx(-0.5)
-    assert nth_root(-1, 3) == -1
+    assert nth_root(-1, 3) == approx(-1)
     assert nth_root(-2, 3) == approx(-1.2599210498948)
-    assert nth_root(-8, 3) == -2
+    assert nth_root(-8, 3) == approx(-2)
     # n = 4
     assert nth_root(0.5 ** 4, 4) == approx(0.5)
-    assert nth_root(1, 4) == 1
+    assert nth_root(1, 4) == approx(1)
     assert nth_root(4, 4) == approx(1.4142135623730)
-    assert nth_root(81, 4) == 3
-    assert nth_root(50 ** 4, 4) == 50
+    assert nth_root(81, 4) == approx(3)
+    assert nth_root(50 ** 4, 4) == approx(50)
     with raises(DomainError):
         nth_root(0, 4)
     with raises(DomainError):
         nth_root(-1, 4)
+    # n = 5
+    assert nth_root(0.5 ** 5, 5) == approx(0.5)
+    assert nth_root(1, 5) == approx(1)
+    assert nth_root(4, 5) == approx(1.3195079107728942)
+    assert nth_root(243, 5) == approx(3)
+    assert nth_root(50 ** 5, 5) == approx(50)
+    with raises(DomainError):
+        nth_root(0, 5)
+    assert nth_root(-1, 5) == approx(-1)
+    assert nth_root(-243, 5) == approx(-3)
 
 
 def test_NthRoot_with_n_equal_two():
