@@ -296,10 +296,13 @@ def test_reduce_nth_power_of_exponential_of_u():
 
 def test_reduce_logarithm_of_nth_power_of_u():
     u = Variable("u")
-    z = Logarithm(NthPower(u, n = 2))
-    assert r._reduce_logarithm_of_nth_power_of_u(z) == Multiply(Constant(2), Logarithm(u))
+    z = Logarithm(NthPower(u, n = 3))
+    assert r._reduce_logarithm_of_nth_power_of_u(z) == Multiply(Constant(3), Logarithm(u))
     z = Logarithm(NthPower(u, n = 3), base = 2)
     assert r._reduce_logarithm_of_nth_power_of_u(z) == Multiply(Constant(3), Logarithm(u, base = 2))
+    z = Logarithm(NthPower(u, n = 4))
+    # We don't want to reduce to Multiply(Constant(4), Logarithm(u)) because u might be negative
+    assert r._reduce_logarithm_of_nth_power_of_u(z) == None
 
 
 # Power

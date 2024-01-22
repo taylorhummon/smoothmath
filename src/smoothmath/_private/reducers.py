@@ -684,13 +684,14 @@ def _reduce_nth_power_of_exponential_of_u(
         return None
 
 
-# Logarithm(NthPower(u, n)) = Multiply(Constant(n), Logarithm(u))
+# Logarithm(NthPower(u, n)) = Multiply(Constant(n), Logarithm(u)) when n is odd
 def _reduce_logarithm_of_nth_power_of_u(
     expression: sm.Expression
 ) -> sm.Expression | None:
     if (
         isinstance(expression, ex.Logarithm) and
-        isinstance(expression._inner, ex.NthPower)
+        isinstance(expression._inner, ex.NthPower) and
+        expression._inner.n % 2 == 1
     ):
         reduced = apply_reducers(
             ex.Logarithm(expression._inner._inner, base = expression.base)
