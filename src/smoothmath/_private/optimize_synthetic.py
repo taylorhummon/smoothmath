@@ -76,3 +76,25 @@ def _reassemble_minus_and_divide(
             return expression._rebuild(reassembled_left, reassembled_right)
     else:
         raise Exception("internal error: unknown Expression base class")
+
+
+# !!! make use of something like the following
+def _reassemble_minus(
+    expression: sm.Expression
+) -> sm.Expression:
+    if isinstance(expression, base.NullaryExpression):
+        return expression
+    elif isinstance(expression, (base.UnaryExpression, base.ParameterizedUnaryExpression)):
+        reassembled_inner = _reassemble_minus_and_divide(expression._inner)
+        return expression._rebuild(reassembled_inner)
+    elif isinstance(expression, base.BinaryExpression):
+        if isinstance(expression, ex.Plus) and isinstance(expression._right, ex.Negation):
+            reassembled_left = _reassemble_minus_and_divide(expression._left)
+            reassembled_right = _reassemble_minus_and_divide(expression._right._inner)
+            return ex.Minus(reassembled_left, reassembled_right)
+        else:
+            reassembled_left = _reassemble_minus_and_divide(expression._left)
+            reassembled_right = _reassemble_minus_and_divide(expression._right)
+            return expression._rebuild(reassembled_left, reassembled_right)
+    else:
+        raise Exception("internal error: unknown Expression base class")

@@ -150,11 +150,27 @@ def _reduce_by_commuting_negation_right_across_plus(
         return None
 
 
+# Plus(Negation(u), Negation(v)) => Negation(Plus(u, v))
+def _reduce_sum_of_negations(
+    expression: sm.Expression
+) -> sm.Expression | None:
+    if (
+        isinstance(expression, ex.Plus) and
+        isinstance(expression._left, ex.Negation) and
+        isinstance(expression._right, ex.Negation)
+    ):
+        reduced = apply_reducers(
+            ex.Plus(expression._left._inner, expression._right._inner)
+        )
+        return apply_reducers(
+            ex.Negation(reduced)
+        )
+    else:
+        return None
+
+
 ### Multiply Reducers ###
 
-# u * (v * w) => (u * v) * w
-
-# ((((a * b) * c) * d) * e) * f
 
 # Multiply(u, Multiply(v, w)) => Multiply(Multiply(u, v), w)
 def _reduce_by_associating_multiply_left(
@@ -225,7 +241,7 @@ def _reduce_by_commuting_constant_left_across_multiply(
     if (
         isinstance(expression, ex.Multiply) and
         isinstance(expression._right, ex.Constant) and
-        not isinstance(expression._left, (ex.Constant, ex.Reciprocal))
+        not isinstance(expression._left, (ex.Constant, ex.Reciprocal, ex.Multiply))
     ):
         return apply_reducers(
             ex.Multiply(expression._right, expression._left)
@@ -277,7 +293,7 @@ def _reduce_by_commuting_reciprocal_left_across_multiply(
     if (
         isinstance(expression, ex.Multiply) and
         isinstance(expression._right, ex.Reciprocal) and
-        not isinstance(expression._left, ex.Reciprocal)
+        not isinstance(expression._left, (ex.Reciprocal, ex.Multiply))
     ):
         return apply_reducers(
             ex.Multiply(expression._right, expression._left)
@@ -882,6 +898,7 @@ reducers = [
     _reduce_u_plus_zero,
     _reduce_by_commuting_constant_right_across_plus,
     _reduce_by_commuting_negation_right_across_plus,
+    _reduce_sum_of_negations,
     # Multiply
     _reduce_by_associating_multiply_left,
     _reduce_one_times_u,

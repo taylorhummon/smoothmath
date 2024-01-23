@@ -68,6 +68,13 @@ def test_reduce_by_commuting_negation_right_across_plus():
     assert r._reduce_by_commuting_negation_right_across_plus(z) == Plus(v, Negation(u))
 
 
+def test_reduce_sum_of_negations():
+    u = Variable("u")
+    v = Variable("v")
+    z = Plus(Negation(u), Negation(v))
+    assert r._reduce_sum_of_negations(z) == Negation(Plus(u, v))
+
+
 # Multiply
 
 
