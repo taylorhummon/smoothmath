@@ -15,10 +15,12 @@ from smoothmath._private.utilities import (
 class Expression(ABC):
     def __init__(
         self: Expression,
-        lacks_variables: bool
+        lacks_variables: bool,
+        is_fully_reduced: bool
     ) -> None:
         self._lacks_variables: bool
         self._lacks_variables = lacks_variables
+        self._is_fully_reduced = is_fully_reduced
 
     def evaluate(
         self: Expression,
@@ -163,7 +165,7 @@ class NullaryExpression(Expression):
         self: NullaryExpression,
         lacks_variables: bool
     ) -> None:
-        super().__init__(lacks_variables)
+        super().__init__(lacks_variables, is_fully_reduced = True)
 
     def _reset_evaluation_cache(
         self: NullaryExpression
@@ -178,7 +180,7 @@ class UnaryExpression(Expression):
     ) -> None:
         if not isinstance(inner, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
-        super().__init__(inner._lacks_variables)
+        super().__init__(inner._lacks_variables, is_fully_reduced = False)
         self._inner: Expression
         self._inner = inner
         self._value: sm.real_number | None
@@ -297,7 +299,8 @@ class BinaryExpression(Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {left}")
         if not isinstance(right, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {right}")
-        super().__init__(left._lacks_variables and right._lacks_variables)
+        lacks_variables = left._lacks_variables and right._lacks_variables
+        super().__init__(lacks_variables, is_fully_reduced = False)
         self._left: Expression
         self._left = left
         self._right: Expression

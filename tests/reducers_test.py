@@ -173,9 +173,9 @@ def test_reduce_nth_power_of_mth_root_of_u():
     z = NthPower(NthRoot(u, n = 2), n = 2)
     assert r._reduce_nth_power_of_mth_root_of_u(z) == u
     z = NthPower(NthRoot(u, n = 6), n = 2)
-    assert r._reduce_nth_power_of_mth_root_of_u(z) == NthRoot(u, n = 3)
+    assert r._reduce_nth_power_of_mth_root_of_u(z) == NthPower(NthRoot(u, n = 3), n = 1)
     z = NthPower(NthRoot(u, n = 2), n = 6)
-    assert r._reduce_nth_power_of_mth_root_of_u(z) == NthPower(u, n = 3)
+    assert r._reduce_nth_power_of_mth_root_of_u(z) == NthPower(NthRoot(u, n = 1), n = 3)
     z = NthPower(NthRoot(u, n = 6), n = 4)
     assert r._reduce_nth_power_of_mth_root_of_u(z) == NthPower(NthRoot(u, n = 3), n = 2)
     z = NthPower(NthRoot(u, n = 4), n = 6)

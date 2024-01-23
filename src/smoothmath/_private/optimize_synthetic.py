@@ -17,19 +17,30 @@ def optimize_synthetic(
 def _reduce_synthetic(
     expression: sm.Expression
 ) -> sm.Expression:
-    if isinstance(expression, base.NullaryExpression):
+    if expression._is_fully_reduced:
         return expression
-    elif isinstance(expression, (base.UnaryExpression, base.ParameterizedUnaryExpression)):
-        reduced_inner = _reduce_synthetic(expression._inner)
-        rebuilt = expression._rebuild(reduced_inner)
-        return r.apply_reducers(rebuilt)
+    if isinstance(expression, (base.UnaryExpression, base.ParameterizedUnaryExpression)):
+        if not expression._inner._is_fully_reduced:
+            reduced_inner = _reduce_synthetic(expression._inner)
+            rebuilt_expression = expression._rebuild(reduced_inner)
+            return _reduce_synthetic(rebuilt_expression)
+        else: # inner expression is reduced
+            reduced_expression = r.apply_reducers(expression)
+            return _reduce_synthetic(reduced_expression)
     elif isinstance(expression, base.BinaryExpression):
-        reduced_left = _reduce_synthetic(expression._left)
-        reduced_right = _reduce_synthetic(expression._right)
-        rebuilt = expression._rebuild(reduced_left, reduced_right)
-        return r.apply_reducers(rebuilt)
+        if not expression._left._is_fully_reduced:
+            reduced_left = _reduce_synthetic(expression._left)
+            rebuilt_expression = expression._rebuild(reduced_left, expression._right)
+            return _reduce_synthetic(rebuilt_expression)
+        if not expression._right._is_fully_reduced:
+            reduced_right = _reduce_synthetic(expression._right)
+            rebuilt_expression = expression._rebuild(expression._left, reduced_right)
+            return _reduce_synthetic(rebuilt_expression)
+        else: # both left and right inner expressions are reduced
+            reduced_expression = r.apply_reducers(expression)
+            return _reduce_synthetic(reduced_expression)
     else:
-        raise Exception("internal error: unknown Expression base class")
+        raise Exception("internal error: !!!")
 
 
 def _disassemble_minus_and_divide(
