@@ -1,6 +1,8 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, NthPower, NthRoot
+from smoothmath.expression import (
+    Constant, Variable, Negation, Reciprocal, NthPower, NthRoot, Exponential, Multiply
+)
 from smoothmath._private.expression.nth_power import nth_power
 
 
@@ -107,3 +109,57 @@ def test_NthPower_with_n_equal_two_composition():
     assert z.global_partial(x).at(point) == approx(12)
     assert z.local_differential(point).component(x) == approx(12)
     assert z.global_differential().component_at(point, x) == approx(12)
+
+
+def test_reduce_nth_power_where_n_is_one():
+    u = Variable("u")
+    z = NthPower(u, n = 1)
+    assert z._reduce_nth_power_where_n_is_one() == u
+
+
+def test_reduce_nth_root_where_n_is_one():
+    u = Variable("u")
+    z = NthRoot(u, n = 1)
+    assert z._reduce_nth_root_where_n_is_one() == u
+
+
+def test_reduce_nth_power_of_mth_root_of_u():
+    u = Variable("u")
+    z = NthPower(NthRoot(u, n = 2), n = 2)
+    assert z._reduce_nth_power_of_mth_root_of_u() == u
+    z = NthPower(NthRoot(u, n = 6), n = 2)
+    assert z._reduce_nth_power_of_mth_root_of_u() == NthPower(NthRoot(u, n = 3), n = 1)
+    z = NthPower(NthRoot(u, n = 2), n = 6)
+    assert z._reduce_nth_power_of_mth_root_of_u() == NthPower(NthRoot(u, n = 1), n = 3)
+    z = NthPower(NthRoot(u, n = 6), n = 4)
+    assert z._reduce_nth_power_of_mth_root_of_u() == NthPower(NthRoot(u, n = 3), n = 2)
+    z = NthPower(NthRoot(u, n = 4), n = 6)
+    assert z._reduce_nth_power_of_mth_root_of_u() == NthPower(NthRoot(u, n = 2), n = 3)
+
+
+def test_reduce_nth_power_of_mth_power_of_u():
+    u = Variable("u")
+    z = NthPower(NthPower(u, n = 3), n = 2)
+    assert z._reduce_nth_power_of_mth_power_of_u() == NthPower(u, n = 6)
+
+
+def test_reduce_nth_power_of_negation_of_u():
+    u = Variable("u")
+    z = NthPower(Negation(u), n = 2)
+    assert z._reduce_nth_power_of_negation_of_u() == NthPower(u, n = 2)
+    z = NthPower(Negation(u), n = 3)
+    assert z._reduce_nth_power_of_negation_of_u() == Negation(NthPower(u, n = 3))
+
+
+def test_reduce_nth_power_of_reciprocal_of_u():
+    u = Variable("u")
+    z = NthPower(Reciprocal(u), n = 2)
+    assert z._reduce_nth_power_of_reciprocal_of_u() == Reciprocal(NthPower(u, n = 2))
+
+
+def test_reduce_nth_power_of_exponential_of_u():
+    u = Variable("u")
+    z = NthPower(Exponential(u), n = 2)
+    assert z._reduce_nth_power_of_exponential_of_u() == Exponential(Multiply(Constant(2), u))
+    z = NthPower(Exponential(u, base = 2), n = 3)
+    assert z._reduce_nth_power_of_exponential_of_u() == Exponential(Multiply(Constant(3), u), base = 2)

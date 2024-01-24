@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, NthRoot
+from smoothmath.expression import Constant, Variable, Negation, Reciprocal, NthPower, NthRoot
 from smoothmath._private.expression.nth_root import nth_root
 
 
@@ -213,3 +213,27 @@ def test_NthRoot_where_exponent_is_an_integer_represented_as_a_float():
     assert z.global_partial(x).at(point) == approx(1 / 6)
     assert z.local_differential(point).component(x) == approx(1 / 6)
     assert z.global_differential().component_at(point, x) == approx(1 / 6)
+
+
+def test_reduce_nth_root_of_mth_power_of_u():
+    u = Variable("u")
+    z = NthRoot(NthPower(u, n = 2), n = 3)
+    assert z._reduce_nth_root_of_mth_power_of_u() == NthPower(NthRoot(u, n = 3), n = 2)
+
+
+def test_reduce_nth_root_of_mth_root_of_u():
+    u = Variable("u")
+    z = NthRoot(NthRoot(u, n = 3), n = 2)
+    assert z._reduce_nth_root_of_mth_root_of_u() == NthRoot(u, n = 6)
+
+
+def test_reduce_odd_nth_root_of_negation_of_u():
+    u = Variable("u")
+    z = NthRoot(Negation(u), n = 3)
+    assert z._reduce_odd_nth_root_of_negation_of_u() == Negation(NthRoot(u, n = 3))
+
+
+def test_reduce_nth_root_of_reciprocal_of_u():
+    u = Variable("u")
+    z = NthRoot(Reciprocal(u), n = 2)
+    assert z._reduce_nth_root_of_reciprocal_of_u() == Reciprocal(NthRoot(u, n = 2))

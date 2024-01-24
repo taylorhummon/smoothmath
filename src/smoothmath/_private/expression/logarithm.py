@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
@@ -99,3 +99,49 @@ class Logarithm(base.ParameterizedUnaryExpression):
                 multiplier,
                 ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self._inner)
             )
+
+    @property
+    def _reducers(
+        self: Logarithm
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_logarithm_of_exponential_of_u,
+            self._reduce_logarithm_of_reciprocal_of_u,
+            self._reduce_logarithm_of_nth_power_of_u
+        ]
+
+    # Logarithm(Exponential(u)) => u
+    def _reduce_logarithm_of_exponential_of_u(
+        self: Logarithm
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._inner, ex.Exponential) and
+            self.base == self._inner.base
+        ):
+            return self._inner._inner
+        else:
+            return None
+
+    # Logarithm(Reciprocal(u)) => Negation(Logarithm(u))
+    def _reduce_logarithm_of_reciprocal_of_u(
+        self: Logarithm
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.Reciprocal):
+            return ex.Negation(ex.Logarithm(self._inner._inner, base = self.base))
+        else:
+            return None
+
+    # Logarithm(NthPower(u, n)) = Multiply(Constant(n), Logarithm(u)) when n is odd
+    def _reduce_logarithm_of_nth_power_of_u(
+        self: Logarithm
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._inner, ex.NthPower) and
+            self._inner.n % 2 == 1
+        ):
+            return ex.Multiply(
+                ex.Constant(self._inner.n),
+                ex.Logarithm(self._inner._inner, base = self.base)
+            )
+        else:
+            return None

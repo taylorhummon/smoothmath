@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base

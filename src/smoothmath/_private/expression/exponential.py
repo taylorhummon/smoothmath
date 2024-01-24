@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
@@ -94,3 +94,33 @@ class Exponential(base.ParameterizedUnaryExpression):
                 ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self),
                 multiplier
             )
+
+    @property
+    def _reducers(
+        self: Exponential
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_exponential_of_logarithm_of_u,
+            self._reduce_exponential_of_negation_of_u
+        ]
+
+    # Exponential(Logarithm(u)) => u
+    def _reduce_exponential_of_logarithm_of_u(
+        self: Exponential
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._inner, ex.Logarithm) and
+            self.base == self._inner.base
+        ):
+            return self._inner._inner
+        else:
+            return None
+
+    # Exponential(Negation(u)) => Reciprocal(Exponential(u))
+    def _reduce_exponential_of_negation_of_u(
+        self: Exponential
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.Negation):
+            return ex.Reciprocal(ex.Exponential(self._inner._inner, base = self.base))
+        else:
+            return None

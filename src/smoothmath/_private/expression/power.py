@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
+from smoothmath._private.utilities import integer_from_integral_real_number
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -121,3 +122,135 @@ class Power(base.BinaryExpression):
         multiplier: sm.Expression
     ) -> sm.Expression:
         return ex.Multiply(ex.Multiply(ex.Logarithm(self._left, base = math.e), self), multiplier)
+
+    @property
+    def _reducers(
+        self: Power
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_u_to_the_one,
+            self._reduce_u_to_the_zero,
+            self._reduce_one_to_the_u,
+            self._reduce_u_to_the_n_at_least_two,
+            self._reduce_u_to_the_negative_one,
+            self._reduce_u_to_the_one_over_n,
+            self._reduce_power_with_constant_base,
+            self._reduce_power_of_power,
+            self._reduce_u_to_the_negation_of_v,
+            self._reduce_one_over_u__to_the_v
+        ]
+
+    # Power(u, Constant(1)) => u
+    def _reduce_u_to_the_one(
+        self: Power
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._right, ex.Constant) and
+            self._right.value == 1
+        ):
+            return self._left
+        else:
+            return None
+
+    # Power(u, Constant(0)) => Constant(1)
+    def _reduce_u_to_the_zero(
+        self: Power
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._right, ex.Constant) and
+            self._right.value == 0
+        ):
+            return ex.Constant(1)
+        else:
+            return None
+
+    # Power(Constant(1), u) => Constant(1)
+    def _reduce_one_to_the_u(
+        self: Power
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._left, ex.Constant) and
+            self._left.value == 1
+        ):
+            return ex.Constant(1)
+        else:
+            return None
+
+    # Power(u, Constant(n)) => NthPower(u, n) when n >= 2
+    def _reduce_u_to_the_n_at_least_two(
+        self: Power
+    ) -> sm.Expression | None:
+        if isinstance(self._right, ex.Constant):
+            n = integer_from_integral_real_number(self._right.value)
+            if n is not None and n >= 2:
+                return ex.NthPower(self._left, n)
+        return None
+
+    # Power(u, Constant(-1)) => Reciprocal(u)
+    def _reduce_u_to_the_negative_one(
+        self: Power
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._right, ex.Constant) and
+            self._right.value == -1
+        ):
+            return ex.Reciprocal(self._left)
+        else:
+            return None
+
+    # Power(u, Reciprocal(Constant(n))) => NthRoot(u, n) when n >= 1
+    def _reduce_u_to_the_one_over_n(
+        self: Power
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._right, ex.Reciprocal) and
+            isinstance(self._right._inner, ex.Constant)
+        ):
+            n = integer_from_integral_real_number(self._right._inner.value)
+            if n is not None and n >= 1:
+                return ex.NthRoot(self._left, n)
+        else:
+            return None
+
+    # Power(Constant(C), u) => Exponential(u, base = C)
+    def _reduce_power_with_constant_base(
+        self: Power
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._left, ex.Constant) and
+            self._left.value > 0 and
+            self._left.value != 1
+        ):
+            return ex.Exponential(self._right, base = self._left.value)
+        else:
+            return None
+
+    # Power(Power(u, v), w) => Power(u, Multiply(v, w))
+    def _reduce_power_of_power(
+        self: Power
+    ) -> sm.Expression | None:
+        if isinstance(self._left, ex.Power):
+            return ex.Power(
+                self._left._left,
+                ex.Multiply(self._left._right, self._right)
+            )
+        else:
+            return None
+
+    # Power(u, Negation(v)) => Reciprocal(Power(u, v))
+    def _reduce_u_to_the_negation_of_v(
+        self: Power
+    ) -> sm.Expression | None:
+        if isinstance(self._right, ex.Negation):
+            return ex.Reciprocal(ex.Power(self._left, self._right._inner))
+        else:
+            return None
+
+    # Power(Reciprocal(u), v) => Reciprocal(Power(u, v))
+    def _reduce_one_over_u__to_the_v(
+        self: Power
+    ) -> sm.Expression | None:
+        if isinstance(self._left, ex.Reciprocal):
+            return ex.Reciprocal(ex.Power(self._left._inner, self._right))
+        else:
+            return None

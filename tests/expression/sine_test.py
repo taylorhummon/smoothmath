@@ -1,7 +1,7 @@
 from pytest import approx
 import math
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Sine
+from smoothmath.expression import Constant, Variable, Negation, Sine
 
 
 def test_Sine():
@@ -34,3 +34,9 @@ def test_Sine_composition():
     assert z.global_partial(theta).at(point) == approx(2)
     assert z.local_differential(point).component(theta) == approx(2)
     assert z.global_differential().component_at(point, theta) == approx(2)
+
+
+def test_reduce_sine_of_negation_of_u():
+    u = Variable("u")
+    z = Sine(Negation(u))
+    assert z._reduce_sine_of_negation_of_u() == Negation(Sine(u))

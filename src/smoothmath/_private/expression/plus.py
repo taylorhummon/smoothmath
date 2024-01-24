@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
@@ -55,3 +55,92 @@ class Plus(base.BinaryExpression):
     ) -> None:
         self._left._compute_global_differential(builder, accumulated)
         self._right._compute_global_differential(builder, accumulated)
+
+    @property
+    def _reducers(
+        self: Plus
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_by_associating_plus_right,
+            self._reduce_u_plus_zero,
+            self._reduce_by_commuting_constant_right_across_plus,
+            self._reduce_by_commuting_negation_right_across_plus,
+            self._reduce_sum_of_negations,
+            self._reduce_sum_of_logarithms
+        ]
+
+    # Plus(Plus(u, v), w) => Plus(u, Plus(v, w))
+    def _reduce_by_associating_plus_right(
+        self: Plus
+    ) -> sm.Expression | None:
+        if isinstance(self._left, ex.Plus):
+            return ex.Plus(
+                self._left._left,
+                ex.Plus(self._left._right, self._right)
+            )
+        else:
+            return None
+
+    # Plus(u, Constant(0)) => u
+    def _reduce_u_plus_zero(
+        self: Plus
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._right, ex.Constant) and
+            self._right.value == 0
+        ):
+            return self._left
+        else:
+            return None
+
+    # Plus(Constant(c), u) => Plus(u, Constant(c))
+    def _reduce_by_commuting_constant_right_across_plus(
+        self: Plus
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._left, ex.Constant) and
+            not isinstance(self._right, (ex.Constant, ex.Negation))
+        ):
+            return ex.Plus(self._right, self._left)
+        else:
+            return None
+
+    # Plus(Negation(u), v) => Plus(v, Negation(u))
+    def _reduce_by_commuting_negation_right_across_plus(
+        self: Plus
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._left, ex.Negation) and
+            not isinstance(self._right, ex.Negation)
+        ):
+            return ex.Plus(self._right, self._left)
+        else:
+            return None
+
+    # Plus(Negation(u), Negation(v)) => Negation(Plus(u, v))
+    def _reduce_sum_of_negations(
+        self: Plus
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._left, ex.Negation) and
+            isinstance(self._right, ex.Negation)
+        ):
+            return ex.Negation(ex.Plus(self._left._inner, self._right._inner))
+        else:
+            return None
+
+    # Plus(Logarithm(u), Logarithm(v)) => Logarithm(Multiply(u, v))
+    def _reduce_sum_of_logarithms(
+        self: Plus
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._left, ex.Logarithm) and
+            isinstance(self._right, ex.Logarithm) and
+            self._left.base == self._right.base
+        ):
+            return ex.Logarithm(
+                ex.Multiply(self._left._inner, self._right._inner),
+                base = self._left.base
+            )
+        else:
+            return None

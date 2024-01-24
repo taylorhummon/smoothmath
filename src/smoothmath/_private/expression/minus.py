@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
@@ -55,3 +55,9 @@ class Minus(base.BinaryExpression):
     ) -> None:
         self._left._compute_global_differential(builder, accumulated)
         self._right._compute_global_differential(builder, ex.Negation(accumulated))
+
+    @property
+    def _reducers(
+        self: Minus
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return []

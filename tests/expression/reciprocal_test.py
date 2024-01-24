@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, Reciprocal
+from smoothmath.expression import Constant, Variable, Negation, Reciprocal
 
 
 def test_Reciprocal():
@@ -45,3 +45,15 @@ def test_Reciprocal_composition():
     assert z.global_partial(x).at(point) == approx(-0.5)
     assert z.local_differential(point).component(x) == approx(-0.5)
     assert z.global_differential().component_at(point, x) == approx(-0.5)
+
+
+def test_reduce_reciprocal_of_reciprocal_of_u():
+    u = Variable("u")
+    z = Reciprocal(Reciprocal(u))
+    assert z._reduce_reciprocal_of_reciprocal_of_u() == u
+
+
+def test_reduce_reciprocal_of_negation_of_u():
+    u = Variable("u")
+    z = Reciprocal(Negation(u))
+    assert z._reduce_reciprocal_of_negation_of_u() == Negation(Reciprocal(u))

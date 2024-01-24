@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
@@ -146,3 +146,66 @@ class NthRoot(base.ParameterizedUnaryExpression):
                 multiplier,
                 ex.Multiply(ex.Constant(n), ex.NthPower(self, n - 1))
             )
+
+    @property
+    def _reducers(
+        self: NthRoot
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_nth_root_where_n_is_one,
+            self._reduce_nth_root_of_mth_power_of_u,
+            self._reduce_nth_root_of_mth_root_of_u,
+            self._reduce_odd_nth_root_of_negation_of_u,
+            self._reduce_nth_root_of_reciprocal_of_u
+        ]
+
+    # NthRoot(u, 1) => u
+    def _reduce_nth_root_where_n_is_one(
+        self: NthRoot
+    ) -> sm.Expression | None:
+        if self.n == 1:
+            return self._inner
+        else:
+            return None
+
+    # NthRoot(NthPower(u, m), n) => NthPower(NthRoot(u, n), m)
+    def _reduce_nth_root_of_mth_power_of_u(
+        self: NthRoot
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.NthPower):
+            return ex.NthPower(
+                ex.NthRoot(self._inner._inner, self.n),
+                self._inner.n
+            )
+        else:
+            return None
+
+    # NthRoot(NthRoot(u, m), n) => NthRoot(u, m * n))
+    def _reduce_nth_root_of_mth_root_of_u(
+        self: NthRoot
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.NthRoot):
+            return ex.NthRoot(self._inner._inner, self.n * self._inner.n)
+        else:
+            return None
+
+    # NthRoot(Negation(u), n) => Negation(NthRoot(u, n)) where n is odd
+    def _reduce_odd_nth_root_of_negation_of_u(
+        self: NthRoot
+    ) -> sm.Expression | None:
+        if (
+            isinstance(self._inner, ex.Negation) and
+            self.n % 2 == 1
+        ):
+            return ex.Negation(ex.NthRoot(self._inner._inner, self.n))
+        else:
+            return None
+
+    # NthRoot(Reciprocal(u), n) => Reciprocal(NthRoot(u, n))
+    def _reduce_nth_root_of_reciprocal_of_u(
+        self: NthRoot
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.Reciprocal):
+            return ex.Reciprocal(ex.NthRoot(self._inner._inner, self.n))
+        else:
+            return None

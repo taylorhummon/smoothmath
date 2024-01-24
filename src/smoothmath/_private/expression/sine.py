@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
@@ -66,3 +66,20 @@ class Sine(base.UnaryExpression):
         multiplier: sm.Expression
     ) -> sm.Expression:
         return ex.Multiply(ex.Cosine(self._inner), multiplier)
+
+    @property
+    def _reducers(
+        self: Sine
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_sine_of_negation_of_u
+        ]
+
+    # Sine(Negation(u)) => Sine(u)
+    def _reduce_sine_of_negation_of_u(
+        self: Sine
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.Negation):
+            return ex.Negation(ex.Sine(self._inner._inner))
+        else:
+            return None

@@ -1,7 +1,7 @@
 from pytest import approx
 import math
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Exponential
+from smoothmath.expression import Constant, Variable, Negation, Reciprocal, Exponential, Logarithm
 
 
 def test_exponential():
@@ -91,3 +91,19 @@ def test_Exponential_equality():
     assert Exponential(x, base = 2) == Exponential(x, base = 2)
     assert Exponential(x, base = 2) != Exponential(x, base = 3)
     assert Exponential(x, base = 2) != Exponential(x)
+
+
+def test_reduce_exponential_of_logarithm_of_u():
+    u = Variable("u")
+    z = Exponential(Logarithm(u))
+    assert z._reduce_exponential_of_logarithm_of_u() == u
+    z = Exponential(Logarithm(u, base = 2), base = 2)
+    assert z._reduce_exponential_of_logarithm_of_u() == u
+
+
+def test_reduce_exponential_of_negation_of_u():
+    u = Variable("u")
+    z = Exponential(Negation(u))
+    assert z._reduce_exponential_of_negation_of_u() == Reciprocal(Exponential(u))
+    z = Exponential(Negation(u), base = 2)
+    assert z._reduce_exponential_of_negation_of_u() == Reciprocal(Exponential(u, base = 2))

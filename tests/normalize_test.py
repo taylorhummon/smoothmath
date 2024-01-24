@@ -4,9 +4,8 @@ from smoothmath.expression import (
     NthPower, NthRoot, Exponential, Logarithm,
     Plus, Minus, Multiply, Divide, Power
 )
-from smoothmath._private.optimize_synthetic import (
-    optimize_synthetic, _fully_reduce_synthetic,
-    _disassemble_minus_and_divide, _reassemble_minus_and_divide
+from smoothmath._private.normalize import (
+    normalize_synthetic, _fully_reduce_synthetic,
 )
 
 

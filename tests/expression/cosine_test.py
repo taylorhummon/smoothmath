@@ -1,7 +1,7 @@
 from pytest import approx
 import math
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Cosine
+from smoothmath.expression import Constant, Variable, Negation, Cosine
 
 
 def test_Cosine():
@@ -34,3 +34,9 @@ def test_Cosine_composition():
     assert z.global_partial(theta).at(point) == approx(-2)
     assert z.local_differential(point).component(theta) == approx(-2)
     assert z.global_differential().component_at(point, theta) == approx(-2)
+
+
+def test_reduce_cosine_of_negation_of_u():
+    u = Variable("u")
+    z = Cosine(Negation(u))
+    assert z._reduce_cosine_of_negation_of_u() == Cosine(u)

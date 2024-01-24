@@ -23,3 +23,9 @@ def test_Negation_composition():
     assert z.global_partial(x).at(point) == approx(-2)
     assert z.local_differential(point).component(x) == approx(-2)
     assert z.global_differential().component_at(point, x) == approx(-2)
+
+
+def test_reduce_negation_of_negation_of_u():
+    u = Variable("u")
+    z = Negation(Negation(u))
+    assert z._reduce_negation_of_negation_of_u() == u

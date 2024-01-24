@@ -3,7 +3,7 @@ from typing import Any
 import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.local_differential import LocalDifferentialBuilder
-from smoothmath._private.optimize_synthetic import optimize_synthetic
+from smoothmath._private.normalize import normalize_synthetic
 from smoothmath._private.utilities import get_variable_name
 
 
@@ -103,14 +103,7 @@ class GlobalDifferentialBuilder:
     def build(
         self: GlobalDifferentialBuilder
     ) -> GlobalDifferential:
-        optimized_synthetic_partials = _optimized_synthetic_partials(self._synthetic_partials)
-        return GlobalDifferential(self.original_expression, optimized_synthetic_partials)
-
-
-def _optimized_synthetic_partials(
-    synthetic_partials: dict[str, sm.Expression]
-) -> dict[str, sm.Expression]:
-    optimized_synthetic_partials = {}
-    for variable_name, synthetic_partial in synthetic_partials.items():
-        optimized_synthetic_partials[variable_name] = optimize_synthetic(synthetic_partial)
-    return optimized_synthetic_partials
+        normalized_synthetic_partials = {}
+        for variable_name, synthetic_partial in self._synthetic_partials.items():
+            normalized_synthetic_partials[variable_name] = normalize_synthetic(synthetic_partial)
+        return GlobalDifferential(self.original_expression, normalized_synthetic_partials)

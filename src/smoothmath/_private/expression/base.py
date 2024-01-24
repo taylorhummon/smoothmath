@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any
+from typing import Any, Callable
 from abc import ABC, abstractmethod
 import smoothmath as sm
 import smoothmath.expression as ex
@@ -15,12 +15,11 @@ from smoothmath._private.utilities import (
 class Expression(ABC):
     def __init__(
         self: Expression,
-        lacks_variables: bool,
-        is_fully_reduced: bool
+        lacks_variables: bool
     ) -> None:
         self._lacks_variables: bool
         self._lacks_variables = lacks_variables
-        self._is_fully_reduced = is_fully_reduced
+        self._is_fully_reduced = False
 
     def evaluate(
         self: Expression,
@@ -67,6 +66,19 @@ class Expression(ABC):
         builder = GlobalDifferentialBuilder(self)
         self._compute_global_differential(builder, ex.Constant(1))
         return builder.build()
+
+    def _reduce_when_lacking_variables(
+        self: Expression
+    ) -> Expression | None:
+        if self._lacks_variables and not isinstance(self, ex.Constant):
+            try:
+                value = self.evaluate(sm.Point({}))
+                return ex.Constant(value)
+            except sm.DomainError:
+                self._lacks_variables = False # PERFORMARCE HACK: !!! don't retry evaluation
+                return None
+        else:
+            return None
 
     ## Operations ##
 
@@ -159,18 +171,30 @@ class Expression(ABC):
     ) -> None: # instead of returning a value, we mutate the global_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
 
+    @abstractmethod
+    def _take_reduction_step(
+        self: Expression
+    ) -> Expression:
+        raise Exception("Concrete classes derived from Expression must implement _take_reduction_step()")
+
 
 class NullaryExpression(Expression):
     def __init__(
         self: NullaryExpression,
         lacks_variables: bool
     ) -> None:
-        super().__init__(lacks_variables, is_fully_reduced = True)
+        super().__init__(lacks_variables)
 
     def _reset_evaluation_cache(
         self: NullaryExpression
     ) -> None:
         pass
+
+    def _take_reduction_step(
+        self: Expression
+    ) -> sm.Expression:
+        self._is_fully_reduced = True
+        return self
 
 
 class UnaryExpression(Expression):
@@ -180,7 +204,7 @@ class UnaryExpression(Expression):
     ) -> None:
         if not isinstance(inner, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
-        super().__init__(inner._lacks_variables, is_fully_reduced = False)
+        super().__init__(inner._lacks_variables)
         self._inner: Expression
         self._inner = inner
         self._value: sm.real_number | None
@@ -208,6 +232,24 @@ class UnaryExpression(Expression):
         self._verify_domain_constraints(inner_value)
         self._value = self._value_formula(inner_value)
         return self._value
+
+    def _take_reduction_step(
+        self: UnaryExpression
+    ) -> sm.Expression:
+        if self._is_fully_reduced:
+            return self
+        if not self._inner._is_fully_reduced:
+            reduced_inner = self._inner._take_reduction_step()
+            return self._rebuild(reduced_inner)
+        reduced = self._reduce_when_lacking_variables()
+        if reduced is not None:
+            return reduced
+        for reducer in self._reducers:
+            reduced = reducer()
+            if reduced is not None:
+                return reduced
+        self._is_fully_reduced = True
+        return self
 
     ## Operations ##
 
@@ -247,6 +289,13 @@ class UnaryExpression(Expression):
         inner_value: sm.real_number
     ) -> sm.real_number:
         raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
+
+    @property
+    @abstractmethod
+    def _reducers(
+        self: UnaryExpression
+    ) -> list[Callable[[], Expression | None]]:
+        raise Exception("Concrete classes derived from UnaryExpression must implement _reducers()")
 
 
 class ParameterizedUnaryExpression(UnaryExpression):
@@ -299,8 +348,7 @@ class BinaryExpression(Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {left}")
         if not isinstance(right, Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {right}")
-        lacks_variables = left._lacks_variables and right._lacks_variables
-        super().__init__(lacks_variables, is_fully_reduced = False)
+        super().__init__(left._lacks_variables and right._lacks_variables)
         self._left: Expression
         self._left = left
         self._right: Expression
@@ -333,6 +381,27 @@ class BinaryExpression(Expression):
         self._verify_domain_constraints(left_value, right_value)
         self._value = self._value_formula(left_value, right_value)
         return self._value
+
+    def _take_reduction_step(
+        self: BinaryExpression
+    ) -> sm.Expression:
+        if self._is_fully_reduced:
+            return self
+        if not self._left._is_fully_reduced:
+            reduced_left = self._left._take_reduction_step()
+            return self._rebuild(reduced_left, self._right)
+        if not self._right._is_fully_reduced:
+            reduced_right = self._right._take_reduction_step()
+            return self._rebuild(self._left, reduced_right)
+        reduced = self._reduce_when_lacking_variables()
+        if reduced is not None:
+            return reduced
+        for reducer in self._reducers:
+            reduced = reducer()
+            if reduced is not None:
+                return reduced
+        self._is_fully_reduced = True
+        return self
 
     ## Operations ##
 
@@ -378,3 +447,10 @@ class BinaryExpression(Expression):
         right_value: sm.real_number
     ) -> sm.real_number:
         raise Exception("Concrete classes derived from BinaryExpression must implement _value_formula()")
+
+    @property
+    @abstractmethod
+    def _reducers(
+        self: BinaryExpression
+    ) -> list[Callable[[], Expression | None]]:
+        raise Exception("Concrete classes derived from BinaryExpression must implement _reducers()")

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
@@ -108,3 +108,9 @@ class Divide(base.BinaryExpression):
             ex.Negation(ex.Divide(self._left, ex.NthPower(self._right, n = 2))),
             multiplier
         )
+
+    @property
+    def _reducers(
+        self: Divide
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return []

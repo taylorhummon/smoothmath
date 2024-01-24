@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
@@ -49,3 +49,19 @@ class Negation(base.UnaryExpression):
         accumulated: sm.Expression
     ) -> None:
         self._inner._compute_global_differential(builder, ex.Negation(accumulated))
+
+    @property
+    def _reducers(
+        self: Negation
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_negation_of_negation_of_u
+        ]
+
+    def _reduce_negation_of_negation_of_u(
+        self: Negation
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.Negation):
+            return self._inner._inner
+        else:
+            return None

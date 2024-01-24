@@ -1,6 +1,8 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, Reciprocal, Exponential, Multiply
+from smoothmath.expression import (
+    Constant, Variable, Reciprocal, NthPower, Exponential, Logarithm, Plus, Multiply
+)
 
 
 def test_unary_expression_equality():
@@ -139,3 +141,10 @@ def test_indeterminate_form():
     global_differential = z.global_differential()
     with raises(DomainError):
         global_differential.component_at(point, t)
+
+
+def test_reduce_when_lacking_variables():
+    z = Multiply(NthPower(Plus(Constant(2), Constant(1)), n = 2), Constant(2))
+    assert z._reduce_when_lacking_variables() == Constant(18)
+    z = Logarithm(Constant(-1))
+    assert z._reduce_when_lacking_variables() == None

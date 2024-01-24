@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.expression.base as base
@@ -71,3 +71,30 @@ class Reciprocal(base.UnaryExpression):
         multiplier: sm.Expression
     ) -> sm.Expression:
         return ex.Negation(ex.Divide(multiplier, ex.NthPower(self._inner, n = 2)))
+
+    @property
+    def _reducers(
+        self: Reciprocal
+    ) -> list[Callable[[], sm.Expression | None]]:
+        return [
+            self._reduce_reciprocal_of_reciprocal_of_u,
+            self._reduce_reciprocal_of_negation_of_u
+        ]
+
+    # Reciprocal(Reciprocal(u)) => u
+    def _reduce_reciprocal_of_reciprocal_of_u(
+        self: Reciprocal
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.Reciprocal):
+            return self._inner._inner
+        else:
+            return None
+
+    # Reciprocal(Negation(u)) => Negation(Reciprocal(u))
+    def _reduce_reciprocal_of_negation_of_u(
+        self: Reciprocal
+    ) -> sm.Expression | None:
+        if isinstance(self._inner, ex.Negation):
+            return ex.Negation(ex.Reciprocal(self._inner._inner))
+        else:
+            return None
