@@ -103,14 +103,14 @@ class GlobalDifferentialBuilder:
     def build(
         self: GlobalDifferentialBuilder
     ) -> GlobalDifferential:
-        reduced_synthetic_partials = _reduce_synthetic_partials(self._synthetic_partials)
-        return GlobalDifferential(self.original_expression, reduced_synthetic_partials)
+        optimized_synthetic_partials = _optimized_synthetic_partials(self._synthetic_partials)
+        return GlobalDifferential(self.original_expression, optimized_synthetic_partials)
 
 
-def _reduce_synthetic_partials(
+def _optimized_synthetic_partials(
     synthetic_partials: dict[str, sm.Expression]
 ) -> dict[str, sm.Expression]:
-    reduced_synthetic_partials = {}
+    optimized_synthetic_partials = {}
     for variable_name, synthetic_partial in synthetic_partials.items():
-        reduced_synthetic_partials[variable_name] = optimize_synthetic(synthetic_partial)
-    return reduced_synthetic_partials
+        optimized_synthetic_partials[variable_name] = optimize_synthetic(synthetic_partial)
+    return optimized_synthetic_partials

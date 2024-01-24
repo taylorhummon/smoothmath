@@ -9,7 +9,7 @@ from smoothmath._private.utilities import integer_from_integral_real_number
 
 # We can assume that all inner subexpressions are fully reduced.
 # Our job is to either make a reduction or mark the outer expression as fully reduced.
-def apply_reducers(
+def apply_reducer_or_mark_as_fully_reduced(
     expression: sm.Expression
 ) -> sm.Expression:
     for reducer in reducers:
