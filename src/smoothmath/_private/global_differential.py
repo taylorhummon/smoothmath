@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any
 import smoothmath as sm
 import smoothmath.expression as ex
-from smoothmath._private.local_differential import LocalDifferentialBuilder
+import smoothmath._private.local_differential as ld
 from smoothmath._private.normalize import normalize_synthetic
 from smoothmath._private.utilities import get_variable_name
 
@@ -39,7 +39,7 @@ class GlobalDifferential:
         point: sm.Point
     ) -> sm.LocalDifferential:
         self.original_expression.evaluate(point)
-        builder = LocalDifferentialBuilder(self.original_expression, point)
+        builder = ld.LocalDifferentialBuilder(self.original_expression, point)
         for variable_name, synthetic_partial in self._synthetic_partials.items():
             local_partial = synthetic_partial.evaluate(point)
             builder.add_to(variable_name, local_partial)

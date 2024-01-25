@@ -1,9 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 import re
 import smoothmath as sm
 import smoothmath.expression as ex
-import smoothmath._private.expression.base as base
+import smoothmath._private.base_expression as base
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder

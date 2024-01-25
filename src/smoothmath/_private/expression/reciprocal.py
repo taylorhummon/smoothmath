@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
-import smoothmath._private.expression.base as base
+import smoothmath._private.base_expression as base
 from smoothmath._private.expression.nth_power import nth_power
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder

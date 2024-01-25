@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
-import smoothmath._private.expression.base as base
+import smoothmath._private.base_expression as base
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder

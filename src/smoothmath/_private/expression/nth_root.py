@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
-import smoothmath._private.expression.base as base
+import smoothmath._private.base_expression as base
 from smoothmath._private.expression.nth_power import nth_power
 from smoothmath._private.utilities import integer_from_integral_real_number
 if TYPE_CHECKING:

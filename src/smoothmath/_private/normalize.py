@@ -2,7 +2,7 @@ from __future__ import annotations
 import logging
 import smoothmath as sm
 import smoothmath.expression as ex
-import smoothmath._private.expression.base as base
+import smoothmath._private.base_expression as base
 
 
 def normalize_synthetic(
@@ -46,5 +46,11 @@ def _reintroduce_minus_and_divide(
             reassembled_left = _reintroduce_minus_and_divide(expression._left)
             reassembled_right = _reintroduce_minus_and_divide(expression._right)
             return expression._rebuild(reassembled_left, reassembled_right)
+    elif isinstance(expression, base.NAryExpression):
+        reassembled_inners = [
+            _reintroduce_minus_and_divide(inner)
+            for inner in expression._inner_expressions
+        ]
+        return expression._rebuild(reassembled_inners)
     else:
         raise Exception("smoothmath internal error: unknown Expression base class")

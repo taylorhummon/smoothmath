@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable
 from functools import reduce
 import smoothmath as sm
 import smoothmath.expression as ex
-import smoothmath._private.expression.base as base
+import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import list_without_entry_at
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
