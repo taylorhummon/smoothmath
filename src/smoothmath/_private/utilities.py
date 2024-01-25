@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any
+from typing import Any, TypeVar
 import smoothmath as sm
 import smoothmath.expression as ex
 
@@ -36,3 +36,18 @@ def get_variable_name(
         return variable_or_name
     else:
         return variable_or_name.name
+
+U = TypeVar("U")
+
+def list_without_entry_at(
+    entries: list[U],
+    i: int
+) -> list[U]:
+    return entries[0:i] + entries[i + 1:]
+
+def list_with_updated_entry_at(
+    entries: list[U],
+    i: int,
+    new_entry: U
+) -> list[U]:
+    return entries[0:i] + [new_entry] + entries[i + 1:]

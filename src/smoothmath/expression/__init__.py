@@ -17,6 +17,9 @@ from smoothmath._private.expression.minus import Minus
 from smoothmath._private.expression.multiply import Multiply
 from smoothmath._private.expression.divide import Divide
 from smoothmath._private.expression.power import Power
+# NAry
+from smoothmath._private.expression.sum import Sum
+from smoothmath._private.expression.product import Product
 
 
 __all__ = [
@@ -34,5 +37,7 @@ __all__ = [
     "Minus",
     "Multiply",
     "Divide",
-    "Power"
+    "Power",
+    "Sum",
+    "Product"
 ]
