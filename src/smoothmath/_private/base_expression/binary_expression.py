@@ -31,6 +31,8 @@ class BinaryExpression(base.Expression):
     ) -> BinaryExpression:
         return self.__class__(left, right)
 
+    ## Evaluation ##
+
     def _reset_evaluation_cache(
         self: BinaryExpression
     ) -> None:
@@ -49,6 +51,24 @@ class BinaryExpression(base.Expression):
         self._verify_domain_constraints(left_value, right_value)
         self._value = self._value_formula(left_value, right_value)
         return self._value
+
+    @abstractmethod
+    def _verify_domain_constraints(
+        self: BinaryExpression,
+        left_value: sm.real_number,
+        right_value: sm.real_number
+    ) -> None:
+        raise Exception("Concrete classes derived from BinaryExpression must implement _verify_domain_constraints()")
+
+    @abstractmethod
+    def _value_formula(
+        self: BinaryExpression,
+        left_value: sm.real_number,
+        right_value: sm.real_number
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from BinaryExpression must implement _value_formula()")
+
+    ## Normalization and Reduction ##
 
     def _take_reduction_step(
         self: BinaryExpression
@@ -70,6 +90,13 @@ class BinaryExpression(base.Expression):
                 return reduced
         self._is_fully_reduced = True
         return self
+
+    @property
+    @abstractmethod
+    def _reducers(
+        self: BinaryExpression
+    ) -> list[Callable[[], sm.Expression | None]]:
+        raise Exception("Concrete classes derived from BinaryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(
         self: BinaryExpression
@@ -104,28 +131,3 @@ class BinaryExpression(base.Expression):
         self: BinaryExpression
     ) -> str:
         return f"{get_class_name(self)}({self._left}, {self._right})"
-
-    ## Abstract methods ##
-
-    @abstractmethod
-    def _verify_domain_constraints(
-        self: BinaryExpression,
-        left_value: sm.real_number,
-        right_value: sm.real_number
-    ) -> None:
-        raise Exception("Concrete classes derived from BinaryExpression must implement _verify_domain_constraints()")
-
-    @abstractmethod
-    def _value_formula(
-        self: BinaryExpression,
-        left_value: sm.real_number,
-        right_value: sm.real_number
-    ) -> sm.real_number:
-        raise Exception("Concrete classes derived from BinaryExpression must implement _value_formula()")
-
-    @property
-    @abstractmethod
-    def _reducers(
-        self: BinaryExpression
-    ) -> list[Callable[[], sm.Expression | None]]:
-        raise Exception("Concrete classes derived from BinaryExpression must implement _reducers()")

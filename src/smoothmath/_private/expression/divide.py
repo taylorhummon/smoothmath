@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 
 
 class Divide(base.BinaryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Divide,
         left_value: sm.real_number,
@@ -27,6 +30,8 @@ class Divide(base.BinaryExpression):
         right_value: sm.real_number
     ) -> sm.real_number:
         return divide(left_value, right_value)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Divide,
@@ -111,6 +116,8 @@ class Divide(base.BinaryExpression):
             ex.Negation(ex.Divide(self._left, ex.NthPower(self._right, n = 2))),
             multiplier
         )
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

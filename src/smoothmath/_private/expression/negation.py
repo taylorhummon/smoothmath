@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 
 
 class Negation(base.UnaryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Negation,
         inner_value: sm.real_number
@@ -21,6 +24,8 @@ class Negation(base.UnaryExpression):
         inner_value: sm.real_number
     ) -> sm.real_number:
         return negation(inner_value)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Negation,
@@ -50,6 +55,8 @@ class Negation(base.UnaryExpression):
         accumulated: sm.Expression
     ) -> None:
         self._inner._compute_global_differential(builder, ex.Negation(accumulated))
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

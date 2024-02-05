@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 
 
 class Minus(base.BinaryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Minus,
         left_value: sm.real_number,
@@ -23,6 +26,8 @@ class Minus(base.BinaryExpression):
         right_value: sm.real_number
     ) -> sm.real_number:
         return minus(left_value, right_value)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Minus,
@@ -56,6 +61,8 @@ class Minus(base.BinaryExpression):
     ) -> None:
         self._left._compute_global_differential(builder, accumulated)
         self._right._compute_global_differential(builder, ex.Negation(accumulated))
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

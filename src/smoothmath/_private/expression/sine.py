@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
-import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -11,6 +10,9 @@ if TYPE_CHECKING:
 
 
 class Sine(base.UnaryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Sine,
         inner_value: sm.real_number
@@ -22,6 +24,8 @@ class Sine(base.UnaryExpression):
         inner_value: sm.real_number
     ) -> sm.real_number:
         return sine(inner_value)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Sine,
@@ -68,13 +72,13 @@ class Sine(base.UnaryExpression):
     ) -> sm.Expression:
         return ex.Multiply(ex.Cosine(self._inner), multiplier)
 
+    ## Normalization and Reduction ##
+
     @property
     def _reducers(
         self: Sine
     ) -> list[Callable[[], sm.Expression | None]]:
-        return [
-            self._reduce_sine_of_negation_of_u
-        ]
+        return [self._reduce_sine_of_negation_of_u]
 
     # Sine(Negation(u)) => Negation(Sine(u))
     def _reduce_sine_of_negation_of_u(

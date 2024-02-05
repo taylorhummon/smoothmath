@@ -14,6 +14,9 @@ if TYPE_CHECKING:
 
 
 class Add(base.NAryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Add,
         *inner_values: sm.real_number
@@ -25,6 +28,8 @@ class Add(base.NAryExpression):
         *inner_values: sm.real_number
     ) -> sm.real_number:
         return add(*inner_values)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Add,
@@ -60,6 +65,8 @@ class Add(base.NAryExpression):
     ) -> None:
         for inner in self._inners:
             inner._compute_global_differential(builder, accumulated)
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

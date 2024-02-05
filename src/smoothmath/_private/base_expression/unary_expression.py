@@ -25,6 +25,8 @@ class UnaryExpression(base.Expression):
     ) -> UnaryExpression:
         return self.__class__(inner)
 
+    ## Evaluation ##
+
     def _reset_evaluation_cache(
         self: UnaryExpression
     ) -> None:
@@ -41,6 +43,22 @@ class UnaryExpression(base.Expression):
         self._verify_domain_constraints(inner_value)
         self._value = self._value_formula(inner_value)
         return self._value
+
+    @abstractmethod
+    def _verify_domain_constraints(
+        self: UnaryExpression,
+        inner_value: sm.real_number
+    ) -> None:
+        raise Exception("Concrete classes derived from UnaryExpression must implement _verify_domain_constraints()")
+
+    @abstractmethod
+    def _value_formula(
+        self: UnaryExpression,
+        inner_value: sm.real_number
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
+
+    ## Normalization and Reduction ##
 
     def _take_reduction_step(
         self: UnaryExpression
@@ -59,6 +77,13 @@ class UnaryExpression(base.Expression):
                 return reduced
         self._is_fully_reduced = True
         return self
+
+    @property
+    @abstractmethod
+    def _reducers(
+        self: UnaryExpression
+    ) -> list[Callable[[], sm.Expression | None]]:
+        raise Exception("Concrete classes derived from UnaryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(
         self: UnaryExpression
@@ -88,26 +113,3 @@ class UnaryExpression(base.Expression):
         self: UnaryExpression
     ) -> str:
         return f"{get_class_name(self)}({self._inner})"
-
-    ## Abstract methods ##
-
-    @abstractmethod
-    def _verify_domain_constraints(
-        self: UnaryExpression,
-        inner_value: sm.real_number
-    ) -> None:
-        raise Exception("Concrete classes derived from UnaryExpression must implement _verify_domain_constraints()")
-
-    @abstractmethod
-    def _value_formula(
-        self: UnaryExpression,
-        inner_value: sm.real_number
-    ) -> sm.real_number:
-        raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
-
-    @property
-    @abstractmethod
-    def _reducers(
-        self: UnaryExpression
-    ) -> list[Callable[[], sm.Expression | None]]:
-        raise Exception("Concrete classes derived from UnaryExpression must implement _reducers()")

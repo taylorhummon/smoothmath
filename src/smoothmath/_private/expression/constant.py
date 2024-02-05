@@ -17,6 +17,8 @@ class Constant(base.Expression):
         self.value: sm.real_number
         self.value = value
 
+    ## Evaluation ##
+
     def _reset_evaluation_cache(
         self: Constant
     ) -> None:
@@ -27,6 +29,8 @@ class Constant(base.Expression):
         point: sm.Point
     ) -> sm.real_number:
         return self.value
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Constant,
@@ -55,6 +59,8 @@ class Constant(base.Expression):
     ) -> None:
         pass
 
+    ## Normalization and Reduction ##
+
     def _take_reduction_step(
         self: Constant
     ) -> Constant:
@@ -65,6 +71,8 @@ class Constant(base.Expression):
         self: Constant
     ) -> sm.Expression:
         return self
+
+    ## Operations ##
 
     def __eq__(
         self: Constant,

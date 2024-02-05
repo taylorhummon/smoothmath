@@ -18,7 +18,10 @@ class Expression(ABC):
     ) -> None:
         self._lacks_variables: bool
         self._lacks_variables = lacks_variables
+        self._is_fully_reduced: bool
         self._is_fully_reduced = False
+
+    ## Evaluation ##
 
     def evaluate(
         self: Expression,
@@ -28,6 +31,21 @@ class Expression(ABC):
             raise Exception("Must provide a Point to evaluate()")
         self._reset_evaluation_cache()
         return self._evaluate(point)
+
+    @abstractmethod
+    def _reset_evaluation_cache(
+        self: Expression
+    ) -> None:
+        raise Exception("Concrete classes derived from Expression must implement _reset_evaluation_cache()")
+
+    @abstractmethod
+    def _evaluate(
+        self: Expression,
+        point: sm.Point
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from Expression must implement _evaluate()")
+
+    ## Partials and Differentials ##
 
     def local_partial(
         self: Expression,
@@ -40,6 +58,14 @@ class Expression(ABC):
         variable_name = get_variable_name(with_respect_to)
         return self._local_partial(point, variable_name)
 
+    @abstractmethod
+    def _local_partial(
+        self: Expression,
+        point: sm.Point,
+        with_respect_to: str
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from Expression must implement _local_partial()")
+
     def global_partial(
         self: Expression,
         with_respect_to: ex.Variable | str
@@ -47,6 +73,13 @@ class Expression(ABC):
         variable_name = get_variable_name(with_respect_to)
         synthetic_partial = self._synthetic_partial(variable_name)
         return sm.GlobalPartial.build(self, synthetic_partial)
+
+    @abstractmethod
+    def _synthetic_partial(
+        self: Expression,
+        with_respect_to: str
+    ) -> Expression:
+        raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
 
     def local_differential(
         self: Expression,
@@ -59,12 +92,30 @@ class Expression(ABC):
         self._compute_local_differential(builder, 1)
         return builder.build()
 
+    @abstractmethod
+    def _compute_local_differential(
+        self: Expression,
+        builder: local_differential.LocalDifferentialBuilder,
+        accumulated: sm.real_number
+    ) -> None: # instead of returning a value, we mutate the local_differential argument
+        raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
+
     def global_differential(
         self: Expression
     ) -> sm.GlobalDifferential:
         builder = gd.GlobalDifferentialBuilder(self)
         self._compute_global_differential(builder, ex.Constant(1))
         return builder.build()
+
+    @abstractmethod
+    def _compute_global_differential(
+        self: Expression,
+        builder: global_differential.GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None: # instead of returning a value, we mutate the global_differential argument
+        raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
+
+    ## Normalization and Reduction ##
 
     def _normalize(
         self: Expression
@@ -85,6 +136,12 @@ class Expression(ABC):
         expression._is_fully_reduced = True
         return expression
 
+    @abstractmethod
+    def _take_reduction_step(
+        self: Expression
+    ) -> Expression:
+        raise Exception("Concrete classes derived from Expression must implement _take_reduction_step()")
+
     def _consolidate_expression_lacking_variables(
         self: Expression
     ) -> Expression | None:
@@ -97,6 +154,12 @@ class Expression(ABC):
                 return None
         else:
             return None
+
+    @abstractmethod
+    def _normalize_fully_reduced(
+        self: Expression
+    ) -> Expression:
+        raise Exception("Concrete classes derived from Expression must implement _normalize_fully_reduced()")
 
     ## Operations ##
 
@@ -141,61 +204,3 @@ class Expression(ABC):
         if isinstance(n, int):
             return ex.NthPower(self, n)
         raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")
-
-    ## Abstract methods ##
-
-    @abstractmethod
-    def _reset_evaluation_cache(
-        self: Expression
-    ) -> None:
-        raise Exception("Concrete classes derived from Expression must implement _reset_evaluation_cache()")
-
-    @abstractmethod
-    def _evaluate(
-        self: Expression,
-        point: sm.Point
-    ) -> sm.real_number:
-        raise Exception("Concrete classes derived from Expression must implement _evaluate()")
-
-    @abstractmethod
-    def _local_partial(
-        self: Expression,
-        point: sm.Point,
-        with_respect_to: str
-    ) -> sm.real_number:
-        raise Exception("Concrete classes derived from Expression must implement _local_partial()")
-
-    @abstractmethod
-    def _synthetic_partial(
-        self: Expression,
-        with_respect_to: str
-    ) -> Expression:
-        raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
-
-    @abstractmethod
-    def _compute_local_differential(
-        self: Expression,
-        builder: local_differential.LocalDifferentialBuilder,
-        accumulated: sm.real_number
-    ) -> None: # instead of returning a value, we mutate the local_differential argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
-
-    @abstractmethod
-    def _compute_global_differential(
-        self: Expression,
-        builder: global_differential.GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None: # instead of returning a value, we mutate the global_differential argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
-
-    @abstractmethod
-    def _take_reduction_step(
-        self: Expression
-    ) -> Expression:
-        raise Exception("Concrete classes derived from Expression must implement _take_reduction_step()")
-
-    @abstractmethod
-    def _normalize_fully_reduced(
-        self: Expression
-    ) -> Expression:
-        raise Exception("Concrete classes derived from Expression must implement _normalize_fully_reduced()")

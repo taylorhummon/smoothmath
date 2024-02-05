@@ -16,6 +16,9 @@ if TYPE_CHECKING:
 
 
 class Multiply(base.NAryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Multiply,
         *inner_values: sm.real_number
@@ -27,6 +30,8 @@ class Multiply(base.NAryExpression):
         *inner_values: sm.real_number
     ) -> sm.real_number:
         return multiply(*inner_values)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Multiply,
@@ -78,6 +83,8 @@ class Multiply(base.NAryExpression):
                 *list_without_entry_at(self._inners, i)
             )
             inner._compute_global_differential(builder, next_accumulated)
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

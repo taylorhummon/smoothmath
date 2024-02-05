@@ -29,6 +29,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
     ) -> sm.real_number:
         return self._parameter
 
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Logarithm,
         inner_value: sm.real_number
@@ -43,6 +45,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
         inner_value: sm.real_number
     ):
         return logarithm(inner_value, base = self.base)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Logarithm,
@@ -104,6 +108,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
                 multiplier,
                 ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self._inner)
             )
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

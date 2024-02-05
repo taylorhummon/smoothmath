@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 
 
 class Cosine(base.UnaryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Cosine,
         inner_value: sm.real_number
@@ -21,6 +24,8 @@ class Cosine(base.UnaryExpression):
         inner_value: sm.real_number
     ) -> sm.real_number:
         return cosine(inner_value)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Cosine,
@@ -67,13 +72,13 @@ class Cosine(base.UnaryExpression):
     ) -> sm.Expression:
         return ex.Multiply(ex.Negation(ex.Sine(self._inner)), multiplier)
 
+    ## Normalization and Reduction ##
+
     @property
     def _reducers(
         self: Cosine
     ) -> list[Callable[[], sm.Expression | None]]:
-        return [
-            self._reduce_cosine_of_negation_of_u
-        ]
+        return [self._reduce_cosine_of_negation_of_u]
 
     # Cosine(Negation(u)) => Cosine(u)
     def _reduce_cosine_of_negation_of_u(

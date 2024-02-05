@@ -12,6 +12,9 @@ if TYPE_CHECKING:
 
 
 class Power(base.BinaryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Power,
         left_value: sm.real_number,
@@ -33,6 +36,8 @@ class Power(base.BinaryExpression):
         right_value: sm.real_number
     ) -> sm.real_number:
         return power(left_value, right_value)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Power,
@@ -128,6 +133,8 @@ class Power(base.BinaryExpression):
         multiplier: sm.Expression
     ) -> sm.Expression:
         return ex.Multiply(ex.Logarithm(self._left, base = math.e), self, multiplier)
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

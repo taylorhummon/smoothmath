@@ -26,6 +26,8 @@ class Exponential(base.ParameterizedUnaryExpression):
     ) -> sm.real_number:
         return self._parameter
 
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Exponential,
         inner_value: sm.real_number
@@ -37,6 +39,8 @@ class Exponential(base.ParameterizedUnaryExpression):
         inner_value: sm.real_number
     ):
         return exponential(inner_value, base = self.base)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Exponential,
@@ -100,6 +104,8 @@ class Exponential(base.ParameterizedUnaryExpression):
                 self,
                 multiplier
             )
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

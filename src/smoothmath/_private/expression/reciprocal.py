@@ -10,6 +10,9 @@ if TYPE_CHECKING:
 
 
 class Reciprocal(base.UnaryExpression):
+
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: Reciprocal,
         inner_value: sm.real_number
@@ -22,6 +25,8 @@ class Reciprocal(base.UnaryExpression):
         inner_value: sm.real_number
     ):
         return reciprocal(inner_value)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Reciprocal,
@@ -71,6 +76,8 @@ class Reciprocal(base.UnaryExpression):
         multiplier: sm.Expression
     ) -> sm.Expression:
         return ex.Negation(ex.Divide(multiplier, ex.NthPower(self._inner, n = 2)))
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

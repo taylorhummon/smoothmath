@@ -27,6 +27,8 @@ class NAryExpression(base.Expression):
     ) -> NAryExpression:
         return self.__class__(*args)
 
+    ## Evaluation ##
+
     def _reset_evaluation_cache(
         self: NAryExpression
     ) -> None:
@@ -44,6 +46,22 @@ class NAryExpression(base.Expression):
         self._verify_domain_constraints(*inner_values)
         self._value = self._value_formula(*inner_values)
         return self._value
+
+    @abstractmethod
+    def _verify_domain_constraints(
+        self: NAryExpression,
+        *inner_values: sm.real_number
+    ) -> None:
+        raise Exception("Concrete classes derived from NAryExpression must implement _verify_domain_constraints()")
+
+    @abstractmethod
+    def _value_formula(
+        self: NAryExpression,
+        *inner_values: sm.real_number
+    ) -> sm.real_number:
+        raise Exception("Concrete classes derived from NAryExpression must implement _value_formula()")
+
+    ## Normalization and Reduction ##
 
     def _take_reduction_step(
         self: NAryExpression
@@ -64,6 +82,13 @@ class NAryExpression(base.Expression):
                 return reduced
         self._is_fully_reduced = True
         return self
+
+    @property
+    @abstractmethod
+    def _reducers(
+        self: NAryExpression
+    ) -> list[Callable[[], sm.Expression | None]]:
+        raise Exception("Concrete classes derived from NAryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(
         self: NAryExpression
@@ -105,26 +130,3 @@ class NAryExpression(base.Expression):
     ) -> str:
         inner_strings = ", ".join(str(inner) for inner in self._inners)
         return f"{get_class_name(self)}({inner_strings})"
-
-    ## Abstract methods ##
-
-    @abstractmethod
-    def _verify_domain_constraints(
-        self: NAryExpression,
-        *inner_values: sm.real_number
-    ) -> None:
-        raise Exception("Concrete classes derived from NAryExpression must implement _verify_domain_constraints()")
-
-    @abstractmethod
-    def _value_formula(
-        self: NAryExpression,
-        *inner_values: sm.real_number
-    ) -> sm.real_number:
-        raise Exception("Concrete classes derived from NAryExpression must implement _value_formula()")
-
-    @property
-    @abstractmethod
-    def _reducers(
-        self: NAryExpression
-    ) -> list[Callable[[], sm.Expression | None]]:
-        raise Exception("Concrete classes derived from NAryExpression must implement _reducers()")

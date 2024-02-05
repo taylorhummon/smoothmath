@@ -31,6 +31,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> int:
         return self._parameter
 
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: NthRoot,
         inner_value: sm.real_number
@@ -45,6 +47,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
         inner_value: sm.real_number
     ):
         return nth_root(inner_value, self.n)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: NthRoot,
@@ -108,6 +112,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
                 multiplier,
                 ex.Multiply(ex.Constant(n), ex.NthPower(self, n - 1))
             )
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(

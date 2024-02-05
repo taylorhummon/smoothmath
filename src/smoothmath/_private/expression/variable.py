@@ -23,6 +23,8 @@ class Variable(base.Expression):
         self.name: str
         self.name = name
 
+    ## Evaluation ##
+
     def _reset_evaluation_cache(
         self: Variable
     ) -> None:
@@ -33,6 +35,8 @@ class Variable(base.Expression):
         point: sm.Point
     ) -> sm.real_number:
         return point.value_for(self.name)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: Variable,
@@ -67,6 +71,8 @@ class Variable(base.Expression):
     ) -> None:
         builder.add_to(self, accumulated)
 
+    ## Normalization and Reduction ##
+
     def _take_reduction_step(
         self: Variable
     ) -> Variable:
@@ -77,6 +83,8 @@ class Variable(base.Expression):
         self: Variable
     ) -> sm.Expression:
         return self
+
+    ## Operations ##
 
     def __eq__(
         self: Variable,

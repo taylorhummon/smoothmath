@@ -32,6 +32,8 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> int:
         return self._parameter
 
+    ## Evaluation ##
+
     def _verify_domain_constraints(
         self: NthPower,
         inner_value: sm.real_number
@@ -43,6 +45,8 @@ class NthPower(base.ParameterizedUnaryExpression):
         inner_value: sm.real_number
     ):
         return nth_power(inner_value, self.n)
+
+    ## Partials and Differentials ##
 
     def _local_partial(
         self: NthPower,
@@ -108,6 +112,8 @@ class NthPower(base.ParameterizedUnaryExpression):
                 ex.NthPower(self._inner, n - 1),
                 multiplier
             )
+
+    ## Normalization and Reduction ##
 
     @property
     def _reducers(
