@@ -143,8 +143,8 @@ def test_indeterminate_form():
         global_differential.component_at(point, t)
 
 
-def test_consolidate_constant_expression():
+def test_consolidate_expression_lacking_variables():
     z = Multiply(NthPower(Add(Constant(2), Constant(1)), n = 2), Constant(2))
-    assert z._consolidate_constant_expression() == Constant(18)
+    assert z._consolidate_expression_lacking_variables() == Constant(18)
     z = Logarithm(Constant(-1))
-    assert z._consolidate_constant_expression() == None
+    assert z._consolidate_expression_lacking_variables() == None

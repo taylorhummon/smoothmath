@@ -85,7 +85,7 @@ class Expression(ABC):
         expression._is_fully_reduced = True
         return expression
 
-    def _consolidate_constant_expression(
+    def _consolidate_expression_lacking_variables(
         self: Expression
     ) -> Expression | None:
         if self._lacks_variables and not isinstance(self, ex.Constant):

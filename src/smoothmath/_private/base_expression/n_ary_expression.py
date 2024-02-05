@@ -50,7 +50,7 @@ class NAryExpression(base.Expression):
     ) -> sm.Expression:
         if self._is_fully_reduced:
             return self
-        consolidated = self._consolidate_constant_expression()
+        consolidated = self._consolidate_expression_lacking_variables()
         if consolidated is not None:
             return consolidated
         for (i, inner) in enumerate(self._inners):
