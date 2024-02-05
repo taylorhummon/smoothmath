@@ -1,7 +1,7 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
 from smoothmath.expression import (
-    Constant, Variable, Reciprocal, NthPower, Exponential, Logarithm, Plus, Multiply
+    Constant, Variable, Reciprocal, NthPower, Exponential, Logarithm, Add, Multiply
 )
 
 
@@ -143,8 +143,8 @@ def test_indeterminate_form():
         global_differential.component_at(point, t)
 
 
-def test_reduce_when_lacking_variables():
-    z = Multiply(NthPower(Plus(Constant(2), Constant(1)), n = 2), Constant(2))
-    assert z._reduce_when_lacking_variables() == Constant(18)
+def test_consolidate_constant_expression():
+    z = Multiply(NthPower(Add(Constant(2), Constant(1)), n = 2), Constant(2))
+    assert z._consolidate_constant_expression() == Constant(18)
     z = Logarithm(Constant(-1))
-    assert z._reduce_when_lacking_variables() == None
+    assert z._consolidate_constant_expression() == None

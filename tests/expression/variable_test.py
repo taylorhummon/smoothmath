@@ -2,7 +2,7 @@ from smoothmath import Point
 from smoothmath.expression import Constant, Variable
 
 
-def test_variable():
+def test_Variable():
     x = Variable("x")
     y = Variable("y")
     point = Point({y: 3})

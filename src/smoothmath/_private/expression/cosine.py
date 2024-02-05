@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
-import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
+from smoothmath._private.math_functions import negation, cosine, sine, multiply
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -20,7 +20,7 @@ class Cosine(base.UnaryExpression):
         self: Cosine,
         inner_value: sm.real_number
     ) -> sm.real_number:
-        return math.cos(inner_value)
+        return cosine(inner_value)
 
     def _local_partial(
         self: Cosine,
@@ -59,7 +59,7 @@ class Cosine(base.UnaryExpression):
         multiplier: sm.real_number
     ) -> sm.real_number:
         inner_value = self._inner._evaluate(point)
-        return - math.sin(inner_value) * multiplier
+        return multiply(negation(sine(inner_value)), multiplier)
 
     def _synthetic_partial_formula(
         self: Cosine,

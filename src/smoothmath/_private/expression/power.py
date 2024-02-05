@@ -5,6 +5,7 @@ import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import integer_from_integral_real_number
+from smoothmath._private.math_functions import logarithm, minus, power, multiply
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -31,7 +32,7 @@ class Power(base.BinaryExpression):
         left_value: sm.real_number,
         right_value: sm.real_number
     ) -> sm.real_number:
-        return left_value ** right_value
+        return power(left_value, right_value)
 
     def _local_partial(
         self: Power,
@@ -58,7 +59,7 @@ class Power(base.BinaryExpression):
     ) -> sm.Expression:
         left_partial = self._left._synthetic_partial(with_respect_to)
         right_partial = self._right._synthetic_partial(with_respect_to)
-        return ex.Plus(
+        return ex.Add(
             self._synthetic_partial_formula_left(left_partial),
             self._synthetic_partial_formula_right(right_partial)
         )
@@ -97,7 +98,21 @@ class Power(base.BinaryExpression):
     ) -> sm.real_number:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
-        return right_value * (left_value ** (right_value - 1)) * multiplier
+        return multiply(
+            right_value,
+            power(left_value, minus(right_value, 1)),
+            multiplier
+        )
+
+    def _synthetic_partial_formula_left(
+        self: Power,
+        multiplier: sm.Expression
+    ) -> sm.Expression:
+        return ex.Multiply(
+            self._right,
+            ex.Power(self._left, ex.Minus(self._right, ex.Constant(1))),
+            multiplier
+        )
 
     def _local_partial_formula_right(
         self: Power,
@@ -106,22 +121,13 @@ class Power(base.BinaryExpression):
     ) -> sm.real_number:
         left_value = self._left._evaluate(point)
         self_value = self._evaluate(point)
-        return math.log(left_value) * self_value * multiplier
-
-    def _synthetic_partial_formula_left(
-        self: Power,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
-        return ex.Multiply(
-            ex.Multiply(self._right, ex.Power(self._left, ex.Minus(self._right, ex.Constant(1)))),
-            multiplier
-        )
+        return multiply(logarithm(left_value, base = math.e), self_value, multiplier)
 
     def _synthetic_partial_formula_right(
         self: Power,
         multiplier: sm.Expression
     ) -> sm.Expression:
-        return ex.Multiply(ex.Multiply(ex.Logarithm(self._left, base = math.e), self), multiplier)
+        return ex.Multiply(ex.Logarithm(self._left, base = math.e), self, multiplier)
 
     @property
     def _reducers(
@@ -133,7 +139,6 @@ class Power(base.BinaryExpression):
             self._reduce_one_to_the_u,
             self._reduce_u_to_the_n_at_least_two,
             self._reduce_u_to_the_negative_one,
-            self._reduce_u_to_the_one_over_n,
             self._reduce_power_with_constant_base,
             self._reduce_power_of_power,
             self._reduce_u_to_the_negation_of_v,
@@ -195,20 +200,6 @@ class Power(base.BinaryExpression):
             self._right.value == -1
         ):
             return ex.Reciprocal(self._left)
-        else:
-            return None
-
-    # Power(u, Reciprocal(Constant(n))) => NthRoot(u, n) when n >= 1
-    def _reduce_u_to_the_one_over_n(
-        self: Power
-    ) -> sm.Expression | None:
-        if (
-            isinstance(self._right, ex.Reciprocal) and
-            isinstance(self._right._inner, ex.Constant)
-        ):
-            n = integer_from_integral_real_number(self._right._inner.value)
-            if n is not None and n >= 1:
-                return ex.NthRoot(self._left, n)
         else:
             return None
 

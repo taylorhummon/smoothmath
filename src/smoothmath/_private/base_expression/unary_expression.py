@@ -47,18 +47,24 @@ class UnaryExpression(base.Expression):
     ) -> sm.Expression:
         if self._is_fully_reduced:
             return self
+        consolidated = self._consolidate_constant_expression()
+        if consolidated is not None:
+            return consolidated
         if not self._inner._is_fully_reduced:
             reduced_inner = self._inner._take_reduction_step()
             return self._rebuild(reduced_inner)
-        reduced = self._reduce_when_lacking_variables()
-        if reduced is not None:
-            return reduced
         for reducer in self._reducers:
             reduced = reducer()
             if reduced is not None:
                 return reduced
         self._is_fully_reduced = True
         return self
+
+    def _normalize_fully_reduced(
+        self: UnaryExpression
+    ) -> sm.Expression:
+        normalized_inner = self._inner._normalize_fully_reduced()
+        return self._rebuild(normalized_inner)
 
     ## Operations ##
 

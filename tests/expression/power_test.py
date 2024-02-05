@@ -1,7 +1,7 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
 from smoothmath.expression import (
-  Constant, Variable, Negation, Reciprocal, NthPower, NthRoot, Exponential, Multiply, Power
+  Constant, Variable, Negation, Reciprocal, NthPower, Exponential, Multiply, Power
 )
 
 
@@ -295,69 +295,29 @@ def test_Power_one_to_the_zero():
     assert z.evaluate(Point({})) == approx(1)
 
 
-def test_reduce_u_to_the_one():
-    u = Variable("u")
-    z = Power(u, Constant(1))
-    assert z._reduce_u_to_the_one() == u
-
-
-def test_reduce_u_to_the_zero():
-    u = Variable("u")
-    z = Power(u, Constant(0))
-    assert z._reduce_u_to_the_zero() == Constant(1)
-
-
-def test_reduce_one_to_the_u():
-    u = Variable("u")
-    z = Power(Constant(1), u)
-    assert z._reduce_one_to_the_u() == Constant(1)
-
-
-def test_reduce_u_to_the_n_at_least_two():
-    u = Variable("u")
-    z = Power(u, Constant(2))
-    assert z._reduce_u_to_the_n_at_least_two() == NthPower(u, n = 2)
-    z = Power(u, Constant(3))
-    assert z._reduce_u_to_the_n_at_least_two() == NthPower(u, n = 3)
-
-
-def test_reduce_u_to_the_negative_one():
-    u = Variable("u")
-    z = Power(u, Constant(-1))
-    assert z._reduce_u_to_the_negative_one() == Reciprocal(u)
-
-
-def test_reduce_u_to_the_one_over_n():
-    u = Variable("u")
-    z = Power(u, Reciprocal(Constant(2)))
-    assert z._reduce_u_to_the_one_over_n() == NthRoot(u, n = 2)
-    z = Power(u, Reciprocal(Constant(3)))
-    assert z._reduce_u_to_the_one_over_n() == NthRoot(u, n = 3)
-
-
-def test_reduce_power_with_constant_base():
-    u = Variable("u")
-    z = Power(Constant(2), u)
-    assert z._reduce_power_with_constant_base() == Exponential(u, base = 2)
-
-
-def test_reduce_power_of_power():
-    u = Variable("u")
-    v = Variable("v")
+def test_Power_normalization():
     w = Variable("w")
-    z = Power(Power(u, v), w)
-    assert z._reduce_power_of_power() == Power(u, Multiply(v, w))
-
-
-def test_reduce_u_to_the_negation_of_v():
-    u = Variable("u")
-    v = Variable("v")
-    z = Power(u, Negation(v))
-    assert z._reduce_u_to_the_negation_of_v() == Reciprocal(Power(u, v))
-
-
-def test_reduce_one_over_u__to_the_v():
-    u = Variable("u")
-    v = Variable("v")
-    z = Power(Reciprocal(u), v)
-    assert z._reduce_one_over_u__to_the_v() == Reciprocal(Power(u, v))
+    x = Variable("x")
+    y = Variable("y")
+    z = Power(x, y)
+    assert z._normalize() == Power(x, y)
+    z = Power(x, Constant(1))
+    assert z._normalize() == x
+    z = Power(x, Constant(0))
+    assert z._normalize() == Constant(1)
+    z = Power(Constant(1), x)
+    assert z._normalize() == Constant(1)
+    z = Power(x, Constant(2))
+    assert z._normalize() == NthPower(x, n = 2)
+    z = Power(x, Constant(3))
+    assert z._normalize() == NthPower(x, n = 3)
+    z = Power(x, Constant(-1))
+    assert z._normalize() == Reciprocal(x)
+    z = Power(Constant(2), x)
+    assert z._normalize() == Exponential(x, base = 2)
+    z = Power(Power(w, x), y)
+    assert z._normalize() == Power(w, Multiply(x, y))
+    z = Power(Reciprocal(x), y)
+    assert z._normalize() == Reciprocal(Power(x, y))
+    z = Power(x, Negation(y))
+    assert z._normalize() == Reciprocal(Power(x, y))

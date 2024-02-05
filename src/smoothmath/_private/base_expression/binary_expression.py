@@ -55,21 +55,28 @@ class BinaryExpression(base.Expression):
     ) -> sm.Expression:
         if self._is_fully_reduced:
             return self
+        consolidated = self._consolidate_constant_expression()
+        if consolidated is not None:
+            return consolidated
         if not self._left._is_fully_reduced:
             reduced_left = self._left._take_reduction_step()
             return self._rebuild(reduced_left, self._right)
         if not self._right._is_fully_reduced:
             reduced_right = self._right._take_reduction_step()
             return self._rebuild(self._left, reduced_right)
-        reduced = self._reduce_when_lacking_variables()
-        if reduced is not None:
-            return reduced
         for reducer in self._reducers:
             reduced = reducer()
             if reduced is not None:
                 return reduced
         self._is_fully_reduced = True
         return self
+
+    def _normalize_fully_reduced(
+        self: BinaryExpression
+    ) -> sm.Expression:
+        normalized_left = self._left._normalize_fully_reduced()
+        normalized_right = self._right._normalize_fully_reduced()
+        return self._rebuild(normalized_left, normalized_right)
 
     ## Operations ##
 

@@ -1,4 +1,3 @@
-# Nullary
 from smoothmath._private.expression.constant import Constant
 from smoothmath._private.expression.variable import Variable
 # Unary
@@ -12,14 +11,12 @@ from smoothmath._private.expression.nth_root import NthRoot
 from smoothmath._private.expression.exponential import Exponential
 from smoothmath._private.expression.logarithm import Logarithm
 # Binary
-from smoothmath._private.expression.plus import Plus
 from smoothmath._private.expression.minus import Minus
-from smoothmath._private.expression.multiply import Multiply
 from smoothmath._private.expression.divide import Divide
 from smoothmath._private.expression.power import Power
 # n-Ary
-from smoothmath._private.expression.sum import Sum
-from smoothmath._private.expression.product import Product
+from smoothmath._private.expression.add import Add
+from smoothmath._private.expression.multiply import Multiply
 
 
 __all__ = [
@@ -33,11 +30,9 @@ __all__ = [
     "NthRoot",
     "Exponential",
     "Logarithm",
-    "Plus",
     "Minus",
-    "Multiply",
     "Divide",
     "Power",
-    "Sum",
-    "Product"
+    "Add",
+    "Multiply"
 ]

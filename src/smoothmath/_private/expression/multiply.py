@@ -3,278 +3,252 @@ from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
+from smoothmath._private.math_functions import add, multiply
+from smoothmath._private.utilities import (
+    is_even,
+    list_without_entry_at,
+    group_by_key, map_dictionary_values,
+    first_of_given_type, partition_by_given_type
+)
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
-class Multiply(base.BinaryExpression):
+class Multiply(base.NAryExpression):
     def _verify_domain_constraints(
         self: Multiply,
-        left_value: sm.real_number,
-        right_value: sm.real_number
+        *inner_values: sm.real_number
     ) -> None:
         pass
 
     def _value_formula(
         self: Multiply,
-        left_value: sm.real_number,
-        right_value: sm.real_number
+        *inner_values: sm.real_number
     ) -> sm.real_number:
-        return left_value * right_value
-
-    def _evaluate(
-        self: Multiply,
-        point: sm.Point
-    ) -> sm.real_number:
-        inner_pair_or_none = self._get_inner_inner_pair_or_none(point)
-        if inner_pair_or_none == None:
-            self._value = 0
-        else: # inner_pair_or_none is the pair (left_value, right_value)
-            left_value, right_value = inner_pair_or_none
-            self._value = left_value * right_value
-        return self._value
+        return multiply(*inner_values)
 
     def _local_partial(
         self: Multiply,
         point: sm.Point,
         with_respect_to: str
     ) -> sm.real_number:
-        inner_pair_or_none = self._get_inner_inner_pair_or_none(point)
-        if inner_pair_or_none == None:
-            return 0
-        else: # inner_pair_or_none is the pair (left_value, right_value)
-            left_value, right_value = inner_pair_or_none
-            left_partial = self._left._local_partial(point, with_respect_to)
-            right_partial = self._right._local_partial(point, with_respect_to)
-            return right_value * left_partial + left_value * right_partial
+        inner_values = [inner._evaluate(point) for inner in self._inners]
+        return add(*(
+            multiply(
+                inner._local_partial(point, with_respect_to),
+                *list_without_entry_at(inner_values, i)
+            )
+            for (i, inner) in enumerate(self._inners)
+        ))
 
     def _synthetic_partial(
         self: Multiply,
         with_respect_to: str
     ) -> sm.Expression:
-        left_partial = self._left._synthetic_partial(with_respect_to)
-        right_partial = self._right._synthetic_partial(with_respect_to)
-        return ex.Plus(
-            ex.Multiply(self._right, left_partial),
-            ex.Multiply(self._left, right_partial)
-        )
+        return ex.Add(*(
+            ex.Multiply(
+                inner._synthetic_partial(with_respect_to),
+                *list_without_entry_at(self._inners, i)
+            )
+            for (i, inner) in enumerate(self._inners)
+        ))
 
     def _compute_local_differential(
         self: Multiply,
         builder: LocalDifferentialBuilder,
         accumulated: sm.real_number
     ) -> None:
-        inner_pair_or_none = self._get_inner_inner_pair_or_none(builder.point)
-        if inner_pair_or_none == None:
-            return
-        else: # inner_pair_or_none is the pair (left_value, right_value)
-            left_value, right_value = inner_pair_or_none
-            self._left._compute_local_differential(builder, right_value * accumulated)
-            self._right._compute_local_differential(builder, left_value * accumulated)
+        inner_values = [inner._evaluate(builder.point) for inner in self._inners]
+        for i, inner in enumerate(self._inners):
+            next_accumulated = multiply(
+                accumulated,
+                *list_without_entry_at(inner_values, i)
+            )
+            inner._compute_local_differential(builder, next_accumulated)
 
     def _compute_global_differential(
         self: Multiply,
         builder: GlobalDifferentialBuilder,
         accumulated: sm.Expression
     ) -> None:
-        self._left._compute_global_differential(builder, ex.Multiply(self._right, accumulated))
-        self._right._compute_global_differential(builder, ex.Multiply(self._left, accumulated))
-
-    # the following method is used to allow shirt-circuiting of either left * 0 or 0 * right
-    def _get_inner_inner_pair_or_none(
-        self: Multiply,
-        point: sm.Point
-    ) -> tuple[sm.real_number, sm.real_number] | None:
-        try:
-            left_value = self._left._evaluate(point)
-        except sm.DomainError as error:
-            try:
-                _right_value = self._right._evaluate(point)
-            except sm.DomainError:
-                raise error
-            if _right_value == 0:
-                return None
-            raise
-        try:
-            right_value = self._right._evaluate(point)
-        except sm.DomainError as error:
-            try:
-                _left_value = self._left._evaluate(point)
-            except sm.DomainError:
-                raise error
-            if _left_value == 0:
-                return None
-            raise
-        return (left_value, right_value)
+        for i, inner in enumerate(self._inners):
+            next_accumulated = ex.Multiply(
+                accumulated,
+                *list_without_entry_at(self._inners, i)
+            )
+            inner._compute_global_differential(builder, next_accumulated)
 
     @property
     def _reducers(
         self: Multiply
     ) -> list[Callable[[], sm.Expression | None]]:
         return [
-            self._reduce_by_associating_multiply_left,
-            self._reduce_one_times_u,
-            self._reduce_zero_times_u,
-            self._reduce_negative_one_times_u,
-            self._reduce_by_commuting_constant_left_across_multiply,
-            self._reduce_negation_of_u__times_v,
-            self._reduce_u_times_negation_of_v,
-            self._reduce_by_commuting_reciprocal_left_across_multiply,
-            self._reduce_product_of_reciprocals,
-            self._reduce_product_of_nth_powers,
-            self._reduce_product_of_nth_roots,
-            self._reduce_product_of_exponentials
+            self._reduce_by_flattening_nested_products,
+            self._reduce_product_when_multiplying_by_zero,
+            self._reduce_product_by_eliminating_ones,
+            self._reduce_product_by_eliminating_negations,
+            self._reduce_product_by_consolidating_nth_powers,
+            self._reduce_product_by_consolidating_nth_roots,
+            self._reduce_product_by_consolidating_exponentials,
+            self._reduce_product_by_consolidating_constants
         ]
 
-    # Multiply(u, Multiply(v, w)) => Multiply(Multiply(u, v), w)
-    def _reduce_by_associating_multiply_left(
+    def _reduce_by_flattening_nested_products(
         self: Multiply
     ) -> sm.Expression | None:
-        if isinstance(self._right, ex.Multiply):
-            return ex.Multiply(
-                ex.Multiply(self._left, self._right._left),
-                self._right._right
-            )
-        else:
+        pair_or_none = first_of_given_type(self._inners, Multiply)
+        if pair_or_none is None:
             return None
+        i, inner_multiply = pair_or_none
+        nested_inners = inner_multiply._inners
+        before = self._inners[:i]
+        after = self._inners[i + 1:]
+        return Multiply(*before, *nested_inners, *after)
 
-    # Multiply(Constant(1), u) => u
-    def _reduce_one_times_u(
+    def _reduce_product_when_multiplying_by_zero(
         self: Multiply
     ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.Constant) and
-            self._left.value == 1
-        ):
-            return self._right
-        else:
-            return None
-
-    # Multiply(Constant(0), u) => Constant(0)
-    def _reduce_zero_times_u(
-        self: Multiply
-    ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.Constant) and
-            self._left.value == 0
+        if any(
+            isinstance(inner, ex.Constant) and inner.value == 0
+            for inner in self._inners
         ):
             return ex.Constant(0)
         else:
             return None
 
-    # Multiply(Constant(-1), u) => Negation(u)
-    def _reduce_negative_one_times_u(
+    def _reduce_product_by_eliminating_ones(
         self: Multiply
     ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.Constant) and
-            self._left.value == -1
-        ):
-            return ex.Negation(self._right)
-        else:
+        non_ones: list[sm.Expression]
+        non_ones = [
+            inner
+            for inner in self._inners
+            if not (isinstance(inner, ex.Constant) and inner.value == 1)
+        ]
+        if len(non_ones) == len(self._inners):
             return None
+        return Multiply(*non_ones)
 
-    # Multiply(u, Constant(c)) => Multiply(Constant(c), u)
-    def _reduce_by_commuting_constant_left_across_multiply(
+    def _reduce_product_by_eliminating_negations(
         self: Multiply
     ) -> sm.Expression | None:
-        if (
-            isinstance(self._right, ex.Constant) and
-            not isinstance(self._left, (ex.Constant, ex.Reciprocal, ex.Multiply))
-        ):
-            return ex.Multiply(self._right, self._left)
-        else:
+        negations: list[ex.Negation]
+        non_negations: list[sm.Expression]
+        negations, non_negations = partition_by_given_type(self._inners, ex.Negation)
+        negations_count = len(negations)
+        if negations_count == 0:
             return None
+        negation_inners = (negation._inner for negation in negations)
+        if is_even(negations_count):
+            return Multiply(*non_negations, *negation_inners)
+        else: # negations_count is odd
+            return Multiply(*non_negations, *negation_inners, ex.Constant(-1))
 
-    # Multiply(Negation(u), v) => Negation(Multiply(u, v))
-    def _reduce_negation_of_u__times_v(
+    def _reduce_product_by_consolidating_nth_powers(
         self: Multiply
     ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.Negation)
-        ):
-            return ex.Negation(ex.Multiply(self._left._inner, self._right))
-        else:
+        nth_powers: list[ex.NthPower]
+        non_nth_powers: list[sm.Expression]
+        nth_powers, non_nth_powers = partition_by_given_type(self._inners, ex.NthPower)
+        if len(nth_powers) <= 1:
             return None
-
-    # Multiply(u, Negation(v)) => Negation(Multiply(u, v))
-    def _reduce_u_times_negation_of_v(
-        self: Multiply
-    ) -> sm.Expression | None:
-        if isinstance(self._right, ex.Negation):
-            return ex.Negation(ex.Multiply(self._left, self._right._inner))
-        else:
+        nth_powers_by_n = group_by_key(nth_powers, lambda nth_power: nth_power.n)
+        if all(len(nth_powers) <= 1 for nth_powers in nth_powers_by_n.values()):
             return None
+        nth_power_inners_by_n = map_dictionary_values(
+            nth_powers_by_n,
+            lambda _, nth_powers: [nth_power._inner for nth_power in nth_powers]
+        )
+        consolidated_nth_powers = [
+            ex.NthPower(Multiply(*inners), n)
+            for n, inners in nth_power_inners_by_n.items()
+        ]
+        return Multiply(*non_nth_powers, *consolidated_nth_powers)
 
-    # Multiply(u, Reciprocal(v)) => Multiply(Reciprocal(v), u)
-    def _reduce_by_commuting_reciprocal_left_across_multiply(
+    def _reduce_product_by_consolidating_nth_roots(
         self: Multiply
     ) -> sm.Expression | None:
-        if (
-            isinstance(self._right, ex.Reciprocal) and
-            not isinstance(self._left, (ex.Reciprocal, ex.Multiply))
-        ):
-            return ex.Multiply(self._right, self._left)
-        else:
+        nth_roots: list[ex.NthRoot]
+        non_nth_roots: list[sm.Expression]
+        nth_roots, non_nth_roots = partition_by_given_type(self._inners, ex.NthRoot)
+        if len(nth_roots) <= 1:
             return None
-
-    # Multiply(Reciprocal(u), Reciprocal(v)) => Reciprocal(Multiply(u, v))
-    def _reduce_product_of_reciprocals(
-        self: Multiply
-    ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.Reciprocal) and
-            isinstance(self._right, ex.Reciprocal)
-        ):
-            return ex.Reciprocal(ex.Multiply(self._left._inner, self._right._inner))
-        else:
+        nth_roots_by_n = group_by_key(nth_roots, lambda nth_root: nth_root.n)
+        if all(len(nth_roots) <= 1 for nth_roots in nth_roots_by_n.values()):
             return None
+        nth_root_inners_by_n = map_dictionary_values(
+            nth_roots_by_n,
+            lambda _, nth_roots: [nth_root._inner for nth_root in nth_roots]
+        )
+        consolidated_nth_roots = [
+            ex.NthRoot(Multiply(*inners), n)
+            for n, inners in nth_root_inners_by_n.items()
+        ]
+        return Multiply(*non_nth_roots, *consolidated_nth_roots)
 
-    # Multiply(NthPower(u, n), NthPower(v, n)) => NthPower(Multiply(u, v), n)
-    def _reduce_product_of_nth_powers(
+    def _reduce_product_by_consolidating_exponentials(
         self: Multiply
     ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.NthPower) and
-            isinstance(self._right, ex.NthPower) and
-            self._left.n == self._right.n
-        ):
-            return ex.NthPower(
-                ex.Multiply(self._left._inner, self._right._inner),
-                self._left.n
+        exponentials: list[ex.Exponential]
+        non_exponentials: list[sm.Expression]
+        exponentials, non_exponentials = partition_by_given_type(self._inners, ex.Exponential)
+        if len(exponentials) <= 1:
+            return None
+        exponentials_by_base = group_by_key(exponentials, lambda exponential: exponential.base)
+        if all(len(exponentials) <= 1 for exponentials in exponentials_by_base.values()):
+            return None
+        exponential_inners_by_base = map_dictionary_values(
+            exponentials_by_base,
+            lambda _, exponentials: [exponential._inner for exponential in exponentials]
+        )
+        consolidated_exponentials = [
+            ex.Exponential(ex.Add(*inners), base = base)
+            for base, inners in exponential_inners_by_base.items()
+        ]
+        return Multiply(*non_exponentials, *consolidated_exponentials)
+
+    def _reduce_product_by_consolidating_constants(
+        self: Multiply
+    ) -> sm.Expression | None:
+        constants: list[ex.Constant]
+        non_constants: list[sm.Expression]
+        constants, non_constants = partition_by_given_type(self._inners, ex.Constant)
+        if len(constants) <= 1:
+            return None
+        product = multiply(*(constant.value for constant in constants))
+        return Multiply(*non_constants, ex.Constant(product))
+
+    def _normalize_fully_reduced(
+        self: Multiply
+    ) -> sm.Expression:
+        reciprocals: list[ex.Reciprocal]
+        non_reciprocals: list[sm.Expression]
+        reciprocals, non_reciprocals = partition_by_given_type(self._inners, ex.Reciprocal)
+        numerator_terms = [non_reciprocal._normalize() for non_reciprocal in non_reciprocals]
+        denominator_terms = [reciprocal._inner._normalize() for reciprocal in reciprocals]
+        numerator_count = len(numerator_terms)
+        denominator_count = len(denominator_terms)
+        if numerator_count >= 1 and denominator_count >= 1:
+            return ex.Divide(
+                _simplified_Multiply(numerator_terms),
+                _simplified_Multiply(denominator_terms)
             )
-        else:
-            return None
+        elif numerator_count >= 1 and denominator_count == 0:
+            return _simplified_Multiply(numerator_terms)
+        elif numerator_count == 0 and denominator_count >= 1:
+            return ex.Reciprocal(_simplified_Multiply(denominator_terms))
+        else: # numerator_count == 0 and denominator_count == 0
+            return ex.Constant(1)
 
-    # Multiply(NthRoot(u, n), NthRoot(v, n)) => NthRoot(Multiply(u, v), n)
-    def _reduce_product_of_nth_roots(
-        self: Multiply
-    ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.NthRoot) and
-            isinstance(self._right, ex.NthRoot) and
-            self._left.n == self._right.n
-        ):
-            return ex.NthRoot(
-                ex.Multiply(self._left._inner, self._right._inner),
-                self._left.n
-            )
-        else:
-            return None
 
-    # Multiply(Exponential(u), Exponential(v)) => Exponential(Plus(u, v))
-    def _reduce_product_of_exponentials(
-        self: Multiply
-    ) -> sm.Expression | None:
-        if (
-            isinstance(self._left, ex.Exponential) and
-            isinstance(self._right, ex.Exponential) and
-            self._left.base == self._right.base
-        ):
-            return ex.Exponential(
-                ex.Plus(self._left._inner, self._right._inner),
-                base = self._left.base
-            )
-        else:
-            return None
+def _simplified_Multiply(
+    terms: list[sm.Expression]
+) -> sm.Expression:
+    term_count = len(terms)
+    if term_count == 0:
+        return ex.Constant(1)
+    elif term_count == 1:
+        return terms[0]
+    else: # inners_count >= 2
+        return Multiply(*terms)

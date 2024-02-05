@@ -4,19 +4,11 @@ import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.utilities import integer_from_integral_real_number
+from smoothmath._private.math_functions import nth_power, multiply
+from smoothmath._private.utilities import integer_from_integral_real_number, is_even
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
-
-
-def nth_power(
-    x: sm.real_number,
-    n: int
-) -> sm.real_number:
-    if n <= 0:
-        raise sm.DomainError(f"nth_power(x, n) is not defined for n = {n}")
-    return x ** n
 
 
 class NthPower(base.ParameterizedUnaryExpression):
@@ -97,7 +89,11 @@ class NthPower(base.ParameterizedUnaryExpression):
             return multiplier
         else: # n >= 2
             inner_value = self._inner._evaluate(point)
-            return n * nth_power(inner_value, n - 1) * multiplier
+            return multiply(
+                n,
+                nth_power(inner_value, n - 1),
+                multiplier
+            )
 
     def _synthetic_partial_formula(
         self: NthPower,
@@ -108,7 +104,8 @@ class NthPower(base.ParameterizedUnaryExpression):
             return multiplier
         else: # n >= 2
             return ex.Multiply(
-                ex.Multiply(ex.Constant(n), ex.NthPower(self._inner, n - 1)),
+                ex.Constant(n),
+                ex.NthPower(self._inner, n - 1),
                 multiplier
             )
 
@@ -167,7 +164,7 @@ class NthPower(base.ParameterizedUnaryExpression):
         self: NthPower
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Negation):
-            if self.n % 2 == 0: # n is even
+            if is_even(self.n):
                 return ex.NthPower(self._inner._inner, self.n)
             else: # n is odd
                 return ex.Negation(ex.NthPower(self._inner._inner, self.n))

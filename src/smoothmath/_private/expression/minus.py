@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
+from smoothmath._private.math_functions import negation, minus
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -21,7 +22,7 @@ class Minus(base.BinaryExpression):
         left_value: sm.real_number,
         right_value: sm.real_number
     ) -> sm.real_number:
-        return left_value - right_value
+        return minus(left_value, right_value)
 
     def _local_partial(
         self: Minus,
@@ -30,7 +31,7 @@ class Minus(base.BinaryExpression):
     ) -> sm.real_number:
         left_partial = self._left._local_partial(point, with_respect_to)
         right_partial = self._right._local_partial(point, with_respect_to)
-        return left_partial - right_partial
+        return minus(left_partial, right_partial)
 
     def _synthetic_partial(
         self: Minus,
@@ -46,7 +47,7 @@ class Minus(base.BinaryExpression):
         accumulated: sm.real_number
     ) -> None:
         self._left._compute_local_differential(builder, accumulated)
-        self._right._compute_local_differential(builder, - accumulated)
+        self._right._compute_local_differential(builder, negation(accumulated))
 
     def _compute_global_differential(
         self: Minus,
@@ -60,4 +61,10 @@ class Minus(base.BinaryExpression):
     def _reducers(
         self: Minus
     ) -> list[Callable[[], sm.Expression | None]]:
-        return []
+        return [self._reduce_minus_to_sum_with_negation]
+
+    # Minus(u, v) => Add(u, Negation(v))
+    def _reduce_minus_to_sum_with_negation(
+        self: Minus
+    ) -> sm.Expression | None:
+        return ex.Add(self._left, ex.Negation(self._right))

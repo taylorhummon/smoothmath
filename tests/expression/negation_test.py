@@ -25,7 +25,14 @@ def test_Negation_composition():
     assert z.global_differential().component_at(point, x) == approx(-2)
 
 
-def test_reduce_negation_of_negation_of_u():
-    u = Variable("u")
-    z = Negation(Negation(u))
-    assert z._reduce_negation_of_negation_of_u() == u
+def test_Negation_normalization():
+    x = Variable("x")
+    y = Variable("y")
+    z = Negation(x)
+    assert z._normalize() == Negation(x)
+    z = Negation(Negation(x))
+    assert z._normalize() == x
+    z = Negation(Negation(Negation(x)))
+    assert z._normalize() == Negation(x)
+    z = Negation(x + y)
+    assert z._normalize() == Negation(x + y)

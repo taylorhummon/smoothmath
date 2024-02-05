@@ -4,7 +4,7 @@ from smoothmath import Point
 from smoothmath.expression import Constant, Variable, Negation, Reciprocal, Exponential, Logarithm
 
 
-def test_exponential():
+def test_Exponential():
     x = Variable("x")
     z = Exponential(x)
     global_x_partial = z.global_partial(x)
@@ -93,17 +93,20 @@ def test_Exponential_equality():
     assert Exponential(x, base = 2) != Exponential(x)
 
 
-def test_reduce_exponential_of_logarithm_of_u():
-    u = Variable("u")
-    z = Exponential(Logarithm(u))
-    assert z._reduce_exponential_of_logarithm_of_u() == u
-    z = Exponential(Logarithm(u, base = 2), base = 2)
-    assert z._reduce_exponential_of_logarithm_of_u() == u
-
-
-def test_reduce_exponential_of_negation_of_u():
-    u = Variable("u")
-    z = Exponential(Negation(u))
-    assert z._reduce_exponential_of_negation_of_u() == Reciprocal(Exponential(u))
-    z = Exponential(Negation(u), base = 2)
-    assert z._reduce_exponential_of_negation_of_u() == Reciprocal(Exponential(u, base = 2))
+def test_Exponential_normalization():
+    x = Variable("x")
+    y = Variable("y")
+    z = Exponential(x)
+    assert z._normalize() == Exponential(x)
+    z = Exponential(Logarithm(x))
+    assert z._normalize() == x
+    z = Exponential(Logarithm(x, base = 2), base = 2)
+    assert z._normalize() == x
+    z = Exponential(Logarithm(x, base = 3), base = 2)
+    assert z._normalize() == Exponential(Logarithm(x, base = 3), base = 2)
+    z = Exponential(Negation(x))
+    assert z._normalize() == Reciprocal(Exponential(x))
+    z = Exponential(Negation(x), base = 2)
+    assert z._normalize() == Reciprocal(Exponential(x, base = 2))
+    z = Exponential(x + y)
+    assert z._normalize() == Exponential(x + y)

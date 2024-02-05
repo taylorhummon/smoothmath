@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
-class Constant(base.NullaryExpression):
+class Constant(base.Expression):
     def __init__(
         self: Constant,
         value: sm.real_number
@@ -16,6 +16,11 @@ class Constant(base.NullaryExpression):
         super().__init__(lacks_variables = True)
         self.value: sm.real_number
         self.value = value
+
+    def _reset_evaluation_cache(
+        self: Constant
+    ) -> None:
+        pass
 
     def _evaluate(
         self: Constant,
@@ -49,6 +54,17 @@ class Constant(base.NullaryExpression):
         accumulated: sm.Expression
     ) -> None:
         pass
+
+    def _take_reduction_step(
+        self: Constant
+    ) -> Constant:
+        self._is_fully_reduced = True
+        return self
+
+    def _normalize_fully_reduced(
+        self: Constant
+    ) -> sm.Expression:
+        return self
 
     def __eq__(
         self: Constant,

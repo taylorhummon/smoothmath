@@ -129,28 +129,27 @@ def test_Logarithm_equality():
     assert Logarithm(x, base = 2) != Logarithm(x)
 
 
-def test_reduce_logarithm_of_exponential_of_u():
-    u = Variable("u")
-    z = Logarithm(Exponential(u))
-    assert z._reduce_logarithm_of_exponential_of_u() == u
-    z = Logarithm(Exponential(u, base = 2), base = 2)
-    assert z._reduce_logarithm_of_exponential_of_u() == u
-
-
-def test_reduce_logarithm_of_reciprocal_of_u():
-    u = Variable("u")
-    z = Logarithm(Reciprocal(u))
-    assert z._reduce_logarithm_of_reciprocal_of_u() == Negation(Logarithm(u))
-    z = Logarithm(Reciprocal(u), base = 2)
-    assert z._reduce_logarithm_of_reciprocal_of_u() == Negation(Logarithm(u, base = 2))
-
-
-def test_reduce_logarithm_of_nth_power_of_u():
-    u = Variable("u")
-    z = Logarithm(NthPower(u, n = 3))
-    assert z._reduce_logarithm_of_nth_power_of_u() == Multiply(Constant(3), Logarithm(u))
-    z = Logarithm(NthPower(u, n = 3), base = 2)
-    assert z._reduce_logarithm_of_nth_power_of_u() == Multiply(Constant(3), Logarithm(u, base = 2))
-    z = Logarithm(NthPower(u, n = 4))
+def test_Logarithm_normalization():
+    x = Variable("x")
+    y = Variable("y")
+    z = Logarithm(x)
+    assert z._normalize() == Logarithm(x)
+    z = Logarithm(Exponential(x))
+    assert z._normalize() == x
+    z = Logarithm(Exponential(x, base = 2), base = 2)
+    assert z._normalize() == x
+    z = Logarithm(Exponential(x, base = 3), base = 2)
+    assert z._normalize() == Logarithm(Exponential(x, base = 3), base = 2)
+    z = Logarithm(Reciprocal(x))
+    assert z._normalize() == Negation(Logarithm(x))
+    z = Logarithm(Reciprocal(x), base = 2)
+    assert z._normalize() == Negation(Logarithm(x, base = 2))
+    z = Logarithm(NthPower(x, n = 3))
+    assert z._normalize() == Constant(3) * Logarithm(x)
+    z = Logarithm(NthPower(x, n = 3), base = 2)
+    assert z._normalize() == Constant(3) * Logarithm(x, base = 2)
+    z = Logarithm(NthPower(x, n = 4))
     # We don't want to reduce to Multiply(Constant(4), Logarithm(u)) because u might be negative
-    assert z._reduce_logarithm_of_nth_power_of_u() == None
+    assert z._normalize() == Logarithm(NthPower(x, n = 4))
+    z = Logarithm(Multiply(x, y))
+    assert z._normalize() == Logarithm(Multiply(x, y))

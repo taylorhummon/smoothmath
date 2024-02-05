@@ -36,7 +36,9 @@ def test_Cosine_composition():
     assert z.global_differential().component_at(point, theta) == approx(-2)
 
 
-def test_reduce_cosine_of_negation_of_u():
-    u = Variable("u")
-    z = Cosine(Negation(u))
-    assert z._reduce_cosine_of_negation_of_u() == Cosine(u)
+def test_Cosine_normalization():
+    theta = Variable("theta")
+    z = Cosine(theta)
+    assert z._normalize() == Cosine(theta)
+    z = Cosine(Negation(theta))
+    assert z._normalize() == Cosine(theta)

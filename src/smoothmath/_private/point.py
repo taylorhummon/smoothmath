@@ -57,7 +57,7 @@ class Point:
         self: Point
     ) -> str:
         equations_string = ", ".join(
-            f"{variable_name} = {value}"
+            f'"{variable_name}": {value}'
             for variable_name, value in self._value_by_variable_name.items()
         )
-        return f"({equations_string})"
+        return "Point({" + equations_string + "})"

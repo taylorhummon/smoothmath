@@ -9,29 +9,29 @@ from smoothmath._private.utilities import get_class_name, list_with_updated_entr
 class NAryExpression(base.Expression):
     def __init__(
         self: NAryExpression,
-        inner_expressions: list[sm.Expression]
+        *args: sm.Expression
     ) -> None:
-        for inner in inner_expressions:
+        for inner in args:
             if not isinstance(inner, sm.Expression):
                 raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
-        lacks_variables = all(inner._lacks_variables for inner in inner_expressions)
+        lacks_variables = all(inner._lacks_variables for inner in args)
         super().__init__(lacks_variables)
-        self._inner_expressions: list[sm.Expression]
-        self._inner_expressions = inner_expressions
+        self._inners: list[sm.Expression]
+        self._inners = list(args)
         self._value: sm.real_number | None
         self._value = None
 
     def _rebuild(
         self: NAryExpression,
-        inner_expressions: list[sm.Expression]
+        *args: sm.Expression
     ) -> NAryExpression:
-        return self.__class__(inner_expressions)
+        return self.__class__(*args)
 
     def _reset_evaluation_cache(
         self: NAryExpression
     ) -> None:
         self._value = None
-        for inner in self._inner_expressions:
+        for inner in self._inners:
             inner._reset_evaluation_cache()
 
     def _evaluate(
@@ -40,9 +40,9 @@ class NAryExpression(base.Expression):
     ) -> sm.real_number:
         if self._value is not None:
             return self._value
-        inner_values = [inner._evaluate(point) for inner in self._inner_expressions]
-        self._verify_domain_constraints(inner_values)
-        self._value = self._value_formula(inner_values)
+        inner_values = [inner._evaluate(point) for inner in self._inners]
+        self._verify_domain_constraints(*inner_values)
+        self._value = self._value_formula(*inner_values)
         return self._value
 
     def _take_reduction_step(
@@ -50,14 +50,14 @@ class NAryExpression(base.Expression):
     ) -> sm.Expression:
         if self._is_fully_reduced:
             return self
-        for (i, inner) in enumerate(self._inner_expressions):
+        consolidated = self._consolidate_constant_expression()
+        if consolidated is not None:
+            return consolidated
+        for (i, inner) in enumerate(self._inners):
             if not inner._is_fully_reduced:
                 reduced_inner = inner._take_reduction_step()
-                revised = list_with_updated_entry_at(self._inner_expressions, i, reduced_inner)
-                return self._rebuild(revised)
-        reduced = self._reduce_when_lacking_variables()
-        if reduced is not None:
-            return reduced
+                revised = list_with_updated_entry_at(self._inners, i, reduced_inner)
+                return self._rebuild(*revised)
         for reducer in self._reducers:
             reduced = reducer()
             if reduced is not None:
@@ -65,55 +65,60 @@ class NAryExpression(base.Expression):
         self._is_fully_reduced = True
         return self
 
+    def _normalize_fully_reduced(
+        self: NAryExpression
+    ) -> sm.Expression:
+        normalized_inners = (inner._normalize_fully_reduced() for inner in self._inners)
+        return self._rebuild(*normalized_inners)
+
     ## Operations ##
 
     def __eq__(
         self: NAryExpression,
         other: Any
     ) -> bool:
-        return (
-            (other.__class__ == self.__class__) and
-            (len(other._inner_expressions) == len(self._inner_expressions)) and
-            all(
-                inner_a == inner_b
-                for (inner_a, inner_b) in zip(other._inner_expressions, self._inner_expressions)
-            )
-        )
+        if other.__class__ != self.__class__:
+            return False
+        if len(other._inners) != len(self._inners):
+            return False
+        if any(a != b for (a, b) in zip(other._inners, self._inners)):
+            return False
+        return True
 
     def __hash__(
         self: NAryExpression
     ) -> int:
         return hash((
             get_class_name(self),
-            len(self._inner_expressions),
-            self._inner_expressions
+            len(self._inners),
+            tuple(self._inners)
         ))
 
     def __str__(
         self: NAryExpression
     ) -> str:
-        inner_strings = ", ".join(str(inner) for inner in self._inner_expressions)
-        return f"{get_class_name(self)}([{inner_strings}])"
+        inner_strings = ", ".join(str(inner) for inner in self._inners)
+        return f"{get_class_name(self)}({inner_strings})"
 
     def __repr__(
         self: NAryExpression
     ) -> str:
-        inner_strings = ", ".join(str(inner) for inner in self._inner_expressions)
-        return f"{get_class_name(self)}([{inner_strings}])"
+        inner_strings = ", ".join(str(inner) for inner in self._inners)
+        return f"{get_class_name(self)}({inner_strings})"
 
     ## Abstract methods ##
 
     @abstractmethod
     def _verify_domain_constraints(
         self: NAryExpression,
-        inner_values: list[sm.real_number]
+        *inner_values: sm.real_number
     ) -> None:
         raise Exception("Concrete classes derived from NAryExpression must implement _verify_domain_constraints()")
 
     @abstractmethod
     def _value_formula(
         self: NAryExpression,
-        inner_values: list[sm.real_number]
+        *inner_values: sm.real_number
     ) -> sm.real_number:
         raise Exception("Concrete classes derived from NAryExpression must implement _value_formula()")
 

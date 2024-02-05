@@ -1,69 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
 from smoothmath.expression import Constant, Variable, Negation, Reciprocal, NthPower, NthRoot
-from smoothmath._private.expression.nth_root import nth_root
-
-
-def test_nth_root():
-    # n = -2
-    with raises(DomainError):
-        nth_root(12, -2)
-    # n = -1
-    with raises(DomainError):
-        nth_root(12, -1)
-    # n = 0
-    with raises(DomainError):
-        nth_root(0, 12)
-    # n = 1
-    assert nth_root(0.5, 1) == approx(0.5)
-    assert nth_root(1, 1) == approx(1)
-    assert nth_root(2, 1) == approx(2)
-    assert nth_root(0, 1) == approx(0)
-    assert nth_root(-0.5, 1) == approx(-0.5)
-    assert nth_root(-1, 1) == approx(-1)
-    assert nth_root(-2, 1) == approx(-2)
-    # n = 2 (a.k.a square root)
-    assert nth_root(0.25, 2) == approx(0.5)
-    assert nth_root(1, 2) == approx(1)
-    assert nth_root(2, 2) == approx(1.4142135623730)
-    assert nth_root(9, 2) == approx(3)
-    assert nth_root(50 ** 2, 2) == approx(50)
-    with raises(DomainError):
-        nth_root(0, 2)
-    with raises(DomainError):
-        nth_root(-1, 2)
-    # n = 3 (a.k.a cube root)
-    assert nth_root(0.125, 3) == approx(0.5)
-    assert nth_root(1, 3) == approx(1)
-    assert nth_root(2, 3) == approx(1.2599210498948)
-    assert nth_root(8, 3) == approx(2)
-    assert nth_root(50 ** 3, 3) == approx(50)
-    with raises(DomainError):
-        nth_root(0, 3)
-    assert nth_root(-0.125, 3) == approx(-0.5)
-    assert nth_root(-1, 3) == approx(-1)
-    assert nth_root(-2, 3) == approx(-1.2599210498948)
-    assert nth_root(-8, 3) == approx(-2)
-    # n = 4
-    assert nth_root(0.5 ** 4, 4) == approx(0.5)
-    assert nth_root(1, 4) == approx(1)
-    assert nth_root(4, 4) == approx(1.4142135623730)
-    assert nth_root(81, 4) == approx(3)
-    assert nth_root(50 ** 4, 4) == approx(50)
-    with raises(DomainError):
-        nth_root(0, 4)
-    with raises(DomainError):
-        nth_root(-1, 4)
-    # n = 5
-    assert nth_root(0.5 ** 5, 5) == approx(0.5)
-    assert nth_root(1, 5) == approx(1)
-    assert nth_root(4, 5) == approx(1.3195079107728942)
-    assert nth_root(243, 5) == approx(3)
-    assert nth_root(50 ** 5, 5) == approx(50)
-    with raises(DomainError):
-        nth_root(0, 5)
-    assert nth_root(-1, 5) == approx(-1)
-    assert nth_root(-243, 5) == approx(-3)
 
 
 def test_NthRoot_with_n_equal_two():
@@ -215,25 +152,29 @@ def test_NthRoot_where_exponent_is_an_integer_represented_as_a_float():
     assert z.global_differential().component_at(point, x) == approx(1 / 6)
 
 
-def test_reduce_nth_root_of_mth_power_of_u():
-    u = Variable("u")
-    z = NthRoot(NthPower(u, n = 2), n = 3)
-    assert z._reduce_nth_root_of_mth_power_of_u() == NthPower(NthRoot(u, n = 3), n = 2)
-
-
-def test_reduce_nth_root_of_mth_root_of_u():
-    u = Variable("u")
-    z = NthRoot(NthRoot(u, n = 3), n = 2)
-    assert z._reduce_nth_root_of_mth_root_of_u() == NthRoot(u, n = 6)
-
-
-def test_reduce_odd_nth_root_of_negation_of_u():
-    u = Variable("u")
-    z = NthRoot(Negation(u), n = 3)
-    assert z._reduce_odd_nth_root_of_negation_of_u() == Negation(NthRoot(u, n = 3))
-
-
-def test_reduce_nth_root_of_reciprocal_of_u():
-    u = Variable("u")
-    z = NthRoot(Reciprocal(u), n = 2)
-    assert z._reduce_nth_root_of_reciprocal_of_u() == Reciprocal(NthRoot(u, n = 2))
+def test_NthRoot_normalization():
+    x = Variable("x")
+    z = NthRoot(x, n = 1)
+    assert z._normalize() == x
+    z = NthRoot(x, n = 2)
+    assert z._normalize() == NthRoot(x, n = 2)
+    z = NthRoot(NthRoot(x, n = 3), n = 2)
+    assert z._normalize() == NthRoot(x, n = 6)
+    z = NthRoot(NthPower(x, n = 2), n = 2)
+    assert z._normalize() == x
+    z = NthRoot(NthPower(x, n = 2), n = 6)
+    assert z._normalize() == NthRoot(x, n = 3)
+    z = NthRoot(NthPower(x, n = 6), n = 2)
+    assert z._normalize() == NthPower(x, n = 3)
+    z = NthRoot(NthPower(x, n = 6), n = 4)
+    assert z._normalize() == NthPower(NthRoot(x, n = 2), n = 3)
+    z = NthRoot(NthPower(x, n = 4), n = 6)
+    assert z._normalize() == NthPower(NthRoot(x, n = 3), n = 2)
+    z = NthRoot(Negation(x), n = 2)
+    assert z._normalize() == NthRoot(Negation(x), n = 2)
+    z = NthRoot(Negation(x), n = 3)
+    assert z._normalize() == Negation(NthRoot(x, n = 3))
+    z = NthRoot(Reciprocal(x), n = 2)
+    assert z._normalize() == Reciprocal(NthRoot(x, n = 2))
+    z = NthRoot(Reciprocal(x), n = 3)
+    assert z._normalize() == Reciprocal(NthRoot(x, n = 3))

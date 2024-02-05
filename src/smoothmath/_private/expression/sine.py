@@ -4,6 +4,7 @@ import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
+from smoothmath._private.math_functions import cosine, sine, multiply
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -20,7 +21,7 @@ class Sine(base.UnaryExpression):
         self: Sine,
         inner_value: sm.real_number
     ) -> sm.real_number:
-        return math.sin(inner_value)
+        return sine(inner_value)
 
     def _local_partial(
         self: Sine,
@@ -59,7 +60,7 @@ class Sine(base.UnaryExpression):
         multiplier: sm.real_number
     ) -> sm.real_number:
         inner_value = self._inner._evaluate(point)
-        return math.cos(inner_value) * multiplier
+        return multiply(cosine(inner_value), multiplier)
 
     def _synthetic_partial_formula(
         self: Sine,
@@ -75,7 +76,7 @@ class Sine(base.UnaryExpression):
             self._reduce_sine_of_negation_of_u
         ]
 
-    # Sine(Negation(u)) => Sine(u)
+    # Sine(Negation(u)) => Negation(Sine(u))
     def _reduce_sine_of_negation_of_u(
         self: Sine
     ) -> sm.Expression | None:

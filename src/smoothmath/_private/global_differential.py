@@ -3,7 +3,6 @@ from typing import Any
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
-from smoothmath._private.normalize import normalize_synthetic
 from smoothmath._private.utilities import get_variable_name
 
 
@@ -105,5 +104,5 @@ class GlobalDifferentialBuilder:
     ) -> GlobalDifferential:
         normalized_synthetic_partials = {}
         for variable_name, synthetic_partial in self._synthetic_partials.items():
-            normalized_synthetic_partials[variable_name] = normalize_synthetic(synthetic_partial)
+            normalized_synthetic_partials[variable_name] = synthetic_partial._normalize()
         return GlobalDifferential(self.original_expression, normalized_synthetic_partials)

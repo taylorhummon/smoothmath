@@ -4,6 +4,7 @@ import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
+from smoothmath._private.math_functions import exponential, logarithm, multiply
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -17,7 +18,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
-            raise Exception(f"Exponential must have a positive base, found: {base}")
+            raise Exception(f"Exponential(x) must have a positive base, found: {base}")
 
     @property
     def base(
@@ -35,7 +36,7 @@ class Exponential(base.ParameterizedUnaryExpression):
         self: Exponential,
         inner_value: sm.real_number
     ):
-        return self.base ** inner_value
+        return exponential(inner_value, base = self.base)
 
     def _local_partial(
         self: Exponential,
@@ -77,9 +78,13 @@ class Exponential(base.ParameterizedUnaryExpression):
             return 0
         self_value = self._evaluate(point)
         if self.base == math.e:
-            return self_value * multiplier
+            return multiply(self_value, multiplier)
         else:
-            return math.log(self.base, math.e) * self_value * multiplier
+            return multiply(
+                logarithm(self.base, base = math.e),
+                self_value,
+                multiplier
+            )
 
     def _synthetic_partial_formula(
         self: Exponential,
@@ -91,7 +96,8 @@ class Exponential(base.ParameterizedUnaryExpression):
             return ex.Multiply(self, multiplier)
         else:
             return ex.Multiply(
-                ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self),
+                ex.Logarithm(ex.Constant(self.base), base = math.e),
+                self,
                 multiplier
             )
 

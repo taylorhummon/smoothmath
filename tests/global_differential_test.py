@@ -11,7 +11,7 @@ def test_GlobalDifferential():
     original_expression = Constant(4) * w + x * y ** 3
     synthetic_w_partial = Constant(4)
     synthetic_x_partial = y ** 3
-    synthetic_y_partial = Constant(3) * x * NthPower(y, n = 2)
+    synthetic_y_partial = Constant(3) * x * NthPower(y, 2)
     builder = GlobalDifferentialBuilder(original_expression)
     builder.add_to(w, synthetic_w_partial)
     builder.add_to(x, synthetic_x_partial)
@@ -32,9 +32,9 @@ def test_GlobalDifferential():
     assert global_w_partial.original_expression == original_expression
     assert global_x_partial.original_expression == original_expression
     assert global_y_partial.original_expression == original_expression
-    assert global_w_partial == GlobalPartial(original_expression, synthetic_w_partial)
-    assert global_x_partial == GlobalPartial(original_expression, synthetic_x_partial)
-    assert global_y_partial == GlobalPartial(original_expression, synthetic_y_partial)
+    assert global_w_partial == GlobalPartial.build(original_expression, synthetic_w_partial)
+    assert global_x_partial == GlobalPartial.build(original_expression, synthetic_x_partial)
+    assert global_y_partial == GlobalPartial.build(original_expression, synthetic_y_partial)
     # at() method
     local_differential = global_differential.at(point)
     assert local_differential.component(w) == approx(4)

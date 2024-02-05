@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, Logarithm, Divide
+from smoothmath.expression import Constant, Variable, Reciprocal, Logarithm, Divide
 
 
 def test_Divide():
@@ -154,7 +154,7 @@ def test_Divide_with_constant_denominator_one():
     assert global_differential.component_at(point, x) == approx(1)
 
 
-def test_divide_with_constant_denominator_zero():
+def test_Divide_with_constant_denominator_zero():
     x = Variable("x")
     z = Divide(x, Constant(0))
     global_x_partial = z.global_partial(x)
@@ -183,3 +183,23 @@ def test_divide_with_constant_denominator_zero():
         z.local_differential(point)
     with raises(DomainError):
         global_differential.component_at(point, x)
+
+
+def test_Divide_normalization():
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
+    z = Divide(x, y)
+    assert z._normalize() == Divide(x, y)
+    z = Divide(x, Constant(1))
+    assert z._normalize() == x
+    z = Divide(Constant(1), x)
+    assert z._normalize() == Reciprocal(x)
+    z = Divide(w * x, y)
+    assert z._normalize() == Divide(w * x, y)
+    z = Divide(w, x * y)
+    assert z._normalize() == Divide(w, x * y)
+    z = Divide(Divide(w, x), y)
+    assert z._normalize() == Divide(w, x * y)
+    z = Divide(w, Divide(x, y))
+    assert z._normalize() == Divide(w * y, x)

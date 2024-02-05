@@ -1,54 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable
-import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.expression.nth_power import nth_power
-from smoothmath._private.utilities import integer_from_integral_real_number
+from smoothmath._private.math_functions import nth_power, nth_root, divide, multiply
+from smoothmath._private.utilities import integer_from_integral_real_number, is_even, is_odd
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
-
-
-def nth_root(
-    x: sm.real_number,
-    n: int
-) -> sm.real_number:
-    if n <= 0:
-        raise sm.DomainError(f"nth_root(x, n) is not defined for n = {n}")
-    elif n == 1:
-        return x
-    elif n == 2:
-        if x > 0:
-            return math.sqrt(x)
-        elif x == 0:
-            raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = 2")
-        else: # x < 0
-            raise sm.DomainError(f"nth_root(x, n) is not defined for negative x for n = 2")
-    elif n == 3:
-        if x > 0:
-            return math.cbrt(x)
-        elif x == 0:
-            raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = 3")
-        else: # x < 0
-            # CAREFUL: math.cbrt can return imaginary values for negative inputs
-            return - math.cbrt(- x)
-    else: # n >= 4
-        if n % 2 == 0: # n is even
-            if x > 0:
-                return x ** (1 / n)
-            elif x == 0:
-                raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = {n}")
-            else: # x < 0
-                raise sm.DomainError(f"nth_root(x, n) is not defined for negative x for n = {n}")
-        else: # n is odd
-            if x > 0:
-                return x ** (1 / n)
-            elif x == 0:
-                raise sm.DomainError(f"nth_root(x, n) is not defined at x = 0 for n = {n}")
-            else: # x < 0
-                return - ((- x) ** (1 / n))
 
 
 class NthRoot(base.ParameterizedUnaryExpression):
@@ -78,7 +37,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> None:
         if self.n >= 2 and inner_value == 0:
             raise sm.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self.n}")
-        if self.n % 2 == 0 and inner_value < 0:
+        if is_even(self.n) and inner_value < 0:
             raise sm.DomainError(f"NthRoot(x, n) is not defined for negative x when n = {self.n}")
 
     def _value_formula(
@@ -132,7 +91,10 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return multiplier
         else:
             self_value = self._evaluate(point)
-            return multiplier / (n * (nth_power(self_value, n - 1)))
+            return divide(
+                multiplier,
+                multiply(n, nth_power(self_value, n - 1))
+            )
 
     def _synthetic_partial_formula(
         self: NthRoot,
@@ -195,7 +157,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> sm.Expression | None:
         if (
             isinstance(self._inner, ex.Negation) and
-            self.n % 2 == 1
+            is_odd(self.n)
         ):
             return ex.Negation(ex.NthRoot(self._inner._inner, self.n))
         else:

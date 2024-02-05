@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Any
 import smoothmath as sm
-from smoothmath._private.normalize import normalize_synthetic
 
 
 class GlobalPartial:
@@ -11,7 +10,7 @@ class GlobalPartial:
         original_expression: sm.Expression,
         synthetic_partial: sm.Expression
     ):
-        return cls(original_expression, normalize_synthetic(synthetic_partial))
+        return cls(original_expression, synthetic_partial._normalize())
 
     def __init__(
         self: GlobalPartial,

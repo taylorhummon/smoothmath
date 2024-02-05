@@ -36,7 +36,9 @@ def test_Sine_composition():
     assert z.global_differential().component_at(point, theta) == approx(2)
 
 
-def test_reduce_sine_of_negation_of_u():
-    u = Variable("u")
-    z = Sine(Negation(u))
-    assert z._reduce_sine_of_negation_of_u() == Negation(Sine(u))
+def test_Sine_normalization():
+    theta = Variable("theta")
+    z = Sine(theta)
+    assert z._normalize() == Sine(theta)
+    z = Sine(Negation(theta))
+    assert z._normalize() == Negation(Sine(theta))

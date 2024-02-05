@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 alphanumeric_pattern = re.compile(r"\A\w*\Z")
 
 
-class Variable(base.NullaryExpression):
+class Variable(base.Expression):
     def __init__(
         self: Variable,
         name: str
@@ -22,6 +22,11 @@ class Variable(base.NullaryExpression):
             raise Exception(f"Illegal variable name: {name}")
         self.name: str
         self.name = name
+
+    def _reset_evaluation_cache(
+        self: Variable
+    ) -> None:
+        pass
 
     def _evaluate(
         self: Variable,
@@ -61,6 +66,17 @@ class Variable(base.NullaryExpression):
         accumulated: sm.Expression
     ) -> None:
         builder.add_to(self, accumulated)
+
+    def _take_reduction_step(
+        self: Variable
+    ) -> Variable:
+        self._is_fully_reduced = True
+        return self
+
+    def _normalize_fully_reduced(
+        self: Variable
+    ) -> sm.Expression:
+        return self
 
     def __eq__(
         self: Variable,

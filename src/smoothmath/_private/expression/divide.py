@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.expression.nth_power import nth_power
+from smoothmath._private.math_functions import negation, nth_power, divide, add, multiply
 if TYPE_CHECKING:
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
@@ -26,7 +26,7 @@ class Divide(base.BinaryExpression):
         left_value: sm.real_number,
         right_value: sm.real_number
     ) -> sm.real_number:
-        return left_value / right_value
+        return divide(left_value, right_value)
 
     def _local_partial(
         self: Divide,
@@ -38,8 +38,8 @@ class Divide(base.BinaryExpression):
         self._verify_domain_constraints(left_value, right_value)
         left_partial = self._left._local_partial(point, with_respect_to)
         right_partial = self._right._local_partial(point, with_respect_to)
-        return (
-            self._local_partial_formula_left(point, left_partial) +
+        return add(
+            self._local_partial_formula_left(point, left_partial),
             self._local_partial_formula_right(point, right_partial)
         )
 
@@ -49,7 +49,7 @@ class Divide(base.BinaryExpression):
     ) -> sm.Expression:
         left_partial = self._left._synthetic_partial(with_respect_to)
         right_partial = self._right._synthetic_partial(with_respect_to)
-        return ex.Plus(
+        return ex.Add(
             self._synthetic_partial_formula_left(left_partial),
             self._synthetic_partial_formula_right(right_partial)
         )
@@ -83,7 +83,13 @@ class Divide(base.BinaryExpression):
         multiplier: sm.real_number
     ) -> sm.real_number:
         right_value = self._right._evaluate(point)
-        return multiplier / right_value
+        return divide(multiplier, right_value)
+
+    def _synthetic_partial_formula_left(
+        self: Divide,
+        multiplier: sm.Expression
+    ) -> sm.Expression:
+        return ex.Divide(multiplier, self._right)
 
     def _local_partial_formula_right(
         self: Divide,
@@ -92,13 +98,10 @@ class Divide(base.BinaryExpression):
     ) -> sm.real_number:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
-        return (- left_value / nth_power(right_value, n = 2)) * multiplier
-
-    def _synthetic_partial_formula_left(
-        self: Divide,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
-        return ex.Divide(multiplier, self._right)
+        return multiply(
+            negation(divide(left_value, nth_power(right_value, n = 2))),
+            multiplier
+        )
 
     def _synthetic_partial_formula_right(
         self: Divide,
@@ -113,4 +116,10 @@ class Divide(base.BinaryExpression):
     def _reducers(
         self: Divide
     ) -> list[Callable[[], sm.Expression | None]]:
-        return []
+        return [self._reduce_divide_to_multiplying_with_reciprocal]
+
+    # Divide(u, v) => Multiply(u, Reciprocal(v))
+    def _reduce_divide_to_multiplying_with_reciprocal(
+        self: Divide
+    ) -> sm.Expression | None:
+        return ex.Multiply(self._left, ex.Reciprocal(self._right))
