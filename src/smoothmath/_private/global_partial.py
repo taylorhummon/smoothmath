@@ -6,7 +6,7 @@ import smoothmath as sm
 class GlobalPartial:
     @classmethod
     def build(
-        cls,
+        cls: type,
         original_expression: sm.Expression,
         synthetic_partial: sm.Expression
     ):
