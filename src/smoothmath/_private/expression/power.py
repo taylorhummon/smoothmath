@@ -149,7 +149,7 @@ class Power(base.BinaryExpression):
             self._reduce_power_with_constant_base,
             self._reduce_power_of_power,
             self._reduce_u_to_the_negation_of_v,
-            self._reduce_one_over_u__to_the_v
+            self._reduce_reciprocal_u__to_the_v
         ]
 
     # Power(u, Constant(1)) => u
@@ -245,7 +245,7 @@ class Power(base.BinaryExpression):
             return None
 
     # Power(Reciprocal(u), v) => Reciprocal(Power(u, v))
-    def _reduce_one_over_u__to_the_v(
+    def _reduce_reciprocal_u__to_the_v(
         self: Power
     ) -> sm.Expression | None:
         if isinstance(self._left, ex.Reciprocal):
