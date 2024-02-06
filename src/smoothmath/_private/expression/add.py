@@ -107,8 +107,7 @@ class Add(base.NAryExpression):
     def _reduce_sum_by_consolidating_logarithms(
         self: Add
     ) -> sm.Expression | None:
-        logarithms: list[ex.Logarithm]
-        non_logarithms: list[sm.Expression]
+        logarithms: list[ex.Logarithm]; non_logarithms: list[sm.Expression]
         logarithms, non_logarithms = partition_by_given_type(self._inners, ex.Logarithm)
         if len(logarithms) <= 1:
             return None
@@ -128,8 +127,7 @@ class Add(base.NAryExpression):
     def _reduce_sum_by_consolidating_constants(
         self: Add
     ) -> sm.Expression | None:
-        constants: list[ex.Constant]
-        non_constants: list[sm.Expression]
+        constants: list[ex.Constant]; non_constants: list[sm.Expression]
         constants, non_constants = partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:
             return None
@@ -139,8 +137,7 @@ class Add(base.NAryExpression):
     def _normalize_fully_reduced(
         self: Add
     ) -> sm.Expression:
-        negations: list[ex.Negation]
-        non_negations: list[sm.Expression]
+        negations: list[ex.Negation]; non_negations: list[sm.Expression]
         negations, non_negations = partition_by_given_type(self._inners, ex.Negation)
         type_i_terms = [term._normalize() for term in non_negations]
         type_ii_terms = [negation._inner._normalize() for negation in negations]
