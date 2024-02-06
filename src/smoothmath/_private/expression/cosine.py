@@ -44,10 +44,10 @@ class Cosine(base.UnaryExpression):
     def _reducers(
         self: Cosine
     ) -> list[Callable[[], sm.Expression | None]]:
-        return [self._reduce_cosine_of_negation_of_u]
+        return [self._reduce_cosine_of_negation]
 
     # Cosine(Negation(u)) => Cosine(u)
-    def _reduce_cosine_of_negation_of_u(
+    def _reduce_cosine_of_negation(
         self: Cosine
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Negation):

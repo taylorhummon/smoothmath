@@ -83,11 +83,11 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> list[Callable[[], sm.Expression | None]]:
         return [
             self._reduce_nth_power_where_n_is_one,
-            self._reduce_nth_power_of_mth_root_of_u,
-            self._reduce_nth_power_of_mth_power_of_u,
-            self._reduce_nth_power_of_negation_of_u,
-            self._reduce_nth_power_of_reciprocal_of_u,
-            self._reduce_nth_power_of_exponential_of_u
+            self._reduce_nth_power_of_mth_root,
+            self._reduce_nth_power_of_mth_power,
+            self._reduce_nth_power_of_negation,
+            self._reduce_nth_power_of_reciprocal,
+            self._reduce_nth_power_of_exponential
         ]
 
     # NthPower(u, 1) => u
@@ -100,7 +100,7 @@ class NthPower(base.ParameterizedUnaryExpression):
             return None
 
     # NthPower(NthRoot(u, m), n) => ...
-    def _reduce_nth_power_of_mth_root_of_u(
+    def _reduce_nth_power_of_mth_root(
         self: NthPower
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.NthRoot):
@@ -118,7 +118,7 @@ class NthPower(base.ParameterizedUnaryExpression):
             return None
 
     # NthPower(NthPower(u, m), n) => NthPower(u, m * n))
-    def _reduce_nth_power_of_mth_power_of_u(
+    def _reduce_nth_power_of_mth_power(
         self: NthPower
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.NthPower):
@@ -128,7 +128,7 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     # NthPower(Negation(u), n) => NthPower(u, n) when n is even
     # NthPower(Negation(u), n) => Negation(NthPower(u, n)) when n is odd
-    def _reduce_nth_power_of_negation_of_u(
+    def _reduce_nth_power_of_negation(
         self: NthPower
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Negation):
@@ -140,7 +140,7 @@ class NthPower(base.ParameterizedUnaryExpression):
             return None
 
     # NthPower(Reciprocal(u), n) => Reciprocal(NthPower(u, n))
-    def _reduce_nth_power_of_reciprocal_of_u(
+    def _reduce_nth_power_of_reciprocal(
         self: NthPower
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Reciprocal):
@@ -149,7 +149,7 @@ class NthPower(base.ParameterizedUnaryExpression):
             return None
 
     # NthPower(Exponential(u), n) => Exponential(Multiply(Constant(n), u))
-    def _reduce_nth_power_of_exponential_of_u(
+    def _reduce_nth_power_of_exponential(
         self: NthPower
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Exponential):

@@ -78,12 +78,12 @@ class Exponential(base.ParameterizedUnaryExpression):
         self: Exponential
     ) -> list[Callable[[], sm.Expression | None]]:
         return [
-            self._reduce_exponential_of_logarithm_of_u,
-            self._reduce_exponential_of_negation_of_u
+            self._reduce_exponential_of_logarithm,
+            self._reduce_exponential_of_negation
         ]
 
     # Exponential(Logarithm(u)) => u
-    def _reduce_exponential_of_logarithm_of_u(
+    def _reduce_exponential_of_logarithm(
         self: Exponential
     ) -> sm.Expression | None:
         if (
@@ -95,7 +95,7 @@ class Exponential(base.ParameterizedUnaryExpression):
             return None
 
     # Exponential(Negation(u)) => Reciprocal(Exponential(u))
-    def _reduce_exponential_of_negation_of_u(
+    def _reduce_exponential_of_negation(
         self: Exponential
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Negation):

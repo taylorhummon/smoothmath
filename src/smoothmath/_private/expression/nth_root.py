@@ -83,10 +83,10 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> list[Callable[[], sm.Expression | None]]:
         return [
             self._reduce_nth_root_where_n_is_one,
-            self._reduce_nth_root_of_mth_power_of_u,
-            self._reduce_nth_root_of_mth_root_of_u,
-            self._reduce_odd_nth_root_of_negation_of_u,
-            self._reduce_nth_root_of_reciprocal_of_u
+            self._reduce_nth_root_of_mth_power,
+            self._reduce_nth_root_of_mth_root,
+            self._reduce_odd_nth_root_of_negation,
+            self._reduce_nth_root_of_reciprocal
         ]
 
     # NthRoot(u, 1) => u
@@ -99,7 +99,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return None
 
     # NthRoot(NthPower(u, m), n) => NthPower(NthRoot(u, n), m)
-    def _reduce_nth_root_of_mth_power_of_u(
+    def _reduce_nth_root_of_mth_power(
         self: NthRoot
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.NthPower):
@@ -111,7 +111,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return None
 
     # NthRoot(NthRoot(u, m), n) => NthRoot(u, m * n))
-    def _reduce_nth_root_of_mth_root_of_u(
+    def _reduce_nth_root_of_mth_root(
         self: NthRoot
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.NthRoot):
@@ -120,7 +120,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return None
 
     # NthRoot(Negation(u), n) => Negation(NthRoot(u, n)) where n is odd
-    def _reduce_odd_nth_root_of_negation_of_u(
+    def _reduce_odd_nth_root_of_negation(
         self: NthRoot
     ) -> sm.Expression | None:
         if (
@@ -132,7 +132,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return None
 
     # NthRoot(Reciprocal(u), n) => Reciprocal(NthRoot(u, n))
-    def _reduce_nth_root_of_reciprocal_of_u(
+    def _reduce_nth_root_of_reciprocal(
         self: NthRoot
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Reciprocal):

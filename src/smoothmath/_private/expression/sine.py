@@ -44,10 +44,10 @@ class Sine(base.UnaryExpression):
     def _reducers(
         self: Sine
     ) -> list[Callable[[], sm.Expression | None]]:
-        return [self._reduce_sine_of_negation_of_u]
+        return [self._reduce_sine_of_negation]
 
     # Sine(Negation(u)) => Negation(Sine(u))
-    def _reduce_sine_of_negation_of_u(
+    def _reduce_sine_of_negation(
         self: Sine
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Negation):

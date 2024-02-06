@@ -78,13 +78,13 @@ class Logarithm(base.ParameterizedUnaryExpression):
         self: Logarithm
     ) -> list[Callable[[], sm.Expression | None]]:
         return [
-            self._reduce_logarithm_of_exponential_of_u,
-            self._reduce_logarithm_of_reciprocal_of_u,
-            self._reduce_logarithm_of_nth_power_of_u
+            self._reduce_logarithm_of_exponential,
+            self._reduce_logarithm_of_reciprocal,
+            self._reduce_logarithm_of_nth_power
         ]
 
     # Logarithm(Exponential(u)) => u
-    def _reduce_logarithm_of_exponential_of_u(
+    def _reduce_logarithm_of_exponential(
         self: Logarithm
     ) -> sm.Expression | None:
         if (
@@ -96,7 +96,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
             return None
 
     # Logarithm(Reciprocal(u)) => Negation(Logarithm(u))
-    def _reduce_logarithm_of_reciprocal_of_u(
+    def _reduce_logarithm_of_reciprocal(
         self: Logarithm
     ) -> sm.Expression | None:
         if isinstance(self._inner, ex.Reciprocal):
@@ -105,7 +105,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
             return None
 
     # Logarithm(NthPower(u, n)) = Multiply(Constant(n), Logarithm(u)) when n is odd
-    def _reduce_logarithm_of_nth_power_of_u(
+    def _reduce_logarithm_of_nth_power(
         self: Logarithm
     ) -> sm.Expression | None:
         if (
