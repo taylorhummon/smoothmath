@@ -1,12 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import cosine, sine, multiply
-if TYPE_CHECKING:
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
 class Sine(base.UnaryExpression):
@@ -26,37 +23,6 @@ class Sine(base.UnaryExpression):
         return sine(inner_value)
 
     ## Partials and Differentials ##
-
-    def _local_partial(
-        self: Sine,
-        point: sm.Point,
-        with_respect_to: str
-    ) -> sm.real_number:
-        inner_partial = self._inner._local_partial(point, with_respect_to)
-        return self._local_partial_formula(point, inner_partial)
-
-    def _synthetic_partial(
-        self: Sine,
-        with_respect_to: str
-    ) -> sm.Expression:
-        inner_partial = self._inner._synthetic_partial(with_respect_to)
-        return self._synthetic_partial_formula(inner_partial)
-
-    def _compute_local_differential(
-        self: Sine,
-        builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
-    ) -> None:
-        next_accumulated = self._local_partial_formula(builder.point, accumulated)
-        self._inner._compute_local_differential(builder, next_accumulated)
-
-    def _compute_global_differential(
-        self: Sine,
-        builder: GlobalDifferentialBuilder,
-        accumulated: sm.Expression
-    ) -> None:
-        next_accumulated = self._synthetic_partial_formula(accumulated)
-        self._inner._compute_global_differential(builder, next_accumulated)
 
     def _local_partial_formula(
         self: Sine,
