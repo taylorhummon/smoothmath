@@ -10,7 +10,7 @@ smoothmath
 
     An abstract base class for all expresssions.
 
-    See smoothmath.expression for concrete expression classes.
+    See :doc:`expression` for concrete expression classes.
 
 .. autoclass:: smoothmath.GlobalDifferential
     :members:
