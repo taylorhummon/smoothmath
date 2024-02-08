@@ -1,17 +1,19 @@
 from __future__ import annotations
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import exponential, logarithm, multiply
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class Exponential(base.ParameterizedUnaryExpression):
     def __init__(
         self: Exponential,
         inner: sm.Expression,
-        base: sm.real_number = math.e
+        base: RealNumber = math.e
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
@@ -20,20 +22,20 @@ class Exponential(base.ParameterizedUnaryExpression):
     @property
     def base(
         self: Exponential
-    ) -> sm.real_number:
+    ) -> RealNumber:
         return self._parameter
 
     ## Evaluation ##
 
     def _verify_domain_constraints(
         self: Exponential,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         pass
 
     def _value_formula(
         self: Exponential,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ):
         return exponential(inner_value, base = self.base)
 
@@ -42,8 +44,8 @@ class Exponential(base.ParameterizedUnaryExpression):
     def _local_partial_formula(
         self: Exponential,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         if self.base == 1:
             return 0
         self_value = self._evaluate(point)

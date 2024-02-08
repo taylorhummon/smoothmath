@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 from abc import abstractmethod
 import smoothmath as sm
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class BinaryExpression(base.Expression):
@@ -21,7 +23,7 @@ class BinaryExpression(base.Expression):
         self._left = left
         self._right: sm.Expression
         self._right = right
-        self._value: sm.real_number | None
+        self._value: RealNumber | None
         self._value = None
 
     def _rebuild(
@@ -43,7 +45,7 @@ class BinaryExpression(base.Expression):
     def _evaluate(
         self: BinaryExpression,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         if self._value is not None:
             return self._value
         left_value = self._left._evaluate(point)
@@ -55,17 +57,17 @@ class BinaryExpression(base.Expression):
     @abstractmethod
     def _verify_domain_constraints(
         self: BinaryExpression,
-        left_value: sm.real_number,
-        right_value: sm.real_number
+        left_value: RealNumber,
+        right_value: RealNumber
     ) -> None:
         raise Exception("Concrete classes derived from BinaryExpression must implement _verify_domain_constraints()")
 
     @abstractmethod
     def _value_formula(
         self: BinaryExpression,
-        left_value: sm.real_number,
-        right_value: sm.real_number
-    ) -> sm.real_number:
+        left_value: RealNumber,
+        right_value: RealNumber
+    ) -> RealNumber:
         raise Exception("Concrete classes derived from BinaryExpression must implement _value_formula()")
 
     ## Normalization and Reduction ##

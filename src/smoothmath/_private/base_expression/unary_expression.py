@@ -5,6 +5,7 @@ import smoothmath as sm
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -19,7 +20,7 @@ class UnaryExpression(base.Expression):
         super().__init__(inner._lacks_variables)
         self._inner: sm.Expression
         self._inner = inner
-        self._value: sm.real_number | None
+        self._value: RealNumber | None
         self._value = None
 
     def _rebuild(
@@ -39,7 +40,7 @@ class UnaryExpression(base.Expression):
     def _evaluate(
         self: UnaryExpression,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         if self._value is not None:
             return self._value
         inner_value = self._inner._evaluate(point)
@@ -50,15 +51,15 @@ class UnaryExpression(base.Expression):
     @abstractmethod
     def _verify_domain_constraints(
         self: UnaryExpression,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         raise Exception("Concrete classes derived from UnaryExpression must implement _verify_domain_constraints()")
 
     @abstractmethod
     def _value_formula(
         self: UnaryExpression,
-        inner_value: sm.real_number
-    ) -> sm.real_number:
+        inner_value: RealNumber
+    ) -> RealNumber:
         raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
 
     ## Partials and Differentials ##
@@ -67,7 +68,7 @@ class UnaryExpression(base.Expression):
         self: UnaryExpression,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
         inner_partial = self._inner._local_partial(point, with_respect_to)
@@ -83,7 +84,7 @@ class UnaryExpression(base.Expression):
     def _compute_local_differential(
         self: UnaryExpression,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         inner_value = self._inner._evaluate(builder.point)
         self._verify_domain_constraints(inner_value)
@@ -102,8 +103,8 @@ class UnaryExpression(base.Expression):
     def _local_partial_formula(
         self: UnaryExpression,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         raise Exception("Concrete classes derived from UnaryExpression must implement _local_partial_formula()")
 
     @abstractmethod

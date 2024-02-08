@@ -1,10 +1,12 @@
 from __future__ import annotations
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import nth_power, nth_root, divide, multiply
 from smoothmath._private.utilities import integer_from_integral_real_number, is_even, is_odd
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class NthRoot(base.ParameterizedUnaryExpression):
@@ -32,7 +34,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: NthRoot,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         if self.n >= 2 and inner_value == 0:
             raise sm.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self.n}")
@@ -41,7 +43,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _value_formula(
         self: NthRoot,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ):
         return nth_root(inner_value, self.n)
 
@@ -50,8 +52,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
     def _local_partial_formula(
         self: NthRoot,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         n = self.n
         if n == 1:
             return multiplier

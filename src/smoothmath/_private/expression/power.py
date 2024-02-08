@@ -7,6 +7,7 @@ import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import integer_from_integral_real_number
 from smoothmath._private.math_functions import logarithm, minus, power, multiply
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -17,8 +18,8 @@ class Power(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Power,
-        left_value: sm.real_number,
-        right_value: sm.real_number
+        left_value: RealNumber,
+        right_value: RealNumber
     ) -> None:
         if left_value == 0:
             if right_value > 0:
@@ -32,9 +33,9 @@ class Power(base.BinaryExpression):
 
     def _value_formula(
         self: Power,
-        left_value: sm.real_number,
-        right_value: sm.real_number
-    ) -> sm.real_number:
+        left_value: RealNumber,
+        right_value: RealNumber
+    ) -> RealNumber:
         return power(left_value, right_value)
 
     ## Partials and Differentials ##
@@ -43,7 +44,7 @@ class Power(base.BinaryExpression):
         self: Power,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         if self._left._lacks_variables and self._left._evaluate(point) == 1:
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             return 0
@@ -72,7 +73,7 @@ class Power(base.BinaryExpression):
     def _compute_local_differential(
         self: Power,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         if self._left._lacks_variables and self._left._evaluate(builder.point) == 1:
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
@@ -99,8 +100,8 @@ class Power(base.BinaryExpression):
     def _local_partial_formula_left(
         self: Power,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         return multiply(
@@ -122,8 +123,8 @@ class Power(base.BinaryExpression):
     def _local_partial_formula_right(
         self: Power,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         left_value = self._left._evaluate(point)
         self_value = self._evaluate(point)
         return multiply(logarithm(left_value, base = math.e), self_value, multiplier)

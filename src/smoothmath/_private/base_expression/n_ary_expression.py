@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 from abc import abstractmethod
 import smoothmath as sm
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name, list_with_updated_entry_at
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class NAryExpression(base.Expression):
@@ -18,7 +20,7 @@ class NAryExpression(base.Expression):
         super().__init__(lacks_variables)
         self._inners: list[sm.Expression]
         self._inners = list(args)
-        self._value: sm.real_number | None
+        self._value: RealNumber | None
         self._value = None
 
     def _rebuild(
@@ -39,7 +41,7 @@ class NAryExpression(base.Expression):
     def _evaluate(
         self: NAryExpression,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         if self._value is not None:
             return self._value
         inner_values = [inner._evaluate(point) for inner in self._inners]
@@ -50,15 +52,15 @@ class NAryExpression(base.Expression):
     @abstractmethod
     def _verify_domain_constraints(
         self: NAryExpression,
-        *inner_values: sm.real_number
+        *inner_values: RealNumber
     ) -> None:
         raise Exception("Concrete classes derived from NAryExpression must implement _verify_domain_constraints()")
 
     @abstractmethod
     def _value_formula(
         self: NAryExpression,
-        *inner_values: sm.real_number
-    ) -> sm.real_number:
+        *inner_values: RealNumber
+    ) -> RealNumber:
         raise Exception("Concrete classes derived from NAryExpression must implement _value_formula()")
 
     ## Normalization and Reduction ##

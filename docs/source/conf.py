@@ -19,7 +19,6 @@ author = 'Taylor Hummon'
 extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
 ]
 
 templates_path = ['_templates']
@@ -37,4 +36,4 @@ autodoc_member_order = 'bysource'
 autodoc_typehints = 'description'
 autodoc_typehints_description_target = 'documented_params'
 autodoc_typehints_format = 'short'
-autodoc_type_aliases = {'real_number': 'smoothmath.real_number'}
+autodoc_type_aliases = {'RealNumber': 'smoothmath.RealNumber'}

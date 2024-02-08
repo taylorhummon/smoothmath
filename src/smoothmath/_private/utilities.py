@@ -1,7 +1,9 @@
 from __future__ import annotations
-from typing import Any, Callable, TypeVar
+from typing import TYPE_CHECKING, Any, Callable, TypeVar
 import smoothmath as sm
 import smoothmath.expression as ex
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 U = TypeVar("U")
@@ -26,13 +28,13 @@ def get_class_name(
 
 
 def is_integer(
-    number: sm.real_number
+    number: RealNumber
 ) -> bool:
     return isinstance(number, int) or (isinstance(number, float) and number.is_integer())
 
 
 def integer_from_integral_real_number(
-    number: sm.real_number
+    number: RealNumber
 ) -> int | None:
     if is_integer(number):
         return round(number)

@@ -11,6 +11,7 @@ from smoothmath._private.utilities import (
     first_of_given_type, partition_by_given_type
 )
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -22,14 +23,14 @@ class Multiply(base.NAryExpression):
 
     def _verify_domain_constraints(
         self: Multiply,
-        *inner_values: sm.real_number
+        *inner_values: RealNumber
     ) -> None:
         pass
 
     def _value_formula(
         self: Multiply,
-        *inner_values: sm.real_number
-    ) -> sm.real_number:
+        *inner_values: RealNumber
+    ) -> RealNumber:
         return multiply(*inner_values)
 
     ## Partials and Differentials ##
@@ -38,7 +39,7 @@ class Multiply(base.NAryExpression):
         self: Multiply,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         inner_values = [inner._evaluate(point) for inner in self._inners]
         return add(*(
             multiply(
@@ -63,7 +64,7 @@ class Multiply(base.NAryExpression):
     def _compute_local_differential(
         self: Multiply,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         inner_values = [inner._evaluate(builder.point) for inner in self._inners]
         for i, inner in enumerate(self._inners):

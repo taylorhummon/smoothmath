@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, reciprocal, nth_power, divide
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class Reciprocal(base.UnaryExpression):
@@ -12,14 +14,14 @@ class Reciprocal(base.UnaryExpression):
 
     def _verify_domain_constraints(
         self: Reciprocal,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         if inner_value == 0:
             raise sm.DomainError("Reciprocal(x) blows up around x = 0")
 
     def _value_formula(
         self: Reciprocal,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ):
         return reciprocal(inner_value)
 
@@ -28,8 +30,8 @@ class Reciprocal(base.UnaryExpression):
     def _local_partial_formula(
         self: Reciprocal,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         return negation(divide(multiplier, nth_power(inner_value, n = 2)))
 

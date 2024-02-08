@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class Negation(base.UnaryExpression):
@@ -12,14 +14,14 @@ class Negation(base.UnaryExpression):
 
     def _verify_domain_constraints(
         self: Negation,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         pass
 
     def _value_formula(
         self: Negation,
-        inner_value: sm.real_number
-    ) -> sm.real_number:
+        inner_value: RealNumber
+    ) -> RealNumber:
         return negation(inner_value)
 
     ## Partials and Differentials ##
@@ -27,8 +29,8 @@ class Negation(base.UnaryExpression):
     def _local_partial_formula(
         self: Negation,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         return negation(multiplier)
 
     def _synthetic_partial_formula(

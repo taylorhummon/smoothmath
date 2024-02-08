@@ -4,6 +4,7 @@ import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -13,10 +14,10 @@ class Constant(base.Expression):
 
     def __init__(
         self: Constant,
-        value: sm.real_number
+        value: RealNumber
     ) -> None:
         super().__init__(lacks_variables = True)
-        self.value: sm.real_number
+        self.value: RealNumber
         self.value = value
 
     ## Evaluation ##
@@ -29,7 +30,7 @@ class Constant(base.Expression):
     def _evaluate(
         self: Constant,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         return self.value
 
     ## Partials and Differentials ##
@@ -38,7 +39,7 @@ class Constant(base.Expression):
         self: Constant,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         return 0
 
     def _synthetic_partial(
@@ -50,7 +51,7 @@ class Constant(base.Expression):
     def _compute_local_differential(
         self: Constant,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         pass
 

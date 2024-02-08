@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TypeAlias, Union
 
 
-type real_number = float | int
+RealNumber: TypeAlias = Union[float, int]

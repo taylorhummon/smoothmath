@@ -1,11 +1,13 @@
 from __future__ import annotations
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import nth_power, multiply
 from smoothmath._private.utilities import integer_from_integral_real_number, is_even
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class NthPower(base.ParameterizedUnaryExpression):
@@ -33,13 +35,13 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: NthPower,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         pass
 
     def _value_formula(
         self: NthPower,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ):
         return nth_power(inner_value, self.n)
 
@@ -48,8 +50,8 @@ class NthPower(base.ParameterizedUnaryExpression):
     def _local_partial_formula(
         self: NthPower,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         n = self.n
         if n == 1:
             return multiplier

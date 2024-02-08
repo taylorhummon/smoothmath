@@ -1,18 +1,20 @@
 from __future__ import annotations
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import logarithm, divide, multiply
 from smoothmath._private.utilities import is_odd
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class Logarithm(base.ParameterizedUnaryExpression):
     def __init__(
         self: Logarithm,
         inner: sm.Expression,
-        base: sm.real_number = math.e
+        base: RealNumber = math.e
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
@@ -23,14 +25,14 @@ class Logarithm(base.ParameterizedUnaryExpression):
     @property
     def base(
         self: Logarithm
-    ) -> sm.real_number:
+    ) -> RealNumber:
         return self._parameter
 
     ## Evaluation ##
 
     def _verify_domain_constraints(
         self: Logarithm,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         if inner_value == 0:
             raise sm.DomainError("Logarithm(x) blows up around x = 0")
@@ -39,7 +41,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
 
     def _value_formula(
         self: Logarithm,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ):
         return logarithm(inner_value, base = self.base)
 
@@ -48,8 +50,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
     def _local_partial_formula(
         self: Logarithm,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         if self.base == math.e:
             return divide(multiplier, inner_value)

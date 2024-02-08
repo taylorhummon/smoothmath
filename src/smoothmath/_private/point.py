@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Any, Mapping
-import smoothmath as sm
+from typing import TYPE_CHECKING, Any, Mapping
 import smoothmath.expression as ex
 from smoothmath._private.utilities import get_variable_name
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class Point:
@@ -10,9 +11,9 @@ class Point:
 
     def __init__(
         self: Point,
-        dictionary: Mapping[ex.Variable | str, sm.real_number]
+        dictionary: Mapping[ex.Variable | str, RealNumber]
     ) -> None:
-        self._value_by_variable_name: Mapping[str, sm.real_number]
+        self._value_by_variable_name: Mapping[str, RealNumber]
         self._value_by_variable_name = {}
         for variable_or_name, value in dictionary.items():
             variable_name = get_variable_name(variable_or_name)
@@ -23,7 +24,7 @@ class Point:
     def value_for(
         self: Point,
         variable_or_name: ex.Variable | str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         """
         Returns the real number associated to the given variable
 

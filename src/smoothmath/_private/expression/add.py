@@ -9,6 +9,7 @@ from smoothmath._private.utilities import (
     first_of_given_type, partition_by_given_type
 )
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -20,14 +21,14 @@ class Add(base.NAryExpression):
 
     def _verify_domain_constraints(
         self: Add,
-        *inner_values: sm.real_number
+        *inner_values: RealNumber
     ) -> None:
         pass
 
     def _value_formula(
         self: Add,
-        *inner_values: sm.real_number
-    ) -> sm.real_number:
+        *inner_values: RealNumber
+    ) -> RealNumber:
         return add(*inner_values)
 
     ## Partials and Differentials ##
@@ -36,7 +37,7 @@ class Add(base.NAryExpression):
         self: Add,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         return add(*(
             inner._local_partial(point, with_respect_to)
             for inner in self._inners
@@ -54,7 +55,7 @@ class Add(base.NAryExpression):
     def _compute_local_differential(
         self: Add,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         for inner in self._inners:
             inner._compute_local_differential(builder, accumulated)

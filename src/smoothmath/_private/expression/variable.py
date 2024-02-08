@@ -5,6 +5,7 @@ import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -33,7 +34,7 @@ class Variable(base.Expression):
     def _evaluate(
         self: Variable,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         return point.value_for(self.name)
 
     ## Partials and Differentials ##
@@ -42,7 +43,7 @@ class Variable(base.Expression):
         self: Variable,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         if self.name == with_respect_to:
             return 1
         else:
@@ -60,7 +61,7 @@ class Variable(base.Expression):
     def _compute_local_differential(
         self: Variable,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         builder.add_to(self, accumulated)
 

@@ -1,7 +1,7 @@
 smoothmath
 ==========
 
-.. autodata:: smoothmath.real_number
+.. autodata:: smoothmath.RealNumber
 
 .. autoclass:: smoothmath.Point
     :members:

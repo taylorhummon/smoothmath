@@ -1,6 +1,8 @@
 from __future__ import annotations
-from typing import Any
+from typing import TYPE_CHECKING, Any
 import smoothmath as sm
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class GlobalPartial:
@@ -28,7 +30,7 @@ class GlobalPartial:
     def at(
         self: GlobalPartial,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         """
         The partial localized at a Point.
 

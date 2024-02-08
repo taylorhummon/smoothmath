@@ -5,6 +5,7 @@ import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, minus
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -16,16 +17,16 @@ class Minus(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Minus,
-        left_value: sm.real_number,
-        right_value: sm.real_number
+        left_value: RealNumber,
+        right_value: RealNumber
     ) -> None:
         pass
 
     def _value_formula(
         self: Minus,
-        left_value: sm.real_number,
-        right_value: sm.real_number
-    ) -> sm.real_number:
+        left_value: RealNumber,
+        right_value: RealNumber
+    ) -> RealNumber:
         return minus(left_value, right_value)
 
     ## Partials and Differentials ##
@@ -34,7 +35,7 @@ class Minus(base.BinaryExpression):
         self: Minus,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         left_partial = self._left._local_partial(point, with_respect_to)
         right_partial = self._right._local_partial(point, with_respect_to)
         return minus(left_partial, right_partial)
@@ -50,7 +51,7 @@ class Minus(base.BinaryExpression):
     def _compute_local_differential(
         self: Minus,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         self._left._compute_local_differential(builder, accumulated)
         self._right._compute_local_differential(builder, negation(accumulated))

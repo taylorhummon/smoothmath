@@ -5,6 +5,7 @@ import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, nth_power, divide, add, multiply
 if TYPE_CHECKING:
+    from smoothmath import RealNumber
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -16,8 +17,8 @@ class Divide(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Divide,
-        left_value: sm.real_number,
-        right_value: sm.real_number
+        left_value: RealNumber,
+        right_value: RealNumber
     ) -> None:
         if right_value == 0:
             if left_value == 0:
@@ -27,9 +28,9 @@ class Divide(base.BinaryExpression):
 
     def _value_formula(
         self: Divide,
-        left_value: sm.real_number,
-        right_value: sm.real_number
-    ) -> sm.real_number:
+        left_value: RealNumber,
+        right_value: RealNumber
+    ) -> RealNumber:
         return divide(left_value, right_value)
 
     ## Partials and Differentials ##
@@ -38,7 +39,7 @@ class Divide(base.BinaryExpression):
         self: Divide,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         self._verify_domain_constraints(left_value, right_value)
@@ -63,7 +64,7 @@ class Divide(base.BinaryExpression):
     def _compute_local_differential(
         self: Divide,
         builder: LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None:
         left_value = self._left._evaluate(builder.point)
         right_value = self._right._evaluate(builder.point)
@@ -86,8 +87,8 @@ class Divide(base.BinaryExpression):
     def _local_partial_formula_left(
         self: Divide,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         right_value = self._right._evaluate(point)
         return divide(multiplier, right_value)
 
@@ -100,8 +101,8 @@ class Divide(base.BinaryExpression):
     def _local_partial_formula_right(
         self: Divide,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         return multiply(

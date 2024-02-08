@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 import logging
 import smoothmath as sm
@@ -6,6 +7,8 @@ import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
 import smoothmath._private.global_differential as gd
 from smoothmath._private.utilities import integer_from_integral_real_number, get_variable_name
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 REDUCTION_STEPS_BOUND = 1000
@@ -26,7 +29,7 @@ class Expression(ABC):
     def evaluate(
         self: Expression,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         """
         Evaluates the expression to a real number.
 
@@ -47,7 +50,7 @@ class Expression(ABC):
     def _evaluate(
         self: Expression,
         point: sm.Point
-    ) -> sm.real_number:
+    ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
     ## Partials and Differentials ##
@@ -56,7 +59,7 @@ class Expression(ABC):
         self: Expression,
         point: sm.Point,
         with_respect_to: ex.Variable | str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         """
         Takes the partial derivative with respect to a Variable and localized at a Point.
 
@@ -74,7 +77,7 @@ class Expression(ABC):
         self: Expression,
         point: sm.Point,
         with_respect_to: str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 
     def global_partial(
@@ -117,7 +120,7 @@ class Expression(ABC):
     def _compute_local_differential(
         self: Expression,
         builder: local_differential.LocalDifferentialBuilder,
-        accumulated: sm.real_number
+        accumulated: RealNumber
     ) -> None: # instead of returning a value, we mutate the local_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
 

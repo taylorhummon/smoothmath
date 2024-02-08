@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, cosine, sine, multiply
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class Cosine(base.UnaryExpression):
@@ -13,14 +15,14 @@ class Cosine(base.UnaryExpression):
 
     def _verify_domain_constraints(
         self: Cosine,
-        inner_value: sm.real_number
+        inner_value: RealNumber
     ) -> None:
         pass
 
     def _value_formula(
         self: Cosine,
-        inner_value: sm.real_number
-    ) -> sm.real_number:
+        inner_value: RealNumber
+    ) -> RealNumber:
         return cosine(inner_value)
 
     ## Partials and Differentials ##
@@ -28,8 +30,8 @@ class Cosine(base.UnaryExpression):
     def _local_partial_formula(
         self: Cosine,
         point: sm.Point,
-        multiplier: sm.real_number
-    ) -> sm.real_number:
+        multiplier: RealNumber
+    ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         return multiply(negation(sine(inner_value)), multiplier)
 

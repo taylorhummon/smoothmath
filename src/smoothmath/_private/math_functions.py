@@ -1,20 +1,24 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 import math
 import smoothmath as sm
 from smoothmath._private.utilities import is_even
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 ### Unary Functions ###
 
 
 def negation(
-    x: sm.real_number
-) -> sm.real_number:
+    x: RealNumber
+) -> RealNumber:
     return - x
 
 
 def reciprocal(
-    x: sm.real_number
-) -> sm.real_number:
+    x: RealNumber
+) -> RealNumber:
     if x == 0:
         raise sm.DomainError("reciprocal(x) blows up around x = 0")
     else:
@@ -22,14 +26,14 @@ def reciprocal(
 
 
 def cosine(
-    x: sm.real_number
-) -> sm.real_number:
+    x: RealNumber
+) -> RealNumber:
     return math.cos(x)
 
 
 def sine(
-    x: sm.real_number
-) -> sm.real_number:
+    x: RealNumber
+) -> RealNumber:
     return math.sin(x)
 
 
@@ -37,9 +41,9 @@ def sine(
 
 
 def nth_power(
-    x: sm.real_number,
+    x: RealNumber,
     n: int
-) -> sm.real_number:
+) -> RealNumber:
     if n <= 0:
         raise sm.DomainError(f"nth_power(x, n) is not defined for n = {n}")
     else:
@@ -47,9 +51,9 @@ def nth_power(
 
 
 def nth_root(
-    x: sm.real_number,
+    x: RealNumber,
     n: int
-) -> sm.real_number:
+) -> RealNumber:
     if n <= 0:
         raise sm.DomainError(f"nth_root(x, n) is not defined for n = {n}")
     elif n == 1:
@@ -87,9 +91,9 @@ def nth_root(
 
 
 def exponential(
-    x: sm.real_number,
-    base: sm.real_number = math.e
-) -> sm.real_number:
+    x: RealNumber,
+    base: RealNumber = math.e
+) -> RealNumber:
     if base <= 0:
         raise sm.DomainError(f"exponential(x) must have a positive base, found: {base}")
     else:
@@ -97,9 +101,9 @@ def exponential(
 
 
 def logarithm(
-    x: sm.real_number,
-    base: sm.real_number = math.e
-) -> sm.real_number:
+    x: RealNumber,
+    base: RealNumber = math.e
+) -> RealNumber:
     if base <= 0:
         raise sm.DomainError("logarithm(x) must have a positive base")
     elif base == 1:
@@ -111,16 +115,16 @@ def logarithm(
 
 
 def minus(
-    x: sm.real_number,
-    y: sm.real_number
-) -> sm.real_number:
+    x: RealNumber,
+    y: RealNumber
+) -> RealNumber:
     return x - y
 
 
 def divide(
-    x: sm.real_number,
-    y: sm.real_number
-) -> sm.real_number:
+    x: RealNumber,
+    y: RealNumber
+) -> RealNumber:
     if y == 0:
         if x == 0:
             raise sm.DomainError("divide(x, y) is not smooth around (x = 0, y = 0)")
@@ -131,9 +135,9 @@ def divide(
 
 
 def power(
-    x: sm.real_number,
-    y: sm.real_number
-) -> sm.real_number:
+    x: RealNumber,
+    y: RealNumber
+) -> RealNumber:
     if x == 0:
         if y > 0:
             raise sm.DomainError("power(x, y) is not smooth around x = 0 for y > 0")
@@ -151,14 +155,14 @@ def power(
 
 
 def add(
-    *args: sm.real_number
-) -> sm.real_number:
+    *args: RealNumber
+) -> RealNumber:
     return sum(args)
 
 
 def multiply(
-    *args: sm.real_number
-) -> sm.real_number:
+    *args: RealNumber
+) -> RealNumber:
     product = 1
     for arg in args:
         if arg == 0:

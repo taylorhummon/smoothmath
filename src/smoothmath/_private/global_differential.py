@@ -1,9 +1,11 @@
 from __future__ import annotations
-from typing import Any
+from typing import TYPE_CHECKING, Any
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
 from smoothmath._private.utilities import get_variable_name
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class GlobalDifferential:
@@ -24,7 +26,7 @@ class GlobalDifferential:
         self: GlobalDifferential,
         point: sm.Point,
         variable: ex.Variable | str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         """
         The partial with respect to a Variable localized at a Point.
 

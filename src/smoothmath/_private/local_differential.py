@@ -1,8 +1,10 @@
 from __future__ import annotations
-from typing import Any
+from typing import TYPE_CHECKING, Any
 import smoothmath as sm
 import smoothmath.expression as ex
 from smoothmath._private.utilities import get_variable_name
+if TYPE_CHECKING:
+    from smoothmath import RealNumber
 
 
 class LocalDifferential:
@@ -12,7 +14,7 @@ class LocalDifferential:
         self: LocalDifferential,
         original_expression: sm.Expression,
         point: sm.Point,
-        local_partials: dict[str, sm.real_number]
+        local_partials: dict[str, RealNumber]
     ) -> None:
         #: The Expression which this is the local differential of.
         self.original_expression: sm.Expression
@@ -20,13 +22,13 @@ class LocalDifferential:
         #: The Point at which this local differential is located.
         self.point: sm.Point
         self.point = point
-        self._local_partials: dict[str, sm.real_number]
+        self._local_partials: dict[str, RealNumber]
         self._local_partials = local_partials.copy()
 
     def component(
         self: LocalDifferential,
         variable: ex.Variable | str
-    ) -> sm.real_number:
+    ) -> RealNumber:
         """
         The partial with respect to the given variable.
 
@@ -87,13 +89,13 @@ class LocalDifferentialBuilder:
         self._original_expression = original_expression
         self.point: sm.Point
         self.point = point
-        self._local_partials: dict[str, sm.real_number]
+        self._local_partials: dict[str, RealNumber]
         self._local_partials = {}
 
     def add_to(
         self: LocalDifferentialBuilder,
         variable: ex.Variable | str,
-        contribution: sm.real_number
+        contribution: RealNumber
     ) -> None:
         variable_name = get_variable_name(variable)
         existing = self._local_partials.get(variable_name, 0)
