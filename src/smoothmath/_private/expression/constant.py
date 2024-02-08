@@ -9,6 +9,8 @@ if TYPE_CHECKING:
 
 
 class Constant(base.Expression):
+    """A number."""
+
     def __init__(
         self: Constant,
         value: sm.real_number

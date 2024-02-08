@@ -7,6 +7,7 @@ from smoothmath._private.math_functions import cosine, sine, multiply
 
 
 class Sine(base.UnaryExpression):
+    "The trigonometric sine function."
 
     ## Evaluation ##
 

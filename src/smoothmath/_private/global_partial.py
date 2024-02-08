@@ -4,6 +4,8 @@ import smoothmath as sm
 
 
 class GlobalPartial:
+    """The partial of an Expression."""
+
     @classmethod
     def build(
         cls: type,
@@ -17,6 +19,7 @@ class GlobalPartial:
         original_expression: sm.Expression,
         synthetic_partial: sm.Expression
     ) -> None:
+        #: The Expression which this is the global partial of.
         self.original_expression: sm.Expression
         self.original_expression = original_expression
         self._synthetic_partial: sm.Expression
@@ -26,6 +29,11 @@ class GlobalPartial:
         self: GlobalPartial,
         point: sm.Point
     ) -> sm.real_number:
+        """
+        The partial localized at a Point.
+
+        :param point: the Point to localize at.
+        """
         # We evaluate the original expression to check for DomainErrors.
         # e.g. (ln(x))' = 1 / x
         # Notice that the RHS appears defined for negative x, but ln(x) isn't defined there!

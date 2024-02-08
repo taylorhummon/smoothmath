@@ -7,11 +7,14 @@ from smoothmath._private.utilities import get_variable_name
 
 
 class GlobalDifferential:
+    """The differential of an Expression."""
+
     def __init__(
         self: GlobalDifferential,
         original_expression: sm.Expression,
         synthetic_partials: dict[str, sm.Expression]
     ) -> None:
+        #: The Expression which this is the global differential of.
         self.original_expression: sm.Expression
         self.original_expression = original_expression
         self._synthetic_partials: dict[str, sm.Expression]
@@ -22,27 +25,43 @@ class GlobalDifferential:
         point: sm.Point,
         variable: ex.Variable | str
     ) -> sm.real_number:
-        return self.component(variable).at(point)
+        """
+        The partial with respect to a Variable localized at a Point.
 
-    def component(
-        self: GlobalDifferential,
-        variable: ex.Variable | str
-    ) -> sm.GlobalPartial:
-        variable_name = get_variable_name(variable)
-        existing = self._synthetic_partials.get(variable_name, None)
-        synthetic_partial = existing if existing is not None else ex.Constant(0)
-        return sm.GlobalPartial(self.original_expression, synthetic_partial)
+        :param point: the Point to localize at.
+        :param variable: the "with respect to" Variable.
+        """
+        return self.component(variable).at(point)
 
     def at(
         self: GlobalDifferential,
         point: sm.Point
     ) -> sm.LocalDifferential:
+        """
+        The differential localized at a Point.
+
+        :param point: the Point to localize at.
+        """
         self.original_expression.evaluate(point)
         builder = ld.LocalDifferentialBuilder(self.original_expression, point)
         for variable_name, synthetic_partial in self._synthetic_partials.items():
             local_partial = synthetic_partial.evaluate(point)
             builder.add_to(variable_name, local_partial)
         return builder.build()
+
+    def component(
+        self: GlobalDifferential,
+        variable: ex.Variable | str
+    ) -> sm.GlobalPartial:
+        """
+        The partial with respect to a Variable.
+
+        :param variable: the "with respect to" Variable.
+        """
+        variable_name = get_variable_name(variable)
+        existing = self._synthetic_partials.get(variable_name, None)
+        synthetic_partial = existing if existing is not None else ex.Constant(0)
+        return sm.GlobalPartial(self.original_expression, synthetic_partial)
 
     def __eq__(
         self: GlobalDifferential,

@@ -6,14 +6,18 @@ from smoothmath._private.utilities import get_variable_name
 
 
 class LocalDifferential:
+    """The differential of an Expression localized at a Point."""
+
     def __init__(
         self: LocalDifferential,
         original_expression: sm.Expression,
         point: sm.Point,
         local_partials: dict[str, sm.real_number]
     ) -> None:
+        #: The Expression which this is the local differential of.
         self.original_expression: sm.Expression
         self.original_expression = original_expression
+        #: The Point at which this local differential is located.
         self.point: sm.Point
         self.point = point
         self._local_partials: dict[str, sm.real_number]
@@ -23,6 +27,11 @@ class LocalDifferential:
         self: LocalDifferential,
         variable: ex.Variable | str
     ) -> sm.real_number:
+        """
+        The partial with respect to the given variable.
+
+        :param variable: the "with respect to" Variable.
+        """
         variable_name = get_variable_name(variable)
         return self._local_partials.get(variable_name, 0)
 

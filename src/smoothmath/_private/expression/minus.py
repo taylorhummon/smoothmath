@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 
 class Minus(base.BinaryExpression):
+    """Subtraction."""
 
     ## Evaluation ##
 

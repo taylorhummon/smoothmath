@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 
 class Divide(base.BinaryExpression):
+    """Division."""
 
     ## Evaluation ##
 

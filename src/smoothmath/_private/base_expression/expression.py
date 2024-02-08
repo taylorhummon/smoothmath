@@ -27,6 +27,11 @@ class Expression(ABC):
         self: Expression,
         point: sm.Point
     ) -> sm.real_number:
+        """
+        Evaluates the expression to a real number.
+
+        :param point: Where to localize at
+        """
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to evaluate()")
         self._reset_evaluation_cache()
@@ -52,6 +57,12 @@ class Expression(ABC):
         point: sm.Point,
         with_respect_to: ex.Variable | str
     ) -> sm.real_number:
+        """
+        Takes the partial derivative with respect to a Variable and localized at a Point.
+
+        :param point: Where to localize at
+        :param with_respect_to: the Variable to take the partial with respect to
+        """
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to local_partial()")
         self._reset_evaluation_cache()
@@ -70,6 +81,11 @@ class Expression(ABC):
         self: Expression,
         with_respect_to: ex.Variable | str
     ) -> sm.GlobalPartial:
+        """
+        Takes the partial with respect to a Variable.
+
+        :param with_respect_to: the Variable to take the partial with respect to
+        """
         variable_name = get_variable_name(with_respect_to)
         synthetic_partial = self._synthetic_partial(variable_name)
         return sm.GlobalPartial.build(self, synthetic_partial)
@@ -85,6 +101,11 @@ class Expression(ABC):
         self: Expression,
         point: sm.Point
     ) -> sm.LocalDifferential:
+        """
+        Takes the differential localized at a Point.
+
+        :param point: Where to localize at
+        """
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to local_differential()")
         self._reset_evaluation_cache()
@@ -103,6 +124,9 @@ class Expression(ABC):
     def global_differential(
         self: Expression
     ) -> sm.GlobalDifferential:
+        """
+        Takes the differential.
+        """
         builder = gd.GlobalDifferentialBuilder(self)
         self._compute_global_differential(builder, ex.Constant(1))
         return builder.build()
@@ -120,6 +144,9 @@ class Expression(ABC):
     def _normalize(
         self: Expression
     ) -> Expression:
+        """
+        Reduces and normalizes an expression.
+        """
         fully_reduced = self._fully_reduce()
         normalized = fully_reduced._normalize_fully_reduced()
         return normalized
@@ -166,36 +193,42 @@ class Expression(ABC):
     def __neg__(
         self: Expression
     ) -> ex.Negation:
+        """Takes the negative of this expression."""
         return ex.Negation(self)
 
     def __add__(
         self: Expression,
         other: Expression
     ) -> ex.Add:
+        """Add this expression with another."""
         return ex.Add(self, other)
 
     def __sub__(
         self: Expression,
         other: Expression
     ) -> ex.Minus:
+        """Subtract another expression from this expression."""
         return ex.Minus(self, other)
 
     def __mul__(
         self: Expression,
         other: Expression
     ) -> ex.Multiply:
+        """Multiply this expression with another."""
         return ex.Multiply(self, other)
 
     def __truediv__(
         self: Expression,
         other: Expression
     ) -> ex.Divide:
+        """Divide this expression by another."""
         return ex.Divide(self, other)
 
     def __pow__(
         self: Expression,
         exponent: int | Expression
     ) -> ex.NthPower | ex.Power:
+        """Raise this expression to an integer or another expression."""
         if isinstance(exponent, Expression):
             return ex.Power(self, exponent)
         # We want to accept a float representation of an integer (e.g. 3.0) even though

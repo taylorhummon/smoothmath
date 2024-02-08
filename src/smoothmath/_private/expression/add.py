@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 
 class Add(base.NAryExpression):
+    """Add several expressions together."""
 
     ## Evaluation ##
 

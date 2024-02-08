@@ -6,6 +6,8 @@ from smoothmath._private.utilities import get_variable_name
 
 
 class Point:
+    """Represents a point by associating a real number to each variable x, y, ..."""
+
     def __init__(
         self: Point,
         dictionary: Mapping[ex.Variable | str, sm.real_number]
@@ -22,6 +24,11 @@ class Point:
         self: Point,
         variable_or_name: ex.Variable | str
     ) -> sm.real_number:
+        """
+        Returns the real number associated to the given variable
+
+        :param variable_or_name: a variable or its name as a string
+        """
         variable_name = get_variable_name(variable_or_name)
         value = self._value_by_variable_name.get(variable_name, None)
         if value is None:

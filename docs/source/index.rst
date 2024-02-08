@@ -1,8 +1,3 @@
-.. smoothmath documentation master file, created by
-   sphinx-quickstart on Tue Feb  6 11:32:21 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to smoothmath's documentation!
 ======================================
 
@@ -10,6 +5,13 @@ Welcome to smoothmath's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   usage
+   smoothmath
+   expression
+   api
+
+Check out the :doc:`usage` section for further information, including how to
+:ref:`install <installation>` the project.
 
 
 Indices and tables
