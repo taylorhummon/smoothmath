@@ -31,9 +31,9 @@ class Expression(ABC):
         point: sm.Point
     ) -> RealNumber:
         """
-        Evaluates the expression to a real number.
+        Evaluates the expression.
 
-        :param point: Where to localize at
+        :param point: where to evaluate
         """
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to evaluate()")
@@ -61,10 +61,10 @@ class Expression(ABC):
         with_respect_to: ex.Variable | str
     ) -> RealNumber:
         """
-        Takes the partial derivative with respect to a Variable and localized at a Point.
+        Takes the partial derivative of the expression and localizes at a point.
 
-        :param point: Where to localize at
-        :param with_respect_to: the Variable to take the partial with respect to
+        :param point: where to localize
+        :param with_respect_to: the partial is taken with respect to this variable
         """
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to local_partial()")
@@ -85,9 +85,9 @@ class Expression(ABC):
         with_respect_to: ex.Variable | str
     ) -> sm.GlobalPartial:
         """
-        Takes the partial with respect to a Variable.
+        Takes the partial derivative of the expression.
 
-        :param with_respect_to: the Variable to take the partial with respect to
+        :param with_respect_to: the partial is taken with respect to this variable
         """
         variable_name = get_variable_name(with_respect_to)
         synthetic_partial = self._synthetic_partial(variable_name)
@@ -105,9 +105,9 @@ class Expression(ABC):
         point: sm.Point
     ) -> sm.LocalDifferential:
         """
-        Takes the differential localized at a Point.
+        Takes the differential of the expression and localizes at a point.
 
-        :param point: Where to localize at
+        :param point: where to localize
         """
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to local_differential()")
@@ -128,7 +128,7 @@ class Expression(ABC):
         self: Expression
     ) -> sm.GlobalDifferential:
         """
-        Takes the differential.
+        Takes the differential of the expression.
         """
         builder = gd.GlobalDifferentialBuilder(self)
         self._compute_global_differential(builder, ex.Constant(1))
