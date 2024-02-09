@@ -7,31 +7,34 @@ if TYPE_CHECKING:
 
 
 class Point:
-    """Represents a point by associating a real number to each variable x, y, ..."""
-
     def __init__(
         self: Point,
-        dictionary: Mapping[ex.Variable | str, RealNumber]
+        coordinates: Mapping[ex.Variable | str, RealNumber]
     ) -> None:
-        self._value_by_variable_name: Mapping[str, RealNumber]
-        self._value_by_variable_name = {}
-        for variable_or_name, value in dictionary.items():
-            variable_name = get_variable_name(variable_or_name)
-            if variable_name in self._value_by_variable_name:
-                raise Exception(f"Provided more than one value for variable: {variable_name}")
-            self._value_by_variable_name[variable_name] = value
+        """
+        A point.
 
-    def value_for(
+        :param coordinates: A mapping associating a real number to each variable.
+        """
+        self._coordinates: Mapping[str, RealNumber]
+        self._coordinates = {}
+        for variable_or_name, value in coordinates.items():
+            variable_name = get_variable_name(variable_or_name)
+            if variable_name in self._coordinates:
+                raise Exception(f"Provided more than one value for variable: {variable_name}")
+            self._coordinates[variable_name] = value
+
+    def coordinate(
         self: Point,
-        variable_or_name: ex.Variable | str
+        variable: ex.Variable | str
     ) -> RealNumber:
         """
-        Returns the real number associated to the given variable
+        A coordinate. The y coordinate of Point({"x": 3, y: "4"}) is 4.
 
-        :param variable_or_name: a variable or its name as a string
+        :param variable: a variable (or the variable's name)
         """
-        variable_name = get_variable_name(variable_or_name)
-        value = self._value_by_variable_name.get(variable_name, None)
+        variable_name = get_variable_name(variable)
+        value = self._coordinates.get(variable_name, None)
         if value is None:
             raise Exception(f"No value provided for variable: {variable_name}")
         return value
@@ -42,13 +45,13 @@ class Point:
     ) -> bool:
         return (
             (other.__class__ == self.__class__) and
-            (other._value_by_variable_name == self._value_by_variable_name)
+            (other._coordinates == self._coordinates)
         )
 
     def __hash__(
         self: Point
     ) -> int:
-        data = tuple(sorted(self._value_by_variable_name.items()))
+        data = tuple(sorted(self._coordinates.items()))
         return hash(data)
 
     def __str__(
@@ -66,6 +69,6 @@ class Point:
     ) -> str:
         equations_string = ", ".join(
             f'"{variable_name}": {value}'
-            for variable_name, value in self._value_by_variable_name.items()
+            for variable_name, value in self._coordinates.items()
         )
         return "Point({" + equations_string + "})"

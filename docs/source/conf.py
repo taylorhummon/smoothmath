@@ -31,6 +31,7 @@ html_static_path = ['_static']
 
 ### Autodoc
 
+autoclass_content = 'both'
 autodoc_class_signature = 'mixed'
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'description'

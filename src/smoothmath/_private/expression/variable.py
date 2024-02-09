@@ -35,7 +35,7 @@ class Variable(base.Expression):
         self: Variable,
         point: sm.Point
     ) -> RealNumber:
-        return point.value_for(self.name)
+        return point.coordinate(self.name)
 
     ## Partials and Differentials ##
 
