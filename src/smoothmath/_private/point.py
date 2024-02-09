@@ -31,7 +31,7 @@ class Point:
         """
         A coordinate. The y coordinate of Point({"x": 3, y: "4"}) is 4.
 
-        :param variable: a variable (or the variable's name)
+        :param variable: selects which coordinate
         """
         variable_name = get_variable_name(variable)
         value = self._coordinates.get(variable_name, None)

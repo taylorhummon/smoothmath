@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 
 class GlobalPartial:
-    """The partial of an Expression."""
+    """The partial derivative of an expression."""
 
     @classmethod
     def build(
@@ -21,7 +21,7 @@ class GlobalPartial:
         original_expression: sm.Expression,
         synthetic_partial: sm.Expression
     ) -> None:
-        #: The Expression which this is the global partial of.
+        #: The expression which this is the partial derivative of.
         self.original_expression: sm.Expression
         self.original_expression = original_expression
         self._synthetic_partial: sm.Expression
@@ -32,9 +32,9 @@ class GlobalPartial:
         point: sm.Point
     ) -> RealNumber:
         """
-        The partial localized at a Point.
+        Localize the partial derivative at a point.
 
-        :param point: the Point to localize at.
+        :param point: where to localize
         """
         # We evaluate the original expression to check for DomainErrors.
         # e.g. (ln(x))' = 1 / x

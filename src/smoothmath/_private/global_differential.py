@@ -9,14 +9,14 @@ if TYPE_CHECKING:
 
 
 class GlobalDifferential:
-    """The differential of an Expression."""
+    """The differential of an expression."""
 
     def __init__(
         self: GlobalDifferential,
         original_expression: sm.Expression,
         synthetic_partials: dict[str, sm.Expression]
     ) -> None:
-        #: The Expression which this is the global differential of.
+        #: The expression which this is the global differential of.
         self.original_expression: sm.Expression
         self.original_expression = original_expression
         self._synthetic_partials: dict[str, sm.Expression]
@@ -28,10 +28,10 @@ class GlobalDifferential:
         variable: ex.Variable | str
     ) -> RealNumber:
         """
-        The partial with respect to a Variable localized at a Point.
+        The component of the differential localized at a point.
 
-        :param point: the Point to localize at.
-        :param variable: the "with respect to" Variable.
+        :param point: where to localize
+        :param variable: selects which component
         """
         return self.component(variable).at(point)
 
@@ -40,9 +40,9 @@ class GlobalDifferential:
         point: sm.Point
     ) -> sm.LocalDifferential:
         """
-        The differential localized at a Point.
+        Localize the differential at a point.
 
-        :param point: the Point to localize at.
+        :param point: where to localize
         """
         self.original_expression.evaluate(point)
         builder = ld.LocalDifferentialBuilder(self.original_expression, point)
@@ -56,9 +56,9 @@ class GlobalDifferential:
         variable: ex.Variable | str
     ) -> sm.GlobalPartial:
         """
-        The partial with respect to a Variable.
+        The component of the differential.
 
-        :param variable: the "with respect to" Variable.
+        :param variable: selects which component
         """
         variable_name = get_variable_name(variable)
         existing = self._synthetic_partials.get(variable_name, None)

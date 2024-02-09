@@ -1,24 +1,26 @@
 smoothmath
 ==========
 
-.. class:: smoothmath.Expression
+.. module:: smoothmath
+
+.. class:: Expression
 
     An abstract base class for all expresssions.
 
     See :doc:`expression` for concrete expression classes.
 
-.. autodata:: smoothmath.RealNumber
-
-.. autoclass:: smoothmath.Point
+.. autoclass:: Point
     :members:
 
-.. autoclass:: smoothmath.GlobalDifferential
+.. autoclass:: GlobalDifferential()
     :members:
 
-.. autoclass:: smoothmath.LocalDifferential
+.. autoclass:: LocalDifferential()
     :members:
 
-.. autoclass:: smoothmath.GlobalPartial
+.. autoclass:: GlobalPartial()
     :members:
 
-.. autoexception:: smoothmath.DomainError
+.. autodata:: RealNumber
+
+.. autoexception:: DomainError

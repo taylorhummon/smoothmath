@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class LocalDifferential:
-    """The differential of an Expression localized at a Point."""
+    """The differential of an expression localized at a point."""
 
     def __init__(
         self: LocalDifferential,
@@ -16,10 +16,10 @@ class LocalDifferential:
         point: sm.Point,
         local_partials: dict[str, RealNumber]
     ) -> None:
-        #: The Expression which this is the local differential of.
+        #: The expression which this is the differential of.
         self.original_expression: sm.Expression
         self.original_expression = original_expression
-        #: The Point at which this local differential is located.
+        #: The point at which this differential is located.
         self.point: sm.Point
         self.point = point
         self._local_partials: dict[str, RealNumber]
@@ -30,9 +30,9 @@ class LocalDifferential:
         variable: ex.Variable | str
     ) -> RealNumber:
         """
-        The partial with respect to the given variable.
+        The component of the differential.
 
-        :param variable: the "with respect to" Variable.
+        :param variable: selects which component
         """
         variable_name = get_variable_name(variable)
         return self._local_partials.get(variable_name, 0)
