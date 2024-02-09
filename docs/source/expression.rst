@@ -1,47 +1,49 @@
 smoothmath.expression
 =====================
 
-.. autoclass:: smoothmath.expression.Variable
+.. module:: smoothmath.expression
+
+.. autoclass:: Variable
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Constant
+.. autoclass:: Constant
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Negation
+.. autoclass:: Negation
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Reciprocal
+.. autoclass:: Reciprocal
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.NthPower
+.. autoclass:: NthPower
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.NthRoot
+.. autoclass:: NthRoot
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Exponential
+.. autoclass:: Exponential
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Logarithm
+.. autoclass:: Logarithm
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Cosine
+.. autoclass:: Cosine
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Sine
+.. autoclass:: Sine
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Minus
+.. autoclass:: Minus
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Divide
+.. autoclass:: Divide
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Power
+.. autoclass:: Power
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Add
+.. autoclass:: Add
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
-.. autoclass:: smoothmath.expression.Multiply
+.. autoclass:: Multiply
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
