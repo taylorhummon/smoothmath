@@ -9,10 +9,25 @@ smoothmath.expression
 .. autoclass:: Constant
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
+.. autoclass:: Add
+    :members: evaluate, global_differential, local_differential, global_partial, local_partial
+
+.. autoclass:: Minus
+    :members: evaluate, global_differential, local_differential, global_partial, local_partial
+
 .. autoclass:: Negation
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
+.. autoclass:: Multiply
+    :members: evaluate, global_differential, local_differential, global_partial, local_partial
+
+.. autoclass:: Divide
+    :members: evaluate, global_differential, local_differential, global_partial, local_partial
+
 .. autoclass:: Reciprocal
+    :members: evaluate, global_differential, local_differential, global_partial, local_partial
+
+.. autoclass:: Power
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
 .. autoclass:: NthPower
@@ -31,19 +46,4 @@ smoothmath.expression
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
 
 .. autoclass:: Sine
-    :members: evaluate, global_differential, local_differential, global_partial, local_partial
-
-.. autoclass:: Minus
-    :members: evaluate, global_differential, local_differential, global_partial, local_partial
-
-.. autoclass:: Divide
-    :members: evaluate, global_differential, local_differential, global_partial, local_partial
-
-.. autoclass:: Power
-    :members: evaluate, global_differential, local_differential, global_partial, local_partial
-
-.. autoclass:: Add
-    :members: evaluate, global_differential, local_differential, global_partial, local_partial
-
-.. autoclass:: Multiply
     :members: evaluate, global_differential, local_differential, global_partial, local_partial
