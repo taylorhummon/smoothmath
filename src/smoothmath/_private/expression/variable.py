@@ -14,6 +14,12 @@ alphanumeric_pattern = re.compile(r"\A\w*\Z")
 
 
 class Variable(base.Expression):
+    """
+    A variable.
+
+    :param name: the variable's name
+    """
+
     def __init__(
         self: Variable,
         name: str

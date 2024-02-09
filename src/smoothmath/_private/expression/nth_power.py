@@ -11,6 +11,13 @@ if TYPE_CHECKING:
 
 
 class NthPower(base.ParameterizedUnaryExpression):
+    """
+    The nth power of an expression.
+
+    :param inner: the expression being raised to the nth power
+    :param n: the exponent, which must be an integer greater or equal to 1
+    """
+
     def __init__(
         self: NthPower,
         inner: sm.Expression,

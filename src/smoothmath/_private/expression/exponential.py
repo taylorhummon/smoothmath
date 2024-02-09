@@ -10,6 +10,13 @@ if TYPE_CHECKING:
 
 
 class Exponential(base.ParameterizedUnaryExpression):
+    """
+    An exponential expression.
+
+    :param inner: the exponent
+    :param base: the base, as a real number
+    """
+
     def __init__(
         self: Exponential,
         inner: sm.Expression,

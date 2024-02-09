@@ -13,6 +13,12 @@ if TYPE_CHECKING:
 
 
 class Power(base.BinaryExpression):
+    """
+    A power expression.
+
+    :param left: the base
+    :param right: the exponent
+    """
 
     ## Evaluation ##
 

@@ -9,7 +9,11 @@ if TYPE_CHECKING:
 
 
 class Sine(base.UnaryExpression):
-    "The trigonometric sine function."
+    """
+    The sine of an expression.
+
+    :param inner: an expression representing an angle in radians
+    """
 
     ## Evaluation ##
 

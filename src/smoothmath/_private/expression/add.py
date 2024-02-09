@@ -15,7 +15,11 @@ if TYPE_CHECKING:
 
 
 class Add(base.NAryExpression):
-    """Add several expressions together."""
+    """
+    The sum of several expressions.
+
+    :param \\*args: the expressions being added together
+    """
 
     ## Evaluation ##
 

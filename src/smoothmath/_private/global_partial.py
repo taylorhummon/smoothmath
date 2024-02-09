@@ -6,7 +6,9 @@ if TYPE_CHECKING:
 
 
 class GlobalPartial:
-    """The partial derivative of an expression."""
+    """
+    The partial derivative of an expression.
+    """
 
     @classmethod
     def build(

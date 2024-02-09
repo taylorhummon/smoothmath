@@ -11,7 +11,12 @@ if TYPE_CHECKING:
 
 
 class Divide(base.BinaryExpression):
-    """Division."""
+    """
+    Division.
+
+    :param left: the numerator
+    :param right: the denominator
+    """
 
     ## Evaluation ##
 

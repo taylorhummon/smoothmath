@@ -9,7 +9,9 @@ if TYPE_CHECKING:
 
 
 class GlobalDifferential:
-    """The differential of an expression."""
+    """
+    The differential of an expression.
+    """
 
     def __init__(
         self: GlobalDifferential,

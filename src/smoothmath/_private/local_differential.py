@@ -8,7 +8,9 @@ if TYPE_CHECKING:
 
 
 class LocalDifferential:
-    """The differential of an expression localized at a point."""
+    """
+    The differential of an expression localized at a point.
+    """
 
     def __init__(
         self: LocalDifferential,

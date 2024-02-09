@@ -10,6 +10,11 @@ if TYPE_CHECKING:
 
 
 class Constant(base.Expression):
+    """
+    A constant expression.
+
+    :param value: the real number value of the constant
+    """
     def __init__(
         self: Constant,
         value: RealNumber

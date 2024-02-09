@@ -31,10 +31,7 @@ html_static_path = ['_static']
 
 ### Autodoc
 
-autoclass_content = 'both'
-autodoc_class_signature = 'mixed'
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'description'
 autodoc_typehints_description_target = 'documented_params'
-autodoc_typehints_format = 'short'
 autodoc_type_aliases = {'RealNumber': 'smoothmath.RealNumber'}

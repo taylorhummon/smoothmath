@@ -11,6 +11,12 @@ if TYPE_CHECKING:
 
 
 class Logarithm(base.ParameterizedUnaryExpression):
+    """
+    A logarithmic expression.
+
+    :param inner: the expression to take the logarithm of
+    :param base: the base, as a real number
+    """
     def __init__(
         self: Logarithm,
         inner: sm.Expression,

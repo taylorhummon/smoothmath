@@ -11,7 +11,12 @@ if TYPE_CHECKING:
 
 
 class Minus(base.BinaryExpression):
-    """Subtraction."""
+    """
+    Subtraction.
+
+    :param left: the expression being subtracted from
+    :param right: the expression being subtracted
+    """
 
     ## Evaluation ##
 

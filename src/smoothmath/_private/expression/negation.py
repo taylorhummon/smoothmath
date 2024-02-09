@@ -9,6 +9,11 @@ if TYPE_CHECKING:
 
 
 class Negation(base.UnaryExpression):
+    """
+    The opposite (negative) of an expression.
+
+    :param inner: the inner expression
+    """
 
     ## Evaluation ##
 

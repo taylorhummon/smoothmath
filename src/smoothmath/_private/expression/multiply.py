@@ -17,7 +17,11 @@ if TYPE_CHECKING:
 
 
 class Multiply(base.NAryExpression):
-    """Multiply several numbers together."""
+    """
+    The product of several expressions.
+
+    :param \\*args: the expressions being multiplied together
+    """
 
     ## Evaluation ##
 

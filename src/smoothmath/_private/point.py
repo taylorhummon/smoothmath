@@ -7,15 +7,16 @@ if TYPE_CHECKING:
 
 
 class Point:
+    """
+    A point.
+
+    :param coordinates: A mapping that associates a real number to each variable.
+    """
+
     def __init__(
         self: Point,
         coordinates: Mapping[ex.Variable | str, RealNumber]
     ) -> None:
-        """
-        A point.
-
-        :param coordinates: A mapping associating a real number to each variable.
-        """
         self._coordinates: Mapping[str, RealNumber]
         self._coordinates = {}
         for variable_or_name, value in coordinates.items():

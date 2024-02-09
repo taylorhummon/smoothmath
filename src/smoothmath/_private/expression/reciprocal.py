@@ -9,6 +9,11 @@ if TYPE_CHECKING:
 
 
 class Reciprocal(base.UnaryExpression):
+    """
+    The reciprocal of an expression.
+
+    :param inner: the expression we are taking the reciprocal of
+    """
 
     ## Evaluation ##
 

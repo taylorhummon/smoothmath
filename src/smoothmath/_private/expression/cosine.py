@@ -9,7 +9,11 @@ if TYPE_CHECKING:
 
 
 class Cosine(base.UnaryExpression):
-    "The trigonometric cosine function."
+    """
+    The cosine of an expression.
+
+    :param inner: an expression representing an angle in radians
+    """
 
     ## Evaluation ##
 
