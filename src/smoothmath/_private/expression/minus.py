@@ -34,18 +34,18 @@ class Minus(base.BinaryExpression):
     def _local_partial(
         self: Minus,
         point: sm.Point,
-        with_respect_to: str
+        variable: str
     ) -> RealNumber:
-        left_partial = self._left._local_partial(point, with_respect_to)
-        right_partial = self._right._local_partial(point, with_respect_to)
+        left_partial = self._left._local_partial(point, variable)
+        right_partial = self._right._local_partial(point, variable)
         return minus(left_partial, right_partial)
 
     def _synthetic_partial(
         self: Minus,
-        with_respect_to: str
+        variable: str
     ) -> sm.Expression:
-        left_partial = self._left._synthetic_partial(with_respect_to)
-        right_partial = self._right._synthetic_partial(with_respect_to)
+        left_partial = self._left._synthetic_partial(variable)
+        right_partial = self._right._synthetic_partial(variable)
         return ex.Minus(left_partial, right_partial)
 
     def _compute_local_differential(

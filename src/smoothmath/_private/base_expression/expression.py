@@ -58,45 +58,45 @@ class Expression(ABC):
     def local_partial(
         self: Expression,
         point: sm.Point,
-        with_respect_to: ex.Variable | str
+        variable: ex.Variable | str
     ) -> RealNumber:
         """
         Takes the partial derivative of the expression and localizes at a point.
 
         :param point: where to localize
-        :param with_respect_to: the partial is taken with respect to this variable
+        :param variable: the partial is taken with respect to this variable
         """
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to local_partial()")
         self._reset_evaluation_cache()
-        variable_name = get_variable_name(with_respect_to)
+        variable_name = get_variable_name(variable)
         return self._local_partial(point, variable_name)
 
     @abstractmethod
     def _local_partial(
         self: Expression,
         point: sm.Point,
-        with_respect_to: str
+        variable: str
     ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 
     def global_partial(
         self: Expression,
-        with_respect_to: ex.Variable | str
+        variable: ex.Variable | str
     ) -> sm.GlobalPartial:
         """
         Takes the partial derivative of the expression.
 
-        :param with_respect_to: the partial is taken with respect to this variable
+        :param variable: the partial is taken with respect to this variable
         """
-        variable_name = get_variable_name(with_respect_to)
+        variable_name = get_variable_name(variable)
         synthetic_partial = self._synthetic_partial(variable_name)
         return sm.GlobalPartial.build(self, synthetic_partial)
 
     @abstractmethod
     def _synthetic_partial(
         self: Expression,
-        with_respect_to: str
+        variable: str
     ) -> Expression:
         raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
 

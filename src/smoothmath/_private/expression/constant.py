@@ -38,13 +38,13 @@ class Constant(base.Expression):
     def _local_partial(
         self: Constant,
         point: sm.Point,
-        with_respect_to: str
+        variable: str
     ) -> RealNumber:
         return 0
 
     def _synthetic_partial(
         self: Constant,
-        with_respect_to: str
+        variable: str
     ) -> sm.Expression:
         return ex.Constant(0)
 

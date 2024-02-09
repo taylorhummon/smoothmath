@@ -67,18 +67,18 @@ class UnaryExpression(base.Expression):
     def _local_partial(
         self: UnaryExpression,
         point: sm.Point,
-        with_respect_to: str
+        variable: str
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
-        inner_partial = self._inner._local_partial(point, with_respect_to)
+        inner_partial = self._inner._local_partial(point, variable)
         return self._local_partial_formula(point, inner_partial)
 
     def _synthetic_partial(
         self: UnaryExpression,
-        with_respect_to: str
+        variable: str
     ) -> sm.Expression:
-        inner_partial = self._inner._synthetic_partial(with_respect_to)
+        inner_partial = self._inner._synthetic_partial(variable)
         return self._synthetic_partial_formula(inner_partial)
 
     def _compute_local_differential(

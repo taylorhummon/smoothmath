@@ -36,19 +36,19 @@ class Add(base.NAryExpression):
     def _local_partial(
         self: Add,
         point: sm.Point,
-        with_respect_to: str
+        variable: str
     ) -> RealNumber:
         return add(*(
-            inner._local_partial(point, with_respect_to)
+            inner._local_partial(point, variable)
             for inner in self._inners
         ))
 
     def _synthetic_partial(
         self: Add,
-        with_respect_to: str
+        variable: str
     ) -> sm.Expression:
         return ex.Add(*(
-            inner._synthetic_partial(with_respect_to)
+            inner._synthetic_partial(variable)
             for inner in self._inners
         ))
 
