@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -46,13 +46,13 @@ class Cosine(base.UnaryExpression):
     @property
     def _reducers(
         self: Cosine
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         return [self._reduce_cosine_of_negation]
 
     # Cosine(Negation(u)) => Cosine(u)
     def _reduce_cosine_of_negation(
         self: Cosine
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         if isinstance(self._inner, ex.Negation):
             return ex.Cosine(self._inner._inner)
         else:

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -124,11 +124,11 @@ class Divide(base.BinaryExpression):
     @property
     def _reducers(
         self: Divide
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         return [self._reduce_divide_to_multiplying_with_reciprocal]
 
     # Divide(u, v) => Multiply(u, Reciprocal(v))
     def _reduce_divide_to_multiplying_with_reciprocal(
         self: Divide
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         return ex.Multiply(self._left, ex.Reciprocal(self._right))

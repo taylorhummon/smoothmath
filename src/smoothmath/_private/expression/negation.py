@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -44,7 +44,7 @@ class Negation(base.UnaryExpression):
     @property
     def _reducers(
         self: Negation
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         return [
             self._reduce_negation_of_negation,
             self._reduce_negation_of_sum
@@ -53,7 +53,7 @@ class Negation(base.UnaryExpression):
     # Negation(Negation(u)) => u
     def _reduce_negation_of_negation(
         self: Negation
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         if isinstance(self._inner, ex.Negation):
             return self._inner._inner
         else:
@@ -62,7 +62,7 @@ class Negation(base.UnaryExpression):
     # Negation(Add(u, v)) => Add(Negation(u), Negation(v))
     def _reduce_negation_of_sum(
         self: Negation
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         if isinstance(self._inner, ex.Add):
             return ex.Add(*(Negation(inner) for inner in self._inner._inners))
         else:

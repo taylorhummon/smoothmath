@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Optional
 from abc import abstractmethod
 import smoothmath as sm
 import smoothmath._private.base_expression as base
@@ -20,7 +20,7 @@ class UnaryExpression(base.Expression):
         super().__init__(inner._lacks_variables)
         self._inner: sm.Expression
         self._inner = inner
-        self._value: RealNumber | None
+        self._value: Optional[RealNumber]
         self._value = None
 
     def _rebuild(
@@ -138,7 +138,7 @@ class UnaryExpression(base.Expression):
     @abstractmethod
     def _reducers(
         self: UnaryExpression
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         raise Exception("Concrete classes derived from UnaryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(

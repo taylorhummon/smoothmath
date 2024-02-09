@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -69,11 +69,11 @@ class Minus(base.BinaryExpression):
     @property
     def _reducers(
         self: Minus
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         return [self._reduce_minus_to_sum_with_negation]
 
     # Minus(u, v) => Add(u, Negation(v))
     def _reduce_minus_to_sum_with_negation(
         self: Minus
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         return ex.Add(self._left, ex.Negation(self._right))

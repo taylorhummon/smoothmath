@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -91,7 +91,7 @@ class Multiply(base.NAryExpression):
     @property
     def _reducers(
         self: Multiply
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         return [
             self._reduce_by_flattening_nested_products,
             self._reduce_product_when_multiplying_by_zero,
@@ -105,7 +105,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_by_flattening_nested_products(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         pair_or_none = first_of_given_type(self._inners, Multiply)
         if pair_or_none is None:
             return None
@@ -117,7 +117,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_product_when_multiplying_by_zero(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         if any(
             isinstance(inner, ex.Constant) and inner.value == 0
             for inner in self._inners
@@ -128,7 +128,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_product_by_eliminating_ones(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         non_ones: list[sm.Expression]
         non_ones = [
             inner
@@ -141,7 +141,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_product_by_eliminating_negations(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         negations: list[ex.Negation]; non_negations: list[sm.Expression]
         negations, non_negations = partition_by_given_type(self._inners, ex.Negation)
         negations_count = len(negations)
@@ -155,7 +155,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_product_by_consolidating_nth_powers(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         nth_powers: list[ex.NthPower]; non_nth_powers: list[sm.Expression]
         nth_powers, non_nth_powers = partition_by_given_type(self._inners, ex.NthPower)
         if len(nth_powers) <= 1:
@@ -175,7 +175,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_product_by_consolidating_nth_roots(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         nth_roots: list[ex.NthRoot]; non_nth_roots: list[sm.Expression]
         nth_roots, non_nth_roots = partition_by_given_type(self._inners, ex.NthRoot)
         if len(nth_roots) <= 1:
@@ -195,7 +195,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_product_by_consolidating_exponentials(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         exponentials: list[ex.Exponential]; non_exponentials: list[sm.Expression]
         exponentials, non_exponentials = partition_by_given_type(self._inners, ex.Exponential)
         if len(exponentials) <= 1:
@@ -215,7 +215,7 @@ class Multiply(base.NAryExpression):
 
     def _reduce_product_by_consolidating_constants(
         self: Multiply
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         constants: list[ex.Constant]; non_constants: list[sm.Expression]
         constants, non_constants = partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:

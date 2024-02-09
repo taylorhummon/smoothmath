@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -73,7 +73,7 @@ class Add(base.NAryExpression):
     @property
     def _reducers(
         self: Add
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         return [
             self._reduce_by_flattening_nested_sums,
             self._reduce_sum_by_eliminating_zeros,
@@ -83,7 +83,7 @@ class Add(base.NAryExpression):
 
     def _reduce_by_flattening_nested_sums(
         self: Add
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         pair_or_none = first_of_given_type(self._inners, Add)
         if pair_or_none is None:
             return None
@@ -95,7 +95,7 @@ class Add(base.NAryExpression):
 
     def _reduce_sum_by_eliminating_zeros(
         self: Add
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         non_zeros: list[sm.Expression]
         non_zeros = [
             inner
@@ -108,7 +108,7 @@ class Add(base.NAryExpression):
 
     def _reduce_sum_by_consolidating_logarithms(
         self: Add
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         logarithms: list[ex.Logarithm]; non_logarithms: list[sm.Expression]
         logarithms, non_logarithms = partition_by_given_type(self._inners, ex.Logarithm)
         if len(logarithms) <= 1:
@@ -128,7 +128,7 @@ class Add(base.NAryExpression):
 
     def _reduce_sum_by_consolidating_constants(
         self: Add
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         constants: list[ex.Constant]; non_constants: list[sm.Expression]
         constants, non_constants = partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:

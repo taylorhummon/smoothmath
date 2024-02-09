@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
 import logging
 import smoothmath as sm
@@ -174,7 +174,7 @@ class Expression(ABC):
 
     def _consolidate_expression_lacking_variables(
         self: Expression
-    ) -> Expression | None:
+    ) -> Optional[Expression]:
         if self._lacks_variables and not isinstance(self, ex.Constant):
             try:
                 value = self.evaluate(sm.Point({}))

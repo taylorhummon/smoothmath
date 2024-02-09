@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Callable, TypeVar
+from typing import TYPE_CHECKING, TypeVar, Any, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 if TYPE_CHECKING:
@@ -35,7 +35,7 @@ def is_integer(
 
 def integer_from_integral_real_number(
     number: RealNumber
-) -> int | None:
+) -> Optional[int]:
     if is_integer(number):
         return round(number)
     else:
@@ -89,7 +89,7 @@ def list_with_updated_entry_at(
 def first_match_by_predicate(
     entries: list[U],
     predicate: Callable[[U], bool]
-) -> tuple[int, U] | None:
+) -> Optional[tuple[int, U]]:
     for i, entry in enumerate(entries):
         if predicate(entry):
             return (i, entry)
@@ -152,7 +152,7 @@ def get_variable_name(
 def first_of_given_type(
     expressions: list[sm.Expression],
     expression_type: type
-) -> tuple[int, Any] | None:
+) -> Optional[tuple[int, Any]]:
     predicate = lambda expression: isinstance(expression, expression_type)
     return first_match_by_predicate(expressions, predicate)
 

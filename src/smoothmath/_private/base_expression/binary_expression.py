@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Optional
 from abc import abstractmethod
 import smoothmath as sm
 import smoothmath._private.base_expression as base
@@ -23,7 +23,7 @@ class BinaryExpression(base.Expression):
         self._left = left
         self._right: sm.Expression
         self._right = right
-        self._value: RealNumber | None
+        self._value: Optional[RealNumber]
         self._value = None
 
     def _rebuild(
@@ -97,7 +97,7 @@ class BinaryExpression(base.Expression):
     @abstractmethod
     def _reducers(
         self: BinaryExpression
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         raise Exception("Concrete classes derived from BinaryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
@@ -46,7 +46,7 @@ class Reciprocal(base.UnaryExpression):
     @property
     def _reducers(
         self: Reciprocal
-    ) -> list[Callable[[], sm.Expression | None]]:
+    ) -> list[Callable[[], Optional[sm.Expression]]]:
         return [
             self._reduce_reciprocal_of_reciprocal,
             self._reduce_reciprocal_of_negation,
@@ -56,7 +56,7 @@ class Reciprocal(base.UnaryExpression):
     # Reciprocal(Reciprocal(u)) => u
     def _reduce_reciprocal_of_reciprocal(
         self: Reciprocal
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         if isinstance(self._inner, ex.Reciprocal):
             return self._inner._inner
         else:
@@ -65,7 +65,7 @@ class Reciprocal(base.UnaryExpression):
     # Reciprocal(Negation(u)) => Negation(Reciprocal(u))
     def _reduce_reciprocal_of_negation(
         self: Reciprocal
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         if isinstance(self._inner, ex.Negation):
             return ex.Negation(ex.Reciprocal(self._inner._inner))
         else:
@@ -74,7 +74,7 @@ class Reciprocal(base.UnaryExpression):
     # Reciprocal(Multiply(u, v)) => Multiply(Reciprocal(u), Reciprocal(v))
     def _reduce_reciprocal_of_product(
         self: Reciprocal
-    ) -> sm.Expression | None:
+    ) -> Optional[sm.Expression]:
         if isinstance(self._inner, ex.Multiply):
             return ex.Multiply(*(Reciprocal(inner) for inner in self._inner._inners))
         else:
