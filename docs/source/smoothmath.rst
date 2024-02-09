@@ -1,16 +1,16 @@
 smoothmath
 ==========
 
-.. autodata:: smoothmath.RealNumber
-
-.. autoclass:: smoothmath.Point
-    :members:
-
-.. autoclass:: smoothmath.Expression
+.. class:: smoothmath.Expression
 
     An abstract base class for all expresssions.
 
     See :doc:`expression` for concrete expression classes.
+
+.. autodata:: smoothmath.RealNumber
+
+.. autoclass:: smoothmath.Point
+    :members:
 
 .. autoclass:: smoothmath.GlobalDifferential
     :members:
