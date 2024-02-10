@@ -7,7 +7,7 @@ import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import integer_from_integral_real_number
 from smoothmath._private.math_functions import logarithm, minus, power, multiply
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -48,7 +48,7 @@ class Power(base.BinaryExpression):
 
     def _local_partial(
         self: Power,
-        point: sm.Point,
+        point: Point,
         variable: str
     ) -> RealNumber:
         if self._left._lacks_variables and self._left._evaluate(point) == 1:
@@ -68,7 +68,7 @@ class Power(base.BinaryExpression):
     def _synthetic_partial(
         self: Power,
         variable: str
-    ) -> sm.Expression:
+    ) -> Expression:
         left_partial = self._left._synthetic_partial(variable)
         right_partial = self._right._synthetic_partial(variable)
         return ex.Add(
@@ -96,7 +96,7 @@ class Power(base.BinaryExpression):
     def _compute_global_differential(
         self: Power,
         builder: GlobalDifferentialBuilder,
-        accumulated: sm.Expression
+        accumulated: Expression
     ) -> None:
         next_accumulated_left = self._synthetic_partial_formula_left(accumulated)
         next_accumulated_right = self._synthetic_partial_formula_right(accumulated)
@@ -105,7 +105,7 @@ class Power(base.BinaryExpression):
 
     def _local_partial_formula_left(
         self: Power,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         left_value = self._left._evaluate(point)
@@ -118,8 +118,8 @@ class Power(base.BinaryExpression):
 
     def _synthetic_partial_formula_left(
         self: Power,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         return ex.Multiply(
             self._right,
             ex.Power(self._left, ex.Minus(self._right, ex.Constant(1))),
@@ -128,7 +128,7 @@ class Power(base.BinaryExpression):
 
     def _local_partial_formula_right(
         self: Power,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         left_value = self._left._evaluate(point)
@@ -137,8 +137,8 @@ class Power(base.BinaryExpression):
 
     def _synthetic_partial_formula_right(
         self: Power,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         return ex.Multiply(ex.Logarithm(self._left, base = math.e), self, multiplier)
 
     ## Normalization and Reduction ##
@@ -146,7 +146,7 @@ class Power(base.BinaryExpression):
     @property
     def _reducers(
         self: Power
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [
             self._reduce_u_to_the_one,
             self._reduce_u_to_the_zero,
@@ -162,7 +162,7 @@ class Power(base.BinaryExpression):
     # Power(u, Constant(1)) => u
     def _reduce_u_to_the_one(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._right, ex.Constant) and
             self._right.value == 1
@@ -174,7 +174,7 @@ class Power(base.BinaryExpression):
     # Power(u, Constant(0)) => Constant(1)
     def _reduce_u_to_the_zero(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._right, ex.Constant) and
             self._right.value == 0
@@ -186,7 +186,7 @@ class Power(base.BinaryExpression):
     # Power(Constant(1), u) => Constant(1)
     def _reduce_one_to_the_u(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._left, ex.Constant) and
             self._left.value == 1
@@ -198,7 +198,7 @@ class Power(base.BinaryExpression):
     # Power(u, Constant(n)) => NthPower(u, n) when n >= 2
     def _reduce_u_to_the_n_at_least_two(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._right, ex.Constant):
             n = integer_from_integral_real_number(self._right.value)
             if n is not None and n >= 2:
@@ -208,7 +208,7 @@ class Power(base.BinaryExpression):
     # Power(u, Constant(-1)) => Reciprocal(u)
     def _reduce_u_to_the_negative_one(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._right, ex.Constant) and
             self._right.value == -1
@@ -220,7 +220,7 @@ class Power(base.BinaryExpression):
     # Power(Constant(C), u) => Exponential(u, base = C)
     def _reduce_power_with_constant_base(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._left, ex.Constant) and
             self._left.value > 0 and
@@ -233,7 +233,7 @@ class Power(base.BinaryExpression):
     # Power(Power(u, v), w) => Power(u, Multiply(v, w))
     def _reduce_power_of_power(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._left, ex.Power):
             return ex.Power(
                 self._left._left,
@@ -245,7 +245,7 @@ class Power(base.BinaryExpression):
     # Power(u, Negation(v)) => Reciprocal(Power(u, v))
     def _reduce_u_to_the_negation_of_v(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._right, ex.Negation):
             return ex.Reciprocal(ex.Power(self._left, self._right._inner))
         else:
@@ -254,7 +254,7 @@ class Power(base.BinaryExpression):
     # Power(Reciprocal(u), v) => Reciprocal(Power(u, v))
     def _reduce_reciprocal_u__to_the_v(
         self: Power
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._left, ex.Reciprocal):
             return ex.Reciprocal(ex.Power(self._left._inner, self._right))
         else:

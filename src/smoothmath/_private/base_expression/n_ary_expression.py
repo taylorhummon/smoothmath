@@ -5,27 +5,27 @@ import smoothmath as sm
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name, list_with_updated_entry_at
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class NAryExpression(base.Expression):
     def __init__(
         self: NAryExpression,
-        *args: sm.Expression
+        *args: Expression
     ) -> None:
         for inner in args:
             if not isinstance(inner, sm.Expression):
                 raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
         lacks_variables = all(inner._lacks_variables for inner in args)
         super().__init__(lacks_variables)
-        self._inners: list[sm.Expression]
+        self._inners: list[Expression]
         self._inners = list(args)
         self._value: Optional[RealNumber]
         self._value = None
 
     def _rebuild(
         self: NAryExpression,
-        *args: sm.Expression
+        *args: Expression
     ) -> NAryExpression:
         return self.__class__(*args)
 
@@ -40,7 +40,7 @@ class NAryExpression(base.Expression):
 
     def _evaluate(
         self: NAryExpression,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         if self._value is not None:
             return self._value
@@ -67,7 +67,7 @@ class NAryExpression(base.Expression):
 
     def _take_reduction_step(
         self: NAryExpression
-    ) -> sm.Expression:
+    ) -> Expression:
         if self._is_fully_reduced:
             return self
         consolidated = self._consolidate_expression_lacking_variables()
@@ -89,12 +89,12 @@ class NAryExpression(base.Expression):
     @abstractmethod
     def _reducers(
         self: NAryExpression
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         raise Exception("Concrete classes derived from NAryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(
         self: NAryExpression
-    ) -> sm.Expression:
+    ) -> Expression:
         normalized_inners = (inner._normalize_fully_reduced() for inner in self._inners)
         return self._rebuild(*normalized_inners)
 

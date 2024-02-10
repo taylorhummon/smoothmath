@@ -8,7 +8,10 @@ import smoothmath._private.local_differential as ld
 import smoothmath._private.global_differential as gd
 from smoothmath._private.utilities import integer_from_integral_real_number, get_variable_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Point, GlobalPartial, LocalDifferential, GlobalDifferential
+    from smoothmath.expression import Variable
+    from smoothmath._private.local_differential import LocalDifferentialBuilder
+    from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
 
 REDUCTION_STEPS_BOUND = 1000
@@ -28,7 +31,7 @@ class Expression(ABC):
 
     def evaluate(
         self: Expression,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         """
         Evaluates the expression.
@@ -49,7 +52,7 @@ class Expression(ABC):
     @abstractmethod
     def _evaluate(
         self: Expression,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
@@ -57,8 +60,8 @@ class Expression(ABC):
 
     def local_partial(
         self: Expression,
-        point: sm.Point,
-        variable: ex.Variable | str
+        point: Point,
+        variable: Variable | str
     ) -> RealNumber:
         """
         Takes the partial derivative of the expression and localizes at a point.
@@ -75,15 +78,15 @@ class Expression(ABC):
     @abstractmethod
     def _local_partial(
         self: Expression,
-        point: sm.Point,
+        point: Point,
         variable: str
     ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 
     def global_partial(
         self: Expression,
-        variable: ex.Variable | str
-    ) -> sm.GlobalPartial:
+        variable: Variable | str
+    ) -> GlobalPartial:
         """
         Takes the partial derivative of the expression.
 
@@ -102,8 +105,8 @@ class Expression(ABC):
 
     def local_differential(
         self: Expression,
-        point: sm.Point
-    ) -> sm.LocalDifferential:
+        point: Point
+    ) -> LocalDifferential:
         """
         Takes the differential of the expression and localizes at a point.
 
@@ -119,14 +122,14 @@ class Expression(ABC):
     @abstractmethod
     def _compute_local_differential(
         self: Expression,
-        builder: local_differential.LocalDifferentialBuilder,
+        builder: LocalDifferentialBuilder,
         accumulated: RealNumber
     ) -> None: # instead of returning a value, we mutate the local_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
 
     def global_differential(
         self: Expression
-    ) -> sm.GlobalDifferential:
+    ) -> GlobalDifferential:
         """
         Takes the differential of the expression.
         """
@@ -137,7 +140,7 @@ class Expression(ABC):
     @abstractmethod
     def _compute_global_differential(
         self: Expression,
-        builder: global_differential.GlobalDifferentialBuilder,
+        builder: GlobalDifferentialBuilder,
         accumulated: Expression
     ) -> None: # instead of returning a value, we mutate the global_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")

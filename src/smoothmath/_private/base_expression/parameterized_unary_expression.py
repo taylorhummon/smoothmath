@@ -1,14 +1,15 @@
 from __future__ import annotations
-from typing import Any
-import smoothmath as sm
+from typing import TYPE_CHECKING, Any
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name
+if TYPE_CHECKING:
+    from smoothmath import Expression
 
 
 class ParameterizedUnaryExpression(base.UnaryExpression):
     def __init__(
         self: ParameterizedUnaryExpression,
-        inner: sm.Expression,
+        inner: Expression,
         parameter: Any
     ) -> None:
         super().__init__(inner)
@@ -17,7 +18,7 @@ class ParameterizedUnaryExpression(base.UnaryExpression):
 
     def _rebuild(
         self: ParameterizedUnaryExpression,
-        inner: sm.Expression
+        inner: Expression
     ) -> ParameterizedUnaryExpression:
         return self.__class__(inner, self._parameter)
 

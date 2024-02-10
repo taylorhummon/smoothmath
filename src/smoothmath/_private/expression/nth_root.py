@@ -6,7 +6,7 @@ import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import nth_power, nth_root, divide, multiply
 from smoothmath._private.utilities import integer_from_integral_real_number, is_even, is_odd
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class NthRoot(base.ParameterizedUnaryExpression):
@@ -19,7 +19,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def __init__(
         self: NthRoot,
-        inner: sm.Expression,
+        inner: Expression,
         n: int
     ) -> None:
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
@@ -58,7 +58,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _local_partial_formula(
         self: NthRoot,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         n = self.n
@@ -73,8 +73,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _synthetic_partial_formula(
         self: NthRoot,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         n = self.n
         if n == 1:
             return multiplier
@@ -89,7 +89,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     @property
     def _reducers(
         self: NthRoot
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [
             self._reduce_nth_root_where_n_is_one,
             self._reduce_nth_root_of_mth_power,
@@ -101,7 +101,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     # NthRoot(u, 1) => u
     def _reduce_nth_root_where_n_is_one(
         self: NthRoot
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if self.n == 1:
             return self._inner
         else:
@@ -110,7 +110,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     # NthRoot(NthPower(u, m), n) => NthPower(NthRoot(u, n), m)
     def _reduce_nth_root_of_mth_power(
         self: NthRoot
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.NthPower):
             return ex.NthPower(
                 ex.NthRoot(self._inner._inner, self.n),
@@ -122,7 +122,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     # NthRoot(NthRoot(u, m), n) => NthRoot(u, m * n))
     def _reduce_nth_root_of_mth_root(
         self: NthRoot
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.NthRoot):
             return ex.NthRoot(self._inner._inner, self.n * self._inner.n)
         else:
@@ -131,7 +131,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     # NthRoot(Negation(u), n) => Negation(NthRoot(u, n)) where n is odd
     def _reduce_odd_nth_root_of_negation(
         self: NthRoot
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._inner, ex.Negation) and
             is_odd(self.n)
@@ -143,7 +143,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     # NthRoot(Reciprocal(u), n) => Reciprocal(NthRoot(u, n))
     def _reduce_nth_root_of_reciprocal(
         self: NthRoot
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Reciprocal):
             return ex.Reciprocal(ex.NthRoot(self._inner._inner, self.n))
         else:

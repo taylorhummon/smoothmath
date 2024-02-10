@@ -5,7 +5,9 @@ import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
 from smoothmath._private.utilities import get_variable_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point, GlobalPartial
+    from smoothmath.expression import Variable
+    from smoothmath._private.local_differential import LocalDifferential
 
 
 class GlobalDifferential:
@@ -15,19 +17,19 @@ class GlobalDifferential:
 
     def __init__(
         self: GlobalDifferential,
-        original_expression: sm.Expression,
-        synthetic_partials: dict[str, sm.Expression]
+        original_expression: Expression,
+        synthetic_partials: dict[str, Expression]
     ) -> None:
         #: The expression which this is the global differential of.
-        self.original_expression: sm.Expression
+        self.original_expression: Expression
         self.original_expression = original_expression
-        self._synthetic_partials: dict[str, sm.Expression]
+        self._synthetic_partials: dict[str, Expression]
         self._synthetic_partials = synthetic_partials.copy()
 
     def component_at(
         self: GlobalDifferential,
-        point: sm.Point,
-        variable: ex.Variable | str
+        point: Point,
+        variable: Variable | str
     ) -> RealNumber:
         """
         The component of the differential localized at a point.
@@ -39,8 +41,8 @@ class GlobalDifferential:
 
     def at(
         self: GlobalDifferential,
-        point: sm.Point
-    ) -> sm.LocalDifferential:
+        point: Point
+    ) -> LocalDifferential:
         """
         Localize the differential at a point.
 
@@ -55,8 +57,8 @@ class GlobalDifferential:
 
     def component(
         self: GlobalDifferential,
-        variable: ex.Variable | str
-    ) -> sm.GlobalPartial:
+        variable: Variable | str
+    ) -> GlobalPartial:
         """
         The component of the differential.
 
@@ -105,17 +107,17 @@ class GlobalDifferential:
 class GlobalDifferentialBuilder:
     def __init__(
         self: GlobalDifferentialBuilder,
-        original_expression: sm.Expression
+        original_expression: Expression
     ) -> None:
-        self.original_expression: sm.Expression
+        self.original_expression: Expression
         self.original_expression = original_expression
-        self._synthetic_partials: dict[str, sm.Expression]
+        self._synthetic_partials: dict[str, Expression]
         self._synthetic_partials = {}
 
     def add_to(
         self: GlobalDifferentialBuilder,
-        variable: ex.Variable | str,
-        contribution: sm.Expression
+        variable: Variable | str,
+        contribution: Expression
     ) -> None:
         variable_name = get_variable_name(variable)
         existing = self._synthetic_partials.get(variable_name, None)

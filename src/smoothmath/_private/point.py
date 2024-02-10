@@ -1,9 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Mapping
-import smoothmath.expression as ex
+import smoothmath.expression # !!!
 from smoothmath._private.utilities import get_variable_name
 if TYPE_CHECKING:
     from smoothmath import RealNumber
+    from smoothmath.expression import Variable
 
 
 class Point:
@@ -15,7 +16,7 @@ class Point:
 
     def __init__(
         self: Point,
-        coordinates: Mapping[ex.Variable | str, RealNumber]
+        coordinates: Mapping[Variable | str, RealNumber]
     ) -> None:
         self._coordinates: Mapping[str, RealNumber]
         self._coordinates = {}
@@ -27,7 +28,7 @@ class Point:
 
     def coordinate(
         self: Point,
-        variable: ex.Variable | str
+        variable: Variable | str
     ) -> RealNumber:
         """
         A coordinate. The y coordinate of Point({"x": 3, y: "4"}) is 4.

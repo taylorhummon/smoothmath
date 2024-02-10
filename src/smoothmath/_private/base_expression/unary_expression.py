@@ -5,7 +5,7 @@ import smoothmath as sm
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -13,19 +13,19 @@ if TYPE_CHECKING:
 class UnaryExpression(base.Expression):
     def __init__(
         self: UnaryExpression,
-        inner: sm.Expression
+        inner: Expression
     ) -> None:
         if not isinstance(inner, sm.Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
         super().__init__(inner._lacks_variables)
-        self._inner: sm.Expression
+        self._inner: Expression
         self._inner = inner
         self._value: Optional[RealNumber]
         self._value = None
 
     def _rebuild(
         self: UnaryExpression,
-        inner: sm.Expression
+        inner: Expression
     ) -> UnaryExpression:
         return self.__class__(inner)
 
@@ -39,7 +39,7 @@ class UnaryExpression(base.Expression):
 
     def _evaluate(
         self: UnaryExpression,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         if self._value is not None:
             return self._value
@@ -66,7 +66,7 @@ class UnaryExpression(base.Expression):
 
     def _local_partial(
         self: UnaryExpression,
-        point: sm.Point,
+        point: Point,
         variable: str
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
@@ -77,7 +77,7 @@ class UnaryExpression(base.Expression):
     def _synthetic_partial(
         self: UnaryExpression,
         variable: str
-    ) -> sm.Expression:
+    ) -> Expression:
         inner_partial = self._inner._synthetic_partial(variable)
         return self._synthetic_partial_formula(inner_partial)
 
@@ -94,7 +94,7 @@ class UnaryExpression(base.Expression):
     def _compute_global_differential(
         self: UnaryExpression,
         builder: GlobalDifferentialBuilder,
-        accumulated: sm.Expression
+        accumulated: Expression
     ) -> None:
         next_accumulated = self._synthetic_partial_formula(accumulated)
         self._inner._compute_global_differential(builder, next_accumulated)
@@ -102,7 +102,7 @@ class UnaryExpression(base.Expression):
     @abstractmethod
     def _local_partial_formula(
         self: UnaryExpression,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         raise Exception("Concrete classes derived from UnaryExpression must implement _local_partial_formula()")
@@ -110,15 +110,15 @@ class UnaryExpression(base.Expression):
     @abstractmethod
     def _synthetic_partial_formula(
         self: UnaryExpression,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         raise Exception("Concrete classes derived from UnaryExpression must implement _synthetic_partial_formula()")
 
     ## Normalization and Reduction ##
 
     def _take_reduction_step(
         self: UnaryExpression
-    ) -> sm.Expression:
+    ) -> Expression:
         if self._is_fully_reduced:
             return self
         consolidated = self._consolidate_expression_lacking_variables()
@@ -138,12 +138,12 @@ class UnaryExpression(base.Expression):
     @abstractmethod
     def _reducers(
         self: UnaryExpression
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         raise Exception("Concrete classes derived from UnaryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(
         self: UnaryExpression
-    ) -> sm.Expression:
+    ) -> Expression:
         normalized_inner = self._inner._normalize_fully_reduced()
         return self._rebuild(normalized_inner)
 

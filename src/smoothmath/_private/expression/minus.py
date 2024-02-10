@@ -1,11 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, minus
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -38,7 +37,7 @@ class Minus(base.BinaryExpression):
 
     def _local_partial(
         self: Minus,
-        point: sm.Point,
+        point: Point,
         variable: str
     ) -> RealNumber:
         left_partial = self._left._local_partial(point, variable)
@@ -48,7 +47,7 @@ class Minus(base.BinaryExpression):
     def _synthetic_partial(
         self: Minus,
         variable: str
-    ) -> sm.Expression:
+    ) -> Expression:
         left_partial = self._left._synthetic_partial(variable)
         right_partial = self._right._synthetic_partial(variable)
         return ex.Minus(left_partial, right_partial)
@@ -64,7 +63,7 @@ class Minus(base.BinaryExpression):
     def _compute_global_differential(
         self: Minus,
         builder: GlobalDifferentialBuilder,
-        accumulated: sm.Expression
+        accumulated: Expression
     ) -> None:
         self._left._compute_global_differential(builder, accumulated)
         self._right._compute_global_differential(builder, ex.Negation(accumulated))
@@ -74,11 +73,11 @@ class Minus(base.BinaryExpression):
     @property
     def _reducers(
         self: Minus
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [self._reduce_minus_to_sum_with_negation]
 
     # Minus(u, v) => Add(u, Negation(v))
     def _reduce_minus_to_sum_with_negation(
         self: Minus
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         return ex.Add(self._left, ex.Negation(self._right))

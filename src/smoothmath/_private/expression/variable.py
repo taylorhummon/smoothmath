@@ -1,11 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import re
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -39,7 +38,7 @@ class Variable(base.Expression):
 
     def _evaluate(
         self: Variable,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         return point.coordinate(self.name)
 
@@ -47,7 +46,7 @@ class Variable(base.Expression):
 
     def _local_partial(
         self: Variable,
-        point: sm.Point,
+        point: Point,
         variable: str
     ) -> RealNumber:
         if self.name == variable:
@@ -58,7 +57,7 @@ class Variable(base.Expression):
     def _synthetic_partial(
         self: Variable,
         variable: str
-    ) -> sm.Expression:
+    ) -> Expression:
         if self.name == variable:
             return ex.Constant(1)
         else:
@@ -74,7 +73,7 @@ class Variable(base.Expression):
     def _compute_global_differential(
         self: Variable,
         builder: GlobalDifferentialBuilder,
-        accumulated: sm.Expression
+        accumulated: Expression
     ) -> None:
         builder.add_to(self, accumulated)
 
@@ -88,7 +87,7 @@ class Variable(base.Expression):
 
     def _normalize_fully_reduced(
         self: Variable
-    ) -> sm.Expression:
+    ) -> Expression:
         return self
 
     ## Operations ##

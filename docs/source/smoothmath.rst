@@ -7,7 +7,7 @@ smoothmath
 
     An abstract base class for all expresssions.
 
-    See :doc:`expression` for concrete expression classes.
+    See the :doc:`expression` module for concrete expression classes.
 
 .. autoclass:: Point
     :members:

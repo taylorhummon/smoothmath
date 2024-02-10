@@ -5,7 +5,7 @@ import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, reciprocal, nth_power, divide
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class Reciprocal(base.UnaryExpression):
@@ -34,7 +34,7 @@ class Reciprocal(base.UnaryExpression):
 
     def _local_partial_formula(
         self: Reciprocal,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
@@ -42,8 +42,8 @@ class Reciprocal(base.UnaryExpression):
 
     def _synthetic_partial_formula(
         self: Reciprocal,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         return ex.Negation(ex.Divide(multiplier, ex.NthPower(self._inner, n = 2)))
 
     ## Normalization and Reduction ##
@@ -51,7 +51,7 @@ class Reciprocal(base.UnaryExpression):
     @property
     def _reducers(
         self: Reciprocal
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [
             self._reduce_reciprocal_of_reciprocal,
             self._reduce_reciprocal_of_negation,
@@ -61,7 +61,7 @@ class Reciprocal(base.UnaryExpression):
     # Reciprocal(Reciprocal(u)) => u
     def _reduce_reciprocal_of_reciprocal(
         self: Reciprocal
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Reciprocal):
             return self._inner._inner
         else:
@@ -70,7 +70,7 @@ class Reciprocal(base.UnaryExpression):
     # Reciprocal(Negation(u)) => Negation(Reciprocal(u))
     def _reduce_reciprocal_of_negation(
         self: Reciprocal
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Negation):
             return ex.Negation(ex.Reciprocal(self._inner._inner))
         else:
@@ -79,7 +79,7 @@ class Reciprocal(base.UnaryExpression):
     # Reciprocal(Multiply(u, v)) => Multiply(Reciprocal(u), Reciprocal(v))
     def _reduce_reciprocal_of_product(
         self: Reciprocal
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Multiply):
             return ex.Multiply(*(Reciprocal(inner) for inner in self._inner._inners))
         else:

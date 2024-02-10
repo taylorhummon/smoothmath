@@ -1,10 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -32,7 +31,7 @@ class Constant(base.Expression):
 
     def _evaluate(
         self: Constant,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         return self.value
 
@@ -40,7 +39,7 @@ class Constant(base.Expression):
 
     def _local_partial(
         self: Constant,
-        point: sm.Point,
+        point: Point,
         variable: str
     ) -> RealNumber:
         return 0
@@ -48,7 +47,7 @@ class Constant(base.Expression):
     def _synthetic_partial(
         self: Constant,
         variable: str
-    ) -> sm.Expression:
+    ) -> Expression:
         return ex.Constant(0)
 
     def _compute_local_differential(
@@ -61,7 +60,7 @@ class Constant(base.Expression):
     def _compute_global_differential(
         self: Constant,
         builder: GlobalDifferentialBuilder,
-        accumulated: sm.Expression
+        accumulated: Expression
     ) -> None:
         pass
 
@@ -75,7 +74,7 @@ class Constant(base.Expression):
 
     def _normalize_fully_reduced(
         self: Constant
-    ) -> sm.Expression:
+    ) -> Expression:
         return self
 
     ## Operations ##

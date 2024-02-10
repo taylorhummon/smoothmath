@@ -1,12 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import math
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import exponential, logarithm, multiply
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class Exponential(base.ParameterizedUnaryExpression):
@@ -19,7 +18,7 @@ class Exponential(base.ParameterizedUnaryExpression):
 
     def __init__(
         self: Exponential,
-        inner: sm.Expression,
+        inner: Expression,
         base: RealNumber = math.e
     ) -> None:
         super().__init__(inner, base)
@@ -50,7 +49,7 @@ class Exponential(base.ParameterizedUnaryExpression):
 
     def _local_partial_formula(
         self: Exponential,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         if self.base == 1:
@@ -67,8 +66,8 @@ class Exponential(base.ParameterizedUnaryExpression):
 
     def _synthetic_partial_formula(
         self: Exponential,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         if self.base == 1:
             return ex.Constant(0)
         elif self.base == math.e:
@@ -85,7 +84,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     @property
     def _reducers(
         self: Exponential
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [
             self._reduce_exponential_of_logarithm,
             self._reduce_exponential_of_negation
@@ -94,7 +93,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     # Exponential(Logarithm(u)) => u
     def _reduce_exponential_of_logarithm(
         self: Exponential
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._inner, ex.Logarithm) and
             self.base == self._inner.base
@@ -106,7 +105,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     # Exponential(Negation(u)) => Reciprocal(Exponential(u))
     def _reduce_exponential_of_negation(
         self: Exponential
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Negation):
             return ex.Reciprocal(ex.Exponential(self._inner._inner, base = self.base))
         else:

@@ -5,31 +5,31 @@ import smoothmath as sm
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class BinaryExpression(base.Expression):
     def __init__(
         self: BinaryExpression,
-        left: sm.Expression,
-        right: sm.Expression
+        left: Expression,
+        right: Expression
     ) -> None:
         if not isinstance(left, sm.Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {left}")
         if not isinstance(right, sm.Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {right}")
         super().__init__(left._lacks_variables and right._lacks_variables)
-        self._left: sm.Expression
+        self._left: Expression
         self._left = left
-        self._right: sm.Expression
+        self._right: Expression
         self._right = right
         self._value: Optional[RealNumber]
         self._value = None
 
     def _rebuild(
         self: BinaryExpression,
-        left: sm.Expression,
-        right: sm.Expression
+        left: Expression,
+        right: Expression
     ) -> BinaryExpression:
         return self.__class__(left, right)
 
@@ -44,7 +44,7 @@ class BinaryExpression(base.Expression):
 
     def _evaluate(
         self: BinaryExpression,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         if self._value is not None:
             return self._value
@@ -74,7 +74,7 @@ class BinaryExpression(base.Expression):
 
     def _take_reduction_step(
         self: BinaryExpression
-    ) -> sm.Expression:
+    ) -> Expression:
         if self._is_fully_reduced:
             return self
         consolidated = self._consolidate_expression_lacking_variables()
@@ -97,12 +97,12 @@ class BinaryExpression(base.Expression):
     @abstractmethod
     def _reducers(
         self: BinaryExpression
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         raise Exception("Concrete classes derived from BinaryExpression must implement _reducers()")
 
     def _normalize_fully_reduced(
         self: BinaryExpression
-    ) -> sm.Expression:
+    ) -> Expression:
         normalized_left = self._left._normalize_fully_reduced()
         normalized_right = self._right._normalize_fully_reduced()
         return self._rebuild(normalized_left, normalized_right)

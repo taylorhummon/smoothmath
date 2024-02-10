@@ -1,11 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import cosine, sine, multiply
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class Sine(base.UnaryExpression):
@@ -33,7 +32,7 @@ class Sine(base.UnaryExpression):
 
     def _local_partial_formula(
         self: Sine,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
@@ -41,8 +40,8 @@ class Sine(base.UnaryExpression):
 
     def _synthetic_partial_formula(
         self: Sine,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         return ex.Multiply(ex.Cosine(self._inner), multiplier)
 
     ## Normalization and Reduction ##
@@ -50,13 +49,13 @@ class Sine(base.UnaryExpression):
     @property
     def _reducers(
         self: Sine
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [self._reduce_sine_of_negation]
 
     # Sine(Negation(u)) => Negation(Sine(u))
     def _reduce_sine_of_negation(
         self: Sine
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Negation):
             return ex.Negation(ex.Sine(self._inner._inner))
         else:

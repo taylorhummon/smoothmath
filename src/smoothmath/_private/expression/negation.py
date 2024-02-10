@@ -5,7 +5,7 @@ import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class Negation(base.UnaryExpression):
@@ -33,15 +33,15 @@ class Negation(base.UnaryExpression):
 
     def _local_partial_formula(
         self: Negation,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         return negation(multiplier)
 
     def _synthetic_partial_formula(
         self: Negation,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         return ex.Negation(multiplier)
 
     ## Normalization and Reduction ##
@@ -49,7 +49,7 @@ class Negation(base.UnaryExpression):
     @property
     def _reducers(
         self: Negation
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [
             self._reduce_negation_of_negation,
             self._reduce_negation_of_sum
@@ -58,7 +58,7 @@ class Negation(base.UnaryExpression):
     # Negation(Negation(u)) => u
     def _reduce_negation_of_negation(
         self: Negation
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Negation):
             return self._inner._inner
         else:
@@ -67,7 +67,7 @@ class Negation(base.UnaryExpression):
     # Negation(Add(u, v)) => Add(Negation(u), Negation(v))
     def _reduce_negation_of_sum(
         self: Negation
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Add):
             return ex.Add(*(Negation(inner) for inner in self._inner._inners))
         else:

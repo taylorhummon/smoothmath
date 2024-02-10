@@ -7,7 +7,7 @@ import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import logarithm, divide, multiply
 from smoothmath._private.utilities import is_odd
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class Logarithm(base.ParameterizedUnaryExpression):
@@ -19,7 +19,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     """
     def __init__(
         self: Logarithm,
-        inner: sm.Expression,
+        inner: Expression,
         base: RealNumber = math.e
     ) -> None:
         super().__init__(inner, base)
@@ -55,7 +55,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
 
     def _local_partial_formula(
         self: Logarithm,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
@@ -69,8 +69,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
 
     def _synthetic_partial_formula(
         self: Logarithm,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         if self.base == math.e:
             return ex.Divide(multiplier, self._inner)
         else:
@@ -84,7 +84,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     @property
     def _reducers(
         self: Logarithm
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [
             self._reduce_logarithm_of_exponential,
             self._reduce_logarithm_of_reciprocal,
@@ -94,7 +94,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     # Logarithm(Exponential(u)) => u
     def _reduce_logarithm_of_exponential(
         self: Logarithm
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._inner, ex.Exponential) and
             self.base == self._inner.base
@@ -106,7 +106,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     # Logarithm(Reciprocal(u)) => Negation(Logarithm(u))
     def _reduce_logarithm_of_reciprocal(
         self: Logarithm
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Reciprocal):
             return ex.Negation(ex.Logarithm(self._inner._inner, base = self.base))
         else:
@@ -115,7 +115,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     # Logarithm(NthPower(u, n)) = Multiply(Constant(n), Logarithm(u)) when n is odd
     def _reduce_logarithm_of_nth_power(
         self: Logarithm
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if (
             isinstance(self._inner, ex.NthPower) and
             is_odd(self._inner.n)

@@ -1,11 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-import smoothmath as sm
-import smoothmath.expression as ex
 from smoothmath._private.utilities import get_variable_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
-
+    from smoothmath import RealNumber, Expression, Point
+    from smoothmath.expression import Variable
 
 class LocalDifferential:
     """
@@ -14,22 +12,22 @@ class LocalDifferential:
 
     def __init__(
         self: LocalDifferential,
-        original_expression: sm.Expression,
-        point: sm.Point,
+        original_expression: Expression,
+        point: Point,
         local_partials: dict[str, RealNumber]
     ) -> None:
         #: The expression which this is the differential of.
-        self.original_expression: sm.Expression
+        self.original_expression: Expression
         self.original_expression = original_expression
         #: The point at which this differential is located.
-        self.point: sm.Point
+        self.point: Point
         self.point = point
         self._local_partials: dict[str, RealNumber]
         self._local_partials = local_partials.copy()
 
     def component(
         self: LocalDifferential,
-        variable: ex.Variable | str
+        variable: Variable | str
     ) -> RealNumber:
         """
         The component of the differential.
@@ -84,19 +82,19 @@ class LocalDifferential:
 class LocalDifferentialBuilder:
     def __init__(
         self: LocalDifferentialBuilder,
-        original_expression: sm.Expression,
-        point: sm.Point
+        original_expression: Expression,
+        point: Point
     ) -> None:
-        self._original_expression: sm.Expression
+        self._original_expression: Expression
         self._original_expression = original_expression
-        self.point: sm.Point
+        self.point: Point
         self.point = point
         self._local_partials: dict[str, RealNumber]
         self._local_partials = {}
 
     def add_to(
         self: LocalDifferentialBuilder,
-        variable: ex.Variable | str,
+        variable: Variable | str,
         contribution: RealNumber
     ) -> None:
         variable_name = get_variable_name(variable)

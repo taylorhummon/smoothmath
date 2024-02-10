@@ -1,13 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import math
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import nth_power, multiply
 from smoothmath._private.utilities import integer_from_integral_real_number, is_even
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class NthPower(base.ParameterizedUnaryExpression):
@@ -20,7 +19,7 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     def __init__(
         self: NthPower,
-        inner: sm.Expression,
+        inner: Expression,
         n: int
     ) -> None:
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
@@ -56,7 +55,7 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     def _local_partial_formula(
         self: NthPower,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         n = self.n
@@ -72,8 +71,8 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     def _synthetic_partial_formula(
         self: NthPower,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         n = self.n
         if n == 1:
             return multiplier
@@ -89,7 +88,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     @property
     def _reducers(
         self: NthPower
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [
             self._reduce_nth_power_where_n_is_one,
             self._reduce_nth_power_of_mth_root,
@@ -102,7 +101,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     # NthPower(u, 1) => u
     def _reduce_nth_power_where_n_is_one(
         self: NthPower
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if self.n == 1:
             return self._inner
         else:
@@ -111,7 +110,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     # NthPower(NthRoot(u, m), n) => ...
     def _reduce_nth_power_of_mth_root(
         self: NthPower
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.NthRoot):
             n = self.n
             m = self._inner.n
@@ -129,7 +128,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     # NthPower(NthPower(u, m), n) => NthPower(u, m * n))
     def _reduce_nth_power_of_mth_power(
         self: NthPower
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.NthPower):
             return ex.NthPower(self._inner._inner, self.n * self._inner.n)
         else:
@@ -139,7 +138,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     # NthPower(Negation(u), n) => Negation(NthPower(u, n)) when n is odd
     def _reduce_nth_power_of_negation(
         self: NthPower
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Negation):
             if is_even(self.n):
                 return ex.NthPower(self._inner._inner, self.n)
@@ -151,7 +150,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     # NthPower(Reciprocal(u), n) => Reciprocal(NthPower(u, n))
     def _reduce_nth_power_of_reciprocal(
         self: NthPower
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Reciprocal):
             return ex.Reciprocal(ex.NthPower(self._inner._inner, self.n))
         else:
@@ -160,7 +159,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     # NthPower(Exponential(u), n) => Exponential(Multiply(Constant(n), u))
     def _reduce_nth_power_of_exponential(
         self: NthPower
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Exponential):
             return ex.Exponential(
                 ex.Multiply(ex.Constant(self.n), self._inner._inner),

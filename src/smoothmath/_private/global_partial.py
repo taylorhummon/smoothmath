@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-import smoothmath as sm
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class GlobalPartial:
@@ -13,25 +12,25 @@ class GlobalPartial:
     @classmethod
     def build(
         cls: type,
-        original_expression: sm.Expression,
-        synthetic_partial: sm.Expression
+        original_expression: Expression,
+        synthetic_partial: Expression
     ):
         return cls(original_expression, synthetic_partial._normalize())
 
     def __init__(
         self: GlobalPartial,
-        original_expression: sm.Expression,
-        synthetic_partial: sm.Expression
+        original_expression: Expression,
+        synthetic_partial: Expression
     ) -> None:
         #: The expression which this is the partial derivative of.
-        self.original_expression: sm.Expression
+        self.original_expression: Expression
         self.original_expression = original_expression
-        self._synthetic_partial: sm.Expression
+        self._synthetic_partial: Expression
         self._synthetic_partial = synthetic_partial
 
     def at(
         self: GlobalPartial,
-        point: sm.Point
+        point: Point
     ) -> RealNumber:
         """
         Localize the partial derivative at a point.

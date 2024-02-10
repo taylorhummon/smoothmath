@@ -5,7 +5,7 @@ import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, cosine, sine, multiply
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
+    from smoothmath import RealNumber, Expression, Point
 
 
 class Cosine(base.UnaryExpression):
@@ -33,7 +33,7 @@ class Cosine(base.UnaryExpression):
 
     def _local_partial_formula(
         self: Cosine,
-        point: sm.Point,
+        point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
@@ -41,8 +41,8 @@ class Cosine(base.UnaryExpression):
 
     def _synthetic_partial_formula(
         self: Cosine,
-        multiplier: sm.Expression
-    ) -> sm.Expression:
+        multiplier: Expression
+    ) -> Expression:
         return ex.Multiply(ex.Negation(ex.Sine(self._inner)), multiplier)
 
     ## Normalization and Reduction ##
@@ -50,13 +50,13 @@ class Cosine(base.UnaryExpression):
     @property
     def _reducers(
         self: Cosine
-    ) -> list[Callable[[], Optional[sm.Expression]]]:
+    ) -> list[Callable[[], Optional[Expression]]]:
         return [self._reduce_cosine_of_negation]
 
     # Cosine(Negation(u)) => Cosine(u)
     def _reduce_cosine_of_negation(
         self: Cosine
-    ) -> Optional[sm.Expression]:
+    ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Negation):
             return ex.Cosine(self._inner._inner)
         else:
