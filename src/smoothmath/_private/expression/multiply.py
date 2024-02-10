@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import add, multiply
@@ -12,6 +11,7 @@ from smoothmath._private.utilities import (
 )
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Expression, Point
+    from smoothmath.expression import Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -146,7 +146,7 @@ class Multiply(base.NAryExpression):
     def _reduce_product_by_eliminating_negations(
         self: Multiply
     ) -> Optional[Expression]:
-        negations: list[ex.Negation]; non_negations: list[Expression]
+        negations: list[Negation]; non_negations: list[Expression]
         negations, non_negations = partition_by_given_type(self._inners, ex.Negation)
         negations_count = len(negations)
         if negations_count == 0:
@@ -160,7 +160,7 @@ class Multiply(base.NAryExpression):
     def _reduce_product_by_consolidating_nth_powers(
         self: Multiply
     ) -> Optional[Expression]:
-        nth_powers: list[ex.NthPower]; non_nth_powers: list[Expression]
+        nth_powers: list[NthPower]; non_nth_powers: list[Expression]
         nth_powers, non_nth_powers = partition_by_given_type(self._inners, ex.NthPower)
         if len(nth_powers) <= 1:
             return None
@@ -180,7 +180,7 @@ class Multiply(base.NAryExpression):
     def _reduce_product_by_consolidating_nth_roots(
         self: Multiply
     ) -> Optional[Expression]:
-        nth_roots: list[ex.NthRoot]; non_nth_roots: list[Expression]
+        nth_roots: list[NthRoot]; non_nth_roots: list[Expression]
         nth_roots, non_nth_roots = partition_by_given_type(self._inners, ex.NthRoot)
         if len(nth_roots) <= 1:
             return None
@@ -200,7 +200,7 @@ class Multiply(base.NAryExpression):
     def _reduce_product_by_consolidating_exponentials(
         self: Multiply
     ) -> Optional[Expression]:
-        exponentials: list[ex.Exponential]; non_exponentials: list[Expression]
+        exponentials: list[Exponential]; non_exponentials: list[Expression]
         exponentials, non_exponentials = partition_by_given_type(self._inners, ex.Exponential)
         if len(exponentials) <= 1:
             return None
@@ -220,7 +220,7 @@ class Multiply(base.NAryExpression):
     def _reduce_product_by_consolidating_constants(
         self: Multiply
     ) -> Optional[Expression]:
-        constants: list[ex.Constant]; non_constants: list[Expression]
+        constants: list[Constant]; non_constants: list[Expression]
         constants, non_constants = partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:
             return None
@@ -230,7 +230,7 @@ class Multiply(base.NAryExpression):
     def _normalize_fully_reduced(
         self: Multiply
     ) -> Expression:
-        reciprocals: list[ex.Reciprocal]; non_reciprocals: list[Expression]
+        reciprocals: list[Reciprocal]; non_reciprocals: list[Expression]
         reciprocals, non_reciprocals = partition_by_given_type(self._inners, ex.Reciprocal)
         numerator_terms = [non_reciprocal._normalize() for non_reciprocal in non_reciprocals]
         denominator_terms = [reciprocal._inner._normalize() for reciprocal in reciprocals]

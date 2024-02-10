@@ -9,7 +9,9 @@ import smoothmath._private.global_differential as gd
 from smoothmath._private.utilities import integer_from_integral_real_number, get_variable_name
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, GlobalPartial, LocalDifferential, GlobalDifferential
-    from smoothmath.expression import Variable
+    from smoothmath.expression import (
+        Variable, Negation, NthPower, Minus, Divide, Power, Add, Multiply
+    )
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -198,42 +200,42 @@ class Expression(ABC):
 
     def __neg__(
         self: Expression
-    ) -> ex.Negation:
+    ) -> Negation:
         """Takes the negative of this expression."""
         return ex.Negation(self)
 
     def __add__(
         self: Expression,
         other: Expression
-    ) -> ex.Add:
+    ) -> Add:
         """Add this expression with another."""
         return ex.Add(self, other)
 
     def __sub__(
         self: Expression,
         other: Expression
-    ) -> ex.Minus:
+    ) -> Minus:
         """Subtract another expression from this expression."""
         return ex.Minus(self, other)
 
     def __mul__(
         self: Expression,
         other: Expression
-    ) -> ex.Multiply:
+    ) -> Multiply:
         """Multiply this expression with another."""
         return ex.Multiply(self, other)
 
     def __truediv__(
         self: Expression,
         other: Expression
-    ) -> ex.Divide:
+    ) -> Divide:
         """Divide this expression by another."""
         return ex.Divide(self, other)
 
     def __pow__(
         self: Expression,
         exponent: int | Expression
-    ) -> ex.NthPower | ex.Power:
+    ) -> NthPower | Power:
         """Raise this expression to an integer or another expression."""
         if isinstance(exponent, Expression):
             return ex.Power(self, exponent)

@@ -9,6 +9,7 @@ from smoothmath._private.utilities import (
 )
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Expression, Point
+    from smoothmath.expression import Constant, Negation, Logarithm
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
@@ -112,7 +113,7 @@ class Add(base.NAryExpression):
     def _reduce_sum_by_consolidating_logarithms(
         self: Add
     ) -> Optional[Expression]:
-        logarithms: list[ex.Logarithm]; non_logarithms: list[Expression]
+        logarithms: list[Logarithm]; non_logarithms: list[Expression]
         logarithms, non_logarithms = partition_by_given_type(self._inners, ex.Logarithm)
         if len(logarithms) <= 1:
             return None
@@ -132,7 +133,7 @@ class Add(base.NAryExpression):
     def _reduce_sum_by_consolidating_constants(
         self: Add
     ) -> Optional[Expression]:
-        constants: list[ex.Constant]; non_constants: list[Expression]
+        constants: list[Constant]; non_constants: list[Expression]
         constants, non_constants = partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:
             return None
@@ -142,7 +143,7 @@ class Add(base.NAryExpression):
     def _normalize_fully_reduced(
         self: Add
     ) -> Expression:
-        negations: list[ex.Negation]; non_negations: list[Expression]
+        negations: list[Negation]; non_negations: list[Expression]
         negations, non_negations = partition_by_given_type(self._inners, ex.Negation)
         type_i_terms = [term._normalize() for term in non_negations]
         type_ii_terms = [negation._inner._normalize() for negation in negations]
