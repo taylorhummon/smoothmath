@@ -40,13 +40,13 @@ class Constant(base.Expression):
     def _local_partial(
         self: Constant,
         point: Point,
-        variable: str
+        variable_name: str
     ) -> RealNumber:
         return 0
 
     def _synthetic_partial(
         self: Constant,
-        variable: str
+        variable_name: str
     ) -> Expression:
         return ex.Constant(0)
 

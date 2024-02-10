@@ -47,18 +47,18 @@ class Variable(base.Expression):
     def _local_partial(
         self: Variable,
         point: Point,
-        variable: str
+        variable_name: str
     ) -> RealNumber:
-        if self.name == variable:
+        if self.name == variable_name:
             return 1
         else:
             return 0
 
     def _synthetic_partial(
         self: Variable,
-        variable: str
+        variable_name: str
     ) -> Expression:
-        if self.name == variable:
+        if self.name == variable_name:
             return ex.Constant(1)
         else:
             return ex.Constant(0)

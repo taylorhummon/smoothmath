@@ -42,12 +42,12 @@ class Multiply(base.NAryExpression):
     def _local_partial(
         self: Multiply,
         point: Point,
-        variable: str
+        variable_name: str
     ) -> RealNumber:
         inner_values = [inner._evaluate(point) for inner in self._inners]
         return add(*(
             multiply(
-                inner._local_partial(point, variable),
+                inner._local_partial(point, variable_name),
                 *list_without_entry_at(inner_values, i)
             )
             for (i, inner) in enumerate(self._inners)
@@ -55,11 +55,11 @@ class Multiply(base.NAryExpression):
 
     def _synthetic_partial(
         self: Multiply,
-        variable: str
+        variable_name: str
     ) -> Expression:
         return ex.Add(*(
             ex.Multiply(
-                inner._synthetic_partial(variable),
+                inner._synthetic_partial(variable_name),
                 *list_without_entry_at(self._inners, i)
             )
             for (i, inner) in enumerate(self._inners)

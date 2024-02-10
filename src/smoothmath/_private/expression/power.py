@@ -49,7 +49,7 @@ class Power(base.BinaryExpression):
     def _local_partial(
         self: Power,
         point: Point,
-        variable: str
+        variable_name: str
     ) -> RealNumber:
         if self._left._lacks_variables and self._left._evaluate(point) == 1:
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
@@ -58,8 +58,8 @@ class Power(base.BinaryExpression):
             left_value = self._left._evaluate(point)
             right_value = self._right._evaluate(point)
             self._verify_domain_constraints(left_value, right_value)
-            left_partial = self._left._local_partial(point, variable)
-            right_partial = self._right._local_partial(point, variable)
+            left_partial = self._left._local_partial(point, variable_name)
+            right_partial = self._right._local_partial(point, variable_name)
             return (
                 self._local_partial_formula_left(point, left_partial) +
                 self._local_partial_formula_right(point, right_partial)
@@ -67,10 +67,10 @@ class Power(base.BinaryExpression):
 
     def _synthetic_partial(
         self: Power,
-        variable: str
+        variable_name: str
     ) -> Expression:
-        left_partial = self._left._synthetic_partial(variable)
-        right_partial = self._right._synthetic_partial(variable)
+        left_partial = self._left._synthetic_partial(variable_name)
+        right_partial = self._right._synthetic_partial(variable_name)
         return ex.Add(
             self._synthetic_partial_formula_left(left_partial),
             self._synthetic_partial_formula_right(right_partial)

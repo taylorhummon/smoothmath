@@ -79,7 +79,7 @@ class Expression(ABC):
     def _local_partial(
         self: Expression,
         point: Point,
-        variable: str
+        variable_name: str
     ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 
@@ -99,7 +99,7 @@ class Expression(ABC):
     @abstractmethod
     def _synthetic_partial(
         self: Expression,
-        variable: str
+        variable_name: str
     ) -> Expression:
         raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
 
