@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Mapping
-import smoothmath.expression # !!!
 from smoothmath._private.utilities import get_variable_name
 if TYPE_CHECKING:
     from smoothmath import RealNumber

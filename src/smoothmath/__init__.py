@@ -1,3 +1,5 @@
+import smoothmath.expression
+
 from smoothmath._private.errors import DomainError
 from smoothmath._private.types import RealNumber
 from smoothmath._private.point import Point

@@ -1,3 +1,5 @@
+import smoothmath._private.base_expression
+
 from smoothmath._private.expression.constant import Constant
 from smoothmath._private.expression.variable import Variable
 # Unary
