@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, Reciprocal
+from smoothmath.expression import Variable, Constant, Reciprocal
 
 
 def test_Reciprocal():

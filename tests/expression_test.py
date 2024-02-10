@@ -1,7 +1,7 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
 from smoothmath.expression import (
-    Constant, Variable, Reciprocal, NthPower, Exponential, Logarithm, Add, Multiply
+    Variable, Constant, Add, Multiply, Reciprocal, NthPower, Exponential, Logarithm
 )
 
 

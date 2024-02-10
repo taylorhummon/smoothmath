@@ -4,7 +4,7 @@ import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation, minus
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point
+    from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder
 

@@ -1,5 +1,5 @@
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable
+from smoothmath.expression import Variable, Constant
 
 
 def test_Constant():

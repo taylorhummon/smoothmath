@@ -6,7 +6,7 @@ import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import nth_power, multiply
 from smoothmath._private.utilities import integer_from_integral_real_number, is_even
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point
+    from smoothmath import RealNumber, Point, Expression
 
 
 class NthPower(base.ParameterizedUnaryExpression):

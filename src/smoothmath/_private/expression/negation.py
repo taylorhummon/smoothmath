@@ -1,11 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import negation
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point
+    from smoothmath import RealNumber, Point, Expression
 
 
 class Negation(base.UnaryExpression):

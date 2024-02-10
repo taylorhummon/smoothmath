@@ -7,13 +7,47 @@ if TYPE_CHECKING:
     from smoothmath import RealNumber
 
 
-### Unary Functions ###
+def add(
+    *args: RealNumber
+) -> RealNumber:
+    return sum(args)
+
+
+def minus(
+    x: RealNumber,
+    y: RealNumber
+) -> RealNumber:
+    return x - y
 
 
 def negation(
     x: RealNumber
 ) -> RealNumber:
     return - x
+
+
+def multiply(
+    *args: RealNumber
+) -> RealNumber:
+    product = 1
+    for arg in args:
+        if arg == 0:
+            return 0
+        product *= arg
+    return product
+
+
+def divide(
+    x: RealNumber,
+    y: RealNumber
+) -> RealNumber:
+    if y == 0:
+        if x == 0:
+            raise sm.DomainError("divide(x, y) is not smooth around (x = 0, y = 0)")
+        else: # x != 0
+            raise sm.DomainError("divide(x, y) blows up around x != 0 and y = 0")
+    else:
+        return x / y
 
 
 def reciprocal(
@@ -25,19 +59,21 @@ def reciprocal(
         return 1 / x
 
 
-def cosine(
-    x: RealNumber
+def power(
+    x: RealNumber,
+    y: RealNumber
 ) -> RealNumber:
-    return math.cos(x)
-
-
-def sine(
-    x: RealNumber
-) -> RealNumber:
-    return math.sin(x)
-
-
-### Parameterized Unary Functions ###
+    if x == 0:
+        if y > 0:
+            raise sm.DomainError("power(x, y) is not smooth around x = 0 for y > 0")
+        elif y == 0:
+            raise sm.DomainError("power(x, y) is not smooth around (x = 0, y = 0)")
+        else: # y < 0
+            raise sm.DomainError("power(x, y) blows up around x = 0 for y < 0")
+    elif x < 0:
+        raise sm.DomainError("power(x, y) is undefined for x < 0")
+    else: # x > 0
+        return x ** y
 
 
 def nth_power(
@@ -111,61 +147,13 @@ def logarithm(
     return math.log(x, base)
 
 
-### Binary Functions ###
-
-
-def minus(
-    x: RealNumber,
-    y: RealNumber
+def cosine(
+    x: RealNumber
 ) -> RealNumber:
-    return x - y
+    return math.cos(x)
 
 
-def divide(
-    x: RealNumber,
-    y: RealNumber
+def sine(
+    x: RealNumber
 ) -> RealNumber:
-    if y == 0:
-        if x == 0:
-            raise sm.DomainError("divide(x, y) is not smooth around (x = 0, y = 0)")
-        else: # x != 0
-            raise sm.DomainError("divide(x, y) blows up around x != 0 and y = 0")
-    else:
-        return x / y
-
-
-def power(
-    x: RealNumber,
-    y: RealNumber
-) -> RealNumber:
-    if x == 0:
-        if y > 0:
-            raise sm.DomainError("power(x, y) is not smooth around x = 0 for y > 0")
-        elif y == 0:
-            raise sm.DomainError("power(x, y) is not smooth around (x = 0, y = 0)")
-        else: # y < 0
-            raise sm.DomainError("power(x, y) blows up around x = 0 for y < 0")
-    elif x < 0:
-        raise sm.DomainError("power(x, y) is undefined for x < 0")
-    else: # x > 0
-        return x ** y
-
-
-### n-Ary Functions ###
-
-
-def add(
-    *args: RealNumber
-) -> RealNumber:
-    return sum(args)
-
-
-def multiply(
-    *args: RealNumber
-) -> RealNumber:
-    product = 1
-    for arg in args:
-        if arg == 0:
-            return 0
-        product *= arg
-    return product
+    return math.sin(x)

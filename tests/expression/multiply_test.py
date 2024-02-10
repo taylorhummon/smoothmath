@@ -1,7 +1,7 @@
 from pytest import approx
 from smoothmath import Point
 from smoothmath.expression import (
-    Constant, Variable, Negation, Reciprocal, NthPower, NthRoot, Exponential, Divide, Multiply
+    Variable, Constant, Negation, Multiply, Divide, Reciprocal, NthPower, NthRoot, Exponential
 )
 
 

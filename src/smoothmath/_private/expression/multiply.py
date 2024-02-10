@@ -10,7 +10,7 @@ from smoothmath._private.utilities import (
     first_of_given_type, partition_by_given_type
 )
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point
+    from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder

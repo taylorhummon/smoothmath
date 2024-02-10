@@ -1,6 +1,6 @@
 from pytest import approx
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Negation, Logarithm, Minus, Add, Multiply
+from smoothmath.expression import Variable, Constant, Add, Minus, Negation, Multiply, Logarithm
 
 
 def test_2_ary_Add():

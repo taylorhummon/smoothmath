@@ -1,6 +1,6 @@
 from pytest import approx
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Negation, Minus
+from smoothmath.expression import Variable, Constant, Minus, Negation
 
 
 def test_Minus():

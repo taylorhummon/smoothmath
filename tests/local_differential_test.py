@@ -1,5 +1,5 @@
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable
+from smoothmath.expression import Variable, Constant
 from smoothmath._private.local_differential import LocalDifferentialBuilder
 
 

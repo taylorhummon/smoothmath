@@ -5,7 +5,7 @@ import smoothmath as sm
 import smoothmath._private.base_expression as base
 from smoothmath._private.utilities import get_class_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point
+    from smoothmath import RealNumber, Point, Expression
 
 
 class BinaryExpression(base.Expression):

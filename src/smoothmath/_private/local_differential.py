@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from smoothmath._private.utilities import get_variable_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point
+    from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Variable
 
 class LocalDifferential:

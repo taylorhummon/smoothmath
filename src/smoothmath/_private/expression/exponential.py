@@ -5,7 +5,7 @@ import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 from smoothmath._private.math_functions import exponential, logarithm, multiply
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point
+    from smoothmath import RealNumber, Point, Expression
 
 
 class Exponential(base.ParameterizedUnaryExpression):

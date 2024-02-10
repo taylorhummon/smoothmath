@@ -8,9 +8,9 @@ import smoothmath._private.local_differential as ld
 import smoothmath._private.global_differential as gd
 from smoothmath._private.utilities import integer_from_integral_real_number, get_variable_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, GlobalPartial, LocalDifferential, GlobalDifferential
+    from smoothmath import RealNumber, Point, GlobalDifferential, LocalDifferential, GlobalPartial
     from smoothmath.expression import (
-        Variable, Negation, NthPower, Minus, Divide, Power, Add, Multiply
+        Variable, Add, Minus, Negation, Multiply, Divide, Power, NthPower
     )
     from smoothmath._private.local_differential import LocalDifferentialBuilder
     from smoothmath._private.global_differential import GlobalDifferentialBuilder

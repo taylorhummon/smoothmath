@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, Negation, Reciprocal, NthPower, NthRoot
+from smoothmath.expression import Variable, Constant, Negation, Reciprocal, NthPower, NthRoot
 
 
 def test_NthRoot_with_n_equal_two():

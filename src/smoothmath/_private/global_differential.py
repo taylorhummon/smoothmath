@@ -5,7 +5,7 @@ import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
 from smoothmath._private.utilities import get_variable_name
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression, Point, GlobalPartial
+    from smoothmath import RealNumber, Point, Expression, GlobalPartial
     from smoothmath.expression import Variable
     from smoothmath._private.local_differential import LocalDifferential
 

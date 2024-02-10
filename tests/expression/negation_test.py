@@ -1,6 +1,6 @@
 from pytest import approx
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Negation
+from smoothmath.expression import Variable, Constant, Negation
 
 
 def test_Negation():

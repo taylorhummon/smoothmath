@@ -1,7 +1,7 @@
 from pytest import approx
 import math
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Negation, Sine
+from smoothmath.expression import Variable, Constant, Negation, Sine
 
 
 def test_Sine():

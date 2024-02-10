@@ -1,5 +1,5 @@
 import math
-from smoothmath.expression import Constant, Variable
+from smoothmath.expression import Variable, Constant
 from smoothmath._private.utilities import (
     get_class_name,
     is_integer,

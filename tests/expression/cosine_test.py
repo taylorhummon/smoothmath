@@ -1,7 +1,7 @@
 from pytest import approx
 import math
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Negation, Cosine
+from smoothmath.expression import Variable, Constant, Negation, Cosine
 
 
 def test_Cosine():

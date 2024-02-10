@@ -2,17 +2,46 @@ from pytest import raises, approx
 import math
 from smoothmath import DomainError
 from smoothmath._private.math_functions import (
-    negation, reciprocal, cosine, sine,
-    nth_power, nth_root, exponential, logarithm,
-    minus, divide, power,
-    add, multiply
+    add, minus, negation,
+    multiply, divide, reciprocal,
+    power, nth_power, nth_root, exponential, logarithm,
+    cosine, sine
 )
+
+
+def test_add():
+    assert add(4, 5) == approx(9)
+    assert add(4, 5, 6) == approx(15)
+    assert add(4) == approx(4)
+    assert add() == approx(0)
+
+
+def test_minus():
+    assert minus(5, 2) == 3
 
 
 def test_negation():
     assert negation(5) == approx(-5)
     assert negation(-5) == approx(5)
     assert negation(0) == approx(0)
+
+
+def test_multiply():
+    assert multiply(4, 5) == approx(20)
+    assert multiply(4, 5, 6) == approx(120)
+    assert multiply(4, 0, 6) == approx(0)
+    assert multiply(4) == approx(4)
+    assert multiply() == approx(1)
+
+
+def test_divide():
+    assert divide(6, 3) == approx(2)
+    assert divide(1, 2) == approx(0.5)
+    assert divide(0, 2) == approx(0)
+    with raises(DomainError):
+        divide(2, 0)
+    with raises(DomainError):
+        divide(0, 0)
 
 
 def test_reciprocal():
@@ -23,24 +52,19 @@ def test_reciprocal():
         reciprocal(0)
 
 
-def test_cosine():
-    assert cosine(math.tau) == approx(1)
-    assert cosine(math.tau / 2) == approx(-1)
-    assert cosine(math.tau / 4) == approx(0)
-    assert cosine(0) == approx(1)
-    assert cosine(math.tau / 4) == approx(0)
-    assert cosine(- math.tau / 2) == approx(-1)
-    assert cosine(- math.tau) == approx(1)
-
-
-def test_sine():
-    assert sine(math.tau) == approx(0)
-    assert sine(math.tau / 2) == approx(0)
-    assert sine(math.tau / 4) == approx(1)
-    assert sine(0) == approx(0)
-    assert sine(- math.tau / 4) == approx(-1)
-    assert sine(- math.tau / 2) == approx(0)
-    assert sine(- math.tau) == approx(0)
+def test_power():
+    assert power(2, 3) == approx(8)
+    assert power(3, 2) == approx(9)
+    assert power(9, 0.5) == approx(3)
+    assert power(5, -1) == approx(0.2)
+    with raises(DomainError):
+        power(0, 2)
+    with raises(DomainError):
+        power(0, -2)
+    with raises(DomainError):
+        power(0, 0)
+    with raises(DomainError):
+        power(-2, 2)
 
 
 def test_nth_power():
@@ -169,45 +193,21 @@ def test_logarithm():
     assert logarithm(1 / (math.e * math.e)) == approx(-2)
 
 
-def test_minus():
-    assert minus(5, 2) == 3
+def test_cosine():
+    assert cosine(math.tau) == approx(1)
+    assert cosine(math.tau / 2) == approx(-1)
+    assert cosine(math.tau / 4) == approx(0)
+    assert cosine(0) == approx(1)
+    assert cosine(math.tau / 4) == approx(0)
+    assert cosine(- math.tau / 2) == approx(-1)
+    assert cosine(- math.tau) == approx(1)
 
 
-def test_divide():
-    assert divide(6, 3) == approx(2)
-    assert divide(1, 2) == approx(0.5)
-    assert divide(0, 2) == approx(0)
-    with raises(DomainError):
-        divide(2, 0)
-    with raises(DomainError):
-        divide(0, 0)
-
-
-def test_power():
-    assert power(2, 3) == approx(8)
-    assert power(3, 2) == approx(9)
-    assert power(9, 0.5) == approx(3)
-    assert power(5, -1) == approx(0.2)
-    with raises(DomainError):
-        power(0, 2)
-    with raises(DomainError):
-        power(0, -2)
-    with raises(DomainError):
-        power(0, 0)
-    with raises(DomainError):
-        power(-2, 2)
-
-
-def test_add():
-    assert add(4, 5) == approx(9)
-    assert add(4, 5, 6) == approx(15)
-    assert add(4) == approx(4)
-    assert add() == approx(0)
-
-
-def test_multiply():
-    assert multiply(4, 5) == approx(20)
-    assert multiply(4, 5, 6) == approx(120)
-    assert multiply(4, 0, 6) == approx(0)
-    assert multiply(4) == approx(4)
-    assert multiply() == approx(1)
+def test_sine():
+    assert sine(math.tau) == approx(0)
+    assert sine(math.tau / 2) == approx(0)
+    assert sine(math.tau / 4) == approx(1)
+    assert sine(0) == approx(0)
+    assert sine(- math.tau / 4) == approx(-1)
+    assert sine(- math.tau / 2) == approx(0)
+    assert sine(- math.tau) == approx(0)

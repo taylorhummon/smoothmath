@@ -1,5 +1,5 @@
 from pytest import approx, raises
-from smoothmath import Point, DomainError, GlobalPartial
+from smoothmath import DomainError, Point, GlobalPartial
 from smoothmath.expression import Variable, Constant, Reciprocal, NthPower, Logarithm
 
 

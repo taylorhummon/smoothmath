@@ -1,7 +1,7 @@
 from pytest import approx
 import math
 from smoothmath import Point
-from smoothmath.expression import Constant, Variable, Negation, Reciprocal, Exponential, Logarithm
+from smoothmath.expression import Variable, Constant, Negation, Reciprocal, Exponential, Logarithm
 
 
 def test_Exponential():

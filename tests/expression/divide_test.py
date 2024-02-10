@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
-from smoothmath.expression import Constant, Variable, Reciprocal, Logarithm, Divide
+from smoothmath.expression import Variable, Constant, Divide, Reciprocal, Logarithm
 
 
 def test_Divide():
