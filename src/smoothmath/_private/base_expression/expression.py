@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 import logging
 import smoothmath as sm
 import smoothmath.expression as ex
+import smoothmath._private.errors as er
 import smoothmath._private.local_differential as ld
 import smoothmath._private.global_differential as gd
 import smoothmath._private.utilities as util
@@ -184,7 +185,7 @@ class Expression(ABC):
             try:
                 value = self.evaluate(sm.Point({}))
                 return ex.Constant(value)
-            except sm.DomainError:
+            except er.DomainError:
                 self._lacks_variables = False # PERFORMANCE HACK: don't retry evaluation
                 return None
         else:

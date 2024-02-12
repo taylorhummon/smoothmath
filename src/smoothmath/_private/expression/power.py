@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import math
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 import smoothmath._private.math_functions as mf
+import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.local_differential import LocalDifferentialBuilder
@@ -29,13 +29,13 @@ class Power(base.BinaryExpression):
     ) -> None:
         if left_value == 0:
             if right_value > 0:
-                raise sm.DomainError("Power(x, y) is not smooth around x = 0 for y > 0")
+                raise er.DomainError("Power(x, y) is not smooth around x = 0 for y > 0")
             elif right_value == 0:
-                raise sm.DomainError("Power(x, y) is not smooth around (x = 0, y = 0)")
+                raise er.DomainError("Power(x, y) is not smooth around (x = 0, y = 0)")
             else: # right_value < 0
-                raise sm.DomainError("Power(x, y) blows up around x = 0 for y < 0")
+                raise er.DomainError("Power(x, y) blows up around x = 0 for y < 0")
         elif left_value < 0:
-            raise sm.DomainError("Power(x, y) is undefined for x < 0")
+            raise er.DomainError("Power(x, y) is undefined for x < 0")
 
     def _value_formula(
         self: Power,

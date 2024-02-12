@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import math
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
+import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -41,9 +41,9 @@ class Logarithm(base.ParameterizedUnaryExpression):
         inner_value: RealNumber
     ) -> None:
         if inner_value == 0:
-            raise sm.DomainError("Logarithm(x) blows up around x = 0")
+            raise er.DomainError("Logarithm(x) blows up around x = 0")
         elif inner_value < 0:
-            raise sm.DomainError("Logarithm(x) is undefined for x < 0")
+            raise er.DomainError("Logarithm(x) is undefined for x < 0")
 
     def _value_formula(
         self: Logarithm,

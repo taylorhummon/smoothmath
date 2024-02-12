@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
+import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -44,9 +44,9 @@ class NthRoot(base.ParameterizedUnaryExpression):
         inner_value: RealNumber
     ) -> None:
         if self.n >= 2 and inner_value == 0:
-            raise sm.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self.n}")
+            raise er.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self.n}")
         if util.is_even(self.n) and inner_value < 0:
-            raise sm.DomainError(f"NthRoot(x, n) is not defined for negative x when n = {self.n}")
+            raise er.DomainError(f"NthRoot(x, n) is not defined for negative x when n = {self.n}")
 
     def _value_formula(
         self: NthRoot,
