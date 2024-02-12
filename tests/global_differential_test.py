@@ -17,7 +17,7 @@ def test_GlobalDifferential():
     builder.add_to(x, synthetic_x_partial)
     builder.add_to(y, synthetic_y_partial)
     global_differential = builder.build()
-    point = Point({w: 7, x: 4, y: 5})
+    point = Point(w = 7, x = 4, y = 5)
     # component_at() method
     assert global_differential.component_at(point, w) == approx(4)
     assert global_differential.component_at(point, x) == approx(125)
@@ -52,7 +52,7 @@ def test_GlobalDifferential_raises():
     builder = GlobalDifferentialBuilder(original_expression)
     builder.add_to(x, synthetic_x_partial)
     global_differential = builder.build()
-    point = Point({x: -1})
+    point = Point(x = -1)
     with raises(DomainError):
         global_differential.component_at(point, x)
     global_x_partial = global_differential.component(x)

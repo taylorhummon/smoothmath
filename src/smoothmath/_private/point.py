@@ -10,27 +10,22 @@ class Point:
     """
     A point.
 
-    :param coordinates: A mapping that associates a real number to each variable.
+    :param \\*\\*kwargs: a real number for each variable name
     """
 
     def __init__(
         self: Point,
-        coordinates: Mapping[Variable | str, RealNumber]
+        **kwargs: RealNumber
     ) -> None:
         self._coordinates: Mapping[str, RealNumber]
-        self._coordinates = {}
-        for variable_or_name, value in coordinates.items():
-            variable_name = util.get_variable_name(variable_or_name)
-            if variable_name in self._coordinates:
-                raise Exception(f"Provided more than one value for variable: {variable_name}")
-            self._coordinates[variable_name] = value
+        self._coordinates = kwargs
 
     def coordinate(
         self: Point,
         variable: Variable | str
     ) -> RealNumber:
         """
-        A coordinate. The y coordinate of Point({"x": 3, y: "4"}) is 4.
+        A coordinate. The y coordinate of Point(x=3, y=4) is 4.
 
         :param variable: selects which coordinate
         """
@@ -69,7 +64,7 @@ class Point:
         self: Point
     ) -> str:
         equations_string = ", ".join(
-            f'"{variable_name}": {value}'
+            f'{variable_name}={value}'
             for variable_name, value in self._coordinates.items()
         )
-        return "Point({" + equations_string + "})"
+        return "Point(" + equations_string + ")"

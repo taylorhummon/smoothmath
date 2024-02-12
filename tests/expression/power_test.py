@@ -13,7 +13,7 @@ def test_Power():
     global_y_partial = z.global_partial(y)
     global_differential = z.global_differential()
     # at (x, y) = (3, 2.5)
-    point = Point({x: 3, y: 2.5})
+    point = Point(x = 3, y = 2.5)
     assert z.evaluate(point) == approx(15.588457268)
     assert z.local_partial(point, x) == approx(12.990381056)
     assert z.local_partial(point, y) == approx(17.125670716)
@@ -25,7 +25,7 @@ def test_Power():
     assert global_differential.component_at(point, x) == approx(12.990381056)
     assert global_differential.component_at(point, y) == approx(17.125670716)
     # at (x, y) = (3, 0)
-    point = Point({x: 3, y: 0})
+    point = Point(x = 3, y = 0)
     assert z.evaluate(point) == approx(1)
     assert z.local_partial(point, x) == approx(0)
     assert z.local_partial(point, y) == approx(1.0986122886)
@@ -37,7 +37,7 @@ def test_Power():
     assert global_differential.component_at(point, x) == approx(0)
     assert global_differential.component_at(point, y) == approx(1.0986122886)
     # at (x, y) = (3, -2.5)
-    point = Point({x: 3, y: -2.5})
+    point = Point(x = 3, y = -2.5)
     assert z.evaluate(point) == approx(0.0641500299)
     assert z.local_partial(point, x) == approx(-0.0534583582)
     assert z.local_partial(point, y) == approx(0.0704760111)
@@ -49,7 +49,7 @@ def test_Power():
     assert global_differential.component_at(point, x) == approx(-0.0534583582)
     assert global_differential.component_at(point, y) == approx(0.0704760111)
     # at (x, y) = (0, 2.5)
-    point = Point({x: 0, y: 2.5})
+    point = Point(x = 0, y = 2.5)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -67,7 +67,7 @@ def test_Power():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at (x, y) = (0, 0)
-    point = Point({x: 0, y: 0})
+    point = Point(x = 0, y = 0)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -85,7 +85,7 @@ def test_Power():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at (x, y) = (0, -2.5)
-    point = Point({x: 0, y: -2.5})
+    point = Point(x = 0, y = -2.5)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -103,7 +103,7 @@ def test_Power():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at (x, y) = (-3, 2.5)
-    point = Point({x: -3, y: 2.5})
+    point = Point(x = -3, y = 2.5)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -121,7 +121,7 @@ def test_Power():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at (x, y) = (-3, 0)
-    point = Point({x: -3, y: 0})
+    point = Point(x = -3, y = 0)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -139,7 +139,7 @@ def test_Power():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at (x, y) = (-3, -2.5)
-    point = Point({x: -3, y: -2.5})
+    point = Point(x = -3, y = -2.5)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -162,7 +162,7 @@ def test_Power_composition():
     x = Variable("x")
     y = Variable("y")
     z = Power(Constant(2) * x, Constant(3) * y)
-    point = Point({x: 1, y: 1})
+    point = Point(x = 1, y = 1)
     assert z.evaluate(point) == approx(8)
     assert z.local_partial(point, x) == approx(24)
     assert z.local_partial(point, y) == approx(16.63553233343)
@@ -182,21 +182,21 @@ def test_Power_with_constant_base_one():
     global_y_partial = z.global_partial(y)
     global_differential = z.global_differential()
     # at y = 3
-    point = Point({y: 3})
+    point = Point(y = 3)
     assert z.evaluate(point) == approx(1)
     assert z.local_partial(point, y) == approx(0)
     assert global_y_partial.at(point) == approx(0)
     assert z.local_differential(point).component(y) == approx(0)
     assert global_differential.component_at(point, y) == approx(0)
     # at y = 0
-    point = Point({y: 0})
+    point = Point(y = 0)
     assert z.evaluate(point) == approx(1)
     assert z.local_partial(point, y) == approx(0)
     assert global_y_partial.at(point) == approx(0)
     assert z.local_differential(point).component(y) == approx(0)
     assert global_differential.component_at(point, y) == approx(0)
     # at y = -5
-    point = Point({y: -5})
+    point = Point(y = -5)
     assert z.evaluate(point) == approx(1)
     assert z.local_partial(point, y) == approx(0)
     assert global_y_partial.at(point) == approx(0)
@@ -210,7 +210,7 @@ def test_Power_with_constant_base_zero():
     global_y_partial = z.global_partial(y)
     global_differential = z.global_differential()
     # at y = 3
-    point = Point({y: 3})
+    point = Point(y = 3)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -222,7 +222,7 @@ def test_Power_with_constant_base_zero():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at y = 0
-    point = Point({y: 0})
+    point = Point(y = 0)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -234,7 +234,7 @@ def test_Power_with_constant_base_zero():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at y = -5
-    point = Point({y: -5})
+    point = Point(y = -5)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -253,7 +253,7 @@ def test_Power_with_constant_base_negative_one():
     global_y_partial = z.global_partial(y)
     global_differential = z.global_differential()
     # at y = 3
-    point = Point({y: 3})
+    point = Point(y = 3)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -265,7 +265,7 @@ def test_Power_with_constant_base_negative_one():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at y = 0
-    point = Point({y: 0})
+    point = Point(y = 0)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -277,7 +277,7 @@ def test_Power_with_constant_base_negative_one():
     with raises(DomainError):
         global_differential.component_at(point, y)
     # at y = -5
-    point = Point({y: -5})
+    point = Point(y = -5)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
@@ -292,7 +292,7 @@ def test_Power_with_constant_base_negative_one():
 
 def test_Power_one_to_the_zero():
     z = Power(Constant(1), Constant(0))
-    assert z.evaluate(Point({})) == approx(1)
+    assert z.evaluate(Point()) == approx(1)
 
 
 def test_Power_normalization():

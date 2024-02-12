@@ -9,7 +9,7 @@ def test_2_ary_Multiply():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(x, y)
-    point = Point({x: 2, y: 3})
+    point = Point(x = 2, y = 3)
     assert z.evaluate(point) == approx(6)
     assert z.local_partial(point, x) == approx(3)
     assert z.local_partial(point, y) == approx(2)
@@ -27,7 +27,7 @@ def test_2_ary_Multiply_composition():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(Constant(5) * x, y - Constant(1))
-    point = Point({x: 2, y: 4})
+    point = Point(x = 2, y = 4)
     assert z.evaluate(point) == approx(30)
     assert z.local_partial(point, x) == approx(15)
     assert z.local_partial(point, y) == approx(10)
@@ -46,7 +46,7 @@ def test_3_ary_Multiply():
     x = Variable("x")
     y = Variable("y")
     z = Multiply(w, x, y)
-    point = Point({w: 1, x: 2, y: 3})
+    point = Point(w = 1, x = 2, y = 3)
     assert z.evaluate(point) == approx(6)
     assert z.local_partial(point, w) == approx(6)
     assert z.local_partial(point, x) == approx(3)
@@ -70,7 +70,7 @@ def test_3_ary_Multiply_composition():
     y = Variable("y")
     z = Multiply(w, x, y)
     z = Multiply(Constant(4) * w - Constant(1), Constant(5) * x, y + Constant(1))
-    point = Point({w: 1, x: 2, y: 3})
+    point = Point(w = 1, x = 2, y = 3)
     assert z.evaluate(point) == approx(120)
     assert z.local_partial(point, w) == approx(160)
     assert z.local_partial(point, x) == approx(60)
@@ -91,7 +91,7 @@ def test_3_ary_Multiply_composition():
 def test_1_ary_Multiply():
     x = Variable("x")
     z = Multiply(x)
-    point = Point({x: 2})
+    point = Point(x = 2)
     assert z.evaluate(point) == approx(2)
     assert z.local_partial(point, x) == approx(1)
     assert z.global_partial(x).at(point) == approx(1)
@@ -104,7 +104,7 @@ def test_1_ary_Multiply():
 def test_1_ary_Multiply_composition():
     x = Variable("x")
     z = Multiply(Constant(5) * x - Constant(1))
-    point = Point({x: 2})
+    point = Point(x = 2)
     assert z.evaluate(point) == approx(9)
     assert z.local_partial(point, x) == approx(5)
     assert z.global_partial(x).at(point) == approx(5)
@@ -116,14 +116,14 @@ def test_1_ary_Multiply_composition():
 
 def test_0_ary_Multiply():
     z = Multiply()
-    point = Point({})
+    point = Point()
     assert z.evaluate(point) == approx(1)
 
 
 def test_Multiply_by_zero():
     x = Variable("x")
     z = Multiply(Constant(0), x)
-    point = Point({x: 2})
+    point = Point(x = 2)
     assert z.evaluate(point) == approx(0)
     assert z.local_partial(point, x) == approx(0)
     assert z.global_partial(x).at(point) == approx(0)
@@ -134,7 +134,7 @@ def test_Multiply_by_zero():
 def test_Multiply_by_one():
     x = Variable("x")
     z = Multiply(Constant(1), x)
-    point = Point({x: 2})
+    point = Point(x = 2)
     assert z.evaluate(point) == approx(2)
     assert z.local_partial(point, x) == approx(1)
     assert z.global_partial(x).at(point) == approx(1)

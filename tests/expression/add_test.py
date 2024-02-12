@@ -7,7 +7,7 @@ def test_2_ary_Add():
     x = Variable("x")
     y = Variable("y")
     z = Add(x, y)
-    point = Point({x: 2, y: 3})
+    point = Point(x = 2, y = 3)
     assert z.evaluate(point) == approx(5)
     assert z.local_partial(point, x) == approx(1)
     assert z.local_partial(point, y) == approx(1)
@@ -25,7 +25,7 @@ def test_2_ary_Add_composition():
     x = Variable("x")
     y = Variable("y")
     z = Add(Constant(5) * x, Constant(4) * y)
-    point = Point({x: 2, y: 3})
+    point = Point(x = 2, y = 3)
     assert z.evaluate(point) == approx(22)
     assert z.local_partial(point, x) == approx(5)
     assert z.local_partial(point, y) == approx(4)
@@ -44,7 +44,7 @@ def test_3_ary_Add():
     x = Variable("x")
     y = Variable("y")
     z = Add(w, x, y)
-    point = Point({w: 1, x: 2, y: 3})
+    point = Point(w = 1, x = 2, y = 3)
     assert z.evaluate(point) == approx(6)
     assert z.local_partial(point, w) == approx(1)
     assert z.local_partial(point, x) == approx(1)
@@ -67,7 +67,7 @@ def test_3_ary_Add_composition():
     x = Variable("x")
     y = Variable("y")
     z = Add(Constant(6) * w, Constant(5) * x, Constant(4) * y)
-    point = Point({w: 1, x: 2, y: 3})
+    point = Point(w = 1, x = 2, y = 3)
     assert z.evaluate(point) == approx(28)
     assert z.local_partial(point, w) == approx(6)
     assert z.local_partial(point, x) == approx(5)
@@ -88,7 +88,7 @@ def test_3_ary_Add_composition():
 def test_1_ary_Add():
     x = Variable("x")
     z = Add(x)
-    point = Point({x: 2})
+    point = Point(x = 2)
     assert z.evaluate(point) == approx(2)
     assert z.local_partial(point, x) == approx(1)
     assert z.global_partial(x).at(point) == approx(1)
@@ -101,7 +101,7 @@ def test_1_ary_Add():
 def test_1_ary_Add_composition():
     x = Variable("x")
     z = Add(Constant(5) * x)
-    point = Point({x: 2})
+    point = Point(x = 2)
     assert z.evaluate(point) == approx(10)
     assert z.local_partial(point, x) == approx(5)
     assert z.global_partial(x).at(point) == approx(5)
@@ -113,7 +113,7 @@ def test_1_ary_Add_composition():
 
 def test_0_ary_Add():
     z = Add()
-    point = Point({})
+    point = Point()
     assert z.evaluate(point) == approx(0)
 
 

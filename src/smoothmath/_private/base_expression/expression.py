@@ -184,7 +184,7 @@ class Expression(ABC):
     ) -> Optional[Expression]:
         if self._lacks_variables and not isinstance(self, ex.Constant):
             try:
-                value = self.evaluate(pt.Point({}))
+                value = self.evaluate(pt.Point())
                 return ex.Constant(value)
             except er.DomainError:
                 self._lacks_variables = False # PERFORMANCE HACK: don't retry evaluation

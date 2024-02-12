@@ -10,7 +10,7 @@ def test_GlobalPartial():
     original_expression = Constant(4) * w + x * y ** 3
     synthetic_y_partial = Constant(3) * x * y ** 2
     global_y_partial = GlobalPartial(original_expression, synthetic_y_partial)
-    point = Point({w: 7, x: 4, y: 5})
+    point = Point(w = 7, x = 4, y = 5)
     assert global_y_partial.at(point) == approx(300)
 
 
@@ -20,7 +20,7 @@ def test_GlobalPartial_raises():
     synthetic_x_partial = Reciprocal(x)
     global_x_partial = GlobalPartial(original_expression, synthetic_x_partial)
     with raises(DomainError):
-        global_x_partial.at(Point({x: -1}))
+        global_x_partial.at(Point(x = -1))
 
 
 def test_GlobalPartial_equality():
