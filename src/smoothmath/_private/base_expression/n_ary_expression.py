@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Callable, Optional
 from abc import abstractmethod
-import smoothmath as sm
 import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
@@ -14,7 +13,7 @@ class NAryExpression(base.Expression):
         *args: Expression
     ) -> None:
         for inner in args:
-            if not isinstance(inner, sm.Expression):
+            if not isinstance(inner, base.Expression):
                 raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
         lacks_variables = all(inner._lacks_variables for inner in args)
         super().__init__(lacks_variables)

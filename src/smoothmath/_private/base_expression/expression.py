@@ -2,9 +2,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
 import logging
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.errors as er
+import smoothmath._private.point as pt
+import smoothmath._private.global_partial as gp
 import smoothmath._private.local_differential as ld
 import smoothmath._private.global_differential as gd
 import smoothmath._private.utilities as util
@@ -41,7 +42,7 @@ class Expression(ABC):
 
         :param point: where to evaluate
         """
-        if not isinstance(point, sm.Point):
+        if not isinstance(point, pt.Point):
             raise Exception("Must provide a Point to evaluate()")
         self._reset_evaluation_cache()
         return self._evaluate(point)
@@ -72,7 +73,7 @@ class Expression(ABC):
         :param point: where to localize
         :param variable: the partial is taken with respect to this variable
         """
-        if not isinstance(point, sm.Point):
+        if not isinstance(point, pt.Point):
             raise Exception("Must provide a Point to local_partial()")
         self._reset_evaluation_cache()
         variable_name = util.get_variable_name(variable)
@@ -97,7 +98,7 @@ class Expression(ABC):
         """
         variable_name = util.get_variable_name(variable)
         synthetic_partial = self._synthetic_partial(variable_name)
-        return sm.GlobalPartial.build(self, synthetic_partial)
+        return gp.GlobalPartial.build(self, synthetic_partial)
 
     @abstractmethod
     def _synthetic_partial(
@@ -115,7 +116,7 @@ class Expression(ABC):
 
         :param point: where to localize
         """
-        if not isinstance(point, sm.Point):
+        if not isinstance(point, pt.Point):
             raise Exception("Must provide a Point to local_differential()")
         self._reset_evaluation_cache()
         builder = ld.LocalDifferentialBuilder(self, point)
@@ -183,7 +184,7 @@ class Expression(ABC):
     ) -> Optional[Expression]:
         if self._lacks_variables and not isinstance(self, ex.Constant):
             try:
-                value = self.evaluate(sm.Point({}))
+                value = self.evaluate(pt.Point({}))
                 return ex.Constant(value)
             except er.DomainError:
                 self._lacks_variables = False # PERFORMANCE HACK: don't retry evaluation

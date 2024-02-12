@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
+import smoothmath._private.global_partial as gp
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression, GlobalPartial
@@ -67,7 +67,7 @@ class GlobalDifferential:
         variable_name = util.get_variable_name(variable)
         existing = self._synthetic_partials.get(variable_name, None)
         synthetic_partial = existing if existing is not None else ex.Constant(0)
-        return sm.GlobalPartial(self.original_expression, synthetic_partial)
+        return gp.GlobalPartial(self.original_expression, synthetic_partial)
 
     def __eq__(
         self: GlobalDifferential,
