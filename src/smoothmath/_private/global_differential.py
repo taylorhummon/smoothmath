@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-import smoothmath.expression as ex
+import smoothmath._private.expression as ex
 import smoothmath._private.local_differential as ld
 import smoothmath._private.global_partial as gp
 import smoothmath._private.utilities as util

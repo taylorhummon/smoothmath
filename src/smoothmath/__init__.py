@@ -16,5 +16,5 @@ __all__ = [
     "Expression",
     "GlobalDifferential",
     "LocalDifferential",
-    "GlobalPartial"
+    "GlobalPartial",
 ]

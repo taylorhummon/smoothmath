@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Variable
 
+
 class LocalDifferential:
     """
     The differential of an expression localized at a point.

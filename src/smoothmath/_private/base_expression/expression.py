@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
 import logging
-import smoothmath.expression as ex
+import smoothmath._private.expression as ex
 import smoothmath._private.errors as er
 import smoothmath._private.point as pt
 import smoothmath._private.global_partial as gp

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import re
-import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
+import smoothmath._private.expression as ex
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.local_differential import LocalDifferentialBuilder
