@@ -1,3 +1,5 @@
+# This is the smoothmath._private.expression module
+
 from smoothmath._private.expression.variable import Variable
 from smoothmath._private.expression.constant import Constant
 from smoothmath._private.expression.add import Add

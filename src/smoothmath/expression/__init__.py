@@ -1,3 +1,5 @@
+# This is the public-facing smoothmath.expression module
+
 from smoothmath._private.expression import (
     Variable,
     Constant,

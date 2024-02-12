@@ -1,3 +1,5 @@
+# This is the public-facing smoothmath module
+
 import smoothmath.expression
 
 from smoothmath._private.errors import DomainError
