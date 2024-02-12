@@ -9,7 +9,7 @@ Welcome to smoothmath's documentation!
    expression
 
 
-Indices and tables
+Indices and search
 ==================
 
 * :ref:`genindex`
