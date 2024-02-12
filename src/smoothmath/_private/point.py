@@ -25,7 +25,7 @@ class Point:
         variable: Variable | str
     ) -> RealNumber:
         """
-        A coordinate. The y coordinate of Point(x=3, y=4) is 4.
+        A coordinate. The y coordinate of ``Point(x=3, y=4)`` is 4.
 
         :param variable: selects which coordinate
         """
