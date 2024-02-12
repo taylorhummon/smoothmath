@@ -4,8 +4,8 @@ import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import logarithm, divide, multiply
-from smoothmath._private.utilities import is_odd
+import smoothmath._private.math_functions as mf
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -49,7 +49,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
         self: Logarithm,
         inner_value: RealNumber
     ):
-        return logarithm(inner_value, base = self.base)
+        return mf.logarithm(inner_value, base = self.base)
 
     ## Partials and Differentials ##
 
@@ -60,11 +60,11 @@ class Logarithm(base.ParameterizedUnaryExpression):
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         if self.base == math.e:
-            return divide(multiplier, inner_value)
+            return mf.divide(multiplier, inner_value)
         else:
-            return divide(
+            return mf.divide(
                 multiplier,
-                multiply(logarithm(self.base, base = math.e), inner_value)
+                mf.multiply(mf.logarithm(self.base, base = math.e), inner_value)
             )
 
     def _synthetic_partial_formula(
@@ -118,7 +118,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     ) -> Optional[Expression]:
         if (
             isinstance(self._inner, ex.NthPower) and
-            is_odd(self._inner.n)
+            util.is_odd(self._inner.n)
         ):
             return ex.Multiply(
                 ex.Constant(self._inner.n),

@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import negation, cosine, sine, multiply
+import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -26,7 +26,7 @@ class Cosine(base.UnaryExpression):
         self: Cosine,
         inner_value: RealNumber
     ) -> RealNumber:
-        return cosine(inner_value)
+        return mf.cosine(inner_value)
 
     ## Partials and Differentials ##
 
@@ -36,7 +36,7 @@ class Cosine(base.UnaryExpression):
         multiplier: RealNumber
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
-        return multiply(negation(sine(inner_value)), multiplier)
+        return mf.multiply(mf.negation(mf.sine(inner_value)), multiplier)
 
     def _synthetic_partial_formula(
         self: Cosine,

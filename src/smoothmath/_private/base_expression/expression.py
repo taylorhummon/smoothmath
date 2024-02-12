@@ -6,7 +6,7 @@ import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
 import smoothmath._private.global_differential as gd
-from smoothmath._private.utilities import integer_from_integral_real_number, get_variable_name
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, GlobalDifferential, LocalDifferential, GlobalPartial
     from smoothmath.expression import (
@@ -74,7 +74,7 @@ class Expression(ABC):
         if not isinstance(point, sm.Point):
             raise Exception("Must provide a Point to local_partial()")
         self._reset_evaluation_cache()
-        variable_name = get_variable_name(variable)
+        variable_name = util.get_variable_name(variable)
         return self._local_partial(point, variable_name)
 
     @abstractmethod
@@ -94,7 +94,7 @@ class Expression(ABC):
 
         :param variable: the partial is taken with respect to this variable
         """
-        variable_name = get_variable_name(variable)
+        variable_name = util.get_variable_name(variable)
         synthetic_partial = self._synthetic_partial(variable_name)
         return sm.GlobalPartial.build(self, synthetic_partial)
 
@@ -241,7 +241,7 @@ class Expression(ABC):
             return ex.Power(self, exponent)
         # We want to accept a float representation of an integer (e.g. 3.0) even though
         # that wouldn't pass type checking.
-        n = integer_from_integral_real_number(exponent)
+        n = util.integer_from_integral_real_number(exponent)
         if isinstance(n, int):
             return ex.NthPower(self, n)
         raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")

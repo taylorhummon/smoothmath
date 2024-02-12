@@ -4,8 +4,8 @@ import math
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.utilities import integer_from_integral_real_number
-from smoothmath._private.math_functions import logarithm, minus, power, multiply
+import smoothmath._private.utilities as util
+import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.local_differential import LocalDifferentialBuilder
@@ -42,7 +42,7 @@ class Power(base.BinaryExpression):
         left_value: RealNumber,
         right_value: RealNumber
     ) -> RealNumber:
-        return power(left_value, right_value)
+        return mf.power(left_value, right_value)
 
     ## Partials and Differentials ##
 
@@ -110,9 +110,9 @@ class Power(base.BinaryExpression):
     ) -> RealNumber:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
-        return multiply(
+        return mf.multiply(
             right_value,
-            power(left_value, minus(right_value, 1)),
+            mf.power(left_value, mf.minus(right_value, 1)),
             multiplier
         )
 
@@ -133,7 +133,7 @@ class Power(base.BinaryExpression):
     ) -> RealNumber:
         left_value = self._left._evaluate(point)
         self_value = self._evaluate(point)
-        return multiply(logarithm(left_value, base = math.e), self_value, multiplier)
+        return mf.multiply(mf.logarithm(left_value, base = math.e), self_value, multiplier)
 
     def _synthetic_partial_formula_right(
         self: Power,
@@ -200,7 +200,7 @@ class Power(base.BinaryExpression):
         self: Power
     ) -> Optional[Expression]:
         if isinstance(self._right, ex.Constant):
-            n = integer_from_integral_real_number(self._right.value)
+            n = util.integer_from_integral_real_number(self._right.value)
             if n is not None and n >= 2:
                 return ex.NthPower(self._left, n)
         return None

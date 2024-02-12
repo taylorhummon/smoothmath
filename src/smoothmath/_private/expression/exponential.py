@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 import math
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import exponential, logarithm, multiply
+import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -43,7 +43,7 @@ class Exponential(base.ParameterizedUnaryExpression):
         self: Exponential,
         inner_value: RealNumber
     ):
-        return exponential(inner_value, base = self.base)
+        return mf.exponential(inner_value, base = self.base)
 
     ## Partials and Differentials ##
 
@@ -56,10 +56,10 @@ class Exponential(base.ParameterizedUnaryExpression):
             return 0
         self_value = self._evaluate(point)
         if self.base == math.e:
-            return multiply(self_value, multiplier)
+            return mf.multiply(self_value, multiplier)
         else:
-            return multiply(
-                logarithm(self.base, base = math.e),
+            return mf.multiply(
+                mf.logarithm(self.base, base = math.e),
                 self_value,
                 multiplier
             )

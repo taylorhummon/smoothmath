@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.local_differential as ld
-from smoothmath._private.utilities import get_variable_name
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression, GlobalPartial
     from smoothmath.expression import Variable
@@ -64,7 +64,7 @@ class GlobalDifferential:
 
         :param variable: selects which component
         """
-        variable_name = get_variable_name(variable)
+        variable_name = util.get_variable_name(variable)
         existing = self._synthetic_partials.get(variable_name, None)
         synthetic_partial = existing if existing is not None else ex.Constant(0)
         return sm.GlobalPartial(self.original_expression, synthetic_partial)
@@ -119,7 +119,7 @@ class GlobalDifferentialBuilder:
         variable: Variable | str,
         contribution: Expression
     ) -> None:
-        variable_name = get_variable_name(variable)
+        variable_name = util.get_variable_name(variable)
         existing = self._synthetic_partials.get(variable_name, None)
         next = existing + contribution if existing is not None else contribution
         self._synthetic_partials[variable_name] = next

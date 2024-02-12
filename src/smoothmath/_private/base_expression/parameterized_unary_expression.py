@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import smoothmath._private.base_expression as base
-from smoothmath._private.utilities import get_class_name
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import Expression
 
@@ -33,14 +33,14 @@ class ParameterizedUnaryExpression(base.UnaryExpression):
     def __hash__(
         self: ParameterizedUnaryExpression
     ) -> int:
-        return hash((get_class_name(self), self._inner, self._parameter))
+        return hash((util.get_class_name(self), self._inner, self._parameter))
 
     def __str__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._inner}, {self._parameter})"
+        return f"{util.get_class_name(self)}({self._inner}, {self._parameter})"
 
     def __repr__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._inner}, {self._parameter})"
+        return f"{util.get_class_name(self)}({self._inner}, {self._parameter})"

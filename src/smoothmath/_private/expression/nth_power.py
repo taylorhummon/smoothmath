@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Callable, Optional
 import math
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import nth_power, multiply
-from smoothmath._private.utilities import integer_from_integral_real_number, is_even
+import smoothmath._private.math_functions as mf
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -24,7 +24,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> None:
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
         # even though that wouldn't pass type checking.
-        i = integer_from_integral_real_number(n)
+        i = util.integer_from_integral_real_number(n)
         if i is None:
             raise Exception(f"NthPower() requires parameter n to be an int, found: {n}")
         elif i <= 0:
@@ -49,7 +49,7 @@ class NthPower(base.ParameterizedUnaryExpression):
         self: NthPower,
         inner_value: RealNumber
     ):
-        return nth_power(inner_value, self.n)
+        return mf.nth_power(inner_value, self.n)
 
     ## Partials and Differentials ##
 
@@ -63,9 +63,9 @@ class NthPower(base.ParameterizedUnaryExpression):
             return multiplier
         else: # n >= 2
             inner_value = self._inner._evaluate(point)
-            return multiply(
+            return mf.multiply(
                 n,
-                nth_power(inner_value, n - 1),
+                mf.nth_power(inner_value, n - 1),
                 multiplier
             )
 
@@ -140,7 +140,7 @@ class NthPower(base.ParameterizedUnaryExpression):
         self: NthPower
     ) -> Optional[Expression]:
         if isinstance(self._inner, ex.Negation):
-            if is_even(self.n):
+            if util.is_even(self.n):
                 return ex.NthPower(self._inner._inner, self.n)
             else: # n is odd
                 return ex.Negation(ex.NthPower(self._inner._inner, self.n))

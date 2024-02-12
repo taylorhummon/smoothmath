@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Mapping
-from smoothmath._private.utilities import get_variable_name
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber
     from smoothmath.expression import Variable
@@ -20,7 +20,7 @@ class Point:
         self._coordinates: Mapping[str, RealNumber]
         self._coordinates = {}
         for variable_or_name, value in coordinates.items():
-            variable_name = get_variable_name(variable_or_name)
+            variable_name = util.get_variable_name(variable_or_name)
             if variable_name in self._coordinates:
                 raise Exception(f"Provided more than one value for variable: {variable_name}")
             self._coordinates[variable_name] = value
@@ -34,7 +34,7 @@ class Point:
 
         :param variable: selects which coordinate
         """
-        variable_name = get_variable_name(variable)
+        variable_name = util.get_variable_name(variable)
         value = self._coordinates.get(variable_name, None)
         if value is None:
             raise Exception(f"No value provided for variable: {variable_name}")

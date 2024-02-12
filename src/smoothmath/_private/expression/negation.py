@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import negation
+import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -26,7 +26,7 @@ class Negation(base.UnaryExpression):
         self: Negation,
         inner_value: RealNumber
     ) -> RealNumber:
-        return negation(inner_value)
+        return mf.negation(inner_value)
 
     ## Partials and Differentials ##
 
@@ -35,7 +35,7 @@ class Negation(base.UnaryExpression):
         point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
-        return negation(multiplier)
+        return mf.negation(multiplier)
 
     def _synthetic_partial_formula(
         self: Negation,

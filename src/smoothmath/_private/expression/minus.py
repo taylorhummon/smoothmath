@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import negation, minus
+import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.local_differential import LocalDifferentialBuilder
@@ -31,7 +31,7 @@ class Minus(base.BinaryExpression):
         left_value: RealNumber,
         right_value: RealNumber
     ) -> RealNumber:
-        return minus(left_value, right_value)
+        return mf.minus(left_value, right_value)
 
     ## Partials and Differentials ##
 
@@ -42,7 +42,7 @@ class Minus(base.BinaryExpression):
     ) -> RealNumber:
         left_partial = self._left._local_partial(point, variable_name)
         right_partial = self._right._local_partial(point, variable_name)
-        return minus(left_partial, right_partial)
+        return mf.minus(left_partial, right_partial)
 
     def _synthetic_partial(
         self: Minus,
@@ -58,7 +58,7 @@ class Minus(base.BinaryExpression):
         accumulated: RealNumber
     ) -> None:
         self._left._compute_local_differential(builder, accumulated)
-        self._right._compute_local_differential(builder, negation(accumulated))
+        self._right._compute_local_differential(builder, mf.negation(accumulated))
 
     def _compute_global_differential(
         self: Minus,

@@ -2,11 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import add
-from smoothmath._private.utilities import (
-    group_by_key, map_dictionary_values,
-    first_of_given_type, partition_by_given_type
-)
+import smoothmath._private.math_functions as mf
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Constant, Negation, Logarithm
@@ -33,7 +30,7 @@ class Add(base.NAryExpression):
         self: Add,
         *inner_values: RealNumber
     ) -> RealNumber:
-        return add(*inner_values)
+        return mf.add(*inner_values)
 
     ## Partials and Differentials ##
 
@@ -42,7 +39,7 @@ class Add(base.NAryExpression):
         point: Point,
         variable_name: str
     ) -> RealNumber:
-        return add(*(
+        return mf.add(*(
             inner._local_partial(point, variable_name)
             for inner in self._inners
         ))
@@ -88,7 +85,7 @@ class Add(base.NAryExpression):
     def _reduce_by_flattening_nested_sums(
         self: Add
     ) -> Optional[Expression]:
-        pair_or_none = first_of_given_type(self._inners, Add)
+        pair_or_none = util.first_of_given_type(self._inners, Add)
         if pair_or_none is None:
             return None
         i, inner_add = pair_or_none
@@ -114,13 +111,13 @@ class Add(base.NAryExpression):
         self: Add
     ) -> Optional[Expression]:
         logarithms: list[Logarithm]; non_logarithms: list[Expression]
-        logarithms, non_logarithms = partition_by_given_type(self._inners, ex.Logarithm)
+        logarithms, non_logarithms = util.partition_by_given_type(self._inners, ex.Logarithm)
         if len(logarithms) <= 1:
             return None
-        logarithms_by_base = group_by_key(logarithms, lambda logarithm: logarithm.base)
+        logarithms_by_base = util.group_by_key(logarithms, lambda logarithm: logarithm.base)
         if all(len(logarithms) <= 1 for logarithms in logarithms_by_base.values()):
             return None
-        logarithm_inners_by_base = map_dictionary_values(
+        logarithm_inners_by_base = util.map_dictionary_values(
             logarithms_by_base,
             lambda _, logarithms: [logarithm._inner for logarithm in logarithms]
         )
@@ -134,17 +131,17 @@ class Add(base.NAryExpression):
         self: Add
     ) -> Optional[Expression]:
         constants: list[Constant]; non_constants: list[Expression]
-        constants, non_constants = partition_by_given_type(self._inners, ex.Constant)
+        constants, non_constants = util.partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:
             return None
-        summed = add(*(constant.value for constant in constants))
+        summed = mf.add(*(constant.value for constant in constants))
         return Add(*non_constants, ex.Constant(summed))
 
     def _normalize_fully_reduced(
         self: Add
     ) -> Expression:
         negations: list[Negation]; non_negations: list[Expression]
-        negations, non_negations = partition_by_given_type(self._inners, ex.Negation)
+        negations, non_negations = util.partition_by_given_type(self._inners, ex.Negation)
         type_i_terms = [term._normalize() for term in non_negations]
         type_ii_terms = [negation._inner._normalize() for negation in negations]
         type_i_count = len(type_i_terms)

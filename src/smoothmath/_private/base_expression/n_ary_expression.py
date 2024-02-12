@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional
 from abc import abstractmethod
 import smoothmath as sm
 import smoothmath._private.base_expression as base
-from smoothmath._private.utilities import get_class_name, list_with_updated_entry_at
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -76,7 +76,7 @@ class NAryExpression(base.Expression):
         for (i, inner) in enumerate(self._inners):
             if not inner._is_fully_reduced:
                 reduced_inner = inner._take_reduction_step()
-                revised = list_with_updated_entry_at(self._inners, i, reduced_inner)
+                revised = util.list_with_updated_entry_at(self._inners, i, reduced_inner)
                 return self._rebuild(*revised)
         for reducer in self._reducers:
             reduced = reducer()
@@ -116,7 +116,7 @@ class NAryExpression(base.Expression):
         self: NAryExpression
     ) -> int:
         return hash((
-            get_class_name(self),
+            util.get_class_name(self),
             len(self._inners),
             tuple(self._inners)
         ))
@@ -125,10 +125,10 @@ class NAryExpression(base.Expression):
         self: NAryExpression
     ) -> str:
         inner_strings = ", ".join(str(inner) for inner in self._inners)
-        return f"{get_class_name(self)}({inner_strings})"
+        return f"{util.get_class_name(self)}({inner_strings})"
 
     def __repr__(
         self: NAryExpression
     ) -> str:
         inner_strings = ", ".join(str(inner) for inner in self._inners)
-        return f"{get_class_name(self)}({inner_strings})"
+        return f"{util.get_class_name(self)}({inner_strings})"

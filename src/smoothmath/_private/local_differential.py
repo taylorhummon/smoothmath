@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-from smoothmath._private.utilities import get_variable_name
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Variable
@@ -34,7 +34,7 @@ class LocalDifferential:
 
         :param variable: selects which component
         """
-        variable_name = get_variable_name(variable)
+        variable_name = util.get_variable_name(variable)
         return self._local_partials.get(variable_name, 0)
 
     def __eq__(
@@ -97,7 +97,7 @@ class LocalDifferentialBuilder:
         variable: Variable | str,
         contribution: RealNumber
     ) -> None:
-        variable_name = get_variable_name(variable)
+        variable_name = util.get_variable_name(variable)
         existing = self._local_partials.get(variable_name, 0)
         self._local_partials[variable_name] = existing + contribution
 

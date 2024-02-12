@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import nth_power, nth_root, divide, multiply
-from smoothmath._private.utilities import integer_from_integral_real_number, is_even, is_odd
+import smoothmath._private.math_functions as mf
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -24,7 +24,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> None:
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
         # even though that wouldn't pass type checking.
-        i = integer_from_integral_real_number(n)
+        i = util.integer_from_integral_real_number(n)
         if i is None:
             raise Exception(f"NthRoot() requires parameter n to be an int, found: {n}")
         elif i <= 0:
@@ -45,14 +45,14 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> None:
         if self.n >= 2 and inner_value == 0:
             raise sm.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self.n}")
-        if is_even(self.n) and inner_value < 0:
+        if util.is_even(self.n) and inner_value < 0:
             raise sm.DomainError(f"NthRoot(x, n) is not defined for negative x when n = {self.n}")
 
     def _value_formula(
         self: NthRoot,
         inner_value: RealNumber
     ):
-        return nth_root(inner_value, self.n)
+        return mf.nth_root(inner_value, self.n)
 
     ## Partials and Differentials ##
 
@@ -66,9 +66,9 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return multiplier
         else:
             self_value = self._evaluate(point)
-            return divide(
+            return mf.divide(
                 multiplier,
-                multiply(n, nth_power(self_value, n - 1))
+                mf.multiply(n, mf.nth_power(self_value, n - 1))
             )
 
     def _synthetic_partial_formula(
@@ -134,7 +134,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> Optional[Expression]:
         if (
             isinstance(self._inner, ex.Negation) and
-            is_odd(self.n)
+            util.is_odd(self.n)
         ):
             return ex.Negation(ex.NthRoot(self._inner._inner, self.n))
         else:

@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import negation, nth_power, divide, add, multiply
+import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.local_differential import LocalDifferentialBuilder
@@ -36,7 +36,7 @@ class Divide(base.BinaryExpression):
         left_value: RealNumber,
         right_value: RealNumber
     ) -> RealNumber:
-        return divide(left_value, right_value)
+        return mf.divide(left_value, right_value)
 
     ## Partials and Differentials ##
 
@@ -50,7 +50,7 @@ class Divide(base.BinaryExpression):
         self._verify_domain_constraints(left_value, right_value)
         left_partial = self._left._local_partial(point, variable_name)
         right_partial = self._right._local_partial(point, variable_name)
-        return add(
+        return mf.add(
             self._local_partial_formula_left(point, left_partial),
             self._local_partial_formula_right(point, right_partial)
         )
@@ -95,7 +95,7 @@ class Divide(base.BinaryExpression):
         multiplier: RealNumber
     ) -> RealNumber:
         right_value = self._right._evaluate(point)
-        return divide(multiplier, right_value)
+        return mf.divide(multiplier, right_value)
 
     def _synthetic_partial_formula_left(
         self: Divide,
@@ -110,8 +110,8 @@ class Divide(base.BinaryExpression):
     ) -> RealNumber:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
-        return multiply(
-            negation(divide(left_value, nth_power(right_value, n = 2))),
+        return mf.multiply(
+            mf.negation(mf.divide(left_value, mf.nth_power(right_value, n = 2))),
             multiplier
         )
 

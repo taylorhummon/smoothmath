@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Callable, Optional
 from abc import abstractmethod
 import smoothmath as sm
 import smoothmath._private.base_expression as base
-from smoothmath._private.utilities import get_class_name
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.local_differential import LocalDifferentialBuilder
@@ -158,14 +158,14 @@ class UnaryExpression(base.Expression):
     def __hash__(
         self: UnaryExpression
     ) -> int:
-        return hash((get_class_name(self), self._inner))
+        return hash((util.get_class_name(self), self._inner))
 
     def __str__(
         self: UnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._inner})"
+        return f"{util.get_class_name(self)}({self._inner})"
 
     def __repr__(
         self: UnaryExpression
     ) -> str:
-        return f"{get_class_name(self)}({self._inner})"
+        return f"{util.get_class_name(self)}({self._inner})"

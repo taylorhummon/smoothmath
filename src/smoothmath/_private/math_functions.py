@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import math
 import smoothmath as sm
-from smoothmath._private.utilities import is_even
+import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber
 
@@ -110,7 +110,7 @@ def nth_root(
             # CAREFUL: math.cbrt can return imaginary values for negative inputs
             return - math.cbrt(- x)
     else: # n >= 4
-        if is_even(n):
+        if util.is_even(n):
             if x > 0:
                 return x ** (1 / n)
             elif x == 0:

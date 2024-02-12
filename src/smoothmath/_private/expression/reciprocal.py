@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath as sm
 import smoothmath.expression as ex
 import smoothmath._private.base_expression as base
-from smoothmath._private.math_functions import negation, reciprocal, nth_power, divide
+import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
 
@@ -28,7 +28,7 @@ class Reciprocal(base.UnaryExpression):
         self: Reciprocal,
         inner_value: RealNumber
     ):
-        return reciprocal(inner_value)
+        return mf.reciprocal(inner_value)
 
     ## Partials and Differentials ##
 
@@ -38,7 +38,7 @@ class Reciprocal(base.UnaryExpression):
         multiplier: RealNumber
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
-        return negation(divide(multiplier, nth_power(inner_value, n = 2)))
+        return mf.negation(mf.divide(multiplier, mf.nth_power(inner_value, n = 2)))
 
     def _synthetic_partial_formula(
         self: Reciprocal,
