@@ -35,22 +35,13 @@ class Minus(base.BinaryExpression):
 
     ## Partials and Differentials ##
 
-    def _local_partial(
+    def _compute_global_differential(
         self: Minus,
-        point: Point,
-        variable_name: str
-    ) -> RealNumber:
-        left_partial = self._left._local_partial(point, variable_name)
-        right_partial = self._right._local_partial(point, variable_name)
-        return mf.minus(left_partial, right_partial)
-
-    def _synthetic_partial(
-        self: Minus,
-        variable_name: str
-    ) -> Expression:
-        left_partial = self._left._synthetic_partial(variable_name)
-        right_partial = self._right._synthetic_partial(variable_name)
-        return ex.Minus(left_partial, right_partial)
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        self._left._compute_global_differential(builder, accumulated)
+        self._right._compute_global_differential(builder, ex.Negation(accumulated))
 
     def _compute_local_differential(
         self: Minus,
@@ -60,13 +51,22 @@ class Minus(base.BinaryExpression):
         self._left._compute_local_differential(builder, accumulated)
         self._right._compute_local_differential(builder, mf.negation(accumulated))
 
-    def _compute_global_differential(
+    def _synthetic_partial(
         self: Minus,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        self._left._compute_global_differential(builder, accumulated)
-        self._right._compute_global_differential(builder, ex.Negation(accumulated))
+        variable_name: str
+    ) -> Expression:
+        left_partial = self._left._synthetic_partial(variable_name)
+        right_partial = self._right._synthetic_partial(variable_name)
+        return ex.Minus(left_partial, right_partial)
+
+    def _local_partial(
+        self: Minus,
+        point: Point,
+        variable_name: str
+    ) -> RealNumber:
+        left_partial = self._left._local_partial(point, variable_name)
+        right_partial = self._right._local_partial(point, variable_name)
+        return mf.minus(left_partial, right_partial)
 
     ## Normalization and Reduction ##
 

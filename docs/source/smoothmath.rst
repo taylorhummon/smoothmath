@@ -10,11 +10,8 @@ smoothmath
 .. autoclass:: Point
     :members:
 
-.. class:: Expression
-
-    An abstract base class for all expresssions.
-
-    See the :doc:`expression` module for concrete expression classes.
+.. autoclass:: Expression
+    :members:
 
 .. autoclass:: GlobalDifferential()
     :members:

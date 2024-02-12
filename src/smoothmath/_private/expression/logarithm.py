@@ -53,6 +53,18 @@ class Logarithm(base.ParameterizedUnaryExpression):
 
     ## Partials and Differentials ##
 
+    def _synthetic_partial_formula(
+        self: Logarithm,
+        multiplier: Expression
+    ) -> Expression:
+        if self.base == math.e:
+            return ex.Divide(multiplier, self._inner)
+        else:
+            return ex.Divide(
+                multiplier,
+                ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self._inner)
+            )
+
     def _local_partial_formula(
         self: Logarithm,
         point: Point,
@@ -65,18 +77,6 @@ class Logarithm(base.ParameterizedUnaryExpression):
             return mf.divide(
                 multiplier,
                 mf.multiply(mf.logarithm(self.base, base = math.e), inner_value)
-            )
-
-    def _synthetic_partial_formula(
-        self: Logarithm,
-        multiplier: Expression
-    ) -> Expression:
-        if self.base == math.e:
-            return ex.Divide(multiplier, self._inner)
-        else:
-            return ex.Divide(
-                multiplier,
-                ex.Multiply(ex.Logarithm(ex.Constant(self.base), base = math.e), self._inner)
             )
 
     ## Normalization and Reduction ##

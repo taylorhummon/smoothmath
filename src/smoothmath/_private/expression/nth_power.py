@@ -53,6 +53,20 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     ## Partials and Differentials ##
 
+    def _synthetic_partial_formula(
+        self: NthPower,
+        multiplier: Expression
+    ) -> Expression:
+        n = self.n
+        if n == 1:
+            return multiplier
+        else: # n >= 2
+            return ex.Multiply(
+                ex.Constant(n),
+                ex.NthPower(self._inner, n - 1),
+                multiplier
+            )
+
     def _local_partial_formula(
         self: NthPower,
         point: Point,
@@ -66,20 +80,6 @@ class NthPower(base.ParameterizedUnaryExpression):
             return mf.multiply(
                 n,
                 mf.nth_power(inner_value, n - 1),
-                multiplier
-            )
-
-    def _synthetic_partial_formula(
-        self: NthPower,
-        multiplier: Expression
-    ) -> Expression:
-        n = self.n
-        if n == 1:
-            return multiplier
-        else: # n >= 2
-            return ex.Multiply(
-                ex.Constant(n),
-                ex.NthPower(self._inner, n - 1),
                 multiplier
             )
 

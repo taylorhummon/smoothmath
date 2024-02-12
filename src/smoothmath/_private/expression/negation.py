@@ -30,18 +30,18 @@ class Negation(base.UnaryExpression):
 
     ## Partials and Differentials ##
 
+    def _synthetic_partial_formula(
+        self: Negation,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Negation(multiplier)
+
     def _local_partial_formula(
         self: Negation,
         point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
         return mf.negation(multiplier)
-
-    def _synthetic_partial_formula(
-        self: Negation,
-        multiplier: Expression
-    ) -> Expression:
-        return ex.Negation(multiplier)
 
     ## Normalization and Reduction ##
 

@@ -8,7 +8,12 @@ if TYPE_CHECKING:
 
 class Point:
     """
-    A point.
+    A point. When constructing a point each keyword parameter is a variable name, and each
+    keyword argument is a real number. The order of keyword parameters is ignored.
+
+    >>> from smoothmath import Point
+    >>> Point(x=3, y=4.5) == Point(y=4.5, x=3)
+    True
 
     :param \\*\\*kwargs: a real number for each variable name
     """
@@ -25,7 +30,14 @@ class Point:
         variable: Variable | str
     ) -> RealNumber:
         """
-        A coordinate. The y coordinate of ``Point(x=3, y=4)`` is 4.
+        A coordinate. Raises an ``Exception`` if the variable is not present in the point.
+
+        >>> from smoothmath import Point
+        >>> p = Point(x=3, y=4.5)
+        >>> p.coordinate("x")
+        3
+        >>> p.coordinate("y")
+        4.5
 
         :param variable: selects which coordinate
         """

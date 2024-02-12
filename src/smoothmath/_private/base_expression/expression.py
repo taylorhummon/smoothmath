@@ -22,6 +22,20 @@ REDUCTION_STEPS_BOUND = 1000
 
 
 class Expression(ABC):
+    """
+    An abstract base class for all expresssions.
+    See the :doc:`expression` module for concrete expression classes.
+
+        >>> from smoothmath import Expression, Point
+        >>> from smoothmath.expression import Constant, Variable
+        >>> expression: Expression
+        >>> expression = (Variable("x") + Constant(1)) / Variable("x")
+        >>> expression.evaluate(Point(x = 2))
+        1.5
+        >>> expression.local_partial(Point(x = 2), Variable("x"))
+        -0.25
+    """
+
     def __init__(
         self: Expression,
         lacks_variables: bool
@@ -62,50 +76,23 @@ class Expression(ABC):
 
     ## Partials and Differentials ##
 
-    def local_partial(
-        self: Expression,
-        point: Point,
-        variable: Variable | str
-    ) -> RealNumber:
+    def global_differential(
+        self: Expression
+    ) -> GlobalDifferential:
         """
-        Takes the partial derivative of the expression and localizes at a point.
-
-        :param point: where to localize
-        :param variable: the partial is taken with respect to this variable
+        Takes the differential of the expression.
         """
-        if not isinstance(point, pt.Point):
-            raise Exception("Must provide a Point to local_partial()")
-        self._reset_evaluation_cache()
-        variable_name = util.get_variable_name(variable)
-        return self._local_partial(point, variable_name)
+        builder = gd.GlobalDifferentialBuilder(self)
+        self._compute_global_differential(builder, ex.Constant(1))
+        return builder.build()
 
     @abstractmethod
-    def _local_partial(
+    def _compute_global_differential(
         self: Expression,
-        point: Point,
-        variable_name: str
-    ) -> RealNumber:
-        raise Exception("Concrete classes derived from Expression must implement _local_partial()")
-
-    def global_partial(
-        self: Expression,
-        variable: Variable | str
-    ) -> GlobalPartial:
-        """
-        Takes the partial derivative of the expression.
-
-        :param variable: the partial is taken with respect to this variable
-        """
-        variable_name = util.get_variable_name(variable)
-        synthetic_partial = self._synthetic_partial(variable_name)
-        return gp.GlobalPartial.build(self, synthetic_partial)
-
-    @abstractmethod
-    def _synthetic_partial(
-        self: Expression,
-        variable_name: str
-    ) -> Expression:
-        raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None: # instead of returning a value, we mutate the global_differential argument
+        raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
 
     def local_differential(
         self: Expression,
@@ -131,23 +118,50 @@ class Expression(ABC):
     ) -> None: # instead of returning a value, we mutate the local_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
 
-    def global_differential(
-        self: Expression
-    ) -> GlobalDifferential:
+    def global_partial(
+        self: Expression,
+        variable: Variable | str
+    ) -> GlobalPartial:
         """
-        Takes the differential of the expression.
+        Takes the partial derivative of the expression.
+
+        :param variable: the partial is taken with respect to this variable
         """
-        builder = gd.GlobalDifferentialBuilder(self)
-        self._compute_global_differential(builder, ex.Constant(1))
-        return builder.build()
+        variable_name = util.get_variable_name(variable)
+        synthetic_partial = self._synthetic_partial(variable_name)
+        return gp.GlobalPartial.build(self, synthetic_partial)
 
     @abstractmethod
-    def _compute_global_differential(
+    def _synthetic_partial(
         self: Expression,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None: # instead of returning a value, we mutate the global_differential argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
+        variable_name: str
+    ) -> Expression:
+        raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
+
+    def local_partial(
+        self: Expression,
+        point: Point,
+        variable: Variable | str
+    ) -> RealNumber:
+        """
+        Takes the partial derivative of the expression and localizes at a point.
+
+        :param point: where to localize
+        :param variable: the partial is taken with respect to this variable
+        """
+        if not isinstance(point, pt.Point):
+            raise Exception("Must provide a Point to local_partial()")
+        self._reset_evaluation_cache()
+        variable_name = util.get_variable_name(variable)
+        return self._local_partial(point, variable_name)
+
+    @abstractmethod
+    def _local_partial(
+        self: Expression,
+        point: Point,
+        variable_name: str
+    ) -> RealNumber:
+        raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 
     ## Normalization and Reduction ##
 

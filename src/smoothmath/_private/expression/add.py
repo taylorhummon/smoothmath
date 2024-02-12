@@ -34,15 +34,21 @@ class Add(base.NAryExpression):
 
     ## Partials and Differentials ##
 
-    def _local_partial(
+    def _compute_global_differential(
         self: Add,
-        point: Point,
-        variable_name: str
-    ) -> RealNumber:
-        return mf.add(*(
-            inner._local_partial(point, variable_name)
-            for inner in self._inners
-        ))
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        for inner in self._inners:
+            inner._compute_global_differential(builder, accumulated)
+
+    def _compute_local_differential(
+        self: Add,
+        builder: LocalDifferentialBuilder,
+        accumulated: RealNumber
+    ) -> None:
+        for inner in self._inners:
+            inner._compute_local_differential(builder, accumulated)
 
     def _synthetic_partial(
         self: Add,
@@ -53,21 +59,15 @@ class Add(base.NAryExpression):
             for inner in self._inners
         ))
 
-    def _compute_local_differential(
+    def _local_partial(
         self: Add,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
-    ) -> None:
-        for inner in self._inners:
-            inner._compute_local_differential(builder, accumulated)
-
-    def _compute_global_differential(
-        self: Add,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        for inner in self._inners:
-            inner._compute_global_differential(builder, accumulated)
+        point: Point,
+        variable_name: str
+    ) -> RealNumber:
+        return mf.add(*(
+            inner._local_partial(point, variable_name)
+            for inner in self._inners
+        ))
 
     ## Normalization and Reduction ##
 

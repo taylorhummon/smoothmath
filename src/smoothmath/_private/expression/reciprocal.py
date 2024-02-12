@@ -32,6 +32,12 @@ class Reciprocal(base.UnaryExpression):
 
     ## Partials and Differentials ##
 
+    def _synthetic_partial_formula(
+        self: Reciprocal,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Negation(ex.Divide(multiplier, ex.NthPower(self._inner, n = 2)))
+
     def _local_partial_formula(
         self: Reciprocal,
         point: Point,
@@ -39,12 +45,6 @@ class Reciprocal(base.UnaryExpression):
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         return mf.negation(mf.divide(multiplier, mf.nth_power(inner_value, n = 2)))
-
-    def _synthetic_partial_formula(
-        self: Reciprocal,
-        multiplier: Expression
-    ) -> Expression:
-        return ex.Negation(ex.Divide(multiplier, ex.NthPower(self._inner, n = 2)))
 
     ## Normalization and Reduction ##
 
