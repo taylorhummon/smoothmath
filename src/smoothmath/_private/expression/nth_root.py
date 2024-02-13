@@ -56,19 +56,6 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     ## Partials and Differentials ##
 
-    def _synthetic_partial_formula(
-        self: NthRoot,
-        multiplier: Expression
-    ) -> Expression:
-        n = self.n
-        if n == 1:
-            return multiplier
-        else: # n >= 2
-            return ex.Divide(
-                multiplier,
-                ex.Multiply(ex.Constant(n), ex.NthPower(self, n - 1))
-            )
-
     def _local_partial_formula(
         self: NthRoot,
         point: Point,
@@ -82,6 +69,19 @@ class NthRoot(base.ParameterizedUnaryExpression):
             return mf.divide(
                 multiplier,
                 mf.multiply(n, mf.nth_power(self_value, n - 1))
+            )
+
+    def _synthetic_partial_formula(
+        self: NthRoot,
+        multiplier: Expression
+    ) -> Expression:
+        n = self.n
+        if n == 1:
+            return multiplier
+        else: # n >= 2
+            return ex.Divide(
+                multiplier,
+                ex.Multiply(ex.Constant(n), ex.NthPower(self, n - 1))
             )
 
     ## Normalization and Reduction ##

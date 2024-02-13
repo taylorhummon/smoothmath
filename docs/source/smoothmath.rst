@@ -13,11 +13,11 @@ smoothmath
 .. autoclass:: Expression()
     :members:
 
-.. autoclass:: GlobalDifferential(expression)
+.. autoclass:: GlobalPartial(expression, variable)
     :members:
 
 .. autoclass:: LocalDifferential(expression, point)
     :members:
 
-.. autoclass:: GlobalPartial(expression, variable)
+.. autoclass:: GlobalDifferential(expression)
     :members:

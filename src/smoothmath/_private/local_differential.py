@@ -72,6 +72,7 @@ class LocalDifferential:
         return f"LocalDifferential({self._original_expression}, {self._point})"
 
 
+# !!! move some of this code back to Expression class
 def _retrieve_local_partials(
     original_expression: Expression,
     point: Point,
@@ -85,6 +86,7 @@ def _retrieve_local_partials(
     return builder.local_partials
 
 
+# !!! new name for this
 class LocalDifferentialBuilder:
     def __init__(
         self: LocalDifferentialBuilder,

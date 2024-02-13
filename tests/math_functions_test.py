@@ -17,7 +17,7 @@ def test_add():
 
 
 def test_minus():
-    assert minus(5, 2) == 3
+    assert minus(5, 2) == approx(3)
 
 
 def test_negation():

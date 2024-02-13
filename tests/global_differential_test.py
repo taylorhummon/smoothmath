@@ -3,6 +3,7 @@ from smoothmath import DomainError, Point, LocalDifferential, GlobalPartial
 from smoothmath.expression import Variable, Constant, Reciprocal, NthPower, Logarithm
 from smoothmath._private.global_differential import GlobalDifferentialBuilder
 
+# # !!! turn tests back on
 
 # def test_GlobalDifferential():
 #     w = Variable("w")

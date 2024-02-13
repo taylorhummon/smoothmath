@@ -76,10 +76,7 @@ def test_Multiply_by_zero():
     z = Multiply(Constant(0), x)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(0)
-    assert z.local_partial(x, point) == approx(0)
-    assert z.global_partial(x).at(point) == approx(0)
-    assert z.local_differential(point).component(x) == approx(0)
-    assert z.global_differential().component_at(x, point) == approx(0)
+    assert_1_ary_derivatives(z, point, x, 0)
 
 
 def test_Multiply_by_one():
@@ -87,21 +84,20 @@ def test_Multiply_by_one():
     z = Multiply(Constant(1), x)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(2)
-    assert z.local_partial(x, point) == approx(1)
-    assert z.global_partial(x).at(point) == approx(1)
-    assert z.local_differential(point).component(x) == approx(1)
-    assert z.global_differential().component_at(x, point) == approx(1)
+    assert_1_ary_derivatives(z, point, x, 1)
 
 
-def test_Multiply_normalization():
+def test_Multiply_normalization_with_flattening():
     v = Variable("v")
     w = Variable("w")
     x = Variable("x")
     y = Variable("y")
-    # flattening
     z = Multiply(Multiply(v), Multiply(Multiply(w, x), y), Multiply())
     assert z._normalize() == Multiply(v, w, x, y)
-    # with Constant
+
+
+def test_Multiply_normalization_with_Constant():
+    x = Variable("x")
     z = Multiply(Constant(0), x)
     assert z._normalize() == Constant(0)
     z = Multiply(x, Constant(1))
@@ -112,7 +108,13 @@ def test_Multiply_normalization():
     assert z._normalize() == Multiply(x, Constant(6))
     z = Multiply(Constant(0.5), x, Constant(2))
     assert z._normalize() == x
-    # with Reciprocal
+
+
+def test_Multiply_normalization_with_Reciprocal():
+    v = Variable("v")
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
     z = Multiply(x, y)
     assert z._normalize() == Multiply(x, y)
     z = Multiply(x, Reciprocal(y))
@@ -127,26 +129,48 @@ def test_Multiply_normalization():
     assert z._normalize() == Divide(Multiply(w, y), x)
     z = Multiply(Reciprocal(v), w, Reciprocal(x), y)
     assert z._normalize() == Divide(Multiply(w, y), Multiply(v, x))
-    # with Negation
+
+
+def test_Multiply_normalization_with_Negation():
+    x = Variable("x")
+    y = Variable("y")
     z = Multiply(x, Negation(y))
     assert z._normalize() == Multiply(x, y, Constant(-1))
     z = Multiply(Negation(x), Negation(y))
     assert z._normalize() == Multiply(x, y)
-    # with NthPowers
+
+
+def test_Multiply_normalization_with_NthPower():
+    v = Variable("v")
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
     z = Multiply(NthPower(x, 2), NthPower(y, 2))
     assert z._normalize() == NthPower(Multiply(x, y), 2)
     z = Multiply(NthPower(x, 2), NthPower(y, 3))
     assert z._normalize() == Multiply(NthPower(x, 2), NthPower(y, 3))
     z = Multiply(NthPower(v, 2), NthPower(w, 3), NthPower(x, 2), y)
     assert z._normalize() == Multiply(y, NthPower(Multiply(v, x), 2), NthPower(w, 3))
-    # with NthRoots
+
+
+def test_Multiply_normalization_with_NthRoot():
+    v = Variable("v")
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
     z = Multiply(NthRoot(x, 2), NthRoot(y, 2))
     assert z._normalize() == NthRoot(Multiply(x, y), 2)
     z = Multiply(NthRoot(x, 2), NthRoot(y, 3))
     assert z._normalize() == Multiply(NthRoot(x, 2), NthRoot(y, 3))
     z = Multiply(NthRoot(v, 2), NthRoot(w, 3), NthRoot(x, 2), y)
     assert z._normalize() == Multiply(y, NthRoot(Multiply(v, x), 2), NthRoot(w, 3))
-    # with Exponentials
+
+
+def test_Multiply_normalization_with_Exponential():
+    v = Variable("v")
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
     z = Multiply(Exponential(x, base = 2), Exponential(y, base = 2))
     assert z._normalize() == Exponential(x + y, 2)
     z = Multiply(Exponential(x, base = 2), Exponential(y, base = 3))

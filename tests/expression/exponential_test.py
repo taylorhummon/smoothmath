@@ -29,6 +29,7 @@ def test_Exponential_composition():
     assert z.evaluate(point) == approx(1)
     assert_1_ary_derivatives(z, point, x, 2)
 
+
 def test_base_two_Exponential():
     x = Variable("x")
     z = Exponential(x, base = 2)

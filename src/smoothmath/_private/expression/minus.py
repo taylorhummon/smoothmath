@@ -35,21 +35,14 @@ class Minus(base.BinaryExpression):
 
     ## Partials and Differentials ##
 
-    def _compute_global_differential(
+    def _local_partial(
         self: Minus,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        self._left._compute_global_differential(builder, accumulated)
-        self._right._compute_global_differential(builder, ex.Negation(accumulated))
-
-    def _compute_local_differential(
-        self: Minus,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
-    ) -> None:
-        self._left._compute_local_differential(builder, accumulated)
-        self._right._compute_local_differential(builder, mf.negation(accumulated))
+        variable_name: str,
+        point: Point
+    ) -> RealNumber:
+        left_partial = self._left._local_partial(variable_name, point)
+        right_partial = self._right._local_partial(variable_name, point)
+        return mf.minus(left_partial, right_partial)
 
     def _synthetic_partial(
         self: Minus,
@@ -59,14 +52,21 @@ class Minus(base.BinaryExpression):
         right_partial = self._right._synthetic_partial(variable_name)
         return ex.Minus(left_partial, right_partial)
 
-    def _local_partial(
+    def _compute_local_differential(
         self: Minus,
-        variable_name: str,
-        point: Point
-    ) -> RealNumber:
-        left_partial = self._left._local_partial(variable_name, point)
-        right_partial = self._right._local_partial(variable_name, point)
-        return mf.minus(left_partial, right_partial)
+        builder: LocalDifferentialBuilder,
+        accumulated: RealNumber
+    ) -> None:
+        self._left._compute_local_differential(builder, accumulated)
+        self._right._compute_local_differential(builder, mf.negation(accumulated))
+
+    def _compute_global_differential(
+        self: Minus,
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        self._left._compute_global_differential(builder, accumulated)
+        self._right._compute_global_differential(builder, ex.Negation(accumulated))
 
     ## Normalization and Reduction ##
 

@@ -34,17 +34,31 @@ class Multiply(base.NAryExpression):
 
     ## Partials and Differentials ##
 
-    def _compute_global_differential(
+    def _local_partial(
         self: Multiply,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        for i, inner in enumerate(self._inners):
-            next_accumulated = ex.Multiply(
-                accumulated,
+        variable_name: str,
+        point: Point
+    ) -> RealNumber:
+        inner_values = [inner._evaluate(point) for inner in self._inners]
+        return mf.add(*(
+            mf.multiply(
+                inner._local_partial(variable_name, point),
+                *util.list_without_entry_at(inner_values, i)
+            )
+            for (i, inner) in enumerate(self._inners)
+        ))
+
+    def _synthetic_partial(
+        self: Multiply,
+        variable_name: str
+    ) -> Expression:
+        return ex.Add(*(
+            ex.Multiply(
+                inner._synthetic_partial(variable_name),
                 *util.list_without_entry_at(self._inners, i)
             )
-            inner._compute_global_differential(builder, next_accumulated)
+            for (i, inner) in enumerate(self._inners)
+        ))
 
     def _compute_local_differential(
         self: Multiply,
@@ -59,31 +73,17 @@ class Multiply(base.NAryExpression):
             )
             inner._compute_local_differential(builder, next_accumulated)
 
-    def _synthetic_partial(
+    def _compute_global_differential(
         self: Multiply,
-        variable_name: str
-    ) -> Expression:
-        return ex.Add(*(
-            ex.Multiply(
-                inner._synthetic_partial(variable_name),
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        for i, inner in enumerate(self._inners):
+            next_accumulated = ex.Multiply(
+                accumulated,
                 *util.list_without_entry_at(self._inners, i)
             )
-            for (i, inner) in enumerate(self._inners)
-        ))
-
-    def _local_partial(
-        self: Multiply,
-        variable_name: str,
-        point: Point
-    ) -> RealNumber:
-        inner_values = [inner._evaluate(point) for inner in self._inners]
-        return mf.add(*(
-            mf.multiply(
-                inner._local_partial(variable_name, point),
-                *util.list_without_entry_at(inner_values, i)
-            )
-            for (i, inner) in enumerate(self._inners)
-        ))
+            inner._compute_global_differential(builder, next_accumulated)
 
     ## Normalization and Reduction ##
 

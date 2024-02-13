@@ -30,12 +30,6 @@ class Sine(base.UnaryExpression):
 
     ## Partials and Differentials ##
 
-    def _synthetic_partial_formula(
-        self: Sine,
-        multiplier: Expression
-    ) -> Expression:
-        return ex.Multiply(ex.Cosine(self._inner), multiplier)
-
     def _local_partial_formula(
         self: Sine,
         point: Point,
@@ -43,6 +37,12 @@ class Sine(base.UnaryExpression):
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         return mf.multiply(mf.cosine(inner_value), multiplier)
+
+    def _synthetic_partial_formula(
+        self: Sine,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Multiply(ex.Cosine(self._inner), multiplier)
 
     ## Normalization and Reduction ##
 

@@ -37,12 +37,18 @@ class Constant(base.Expression):
 
     ## Partials and Differentials ##
 
-    def _compute_global_differential(
+    def _local_partial(
         self: Constant,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        pass
+        variable_name: str,
+        point: Point
+    ) -> RealNumber:
+        return 0
+
+    def _synthetic_partial(
+        self: Constant,
+        variable_name: str
+    ) -> Expression:
+        return ex.Constant(0)
 
     def _compute_local_differential(
         self: Constant,
@@ -51,18 +57,12 @@ class Constant(base.Expression):
     ) -> None:
         pass
 
-    def _synthetic_partial(
+    def _compute_global_differential(
         self: Constant,
-        variable_name: str
-    ) -> Expression:
-        return ex.Constant(0)
-
-    def _local_partial(
-        self: Constant,
-        variable_name: str,
-        point: Point
-    ) -> RealNumber:
-        return 0
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        pass
 
     ## Normalization and Reduction ##
 

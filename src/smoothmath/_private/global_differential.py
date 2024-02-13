@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from smoothmath.expression import Variable
     from smoothmath._private.local_differential import LocalDifferential
 
+# !!! normalize
 
 class GlobalDifferential:
     """
@@ -26,6 +27,32 @@ class GlobalDifferential:
         self._synthetic_partials: dict[str, Expression]
         self._synthetic_partials = _retrieve_synthetic_partials(expression)
 
+    def component_at(
+        self: GlobalDifferential,
+        variable: Variable | str,
+        point: Point
+    ) -> RealNumber:
+        """
+        The component of the differential localized at a point.
+
+        :param point: where to localize
+        :param variable: selects which component
+        """
+        return self.component(variable).at(point)
+
+    def component(
+        self: GlobalDifferential,
+        variable: Variable | str
+    ) -> GlobalPartial:
+        """
+        The component of the differential.
+
+        :param variable: selects which component
+        """
+        variable_name = util.get_variable_name(variable)
+        synthetic_partial = self._synthetic_partials.get(variable_name, None)
+        return gp.GlobalPartial(self._original_expression, variable_name, synthetic_partial)
+
     def at(
         self: GlobalDifferential,
         point: Point
@@ -41,32 +68,6 @@ class GlobalDifferential:
         for variable_name, synthetic_partial in self._synthetic_partials.items():
             local_partials[variable_name] = synthetic_partial.evaluate(point)
         return ld.LocalDifferential(self._original_expression, point, local_partials)
-
-    def component(
-        self: GlobalDifferential,
-        variable: Variable | str
-    ) -> GlobalPartial:
-        """
-        The component of the differential.
-
-        :param variable: selects which component
-        """
-        variable_name = util.get_variable_name(variable)
-        synthetic_partial = self._synthetic_partials.get(variable_name, None)
-        return gp.GlobalPartial(self._original_expression, variable_name, synthetic_partial)
-
-    def component_at(
-        self: GlobalDifferential,
-        variable: Variable | str,
-        point: Point
-    ) -> RealNumber:
-        """
-        The component of the differential localized at a point.
-
-        :param point: where to localize
-        :param variable: selects which component
-        """
-        return self.component(variable).at(point)
 
     def __eq__(
         self: GlobalDifferential,
@@ -100,6 +101,7 @@ class GlobalDifferential:
         return f"GlobalDifferential({self._original_expression})"
 
 
+# !!! move some of this code back to Expression class
 def _retrieve_synthetic_partials(
     original_expression: Expression
 ) -> dict[str, Expression]:
@@ -108,6 +110,7 @@ def _retrieve_synthetic_partials(
     return builder.synthetic_partials
 
 
+# !!! new name for this
 class GlobalDifferentialBuilder:
     def __init__(
         self: GlobalDifferentialBuilder

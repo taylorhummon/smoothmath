@@ -63,13 +63,22 @@ class UnaryExpression(base.Expression):
 
     ## Partials and Differentials ##
 
-    def _compute_global_differential(
+    def _local_partial(
         self: UnaryExpression,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        next_accumulated = self._synthetic_partial_formula(accumulated)
-        self._inner._compute_global_differential(builder, next_accumulated)
+        variable_name: str,
+        point: Point
+    ) -> RealNumber:
+        inner_value = self._inner._evaluate(point)
+        self._verify_domain_constraints(inner_value)
+        inner_partial = self._inner._local_partial(variable_name, point)
+        return self._local_partial_formula(point, inner_partial)
+
+    def _synthetic_partial(
+        self: UnaryExpression,
+        variable_name: str
+    ) -> Expression:
+        inner_partial = self._inner._synthetic_partial(variable_name)
+        return self._synthetic_partial_formula(inner_partial)
 
     def _compute_local_differential(
         self: UnaryExpression,
@@ -81,29 +90,13 @@ class UnaryExpression(base.Expression):
         next_accumulated = self._local_partial_formula(builder.point, accumulated)
         self._inner._compute_local_differential(builder, next_accumulated)
 
-    def _synthetic_partial(
+    def _compute_global_differential(
         self: UnaryExpression,
-        variable_name: str
-    ) -> Expression:
-        inner_partial = self._inner._synthetic_partial(variable_name)
-        return self._synthetic_partial_formula(inner_partial)
-
-    def _local_partial(
-        self: UnaryExpression,
-        variable_name: str,
-        point: Point
-    ) -> RealNumber:
-        inner_value = self._inner._evaluate(point)
-        self._verify_domain_constraints(inner_value)
-        inner_partial = self._inner._local_partial(variable_name, point)
-        return self._local_partial_formula(point, inner_partial)
-
-    @abstractmethod
-    def _synthetic_partial_formula(
-        self: UnaryExpression,
-        multiplier: Expression
-    ) -> Expression:
-        raise Exception("Concrete classes derived from UnaryExpression must implement _synthetic_partial_formula()")
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        next_accumulated = self._synthetic_partial_formula(accumulated)
+        self._inner._compute_global_differential(builder, next_accumulated)
 
     @abstractmethod
     def _local_partial_formula(
@@ -112,6 +105,13 @@ class UnaryExpression(base.Expression):
         multiplier: RealNumber
     ) -> RealNumber:
         raise Exception("Concrete classes derived from UnaryExpression must implement _local_partial_formula()")
+
+    @abstractmethod
+    def _synthetic_partial_formula(
+        self: UnaryExpression,
+        multiplier: Expression
+    ) -> Expression:
+        raise Exception("Concrete classes derived from UnaryExpression must implement _synthetic_partial_formula()")
 
     ## Normalization and Reduction ##
 

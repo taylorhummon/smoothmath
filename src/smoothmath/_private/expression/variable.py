@@ -44,19 +44,15 @@ class Variable(base.Expression):
 
     ## Partials and Differentials ##
 
-    def _compute_global_differential(
+    def _local_partial(
         self: Variable,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        builder.add_to(self, accumulated)
-
-    def _compute_local_differential(
-        self: Variable,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
-    ) -> None:
-        builder.add_to(self, accumulated)
+        variable_name: str,
+        point: Point
+    ) -> RealNumber:
+        if self.name == variable_name:
+            return 1
+        else:
+            return 0
 
     def _synthetic_partial(
         self: Variable,
@@ -67,15 +63,19 @@ class Variable(base.Expression):
         else:
             return ex.Constant(0)
 
-    def _local_partial(
+    def _compute_local_differential(
         self: Variable,
-        variable_name: str,
-        point: Point
-    ) -> RealNumber:
-        if self.name == variable_name:
-            return 1
-        else:
-            return 0
+        builder: LocalDifferentialBuilder,
+        accumulated: RealNumber
+    ) -> None:
+        builder.add_to(self, accumulated)
+
+    def _compute_global_differential(
+        self: Variable,
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        builder.add_to(self, accumulated)
 
     ## Normalization and Reduction ##
 

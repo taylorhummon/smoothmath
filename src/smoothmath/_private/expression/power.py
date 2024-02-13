@@ -46,44 +46,6 @@ class Power(base.BinaryExpression):
 
     ## Partials and Differentials ##
 
-    def _compute_global_differential(
-        self: Power,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
-    ) -> None:
-        next_accumulated_left = self._synthetic_partial_formula_left(accumulated)
-        next_accumulated_right = self._synthetic_partial_formula_right(accumulated)
-        self._left._compute_global_differential(builder, next_accumulated_left)
-        self._right._compute_global_differential(builder, next_accumulated_right)
-
-    def _compute_local_differential(
-        self: Power,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
-    ) -> None:
-        if self._left._lacks_variables and self._left._evaluate(builder.point) == 1:
-            # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
-            pass
-        else:
-            left_value = self._left._evaluate(builder.point)
-            right_value = self._right._evaluate(builder.point)
-            self._verify_domain_constraints(left_value, right_value)
-            next_accumulated_left = self._local_partial_formula_left(builder.point, accumulated)
-            next_accumulated_right = self._local_partial_formula_right(builder.point, accumulated)
-            self._left._compute_local_differential(builder, next_accumulated_left)
-            self._right._compute_local_differential(builder, next_accumulated_right)
-
-    def _synthetic_partial(
-        self: Power,
-        variable_name: str
-    ) -> Expression:
-        left_partial = self._left._synthetic_partial(variable_name)
-        right_partial = self._right._synthetic_partial(variable_name)
-        return ex.Add(
-            self._synthetic_partial_formula_left(left_partial),
-            self._synthetic_partial_formula_right(right_partial)
-        )
-
     def _local_partial(
         self: Power,
         variable_name: str,
@@ -103,15 +65,43 @@ class Power(base.BinaryExpression):
                 self._local_partial_formula_right(point, right_partial)
             )
 
-    def _synthetic_partial_formula_left(
+    def _synthetic_partial(
         self: Power,
-        multiplier: Expression
+        variable_name: str
     ) -> Expression:
-        return ex.Multiply(
-            self._right,
-            ex.Power(self._left, ex.Minus(self._right, ex.Constant(1))),
-            multiplier
+        left_partial = self._left._synthetic_partial(variable_name)
+        right_partial = self._right._synthetic_partial(variable_name)
+        return ex.Add(
+            self._synthetic_partial_formula_left(left_partial),
+            self._synthetic_partial_formula_right(right_partial)
         )
+
+    def _compute_local_differential(
+        self: Power,
+        builder: LocalDifferentialBuilder,
+        accumulated: RealNumber
+    ) -> None:
+        if self._left._lacks_variables and self._left._evaluate(builder.point) == 1:
+            # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
+            pass
+        else:
+            left_value = self._left._evaluate(builder.point)
+            right_value = self._right._evaluate(builder.point)
+            self._verify_domain_constraints(left_value, right_value)
+            next_accumulated_left = self._local_partial_formula_left(builder.point, accumulated)
+            next_accumulated_right = self._local_partial_formula_right(builder.point, accumulated)
+            self._left._compute_local_differential(builder, next_accumulated_left)
+            self._right._compute_local_differential(builder, next_accumulated_right)
+
+    def _compute_global_differential(
+        self: Power,
+        builder: GlobalDifferentialBuilder,
+        accumulated: Expression
+    ) -> None:
+        next_accumulated_left = self._synthetic_partial_formula_left(accumulated)
+        next_accumulated_right = self._synthetic_partial_formula_right(accumulated)
+        self._left._compute_global_differential(builder, next_accumulated_left)
+        self._right._compute_global_differential(builder, next_accumulated_right)
 
     def _local_partial_formula_left(
         self: Power,
@@ -123,6 +113,16 @@ class Power(base.BinaryExpression):
         return mf.multiply(
             right_value,
             mf.power(left_value, mf.minus(right_value, 1)),
+            multiplier
+        )
+
+    def _synthetic_partial_formula_left(
+        self: Power,
+        multiplier: Expression
+    ) -> Expression:
+        return ex.Multiply(
+            self._right,
+            ex.Power(self._left, ex.Minus(self._right, ex.Constant(1))),
             multiplier
         )
 

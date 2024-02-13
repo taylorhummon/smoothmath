@@ -3,6 +3,7 @@ from smoothmath import DomainError, Point, GlobalPartial
 from smoothmath.expression import Variable, Constant, Reciprocal, NthPower, Logarithm
 
 
+# # !!!
 # def test_GlobalPartial():
 #     w = Variable("w")
 #     x = Variable("x")

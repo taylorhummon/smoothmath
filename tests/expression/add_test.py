@@ -68,15 +68,17 @@ def test_0_ary_Add():
     assert z.evaluate(point) == approx(0)
 
 
-def test_Add_normalization():
+def test_Add_normalization_with_flattening():
     v = Variable("v")
     w = Variable("w")
     x = Variable("x")
     y = Variable("y")
-    # flattening
     z = Add(Add(v), Add(Add(w, x), y), Add())
     assert z._normalize() == Add(v, w, x, y)
-    # with Constant
+
+
+def test_Add_normalization_with_Constant():
+    x = Variable("x")
     z = Add(Constant(2), x, Constant(3))
     assert z._normalize() == Add(x, Constant(5))
     z = Add(x, Constant(0))
@@ -85,7 +87,13 @@ def test_Add_normalization():
     assert z._normalize() == x
     z = Add(Constant(-1), x, Constant(1))
     assert z._normalize() == x
-    # with Negation
+
+
+def test_Add_normalization_with_Negation():
+    v = Variable("v")
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
     z = Add(x, y)
     assert z._normalize() == Add(x, y)
     z = Add(x, Negation(y))
@@ -100,7 +108,13 @@ def test_Add_normalization():
     assert z._normalize() == Minus(Add(w, y), x)
     z = Add(Negation(v), w, Negation(x), y)
     assert z._normalize() == Minus(Add(w, y), Add(v, x))
-    # with Logarithms
+
+
+def test_Add_normalization_with_Logarithm():
+    v = Variable("v")
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
     z = Add(Logarithm(x, base = 2), Logarithm(y, base = 2))
     assert z._normalize() == Logarithm(Multiply(x, y), base = 2)
     z = Add(Logarithm(x, base = 2), Logarithm(y, base = 3))

@@ -47,21 +47,6 @@ class Exponential(base.ParameterizedUnaryExpression):
 
     ## Partials and Differentials ##
 
-    def _synthetic_partial_formula(
-        self: Exponential,
-        multiplier: Expression
-    ) -> Expression:
-        if self.base == 1:
-            return ex.Constant(0)
-        elif self.base == math.e:
-            return ex.Multiply(self, multiplier)
-        else:
-            return ex.Multiply(
-                ex.Logarithm(ex.Constant(self.base), base = math.e),
-                self,
-                multiplier
-            )
-
     def _local_partial_formula(
         self: Exponential,
         point: Point,
@@ -76,6 +61,21 @@ class Exponential(base.ParameterizedUnaryExpression):
             return mf.multiply(
                 mf.logarithm(self.base, base = math.e),
                 self_value,
+                multiplier
+            )
+
+    def _synthetic_partial_formula(
+        self: Exponential,
+        multiplier: Expression
+    ) -> Expression:
+        if self.base == 1:
+            return ex.Constant(0)
+        elif self.base == math.e:
+            return ex.Multiply(self, multiplier)
+        else:
+            return ex.Multiply(
+                ex.Logarithm(ex.Constant(self.base), base = math.e),
+                self,
                 multiplier
             )
 
