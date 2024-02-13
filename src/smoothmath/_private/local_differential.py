@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
@@ -9,20 +9,23 @@ if TYPE_CHECKING:
 class LocalDifferential:
     """
     The differential of an expression localized at a point.
+
+    :param expression: an expression
+    :param point: where to localize
     """
 
     def __init__(
         self: LocalDifferential,
         expression: Expression,
         point: Point,
-        local_partials: dict[str, RealNumber]
+        local_partials: Optional[dict[str, RealNumber]] = None
     ) -> None:
         self._original_expression: Expression
         self._original_expression = expression
         self._point: Point
         self._point = point
         self._local_partials: dict[str, RealNumber]
-        self._local_partials = local_partials.copy()
+        self._local_partials = _retrieve_local_partials(expression, point, local_partials)
 
     def component(
         self: LocalDifferential,
@@ -56,40 +59,41 @@ class LocalDifferential:
     def __str__(
         self: LocalDifferential
     ) -> str:
-        return f"({self._partials_string()})"
+        return self._to_string()
 
     def __repr__(
         self: LocalDifferential
     ) -> str:
-        dictionary = {
-            "original": self._original_expression,
-            "point": self._point,
-            "partials": self._partials_string()
-        }
-        pairs_string = "; ".join(f"{key}: {value}" for key, value in dictionary.items())
-        return f"({pairs_string})"
+        return self._to_string()
 
-    def _partials_string(
+    def _to_string(
         self: LocalDifferential
     ) -> str:
-        return ", ".join(
-            f"{variable_name}-partial = {local_partial}"
-            for variable_name, local_partial in self._local_partials.items()
-        )
+        return f"LocalDifferential({self._original_expression}, {self._point})"
+
+
+def _retrieve_local_partials(
+    original_expression: Expression,
+    point: Point,
+    optional_local_partials: Optional[dict[str, RealNumber]]
+) -> dict[str, RealNumber]:
+    if optional_local_partials is not None:
+        return optional_local_partials
+    builder = LocalDifferentialBuilder(point)
+    original_expression._reset_evaluation_cache()
+    original_expression._compute_local_differential(builder, 1)
+    return builder.local_partials
 
 
 class LocalDifferentialBuilder:
     def __init__(
         self: LocalDifferentialBuilder,
-        expression: Expression,
         point: Point
     ) -> None:
-        self._original_expression: Expression
-        self._original_expression = expression
         self.point: Point
         self.point = point
-        self._local_partials: dict[str, RealNumber]
-        self._local_partials = {}
+        self.local_partials: dict[str, RealNumber]
+        self.local_partials = {}
 
     def add_to(
         self: LocalDifferentialBuilder,
@@ -97,10 +101,5 @@ class LocalDifferentialBuilder:
         contribution: RealNumber
     ) -> None:
         variable_name = util.get_variable_name(variable)
-        existing = self._local_partials.get(variable_name, 0)
-        self._local_partials[variable_name] = existing + contribution
-
-    def build(
-        self: LocalDifferentialBuilder
-    ) -> LocalDifferential:
-        return LocalDifferential(self._original_expression, self.point, self._local_partials)
+        existing = self.local_partials.get(variable_name, 0)
+        self.local_partials[variable_name] = existing + contribution

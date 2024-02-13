@@ -79,4 +79,4 @@ class Point:
             f'{variable_name}={value}'
             for variable_name, value in self._coordinates.items()
         )
-        return "Point(" + equations_string + ")"
+        return f"Point({equations_string})"

@@ -13,17 +13,18 @@ if TYPE_CHECKING:
 class GlobalDifferential:
     """
     The differential of an expression.
+
+    :param expression: an expression
     """
 
     def __init__(
         self: GlobalDifferential,
-        expression: Expression,
-        synthetic_partials: dict[str, Expression]
+        expression: Expression
     ) -> None:
         self._original_expression: Expression
         self._original_expression = expression
         self._synthetic_partials: dict[str, Expression]
-        self._synthetic_partials = synthetic_partials.copy()
+        self._synthetic_partials = _retrieve_synthetic_partials(expression)
 
     def at(
         self: GlobalDifferential,
@@ -35,11 +36,11 @@ class GlobalDifferential:
         :param point: where to localize
         """
         self._original_expression.evaluate(point)
-        builder = ld.LocalDifferentialBuilder(self._original_expression, point)
+        local_partials: dict[str, RealNumber]
+        local_partials = {}
         for variable_name, synthetic_partial in self._synthetic_partials.items():
-            local_partial = synthetic_partial.evaluate(point)
-            builder.add_to(variable_name, local_partial)
-        return builder.build()
+            local_partials[variable_name] = synthetic_partial.evaluate(point)
+        return ld.LocalDifferential(self._original_expression, point, local_partials)
 
     def component(
         self: GlobalDifferential,
@@ -51,9 +52,8 @@ class GlobalDifferential:
         :param variable: selects which component
         """
         variable_name = util.get_variable_name(variable)
-        existing = self._synthetic_partials.get(variable_name, None)
-        synthetic_partial = existing if existing is not None else ex.Constant(0)
-        return gp.GlobalPartial(self._original_expression, synthetic_partial)
+        synthetic_partial = self._synthetic_partials.get(variable_name, None)
+        return gp.GlobalPartial(self._original_expression, variable_name, synthetic_partial)
 
     def component_at(
         self: GlobalDifferential,
@@ -87,31 +87,33 @@ class GlobalDifferential:
     def __str__(
         self: GlobalDifferential
     ) -> str:
-        return f"({self._partials_string()})"
+        return self._to_string()
 
     def __repr__(
         self: GlobalDifferential
     ) -> str:
-        return f"(original: {self._original_expression}; partials: {self._partials_string()})"
+        return self._to_string()
 
-    def _partials_string(
+    def _to_string(
         self: GlobalDifferential
     ) -> str:
-        return ", ".join(
-            f"{variable_name}-partial = {synthetic_partial}"
-            for variable_name, synthetic_partial in self._synthetic_partials.items()
-        )
+        return f"GlobalDifferential({self._original_expression})"
+
+
+def _retrieve_synthetic_partials(
+    original_expression: Expression
+) -> dict[str, Expression]:
+    builder = GlobalDifferentialBuilder()
+    original_expression._compute_global_differential(builder, ex.Constant(1))
+    return builder.synthetic_partials
 
 
 class GlobalDifferentialBuilder:
     def __init__(
-        self: GlobalDifferentialBuilder,
-        expression: Expression
+        self: GlobalDifferentialBuilder
     ) -> None:
-        self._original_expression: Expression
-        self._original_expression = expression
-        self._synthetic_partials: dict[str, Expression]
-        self._synthetic_partials = {}
+        self.synthetic_partials: dict[str, Expression]
+        self.synthetic_partials = {}
 
     def add_to(
         self: GlobalDifferentialBuilder,
@@ -119,14 +121,6 @@ class GlobalDifferentialBuilder:
         contribution: Expression
     ) -> None:
         variable_name = util.get_variable_name(variable)
-        existing = self._synthetic_partials.get(variable_name, None)
+        existing = self.synthetic_partials.get(variable_name, None)
         next = existing + contribution if existing is not None else contribution
-        self._synthetic_partials[variable_name] = next
-
-    def build(
-        self: GlobalDifferentialBuilder
-    ) -> GlobalDifferential:
-        normalized_synthetic_partials = {}
-        for variable_name, synthetic_partial in self._synthetic_partials.items():
-            normalized_synthetic_partials[variable_name] = synthetic_partial._normalize()
-        return GlobalDifferential(self._original_expression, normalized_synthetic_partials)
+        self.synthetic_partials[variable_name] = next

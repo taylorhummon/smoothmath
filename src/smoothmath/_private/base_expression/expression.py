@@ -56,8 +56,6 @@ class Expression(ABC):
 
         :param point: where to evaluate
         """
-        if not isinstance(point, pt.Point):
-            raise Exception("Must provide a Point to evaluate()")
         self._reset_evaluation_cache()
         return self._evaluate(point)
 
@@ -82,9 +80,7 @@ class Expression(ABC):
         """
         Takes the differential of the expression.
         """
-        builder = gd.GlobalDifferentialBuilder(self)
-        self._compute_global_differential(builder, ex.Constant(1))
-        return builder.build()
+        return gd.GlobalDifferential(self)
 
     @abstractmethod
     def _compute_global_differential(
@@ -103,12 +99,7 @@ class Expression(ABC):
 
         :param point: where to localize
         """
-        if not isinstance(point, pt.Point):
-            raise Exception("Must provide a Point to local_differential()")
-        self._reset_evaluation_cache()
-        builder = ld.LocalDifferentialBuilder(self, point)
-        self._compute_local_differential(builder, 1)
-        return builder.build()
+        return ld.LocalDifferential(self, point)
 
     @abstractmethod
     def _compute_local_differential(
@@ -127,9 +118,7 @@ class Expression(ABC):
 
         :param variable: the partial is taken with respect to this variable
         """
-        variable_name = util.get_variable_name(variable)
-        synthetic_partial = self._synthetic_partial(variable_name)
-        return gp.GlobalPartial.build(self, synthetic_partial)
+        return gp.GlobalPartial(self, variable)
 
     @abstractmethod
     def _synthetic_partial(
@@ -149,8 +138,6 @@ class Expression(ABC):
         :param variable: the partial is taken with respect to this variable
         :param point: where to localize
         """
-        if not isinstance(point, pt.Point):
-            raise Exception("Must provide a Point to local_partial()")
         self._reset_evaluation_cache()
         variable_name = util.get_variable_name(variable)
         return self._local_partial(variable_name, point)
