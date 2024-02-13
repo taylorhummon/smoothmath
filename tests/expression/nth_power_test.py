@@ -3,34 +3,24 @@ from smoothmath import Point
 from smoothmath.expression import (
     Variable, Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
 )
+from assert_derivatives import assert_1_ary_derivatives # type: ignore
 
 
 def test_NthPower_with_n_equal_two():
     x = Variable("x")
     z = NthPower(x, n = 2)
-    global_x_partial = z.global_partial(x)
-    global_differential = z.global_differential()
     # at x = 3
     point = Point(x = 3)
     assert z.evaluate(point) == approx(9)
-    assert z.local_partial(x, point) == approx(6)
-    assert global_x_partial.at(point) == approx(6)
-    assert z.local_differential(point).component(x) == approx(6)
-    assert global_differential.component_at(x, point) == approx(6)
+    assert_1_ary_derivatives(z, point, x, 6)
     # at x = 0
     point = Point(x = 0)
     assert z.evaluate(point) == approx(0)
-    assert z.local_partial(x, point) == approx(0)
-    assert global_x_partial.at(point) == approx(0)
-    assert z.local_differential(point).component(x) == approx(0)
-    assert global_differential.component_at(x, point) == approx(0)
+    assert_1_ary_derivatives(z, point, x, 0)
     # at x = -5
     point = Point(x = -5)
     assert z.evaluate(point) == approx(25)
-    assert z.local_partial(x, point) == approx(-10)
-    assert global_x_partial.at(point) == approx(-10)
-    assert z.local_differential(point).component(x) == approx(-10)
-    assert global_differential.component_at(x, point) == approx(-10)
+    assert_1_ary_derivatives(z, point, x, -10)
 
 
 def test_NthPower_with_n_equal_two_composition():
@@ -38,38 +28,24 @@ def test_NthPower_with_n_equal_two_composition():
     z = NthPower(Constant(3) * x - Constant(1), n = 2)
     point = Point(x = 1)
     assert z.evaluate(point) == approx(4)
-    assert z.local_partial(x, point) == approx(12)
-    assert z.global_partial(x).at(point) == approx(12)
-    assert z.local_differential(point).component(x) == approx(12)
-    assert z.global_differential().component_at(x, point) == approx(12)
+    assert_1_ary_derivatives(z, point, x, 12)
 
 
 def test_NthPower_with_n_equal_one():
     x = Variable("x")
     z = NthPower(x, n = 1)
-    global_x_partial = z.global_partial(x)
-    global_differential = z.global_differential()
     # at x = 3
     point = Point(x = 3)
     assert z.evaluate(point) == approx(3)
-    assert z.local_partial(x, point) == approx(1)
-    assert global_x_partial.at(point) == approx(1)
-    assert z.local_differential(point).component(x) == approx(1)
-    assert global_differential.component_at(x, point) == approx(1)
+    assert_1_ary_derivatives(z, point, x, 1)
     # at x = 0
     point = Point(x = 0)
     assert z.evaluate(point) == approx(0)
-    assert z.local_partial(x, point) == approx(1)
-    assert global_x_partial.at(point) == approx(1)
-    assert z.local_differential(point).component(x) == approx(1)
-    assert global_differential.component_at(x, point) == approx(1)
+    assert_1_ary_derivatives(z, point, x, 1)
     # at x = -5
     point = Point(x = -5)
     assert z.evaluate(point) == approx(-5)
-    assert z.local_partial(x, point) == approx(1)
-    assert global_x_partial.at(point) == approx(1)
-    assert z.local_differential(point).component(x) == approx(1)
-    assert global_differential.component_at(x, point) == approx(1)
+    assert_1_ary_derivatives(z, point, x, 1)
 
 
 def test_NthPower_with_n_equal_one_composition():
@@ -77,10 +53,7 @@ def test_NthPower_with_n_equal_one_composition():
     z = NthPower(Constant(3) * x - Constant(1), n = 1)
     point = Point(x = 1)
     assert z.evaluate(point) == approx(2)
-    assert z.local_partial(x, point) == approx(3)
-    assert z.global_partial(x).at(point) == approx(3)
-    assert z.local_differential(point).component(x) == approx(3)
-    assert z.global_differential().component_at(x, point) == approx(3)
+    assert_1_ary_derivatives(z, point, x, 3)
 
 
 def test_NthPower_normalization():
