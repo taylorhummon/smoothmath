@@ -10,7 +10,7 @@ smoothmath
 .. autoclass:: Point
     :members:
 
-.. autoclass:: Expression
+.. autoclass:: Expression()
     :members:
 
 .. autoclass:: GlobalDifferential()
