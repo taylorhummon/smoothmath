@@ -14,7 +14,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     The nth root of an expression.
 
     :param inner: the expression we are taking the nth root of
-    :param n: must be an integer greater or equal to 1; use n = 2 for square root
+    :param n: *must be an integer greater or equal to 1*; use n = 2 for square root
     """
 
     def __init__(

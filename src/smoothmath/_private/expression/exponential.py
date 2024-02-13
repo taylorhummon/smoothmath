@@ -13,7 +13,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     An exponential expression.
 
     :param inner: the exponent
-    :param base: the base, as a real number
+    :param base: the base, *as a real number*
     """
 
     def __init__(
