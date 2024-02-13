@@ -13,16 +13,14 @@ class LocalDifferential:
 
     def __init__(
         self: LocalDifferential,
-        original_expression: Expression,
+        expression: Expression,
         point: Point,
         local_partials: dict[str, RealNumber]
     ) -> None:
-        #: The expression which this is the differential of.
-        self.original_expression: Expression
-        self.original_expression = original_expression
-        #: The point at which this differential is located.
-        self.point: Point
-        self.point = point
+        self._original_expression: Expression
+        self._original_expression = expression
+        self._point: Point
+        self._point = point
         self._local_partials: dict[str, RealNumber]
         self._local_partials = local_partials.copy()
 
@@ -44,8 +42,8 @@ class LocalDifferential:
     ) -> bool:
         return (
             (other.__class__ == self.__class__) and
-            (self.original_expression == other.original_expression) and
-            (self.point == other.point) and
+            (self._original_expression == other._original_expression) and
+            (self._point == other._point) and
             (self._local_partials == other._local_partials)
         )
 
@@ -53,7 +51,7 @@ class LocalDifferential:
         self: LocalDifferential
     ) -> int:
         data = tuple(sorted(self._local_partials.items()))
-        return hash((self.original_expression, self.point, data))
+        return hash((self._original_expression, self._point, data))
 
     def __str__(
         self: LocalDifferential
@@ -64,8 +62,8 @@ class LocalDifferential:
         self: LocalDifferential
     ) -> str:
         dictionary = {
-            "original": self.original_expression,
-            "point": self.point,
+            "original": self._original_expression,
+            "point": self._point,
             "partials": self._partials_string()
         }
         pairs_string = "; ".join(f"{key}: {value}" for key, value in dictionary.items())
@@ -83,11 +81,11 @@ class LocalDifferential:
 class LocalDifferentialBuilder:
     def __init__(
         self: LocalDifferentialBuilder,
-        original_expression: Expression,
+        expression: Expression,
         point: Point
     ) -> None:
         self._original_expression: Expression
-        self._original_expression = original_expression
+        self._original_expression = expression
         self.point: Point
         self.point = point
         self._local_partials: dict[str, RealNumber]

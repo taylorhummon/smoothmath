@@ -29,9 +29,6 @@ def test_GlobalDifferential():
     assert global_differential.component(w).at(point) == approx(4)
     assert global_differential.component(x).at(point) == approx(125)
     assert global_differential.component(y).at(point) == approx(300)
-    assert global_w_partial.original_expression == original_expression
-    assert global_x_partial.original_expression == original_expression
-    assert global_y_partial.original_expression == original_expression
     assert global_w_partial == GlobalPartial.build(original_expression, synthetic_w_partial)
     assert global_x_partial == GlobalPartial.build(original_expression, synthetic_x_partial)
     assert global_y_partial == GlobalPartial.build(original_expression, synthetic_y_partial)
@@ -40,7 +37,6 @@ def test_GlobalDifferential():
     assert local_differential.component(w) == approx(4)
     assert local_differential.component(x) == approx(125)
     assert local_differential.component(y) == approx(300)
-    assert local_differential.original_expression == original_expression
     desired = LocalDifferential(original_expression, point, {"w": 4, "x": 125, "y": 300})
     assert local_differential == desired
 
