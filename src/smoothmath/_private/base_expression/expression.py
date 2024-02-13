@@ -146,8 +146,8 @@ class Expression(ABC):
         """
         Takes the partial derivative of the expression and localizes at a point.
 
-        :param point: where to localize
         :param variable: the partial is taken with respect to this variable
+        :param point: where to localize
         """
         if not isinstance(point, pt.Point):
             raise Exception("Must provide a Point to local_partial()")
