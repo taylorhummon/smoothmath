@@ -26,19 +26,6 @@ class GlobalDifferential:
         self._synthetic_partials: dict[str, Expression]
         self._synthetic_partials = synthetic_partials.copy()
 
-    def component_at(
-        self: GlobalDifferential,
-        point: Point,
-        variable: Variable | str
-    ) -> RealNumber:
-        """
-        The component of the differential localized at a point.
-
-        :param point: where to localize
-        :param variable: selects which component
-        """
-        return self.component(variable).at(point)
-
     def at(
         self: GlobalDifferential,
         point: Point
@@ -68,6 +55,19 @@ class GlobalDifferential:
         existing = self._synthetic_partials.get(variable_name, None)
         synthetic_partial = existing if existing is not None else ex.Constant(0)
         return gp.GlobalPartial(self.original_expression, synthetic_partial)
+
+    def component_at(
+        self: GlobalDifferential,
+        variable: Variable | str,
+        point: Point
+    ) -> RealNumber:
+        """
+        The component of the differential localized at a point.
+
+        :param point: where to localize
+        :param variable: selects which component
+        """
+        return self.component(variable).at(point)
 
     def __eq__(
         self: GlobalDifferential,

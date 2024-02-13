@@ -32,7 +32,7 @@ class Expression(ABC):
         >>> expression = (Variable("x") + Constant(1)) / Variable("x")
         >>> expression.evaluate(Point(x = 2))
         1.5
-        >>> expression.local_partial(Point(x = 2), Variable("x"))
+        >>> expression.local_partial(Variable("x"), Point(x = 2))
         -0.25
     """
 
@@ -140,8 +140,8 @@ class Expression(ABC):
 
     def local_partial(
         self: Expression,
-        point: Point,
-        variable: Variable | str
+        variable: Variable | str,
+        point: Point
     ) -> RealNumber:
         """
         Takes the partial derivative of the expression and localizes at a point.
@@ -153,13 +153,13 @@ class Expression(ABC):
             raise Exception("Must provide a Point to local_partial()")
         self._reset_evaluation_cache()
         variable_name = util.get_variable_name(variable)
-        return self._local_partial(point, variable_name)
+        return self._local_partial(variable_name, point)
 
     @abstractmethod
     def _local_partial(
         self: Expression,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _local_partial()")
 

@@ -14,41 +14,41 @@ def test_Logarithm():
     # at x = 1
     point = Point(x = 1)
     assert z.evaluate(point) == approx(0)
-    assert z.local_partial(point, x) == approx(1)
+    assert z.local_partial(x, point) == approx(1)
     assert global_x_partial.at(point) == approx(1)
     assert z.local_differential(point).component(x) == approx(1)
-    assert global_differential.component_at(point, x) == approx(1)
+    assert global_differential.component_at(x, point) == approx(1)
     # at x = e
     point = Point(x = math.e)
     assert z.evaluate(point) == approx(1)
-    assert z.local_partial(point, x) == approx(1 / math.e)
+    assert z.local_partial(x, point) == approx(1 / math.e)
     assert global_x_partial.at(point) == approx(1 / math.e)
     assert z.local_differential(point).component(x) == approx(1 / math.e)
-    assert global_differential.component_at(point, x) == approx(1 / math.e)
+    assert global_differential.component_at(x, point) == approx(1 / math.e)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
-        z.local_partial(point, x)
+        z.local_partial(x, point)
     with raises(DomainError):
         global_x_partial.at(point)
     with raises(DomainError):
         z.local_differential(point)
     with raises(DomainError):
-        global_differential.component_at(point, x)
+        global_differential.component_at(x, point)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
-        z.local_partial(point, x)
+        z.local_partial(x, point)
     with raises(DomainError):
         global_x_partial.at(point)
     with raises(DomainError):
         z.local_differential(point)
     with raises(DomainError):
-        global_differential.component_at(point, x)
+        global_differential.component_at(x, point)
 
 
 def test_Logarithm_composition():
@@ -56,10 +56,10 @@ def test_Logarithm_composition():
     z = Logarithm(Constant(2) * x - Constant(3))
     point = Point(x = 2)
     assert z.evaluate(point) == approx(0)
-    assert z.local_partial(point, x) == approx(2)
+    assert z.local_partial(x, point) == approx(2)
     assert z.global_partial(x).at(point) == approx(2)
     assert z.local_differential(point).component(x) == approx(2)
-    assert z.global_differential().component_at(point, x) == approx(2)
+    assert z.global_differential().component_at(x, point) == approx(2)
 
 
 def test_base_two_Logarithm():
@@ -70,41 +70,41 @@ def test_base_two_Logarithm():
     # at x = 1
     point = Point(x = 1)
     assert z.evaluate(point) == approx(0)
-    assert z.local_partial(point, x) == approx(1.442695040888)
+    assert z.local_partial(x, point) == approx(1.442695040888)
     assert global_x_partial.at(point) == approx(1.442695040888)
     assert z.local_differential(point).component(x) == approx(1.442695040888)
-    assert global_differential.component_at(point, x) == approx(1.442695040888)
+    assert global_differential.component_at(x, point) == approx(1.442695040888)
     # at x = 2
     point = Point(x = 2)
     assert z.evaluate(point) == approx(1)
-    assert z.local_partial(point, x) == approx(0.721347520444)
+    assert z.local_partial(x, point) == approx(0.721347520444)
     assert global_x_partial.at(point) == approx(0.721347520444)
     assert z.local_differential(point).component(x) == approx(0.721347520444)
-    assert global_differential.component_at(point, x) == approx(0.721347520444)
+    assert global_differential.component_at(x, point) == approx(0.721347520444)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
-        z.local_partial(point, x)
+        z.local_partial(x, point)
     with raises(DomainError):
         global_x_partial.at(point)
     with raises(DomainError):
         z.local_differential(point)
     with raises(DomainError):
-        global_differential.component_at(point, x)
+        global_differential.component_at(x, point)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
-        z.local_partial(point, x)
+        z.local_partial(x, point)
     with raises(DomainError):
         global_x_partial.at(point)
     with raises(DomainError):
         z.local_differential(point)
     with raises(DomainError):
-        global_differential.component_at(point, x)
+        global_differential.component_at(x, point)
 
 
 def test_base_two_Logarithm_composition():
@@ -112,10 +112,10 @@ def test_base_two_Logarithm_composition():
     z = Logarithm(Constant(2) * x - Constant(6), base = 2)
     point = Point(x = 7)
     assert z.evaluate(point) == approx(3)
-    assert z.local_partial(point, x) == approx(0.3606737602222)
+    assert z.local_partial(x, point) == approx(0.3606737602222)
     assert z.global_partial(x).at(point) == approx(0.3606737602222)
     assert z.local_differential(point).component(x) == approx(0.3606737602222)
-    assert z.global_differential().component_at(point, x) == approx(0.3606737602222)
+    assert z.global_differential().component_at(x, point) == approx(0.3606737602222)
 
 
 def test_Logarithm_equality():

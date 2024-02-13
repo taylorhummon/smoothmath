@@ -61,11 +61,11 @@ class Add(base.NAryExpression):
 
     def _local_partial(
         self: Add,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
         return mf.add(*(
-            inner._local_partial(point, variable_name)
+            inner._local_partial(variable_name, point)
             for inner in self._inners
         ))
 

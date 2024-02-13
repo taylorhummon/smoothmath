@@ -90,12 +90,12 @@ class UnaryExpression(base.Expression):
 
     def _local_partial(
         self: UnaryExpression,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
-        inner_partial = self._inner._local_partial(point, variable_name)
+        inner_partial = self._inner._local_partial(variable_name, point)
         return self._local_partial_formula(point, inner_partial)
 
     @abstractmethod

@@ -11,16 +11,16 @@ def test_2_ary_Multiply():
     z = Multiply(x, y)
     point = Point(x = 2, y = 3)
     assert z.evaluate(point) == approx(6)
-    assert z.local_partial(point, x) == approx(3)
-    assert z.local_partial(point, y) == approx(2)
+    assert z.local_partial(x, point) == approx(3)
+    assert z.local_partial(y, point) == approx(2)
     assert z.global_partial(x).at(point) == approx(3)
     assert z.global_partial(y).at(point) == approx(2)
     local_differential = z.local_differential(point)
     assert local_differential.component(x) == approx(3)
     assert local_differential.component(y) == approx(2)
     global_differential = z.global_differential()
-    assert global_differential.component_at(point, x) == approx(3)
-    assert global_differential.component_at(point, y) == approx(2)
+    assert global_differential.component_at(x, point) == approx(3)
+    assert global_differential.component_at(y, point) == approx(2)
 
 
 def test_2_ary_Multiply_composition():
@@ -29,16 +29,16 @@ def test_2_ary_Multiply_composition():
     z = Multiply(Constant(5) * x, y - Constant(1))
     point = Point(x = 2, y = 4)
     assert z.evaluate(point) == approx(30)
-    assert z.local_partial(point, x) == approx(15)
-    assert z.local_partial(point, y) == approx(10)
+    assert z.local_partial(x, point) == approx(15)
+    assert z.local_partial(y, point) == approx(10)
     assert z.global_partial(x).at(point) == approx(15)
     assert z.global_partial(y).at(point) == approx(10)
     local_differential = z.local_differential(point)
     assert local_differential.component(x) == approx(15)
     assert local_differential.component(y) == approx(10)
     global_differential = z.global_differential()
-    assert global_differential.component_at(point, x) == approx(15)
-    assert global_differential.component_at(point, y) == approx(10)
+    assert global_differential.component_at(x, point) == approx(15)
+    assert global_differential.component_at(y, point) == approx(10)
 
 
 def test_3_ary_Multiply():
@@ -48,9 +48,9 @@ def test_3_ary_Multiply():
     z = Multiply(w, x, y)
     point = Point(w = 1, x = 2, y = 3)
     assert z.evaluate(point) == approx(6)
-    assert z.local_partial(point, w) == approx(6)
-    assert z.local_partial(point, x) == approx(3)
-    assert z.local_partial(point, y) == approx(2)
+    assert z.local_partial(w, point) == approx(6)
+    assert z.local_partial(x, point) == approx(3)
+    assert z.local_partial(y, point) == approx(2)
     assert z.global_partial(w).at(point) == approx(6)
     assert z.global_partial(x).at(point) == approx(3)
     assert z.global_partial(y).at(point) == approx(2)
@@ -59,9 +59,9 @@ def test_3_ary_Multiply():
     assert local_differential.component(x) == approx(3)
     assert local_differential.component(y) == approx(2)
     global_differential = z.global_differential()
-    assert global_differential.component_at(point, w) == approx(6)
-    assert global_differential.component_at(point, x) == approx(3)
-    assert global_differential.component_at(point, y) == approx(2)
+    assert global_differential.component_at(w, point) == approx(6)
+    assert global_differential.component_at(x, point) == approx(3)
+    assert global_differential.component_at(y, point) == approx(2)
 
 
 def test_3_ary_Multiply_composition():
@@ -72,9 +72,9 @@ def test_3_ary_Multiply_composition():
     z = Multiply(Constant(4) * w - Constant(1), Constant(5) * x, y + Constant(1))
     point = Point(w = 1, x = 2, y = 3)
     assert z.evaluate(point) == approx(120)
-    assert z.local_partial(point, w) == approx(160)
-    assert z.local_partial(point, x) == approx(60)
-    assert z.local_partial(point, y) == approx(30)
+    assert z.local_partial(w, point) == approx(160)
+    assert z.local_partial(x, point) == approx(60)
+    assert z.local_partial(y, point) == approx(30)
     assert z.global_partial(w).at(point) == approx(160)
     assert z.global_partial(x).at(point) == approx(60)
     assert z.global_partial(y).at(point) == approx(30)
@@ -83,9 +83,9 @@ def test_3_ary_Multiply_composition():
     assert local_differential.component(x) == approx(60)
     assert local_differential.component(y) == approx(30)
     global_differential = z.global_differential()
-    assert global_differential.component_at(point, w) == approx(160)
-    assert global_differential.component_at(point, x) == approx(60)
-    assert global_differential.component_at(point, y) == approx(30)
+    assert global_differential.component_at(w, point) == approx(160)
+    assert global_differential.component_at(x, point) == approx(60)
+    assert global_differential.component_at(y, point) == approx(30)
 
 
 def test_1_ary_Multiply():
@@ -93,12 +93,12 @@ def test_1_ary_Multiply():
     z = Multiply(x)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(2)
-    assert z.local_partial(point, x) == approx(1)
+    assert z.local_partial(x, point) == approx(1)
     assert z.global_partial(x).at(point) == approx(1)
     local_differential = z.local_differential(point)
     assert local_differential.component(x) == approx(1)
     global_differential = z.global_differential()
-    assert global_differential.component_at(point, x) == approx(1)
+    assert global_differential.component_at(x, point) == approx(1)
 
 
 def test_1_ary_Multiply_composition():
@@ -106,12 +106,12 @@ def test_1_ary_Multiply_composition():
     z = Multiply(Constant(5) * x - Constant(1))
     point = Point(x = 2)
     assert z.evaluate(point) == approx(9)
-    assert z.local_partial(point, x) == approx(5)
+    assert z.local_partial(x, point) == approx(5)
     assert z.global_partial(x).at(point) == approx(5)
     local_differential = z.local_differential(point)
     assert local_differential.component(x) == approx(5)
     global_differential = z.global_differential()
-    assert global_differential.component_at(point, x) == approx(5)
+    assert global_differential.component_at(x, point) == approx(5)
 
 
 def test_0_ary_Multiply():
@@ -125,10 +125,10 @@ def test_Multiply_by_zero():
     z = Multiply(Constant(0), x)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(0)
-    assert z.local_partial(point, x) == approx(0)
+    assert z.local_partial(x, point) == approx(0)
     assert z.global_partial(x).at(point) == approx(0)
     assert z.local_differential(point).component(x) == approx(0)
-    assert z.global_differential().component_at(point, x) == approx(0)
+    assert z.global_differential().component_at(x, point) == approx(0)
 
 
 def test_Multiply_by_one():
@@ -136,10 +136,10 @@ def test_Multiply_by_one():
     z = Multiply(Constant(1), x)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(2)
-    assert z.local_partial(point, x) == approx(1)
+    assert z.local_partial(x, point) == approx(1)
     assert z.global_partial(x).at(point) == approx(1)
     assert z.local_differential(point).component(x) == approx(1)
-    assert z.global_differential().component_at(point, x) == approx(1)
+    assert z.global_differential().component_at(x, point) == approx(1)
 
 
 def test_Multiply_normalization():

@@ -59,8 +59,8 @@ class Constant(base.Expression):
 
     def _local_partial(
         self: Constant,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
         return 0
 

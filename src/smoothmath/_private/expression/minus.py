@@ -61,11 +61,11 @@ class Minus(base.BinaryExpression):
 
     def _local_partial(
         self: Minus,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
-        left_partial = self._left._local_partial(point, variable_name)
-        right_partial = self._right._local_partial(point, variable_name)
+        left_partial = self._left._local_partial(variable_name, point)
+        right_partial = self._right._local_partial(variable_name, point)
         return mf.minus(left_partial, right_partial)
 
     ## Normalization and Reduction ##

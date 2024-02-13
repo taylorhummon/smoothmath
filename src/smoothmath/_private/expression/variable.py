@@ -69,8 +69,8 @@ class Variable(base.Expression):
 
     def _local_partial(
         self: Variable,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
         if self.name == variable_name:
             return 1

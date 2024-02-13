@@ -73,13 +73,13 @@ class Multiply(base.NAryExpression):
 
     def _local_partial(
         self: Multiply,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
         inner_values = [inner._evaluate(point) for inner in self._inners]
         return mf.add(*(
             mf.multiply(
-                inner._local_partial(point, variable_name),
+                inner._local_partial(variable_name, point),
                 *util.list_without_entry_at(inner_values, i)
             )
             for (i, inner) in enumerate(self._inners)

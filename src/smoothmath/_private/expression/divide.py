@@ -76,14 +76,14 @@ class Divide(base.BinaryExpression):
 
     def _local_partial(
         self: Divide,
-        point: Point,
-        variable_name: str
+        variable_name: str,
+        point: Point
     ) -> RealNumber:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         self._verify_domain_constraints(left_value, right_value)
-        left_partial = self._left._local_partial(point, variable_name)
-        right_partial = self._right._local_partial(point, variable_name)
+        left_partial = self._left._local_partial(variable_name, point)
+        right_partial = self._right._local_partial(variable_name, point)
         return mf.add(
             self._local_partial_formula_left(point, left_partial),
             self._local_partial_formula_right(point, right_partial)
