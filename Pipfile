@@ -8,6 +8,7 @@ name = "pypi"
 [dev-packages]
 pytest = "8.0.0"
 Sphinx = "7.2.6"
+sphinx-rtd-theme = "2.0.0"
 
 [requires]
 python_version = "3.12"

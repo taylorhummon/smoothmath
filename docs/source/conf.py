@@ -16,6 +16,7 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
+    'sphinx_rtd_theme',
 ]
 
 templates_path = ['_templates']
@@ -23,12 +24,17 @@ exclude_patterns = []
 
 ### HTML output
 
-html_theme = 'alabaster'
 html_static_path = ['_static']
+html_theme = 'sphinx_rtd_theme'
+html_theme_options = {
+    'navigation_depth': 2,
+}
 
 ### Autodoc
 
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'description'
 autodoc_typehints_description_target = 'documented_params'
-autodoc_type_aliases = {'RealNumber': 'smoothmath.RealNumber'}
+autodoc_type_aliases = {
+    'RealNumber': 'smoothmath.RealNumber',
+}
