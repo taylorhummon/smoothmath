@@ -40,10 +40,22 @@ class GlobalPartial:
         :param point: where to localize
         """
         # We evaluate the original expression to check for DomainErrors.
-        # e.g. (ln(x))' = 1 / x
-        # Notice that the RHS appears defined for negative x, but ln(x) isn't defined there!
         self._original_expression.evaluate(point)
         return self._synthetic_partial.evaluate(point)
+
+    def as_expression(
+        self: GlobalPartial
+    ) -> Expression:
+        """
+        The global partial written as an expression.
+        Sometimes referred to as the *synthetic partial*.
+
+        NOTE: The synthetic partial may be defined at more points than the global partial.
+        For example, take ``z = Logarithm(Variable("x"))`` and so the synthetic partial is
+        ``Reciprocal(Variable("x"))``. The synthetic partial is defined for negative x values,
+        but the global partial is only defined at positive x values.
+        """
+        return self._synthetic_partial
 
     def __eq__(
         self: GlobalPartial,
