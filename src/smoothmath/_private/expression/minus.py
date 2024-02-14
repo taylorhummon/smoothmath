@@ -5,8 +5,8 @@ import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
+    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
+    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 
 class Minus(base.BinaryExpression):
@@ -54,19 +54,19 @@ class Minus(base.BinaryExpression):
 
     def _compute_local_differential(
         self: Minus,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber
     ) -> None:
-        self._left._compute_local_differential(builder, accumulated)
-        self._right._compute_local_differential(builder, mf.negation(accumulated))
+        self._left._compute_local_differential(accumulator, multiplier)
+        self._right._compute_local_differential(accumulator, mf.negation(multiplier))
 
     def _compute_global_differential(
         self: Minus,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
+        accumulator: SyntheticPartialsAccumulator,
+        multiplier: Expression
     ) -> None:
-        self._left._compute_global_differential(builder, accumulated)
-        self._right._compute_global_differential(builder, ex.Negation(accumulated))
+        self._left._compute_global_differential(accumulator, multiplier)
+        self._right._compute_global_differential(accumulator, ex.Negation(multiplier))
 
     ## Normalization and Reduction ##
 

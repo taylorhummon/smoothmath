@@ -8,8 +8,8 @@ import smoothmath._private.math_functions as mf
 import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
+    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
+    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 
 class Power(base.BinaryExpression):
@@ -78,30 +78,30 @@ class Power(base.BinaryExpression):
 
     def _compute_local_differential(
         self: Power,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber
     ) -> None:
-        if self._left._lacks_variables and self._left._evaluate(builder.point) == 1:
+        if self._left._lacks_variables and self._left._evaluate(accumulator.point) == 1:
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             pass
         else:
-            left_value = self._left._evaluate(builder.point)
-            right_value = self._right._evaluate(builder.point)
+            left_value = self._left._evaluate(accumulator.point)
+            right_value = self._right._evaluate(accumulator.point)
             self._verify_domain_constraints(left_value, right_value)
-            next_accumulated_left = self._local_partial_formula_left(builder.point, accumulated)
-            next_accumulated_right = self._local_partial_formula_right(builder.point, accumulated)
-            self._left._compute_local_differential(builder, next_accumulated_left)
-            self._right._compute_local_differential(builder, next_accumulated_right)
+            next_multiplier_left = self._local_partial_formula_left(accumulator.point, multiplier)
+            next_multiplier_right = self._local_partial_formula_right(accumulator.point, multiplier)
+            self._left._compute_local_differential(accumulator, next_multiplier_left)
+            self._right._compute_local_differential(accumulator, next_multiplier_right)
 
     def _compute_global_differential(
         self: Power,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
+        accumulator: SyntheticPartialsAccumulator,
+        multiplier: Expression
     ) -> None:
-        next_accumulated_left = self._synthetic_partial_formula_left(accumulated)
-        next_accumulated_right = self._synthetic_partial_formula_right(accumulated)
-        self._left._compute_global_differential(builder, next_accumulated_left)
-        self._right._compute_global_differential(builder, next_accumulated_right)
+        next_multiplier_left = self._synthetic_partial_formula_left(multiplier)
+        next_multiplier_right = self._synthetic_partial_formula_right(multiplier)
+        self._left._compute_global_differential(accumulator, next_multiplier_left)
+        self._right._compute_global_differential(accumulator, next_multiplier_right)
 
     def _local_partial_formula_left(
         self: Power,

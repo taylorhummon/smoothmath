@@ -1,7 +1,7 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point, LocalDifferential, GlobalPartial
 from smoothmath.expression import Variable, Constant, Reciprocal, NthPower, Logarithm
-from smoothmath._private.global_differential import GlobalDifferentialBuilder
+from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 # # !!! turn tests back on
 
@@ -13,7 +13,7 @@ from smoothmath._private.global_differential import GlobalDifferentialBuilder
 #     synthetic_w_partial = Constant(4)
 #     synthetic_x_partial = y ** 3
 #     synthetic_y_partial = Constant(3) * x * NthPower(y, 2)
-#     builder = GlobalDifferentialBuilder(original_expression)
+#     builder = SyntheticPartialsAccumulator(original_expression)
 #     builder.add_to(w, synthetic_w_partial)
 #     builder.add_to(x, synthetic_x_partial)
 #     builder.add_to(y, synthetic_y_partial)
@@ -46,7 +46,7 @@ from smoothmath._private.global_differential import GlobalDifferentialBuilder
 #     x = Variable("x")
 #     original_expression = Logarithm(x)
 #     synthetic_x_partial = Reciprocal(x)
-#     builder = GlobalDifferentialBuilder(original_expression)
+#     builder = SyntheticPartialsAccumulator(original_expression)
 #     builder.add_to(x, synthetic_x_partial)
 #     global_differential = builder.build()
 #     point = Point(x = -1)
@@ -62,16 +62,16 @@ from smoothmath._private.global_differential import GlobalDifferentialBuilder
 # def test_LocalDifferential_equality():
 #     x = Variable("x")
 #     y = Variable("y")
-#     builder_a = GlobalDifferentialBuilder(Constant(23))
+#     builder_a = SyntheticPartialsAccumulator(Constant(23))
 #     builder_a.add_to(x, Constant(3))
 #     builder_a.add_to(y, Constant(4))
 #     global_differential_a = builder_a.build()
-#     builder_b = GlobalDifferentialBuilder(Constant(23))
+#     builder_b = SyntheticPartialsAccumulator(Constant(23))
 #     builder_b.add_to(y, Constant(4))
 #     builder_b.add_to(x, Constant(3))
 #     global_differential_b = builder_b.build()
 #     assert global_differential_a == global_differential_b
-#     builder_c = GlobalDifferentialBuilder(Constant(23))
+#     builder_c = SyntheticPartialsAccumulator(Constant(23))
 #     builder_c.add_to(x, Constant(4))
 #     builder_c.add_to(y, Constant(3))
 #     global_differential_c = builder_c.build()
@@ -81,11 +81,11 @@ from smoothmath._private.global_differential import GlobalDifferentialBuilder
 # def test_LocalDifferential_hashing():
 #     x = Variable("x")
 #     y = Variable("y")
-#     builder_a = GlobalDifferentialBuilder(Constant(23))
+#     builder_a = SyntheticPartialsAccumulator(Constant(23))
 #     builder_a.add_to(x, Constant(3))
 #     builder_a.add_to(y, Constant(4))
 #     global_differential_a = builder_a.build()
-#     builder_b = GlobalDifferentialBuilder(Constant(23))
+#     builder_b = SyntheticPartialsAccumulator(Constant(23))
 #     builder_b.add_to(y, Constant(4))
 #     builder_b.add_to(x, Constant(3))
 #     global_differential_b = builder_b.build()

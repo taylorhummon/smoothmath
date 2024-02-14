@@ -5,8 +5,8 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
+    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
+    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 
 alphanumeric_pattern = re.compile(r"\A\w*\Z")
@@ -65,17 +65,17 @@ class Variable(base.Expression):
 
     def _compute_local_differential(
         self: Variable,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber
     ) -> None:
-        builder.add_to(self, accumulated)
+        accumulator.add_to(self, multiplier)
 
     def _compute_global_differential(
         self: Variable,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
+        accumulator: SyntheticPartialsAccumulator,
+        multiplier: Expression
     ) -> None:
-        builder.add_to(self, accumulated)
+        accumulator.add_to(self, multiplier)
 
     ## Normalization and Reduction ##
 

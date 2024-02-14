@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import smoothmath._private.expression as ex
+import smoothmath._private.synthetic_partials_accumulator as spa
 import smoothmath._private.local_differential as ld
 import smoothmath._private.global_partial as gp
 import smoothmath._private.utilities as util
@@ -105,25 +106,6 @@ class GlobalDifferential:
 def _retrieve_synthetic_partials(
     original_expression: Expression
 ) -> dict[str, Expression]:
-    builder = GlobalDifferentialBuilder()
-    original_expression._compute_global_differential(builder, ex.Constant(1))
-    return builder.synthetic_partials
-
-
-# !!! new name for this
-class GlobalDifferentialBuilder:
-    def __init__(
-        self: GlobalDifferentialBuilder
-    ) -> None:
-        self.synthetic_partials: dict[str, Expression]
-        self.synthetic_partials = {}
-
-    def add_to(
-        self: GlobalDifferentialBuilder,
-        variable: Variable | str,
-        contribution: Expression
-    ) -> None:
-        variable_name = util.get_variable_name(variable)
-        existing = self.synthetic_partials.get(variable_name, None)
-        next = existing + contribution if existing is not None else contribution
-        self.synthetic_partials[variable_name] = next
+    accumulator = spa.SyntheticPartialsAccumulator()
+    original_expression._compute_global_differential(accumulator, ex.Constant(1))
+    return accumulator.synthetic_partials

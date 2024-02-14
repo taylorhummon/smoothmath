@@ -11,8 +11,8 @@ if TYPE_CHECKING:
     from smoothmath.expression import (
         Variable, Add, Minus, Negation, Multiply, Divide, Power, NthPower
     )
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
+    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
+    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 
 REDUCTION_STEPS_BOUND = 1000
@@ -104,16 +104,16 @@ class Expression(ABC):
     @abstractmethod
     def _compute_local_differential(
         self: Expression,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber
     ) -> None: # instead of returning a value, we mutate the local_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
 
     @abstractmethod
     def _compute_global_differential(
         self: Expression,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
+        accumulator: SyntheticPartialsAccumulator,
+        multiplier: Expression
     ) -> None: # instead of returning a value, we mutate the global_differential argument
         raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
 

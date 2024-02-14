@@ -7,8 +7,8 @@ import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
+    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
+    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 
 class Multiply(base.NAryExpression):
@@ -62,28 +62,28 @@ class Multiply(base.NAryExpression):
 
     def _compute_local_differential(
         self: Multiply,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber
     ) -> None:
-        inner_values = [inner._evaluate(builder.point) for inner in self._inners]
+        inner_values = [inner._evaluate(accumulator.point) for inner in self._inners]
         for i, inner in enumerate(self._inners):
-            next_accumulated = mf.multiply(
-                accumulated,
+            next_multiplier = mf.multiply(
+                multiplier,
                 *util.list_without_entry_at(inner_values, i)
             )
-            inner._compute_local_differential(builder, next_accumulated)
+            inner._compute_local_differential(accumulator, next_multiplier)
 
     def _compute_global_differential(
         self: Multiply,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
+        accumulator: SyntheticPartialsAccumulator,
+        multiplier: Expression
     ) -> None:
         for i, inner in enumerate(self._inners):
-            next_accumulated = ex.Multiply(
-                accumulated,
+            next_multiplier = ex.Multiply(
+                multiplier,
                 *util.list_without_entry_at(self._inners, i)
             )
-            inner._compute_global_differential(builder, next_accumulated)
+            inner._compute_global_differential(accumulator, next_multiplier)
 
     ## Normalization and Reduction ##
 

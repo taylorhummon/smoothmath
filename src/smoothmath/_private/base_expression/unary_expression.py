@@ -5,8 +5,8 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
+    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
+    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 
 class UnaryExpression(base.Expression):
@@ -82,21 +82,21 @@ class UnaryExpression(base.Expression):
 
     def _compute_local_differential(
         self: UnaryExpression,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber
     ) -> None:
-        inner_value = self._inner._evaluate(builder.point)
+        inner_value = self._inner._evaluate(accumulator.point)
         self._verify_domain_constraints(inner_value)
-        next_accumulated = self._local_partial_formula(builder.point, accumulated)
-        self._inner._compute_local_differential(builder, next_accumulated)
+        next_multiplier = self._local_partial_formula(accumulator.point, multiplier)
+        self._inner._compute_local_differential(accumulator, next_multiplier)
 
     def _compute_global_differential(
         self: UnaryExpression,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
+        accumulator: SyntheticPartialsAccumulator,
+        multiplier: Expression
     ) -> None:
-        next_accumulated = self._synthetic_partial_formula(accumulated)
-        self._inner._compute_global_differential(builder, next_accumulated)
+        next_multiplier = self._synthetic_partial_formula(multiplier)
+        self._inner._compute_global_differential(accumulator, next_multiplier)
 
     @abstractmethod
     def _local_partial_formula(

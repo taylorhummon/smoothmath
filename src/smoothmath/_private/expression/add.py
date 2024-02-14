@@ -7,8 +7,8 @@ import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Constant, Negation, Logarithm
-    from smoothmath._private.local_differential import LocalDifferentialBuilder
-    from smoothmath._private.global_differential import GlobalDifferentialBuilder
+    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
+    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
 
 
 class Add(base.NAryExpression):
@@ -55,19 +55,19 @@ class Add(base.NAryExpression):
 
     def _compute_local_differential(
         self: Add,
-        builder: LocalDifferentialBuilder,
-        accumulated: RealNumber
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber
     ) -> None:
         for inner in self._inners:
-            inner._compute_local_differential(builder, accumulated)
+            inner._compute_local_differential(accumulator, multiplier)
 
     def _compute_global_differential(
         self: Add,
-        builder: GlobalDifferentialBuilder,
-        accumulated: Expression
+        accumulator: SyntheticPartialsAccumulator,
+        multiplier: Expression
     ) -> None:
         for inner in self._inners:
-            inner._compute_global_differential(builder, accumulated)
+            inner._compute_global_differential(accumulator, multiplier)
 
     ## Normalization and Reduction ##
 
