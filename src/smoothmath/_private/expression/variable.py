@@ -5,8 +5,9 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
-    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
+    from smoothmath._private.accumulators import (
+        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+    )
 
 
 alphanumeric_pattern = re.compile(r"\A\w*\Z")
@@ -42,7 +43,7 @@ class Variable(base.Expression):
     ) -> RealNumber:
         return point.coordinate(self.name)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial(
         self: Variable,
@@ -63,14 +64,15 @@ class Variable(base.Expression):
         else:
             return ex.Constant(0)
 
-    def _compute_local_differential(
+    def _compute_local_partials(
         self: Variable,
         accumulator: LocalPartialsAccumulator,
-        multiplier: RealNumber
+        multiplier: RealNumber,
+        point: Point
     ) -> None:
         accumulator.add_to(self, multiplier)
 
-    def _compute_global_differential(
+    def _compute_synthetic_partials(
         self: Variable,
         accumulator: SyntheticPartialsAccumulator,
         multiplier: Expression

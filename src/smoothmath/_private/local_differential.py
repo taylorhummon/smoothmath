@@ -1,6 +1,5 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Optional
-import smoothmath._private.local_partials_accumulator as lpa
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
@@ -73,7 +72,6 @@ class LocalDifferential:
         return f"LocalDifferential({self._original_expression}, {self._point})"
 
 
-# !!! move some of this code back to Expression class
 def _retrieve_local_partials(
     original_expression: Expression,
     point: Point,
@@ -81,7 +79,5 @@ def _retrieve_local_partials(
 ) -> dict[str, RealNumber]:
     if optional_local_partials is not None:
         return optional_local_partials
-    accumulator = lpa.LocalPartialsAccumulator(point)
-    original_expression._reset_evaluation_cache()
-    original_expression._compute_local_differential(accumulator, 1)
-    return accumulator.local_partials
+    else:
+        return original_expression._local_partials(point)

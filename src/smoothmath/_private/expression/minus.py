@@ -5,8 +5,9 @@ import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
-    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
+    from smoothmath._private.accumulators import (
+        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+    )
 
 
 class Minus(base.BinaryExpression):
@@ -33,7 +34,7 @@ class Minus(base.BinaryExpression):
     ) -> RealNumber:
         return mf.minus(left_value, right_value)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial(
         self: Minus,
@@ -52,21 +53,22 @@ class Minus(base.BinaryExpression):
         right_partial = self._right._synthetic_partial(variable_name)
         return ex.Minus(left_partial, right_partial)
 
-    def _compute_local_differential(
+    def _compute_local_partials(
         self: Minus,
         accumulator: LocalPartialsAccumulator,
-        multiplier: RealNumber
+        multiplier: RealNumber,
+        point: Point
     ) -> None:
-        self._left._compute_local_differential(accumulator, multiplier)
-        self._right._compute_local_differential(accumulator, mf.negation(multiplier))
+        self._left._compute_local_partials(accumulator, multiplier, point)
+        self._right._compute_local_partials(accumulator, mf.negation(multiplier), point)
 
-    def _compute_global_differential(
+    def _compute_synthetic_partials(
         self: Minus,
         accumulator: SyntheticPartialsAccumulator,
         multiplier: Expression
     ) -> None:
-        self._left._compute_global_differential(accumulator, multiplier)
-        self._right._compute_global_differential(accumulator, ex.Negation(multiplier))
+        self._left._compute_synthetic_partials(accumulator, multiplier)
+        self._right._compute_synthetic_partials(accumulator, ex.Negation(multiplier))
 
     ## Normalization and Reduction ##
 

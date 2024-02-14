@@ -1,16 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-import smoothmath._private.expression as ex
-import smoothmath._private.synthetic_partials_accumulator as spa
 import smoothmath._private.local_differential as ld
 import smoothmath._private.global_partial as gp
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression, GlobalPartial
+    from smoothmath import RealNumber, Point, Expression, GlobalPartial, LocalDifferential
     from smoothmath.expression import Variable
-    from smoothmath._private.local_differential import LocalDifferential
 
-# !!! normalize
 
 class GlobalDifferential:
     """
@@ -26,7 +22,7 @@ class GlobalDifferential:
         self._original_expression: Expression
         self._original_expression = expression
         self._synthetic_partials: dict[str, Expression]
-        self._synthetic_partials = _retrieve_synthetic_partials(expression)
+        self._synthetic_partials = _retrieve_normalized_synthetic_partials(expression)
 
     def component_at(
         self: GlobalDifferential,
@@ -102,10 +98,10 @@ class GlobalDifferential:
         return f"GlobalDifferential({self._original_expression})"
 
 
-# !!! move some of this code back to Expression class
-def _retrieve_synthetic_partials(
+def _retrieve_normalized_synthetic_partials(
     original_expression: Expression
 ) -> dict[str, Expression]:
-    accumulator = spa.SyntheticPartialsAccumulator()
-    original_expression._compute_global_differential(accumulator, ex.Constant(1))
-    return accumulator.synthetic_partials
+    return util.map_dictionary_values(
+        original_expression._synthetic_partials(),
+        lambda _, synthetic_partial: synthetic_partial._normalize()
+    )

@@ -54,7 +54,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ):
         return mf.nth_root(inner_value, self.n)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: NthRoot,

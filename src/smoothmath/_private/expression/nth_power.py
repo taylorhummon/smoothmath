@@ -51,7 +51,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     ):
         return mf.nth_power(inner_value, self.n)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: NthPower,

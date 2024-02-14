@@ -4,8 +4,9 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
-    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
+    from smoothmath._private.accumulators import (
+        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+    )
 
 
 class Constant(base.Expression):
@@ -35,7 +36,7 @@ class Constant(base.Expression):
     ) -> RealNumber:
         return self.value
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial(
         self: Constant,
@@ -50,14 +51,15 @@ class Constant(base.Expression):
     ) -> Expression:
         return ex.Constant(0)
 
-    def _compute_local_differential(
+    def _compute_local_partials(
         self: Constant,
         accumulator: LocalPartialsAccumulator,
-        multiplier: RealNumber
+        multiplier: RealNumber,
+        point: Point
     ) -> None:
         pass
 
-    def _compute_global_differential(
+    def _compute_synthetic_partials(
         self: Constant,
         accumulator: SyntheticPartialsAccumulator,
         multiplier: Expression

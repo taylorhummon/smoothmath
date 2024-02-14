@@ -28,7 +28,7 @@ class Sine(base.UnaryExpression):
     ) -> RealNumber:
         return mf.sine(inner_value)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: Sine,

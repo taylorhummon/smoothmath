@@ -28,7 +28,7 @@ class Cosine(base.UnaryExpression):
     ) -> RealNumber:
         return mf.cosine(inner_value)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: Cosine,

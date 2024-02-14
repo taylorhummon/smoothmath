@@ -1,53 +1,36 @@
-from smoothmath import Point
+from pytest import approx
+from smoothmath import Point, LocalDifferential
 from smoothmath.expression import Variable, Constant
-from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
-
-# # !!!
-# def test_LocalDifferential():
-#     w = Variable("w")
-#     x = Variable("x")
-#     y = Variable("y")
-#     builder = LocalPartialsAccumulator(Constant(23), Point(w = 7, x = 8, y = 9))
-#     builder.add_to(x, 3)
-#     builder.add_to(y, 4)
-#     builder.add_to(y, 2)
-#     local_differential = builder.build()
-#     assert local_differential.component(w) == 0
-#     assert local_differential.component(x) == 3
-#     assert local_differential.component(y) == 6
-#     assert local_differential.component("w") == 0
-#     assert local_differential.component("x") == 3
-#     assert local_differential.component("y") == 6
 
 
-# def test_LocalDifferential_equality():
-#     x = Variable("x")
-#     y = Variable("y")
-#     builder_a = LocalPartialsAccumulator(Constant(23), Point(x = 8, y = 9))
-#     builder_a.add_to(x, 3)
-#     builder_a.add_to(y, 4)
-#     local_differential_a = builder_a.build()
-#     builder_b = LocalPartialsAccumulator(Constant(23), Point(y = 9, x = 8))
-#     builder_b.add_to(y, 4)
-#     builder_b.add_to(x, 3)
-#     local_differential_b = builder_b.build()
-#     assert local_differential_a == local_differential_b
-#     builder_c = LocalPartialsAccumulator(Constant(23), Point(x = 8, y = 9))
-#     builder_c.add_to(x, 4)
-#     builder_c.add_to(y, 3)
-#     local_differential_c = builder_c.build()
-#     assert local_differential_a != local_differential_c
+def test_LocalDifferential():
+    w = Variable("w")
+    x = Variable("x")
+    y = Variable("y")
+    z = Constant(4) * w + x * y ** 3
+    point = Point(w = 7, x = 4, y = 5)
+    local_differential = LocalDifferential(z, point)
+    assert local_differential.component(w) == approx(4)
+    assert local_differential.component(x) == approx(125)
+    assert local_differential.component(y) == approx(300)
+    assert local_differential.component("w") == approx(4)
+    assert local_differential.component("x") == approx(125)
+    assert local_differential.component("y") == approx(300)
 
 
-# def test_LocalDifferential_hashing():
-#     x = Variable("x")
-#     y = Variable("y")
-#     builder_a = LocalPartialsAccumulator(Constant(23), Point(x = 8, y = 9))
-#     builder_a.add_to(x, 3)
-#     builder_a.add_to(y, 4)
-#     local_differential_a = builder_a.build()
-#     builder_b = LocalPartialsAccumulator(Constant(23), Point(y = 9, x = 8))
-#     builder_b.add_to(y, 4)
-#     builder_b.add_to(x, 3)
-#     local_differential_b = builder_b.build()
-#     assert hash(local_differential_a) == hash(local_differential_b)
+def test_LocalDifferential_equality():
+    x = Variable("x")
+    y = Variable("y")
+    point_a = Point(x = 1, y = 1)
+    assert LocalDifferential(x, point_a) == LocalDifferential(x, point_a)
+    assert LocalDifferential(x, point_a) != LocalDifferential(y, point_a)
+    point_b = Point(x = 1, y = 2)
+    assert LocalDifferential(x, point_a) != LocalDifferential(x, point_b)
+
+
+def test_LocalDifferential_hashing():
+    x = Variable("x")
+    y = Variable("y")
+    z = x * y ** 3
+    point = Point(x = 1, y = 2)
+    assert hash(LocalDifferential(z, point)) == hash(LocalDifferential(z, point))

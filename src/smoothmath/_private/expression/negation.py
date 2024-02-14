@@ -28,7 +28,7 @@ class Negation(base.UnaryExpression):
     ) -> RealNumber:
         return mf.negation(inner_value)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: Negation,

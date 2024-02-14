@@ -5,8 +5,9 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
-    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
-    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
+    from smoothmath._private.accumulators import (
+        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+    )
 
 
 class UnaryExpression(base.Expression):
@@ -61,7 +62,7 @@ class UnaryExpression(base.Expression):
     ) -> RealNumber:
         raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial(
         self: UnaryExpression,
@@ -80,23 +81,24 @@ class UnaryExpression(base.Expression):
         inner_partial = self._inner._synthetic_partial(variable_name)
         return self._synthetic_partial_formula(inner_partial)
 
-    def _compute_local_differential(
+    def _compute_local_partials(
         self: UnaryExpression,
         accumulator: LocalPartialsAccumulator,
-        multiplier: RealNumber
+        multiplier: RealNumber,
+        point: Point
     ) -> None:
-        inner_value = self._inner._evaluate(accumulator.point)
+        inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
-        next_multiplier = self._local_partial_formula(accumulator.point, multiplier)
-        self._inner._compute_local_differential(accumulator, next_multiplier)
+        next_multiplier = self._local_partial_formula(point, multiplier)
+        self._inner._compute_local_partials(accumulator, next_multiplier, point)
 
-    def _compute_global_differential(
+    def _compute_synthetic_partials(
         self: UnaryExpression,
         accumulator: SyntheticPartialsAccumulator,
         multiplier: Expression
     ) -> None:
         next_multiplier = self._synthetic_partial_formula(multiplier)
-        self._inner._compute_global_differential(accumulator, next_multiplier)
+        self._inner._compute_synthetic_partials(accumulator, next_multiplier)
 
     @abstractmethod
     def _local_partial_formula(

@@ -51,7 +51,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     ):
         return mf.logarithm(inner_value, base = self.base)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: Logarithm,

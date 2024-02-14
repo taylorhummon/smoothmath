@@ -30,7 +30,7 @@ class Reciprocal(base.UnaryExpression):
     ):
         return mf.reciprocal(inner_value)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: Reciprocal,

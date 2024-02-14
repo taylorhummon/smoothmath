@@ -45,7 +45,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     ):
         return mf.exponential(inner_value, base = self.base)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial_formula(
         self: Exponential,

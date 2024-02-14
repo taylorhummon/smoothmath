@@ -7,8 +7,9 @@ import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
-    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
-    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
+    from smoothmath._private.accumulators import (
+        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+    )
 
 
 class Multiply(base.NAryExpression):
@@ -32,7 +33,7 @@ class Multiply(base.NAryExpression):
     ) -> RealNumber:
         return mf.multiply(*inner_values)
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def _local_partial(
         self: Multiply,
@@ -60,20 +61,21 @@ class Multiply(base.NAryExpression):
             for (i, inner) in enumerate(self._inners)
         ))
 
-    def _compute_local_differential(
+    def _compute_local_partials(
         self: Multiply,
         accumulator: LocalPartialsAccumulator,
-        multiplier: RealNumber
+        multiplier: RealNumber,
+        point: Point
     ) -> None:
-        inner_values = [inner._evaluate(accumulator.point) for inner in self._inners]
+        inner_values = [inner._evaluate(point) for inner in self._inners]
         for i, inner in enumerate(self._inners):
             next_multiplier = mf.multiply(
                 multiplier,
                 *util.list_without_entry_at(inner_values, i)
             )
-            inner._compute_local_differential(accumulator, next_multiplier)
+            inner._compute_local_partials(accumulator, next_multiplier, point)
 
-    def _compute_global_differential(
+    def _compute_synthetic_partials(
         self: Multiply,
         accumulator: SyntheticPartialsAccumulator,
         multiplier: Expression
@@ -83,7 +85,7 @@ class Multiply(base.NAryExpression):
                 multiplier,
                 *util.list_without_entry_at(self._inners, i)
             )
-            inner._compute_global_differential(accumulator, next_multiplier)
+            inner._compute_synthetic_partials(accumulator, next_multiplier)
 
     ## Normalization and Reduction ##
 

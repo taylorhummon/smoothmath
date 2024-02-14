@@ -2,17 +2,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
 import logging
-import smoothmath._private.expression as ex
 import smoothmath._private.errors as er
 import smoothmath._private.point as pt
+import smoothmath._private.expression as ex
+import smoothmath._private.accumulators as acc
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point
     from smoothmath.expression import (
         Variable, Add, Minus, Negation, Multiply, Divide, Power, NthPower
     )
-    from smoothmath._private.local_partials_accumulator import LocalPartialsAccumulator
-    from smoothmath._private.synthetic_partials_accumulator import SyntheticPartialsAccumulator
+    from smoothmath._private.accumulators import (
+        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+    )
 
 
 REDUCTION_STEPS_BOUND = 1000
@@ -69,7 +71,7 @@ class Expression(ABC):
     ) -> RealNumber:
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
-    ## Partials and Differentials ##
+    ## Partials ##
 
     def local_partial(
         self: Expression,
@@ -101,21 +103,38 @@ class Expression(ABC):
     ) -> Expression:
         raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
 
-    @abstractmethod
-    def _compute_local_differential(
+    def _local_partials(
         self: Expression,
-        accumulator: LocalPartialsAccumulator,
-        multiplier: RealNumber
-    ) -> None: # instead of returning a value, we mutate the local_differential argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_local_differential()")
+        point: Point
+    ) -> dict[str, RealNumber]:
+        accumulator = acc.LocalPartialsAccumulator()
+        self._reset_evaluation_cache()
+        self._compute_local_partials(accumulator, 1, point)
+        return accumulator.local_partials
 
     @abstractmethod
-    def _compute_global_differential(
+    def _compute_local_partials(
+        self: Expression,
+        accumulator: LocalPartialsAccumulator,
+        multiplier: RealNumber,
+        point: Point
+    ) -> None: # instead of returning a value, we mutate the accumulator argument
+        raise Exception("Concrete classes derived from Expression must implement _compute_local_partials()")
+
+    def _synthetic_partials(
+        self: Expression
+    ) -> dict[str, Expression]:
+        accumulator = acc.SyntheticPartialsAccumulator()
+        self._compute_synthetic_partials(accumulator, ex.Constant(1))
+        return accumulator.synthetic_partials
+
+    @abstractmethod
+    def _compute_synthetic_partials(
         self: Expression,
         accumulator: SyntheticPartialsAccumulator,
         multiplier: Expression
-    ) -> None: # instead of returning a value, we mutate the global_differential argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_global_differential()")
+    ) -> None: # instead of returning a value, we mutate the accumulator argument
+        raise Exception("Concrete classes derived from Expression must implement _compute_synthetic_partials()")
 
     ## Normalization and Reduction ##
 

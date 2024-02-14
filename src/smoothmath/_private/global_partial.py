@@ -26,10 +26,8 @@ class GlobalPartial:
         self._variable_name: str
         self._variable_name = variable_name
         self._synthetic_partial: Expression
-        self._synthetic_partial = _retrieve_synthetic_partial(
-            expression,
-            variable_name,
-            synthetic_partial
+        self._synthetic_partial = _retrieve_normalized_synthetic_partial(
+            expression, variable_name, synthetic_partial
         )
 
     def at(
@@ -79,11 +77,13 @@ class GlobalPartial:
         return f"GlobalPartial({self._original_expression}, {variable_string})"
 
 
-def _retrieve_synthetic_partial(
+def _retrieve_normalized_synthetic_partial(
     original_expression: Expression,
     variable_name: str,
     optional_synthetic_partial: Optional[Expression]
 ) -> Expression:
     if optional_synthetic_partial is not None:
+        # We'll assume that if a synthetic partial was passed in to the constructor,
+        # we don't need to normalize it.
         return optional_synthetic_partial
     return original_expression._synthetic_partial(variable_name)._normalize()
