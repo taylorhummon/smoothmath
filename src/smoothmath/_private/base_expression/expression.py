@@ -43,6 +43,8 @@ class Expression(ABC):
         self._lacks_variables = lacks_variables
         self._is_fully_reduced: bool
         self._is_fully_reduced = False
+        self._evaluation_failed: bool
+        self._evaluation_failed = False
 
     @abstractmethod
     def _rebuild(
@@ -175,12 +177,16 @@ class Expression(ABC):
     def _consolidate_expression_lacking_variables(
         self: Expression
     ) -> Optional[Expression]:
-        if self._lacks_variables and not isinstance(self, ex.Constant):
+        if (
+            self._lacks_variables and
+            (not self._evaluation_failed) and
+            (not isinstance(self, ex.Constant))
+        ):
             try:
                 value = self.evaluate(pt.Point())
                 return ex.Constant(value)
             except er.DomainError:
-                self._lacks_variables = False # PERFORMANCE HACK: don't retry evaluation
+                self._evaluation_failed = True
                 return None
         else:
             return None
