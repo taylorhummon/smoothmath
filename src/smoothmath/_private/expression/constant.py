@@ -77,7 +77,7 @@ class Constant(base.Expression):
     def _normalize_fully_reduced(
         self: Constant
     ) -> Expression:
-        return self
+        return Constant(self.value)
 
     ## Operations ##
 

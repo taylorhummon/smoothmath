@@ -90,7 +90,7 @@ class Variable(base.Expression):
     def _normalize_fully_reduced(
         self: Variable
     ) -> Expression:
-        return self
+        return Variable(self.name)
 
     ## Operations ##
 
