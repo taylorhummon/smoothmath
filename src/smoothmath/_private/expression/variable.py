@@ -30,6 +30,11 @@ class Variable(base.Expression):
         self.name: str
         self.name = name
 
+    def _rebuild(
+        self: Variable
+    ) -> Expression:
+        return Variable(self.name)
+
     ## Evaluation ##
 
     def _reset_evaluation_cache(
@@ -90,7 +95,7 @@ class Variable(base.Expression):
     def _normalize_fully_reduced(
         self: Variable
     ) -> Expression:
-        return Variable(self.name)
+        return self._rebuild()
 
     ## Operations ##
 

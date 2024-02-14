@@ -44,6 +44,12 @@ class Expression(ABC):
         self._is_fully_reduced: bool
         self._is_fully_reduced = False
 
+    @abstractmethod
+    def _rebuild(
+        self: Expression
+    ) -> Expression:
+        raise Exception("Concrete classes derived from Expression must implement _rebuild()")
+
     ## Evaluation ##
 
     def evaluate(

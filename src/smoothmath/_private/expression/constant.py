@@ -23,6 +23,11 @@ class Constant(base.Expression):
         self.value: RealNumber
         self.value = value
 
+    def _rebuild(
+        self: Constant
+    ) -> Expression:
+        return Constant(self.value)
+
     ## Evaluation ##
 
     def _reset_evaluation_cache(
@@ -77,7 +82,7 @@ class Constant(base.Expression):
     def _normalize_fully_reduced(
         self: Constant
     ) -> Expression:
-        return Constant(self.value)
+        return self._rebuild()
 
     ## Operations ##
 
