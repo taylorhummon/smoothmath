@@ -37,10 +37,10 @@ class Expression(ABC):
 
     def __init__(
         self: Expression,
-        lacks_variables: bool
+        variable_names: set[str]
     ) -> None:
-        self._lacks_variables: bool
-        self._lacks_variables = lacks_variables
+        self._variable_names: set[str]
+        self._variable_names = variable_names
         self._is_fully_reduced: bool
         self._is_fully_reduced = False
         self._evaluation_failed: bool
@@ -56,15 +56,23 @@ class Expression(ABC):
 
     def evaluate(
         self: Expression,
-        point: Point
+        where: RealNumber | Point
     ) -> RealNumber:
         """
-        Evaluates the expression.
+        Evaluates the expression. If ``where`` is a real number, evaluate will raise an exception
+        if the expression has more than one variable.
 
-        :param point: where to evaluate
+        :param where: where to evaluate
         """
-        self._reset_evaluation_cache()
-        return self._evaluate(point)
+        if isinstance(where, pt.Point):
+            self._reset_evaluation_cache()
+            return self._evaluate(where)
+        else: # where is a real number
+            exception_message = "Can only evaluate at a real number for an expression with one variable. Consider passing a point instead."
+            variable_name = _get_the_single_variable_name(self._variable_names, exception_message)
+            point = _point_on_number_line(variable_name, where)
+            self._reset_evaluation_cache()
+            return self._evaluate(point)
 
     @abstractmethod
     def _reset_evaluation_cache(
@@ -81,6 +89,25 @@ class Expression(ABC):
 
     ## Partials ##
 
+    def derivative_at(
+        self: Expression,
+        where: RealNumber | Point
+    ) -> RealNumber:
+        """
+        Produces the derivative of the expression at a given real number. Raises an exception if
+        the expression has more than one variable.
+
+        :param where: where to evaluate the derivative
+        """
+        exception_message = "Can only take the derivative of an expression with one variable. Consider partials or differentials instead."
+        variable_name = _get_the_single_variable_name(self._variable_names, exception_message)
+        if isinstance(where, pt.Point):
+            point = where
+        else: # where is a real number
+            point = _point_on_number_line(variable_name, where)
+        self._reset_evaluation_cache
+        return self._local_partial(variable_name, point)
+
     def local_partial(
         self: Expression,
         variable: Variable | str,
@@ -92,8 +119,8 @@ class Expression(ABC):
         :param variable: the partial is taken with respect to this variable
         :param point: where to localize
         """
-        self._reset_evaluation_cache()
         variable_name = util.get_variable_name(variable)
+        self._reset_evaluation_cache()
         return self._local_partial(variable_name, point)
 
     @abstractmethod
@@ -177,18 +204,17 @@ class Expression(ABC):
     def _consolidate_expression_lacking_variables(
         self: Expression
     ) -> Optional[Expression]:
-        if (
-            self._lacks_variables and
-            (not self._evaluation_failed) and
-            (not isinstance(self, ex.Constant))
-        ):
-            try:
-                value = self.evaluate(pt.Point())
-                return ex.Constant(value)
-            except er.DomainError:
-                self._evaluation_failed = True
-                return None
-        else:
+        if self._variable_names:
+            return None
+        if isinstance(self, ex.Constant):
+            return None
+        if self._evaluation_failed:
+            return None
+        try:
+            value = self.evaluate(pt.Point())
+            return ex.Constant(value)
+        except er.DomainError:
+            self._evaluation_failed = True
             return None
 
     @abstractmethod
@@ -246,3 +272,22 @@ class Expression(ABC):
         if isinstance(n, int):
             return ex.NthPower(self, n)
         raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")
+
+
+def _get_the_single_variable_name(
+    variable_names: set[str],
+    exception_message: str
+) -> str:
+    if len(variable_names) == 0:
+        return "whatever"
+    elif len(variable_names) == 1:
+        (variable_name,) = variable_names
+        return variable_name
+    else:
+        raise Exception(exception_message)
+
+def _point_on_number_line(
+    variable_name: str,
+    value: RealNumber
+) -> Point:
+    return pt.Point(**({variable_name: value}))

@@ -15,8 +15,8 @@ class NAryExpression(base.Expression):
         for inner in args:
             if not isinstance(inner, base.Expression):
                 raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
-        lacks_variables = all(inner._lacks_variables for inner in args)
-        super().__init__(lacks_variables)
+        variable_names = set().union(*(inner._variable_names for inner in args))
+        super().__init__(variable_names)
         self._inners: list[Expression]
         self._inners = list(args)
         self._value: Optional[RealNumber]

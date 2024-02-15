@@ -19,7 +19,7 @@ class Constant(base.Expression):
         self: Constant,
         value: RealNumber
     ) -> None:
-        super().__init__(lacks_variables = True)
+        super().__init__(variable_names = set())
         self.value: RealNumber
         self.value = value
 

@@ -52,7 +52,7 @@ class Power(base.BinaryExpression):
         variable_name: str,
         point: Point
     ) -> RealNumber:
-        if self._left._lacks_variables and self._left._evaluate(point) == 1:
+        if (not self._left._variable_names) and self._left._evaluate(point) == 1:
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             return 0
         else:
@@ -83,7 +83,7 @@ class Power(base.BinaryExpression):
         multiplier: RealNumber,
         point: Point
     ) -> None:
-        if self._left._lacks_variables and self._left._evaluate(point) == 1:
+        if (not self._left._variable_names) and self._left._evaluate(point) == 1:
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             pass
         else:

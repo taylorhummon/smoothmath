@@ -24,7 +24,7 @@ class Variable(base.Expression):
         self: Variable,
         name: str
     ) -> None:
-        super().__init__(lacks_variables = False)
+        super().__init__(variable_names = {name})
         if (not name) or (alphanumeric_pattern.match(name) is None):
             raise Exception(f"Illegal variable name: {name}")
         self.name: str

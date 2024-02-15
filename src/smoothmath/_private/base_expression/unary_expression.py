@@ -17,7 +17,7 @@ class UnaryExpression(base.Expression):
     ) -> None:
         if not isinstance(inner, base.Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {inner}")
-        super().__init__(inner._lacks_variables)
+        super().__init__(inner._variable_names)
         self._inner: Expression
         self._inner = inner
         self._value: Optional[RealNumber]

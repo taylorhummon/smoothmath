@@ -2,11 +2,12 @@ Welcome to smoothmath's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents:
 
-   smoothmath
-   expression
+    usage
+    smoothmath
+    expression
 
 
 Indices and search

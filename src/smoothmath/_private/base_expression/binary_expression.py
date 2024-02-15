@@ -17,7 +17,8 @@ class BinaryExpression(base.Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {left}")
         if not isinstance(right, base.Expression):
             raise Exception(f"Expressions must be composed of Expressions, found: {right}")
-        super().__init__(left._lacks_variables and right._lacks_variables)
+        variable_names = left._variable_names.union(right._variable_names)
+        super().__init__(variable_names)
         self._left: Expression
         self._left = left
         self._right: Expression
