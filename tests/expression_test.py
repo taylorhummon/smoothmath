@@ -25,7 +25,7 @@ def test_expression_reuse():
     z = (w + Constant(1)) / w
     point = Point(x = 2)
     assert z.evaluate(point) == approx(1.25)
-    assert z.local_partial(x, point) == approx(-0.25)
+    assert z.partial_at(x, point) == approx(-0.25)
     assert GlobalPartial(z, x).at(point) == approx(-0.25)
     assert LocalDifferential(z, point).component(x) == approx(-0.25)
     assert GlobalDifferential(z).component_at(x, point) == approx(-0.25)
@@ -36,13 +36,13 @@ def test_taking_partials_using_string_variable_name():
     z = x ** 2
     # at x = 3
     point = Point(x = 3)
-    assert z.local_partial("x", point) == approx(6)
+    assert z.partial_at("x", point) == approx(6)
     assert GlobalPartial(z, "x").at(point) == approx(6)
     assert LocalDifferential(z, point).component("x") == approx(6)
     assert GlobalDifferential(z).component_at("x", point) == approx(6)
     # at x = -1
     point = Point(x = -1)
-    assert z.local_partial("x", point) == approx(-2)
+    assert z.partial_at("x", point) == approx(-2)
     assert GlobalPartial(z, "x").at(point) == approx(-2)
     assert LocalDifferential(z, point).component("x") == approx(-2)
     assert GlobalDifferential(z).component_at("x", point) == approx(-2)
@@ -54,7 +54,7 @@ def test_unrelated_variable():
     z = x ** 2
     point = Point(x = 2)
     assert z.evaluate(point) == approx(4)
-    assert z.local_partial(y, point) == approx(0)
+    assert z.partial_at(y, point) == approx(0)
     assert GlobalPartial(z, y).at(point) == approx(0)
     assert LocalDifferential(z, point).component(y) == approx(0)
     assert GlobalDifferential(z).component_at(y, point) == approx(0)
@@ -65,7 +65,7 @@ def test_polynomial_of_one_variable():
     z = x * x - Constant(6) * x + Constant(4)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(-4)
-    assert z.local_partial(x, point) == approx(-2)
+    assert z.partial_at(x, point) == approx(-2)
     assert GlobalPartial(z, x).at(point) == approx(-2)
     assert LocalDifferential(z, point).component(x) == approx(-2)
     assert GlobalDifferential(z).component_at(x, point) == approx(-2)
@@ -77,8 +77,8 @@ def test_polynomial_of_two_variables():
     z = x * (x + y) - Constant(5) * y ** 2
     point = Point(x = 2, y = 3)
     assert z.evaluate(point) == approx(-35)
-    assert z.local_partial(x, point) == approx(7)
-    assert z.local_partial(y, point) == approx(-28)
+    assert z.partial_at(x, point) == approx(7)
+    assert z.partial_at(y, point) == approx(-28)
     assert GlobalPartial(z, x).at(point) == approx(7)
     assert GlobalPartial(z, y).at(point) == approx(-28)
     local_differential = LocalDifferential(z, point)
@@ -96,9 +96,9 @@ def test_polynomial_of_three_variables():
     z = w * w + Constant(5) * w * x ** 2 - w * x * y
     point = Point(w = 2, x = 3, y = 4)
     assert z.evaluate(point) == approx(70)
-    assert z.local_partial(w, point) == approx(37)
-    assert z.local_partial(x, point) == approx(52)
-    assert z.local_partial(y, point) == approx(-6)
+    assert z.partial_at(w, point) == approx(37)
+    assert z.partial_at(x, point) == approx(52)
+    assert z.partial_at(y, point) == approx(-6)
     assert GlobalPartial(z, w).at(point) == approx(37)
     assert GlobalPartial(z, x).at(point) == approx(52)
     assert GlobalPartial(z, y).at(point) == approx(-6)
@@ -117,7 +117,7 @@ def test_composite_function():
     z = Exponential(x ** 2)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(54.598150033)
-    assert z.local_partial(x, point) == approx(218.392600132)
+    assert z.partial_at(x, point) == approx(218.392600132)
     assert GlobalPartial(z, x).at(point) == approx(218.392600132)
     assert LocalDifferential(z, point).component(x) == approx(218.392600132)
     assert GlobalDifferential(z).component_at(x, point) == approx(218.392600132)
@@ -130,7 +130,7 @@ def test_indeterminate_form():
     with raises(DomainError):
         z.evaluate(point)
     with raises(DomainError):
-        z.local_partial(t, point)
+        z.partial_at(t, point)
     global_t_partial = GlobalPartial(z, t)
     with raises(DomainError):
         global_t_partial.at(point)

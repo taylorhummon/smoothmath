@@ -18,14 +18,14 @@ class LocalDifferential:
         self: LocalDifferential,
         expression: Expression,
         point: Point,
-        local_partials: Optional[dict[str, RealNumber]] = None
+        numeric_partials: Optional[dict[str, RealNumber]] = None
     ) -> None:
         self._original_expression: Expression
         self._original_expression = expression
         self._point: Point
         self._point = point
-        self._local_partials: dict[str, RealNumber]
-        self._local_partials = _retrieve_local_partials(expression, point, local_partials)
+        self._numeric_partials: dict[str, RealNumber]
+        self._numeric_partials = _retrieve_numeric_partials(expression, point, numeric_partials)
 
     def component(
         self: LocalDifferential,
@@ -37,7 +37,7 @@ class LocalDifferential:
         :param variable: selects which component
         """
         variable_name = util.get_variable_name(variable)
-        return self._local_partials.get(variable_name, 0)
+        return self._numeric_partials.get(variable_name, 0)
 
     def __eq__(
         self: LocalDifferential,
@@ -47,13 +47,13 @@ class LocalDifferential:
             (other.__class__ == self.__class__) and
             (self._original_expression == other._original_expression) and
             (self._point == other._point) and
-            (self._local_partials == other._local_partials)
+            (self._numeric_partials == other._numeric_partials)
         )
 
     def __hash__(
         self: LocalDifferential
     ) -> int:
-        data = tuple(sorted(self._local_partials.items()))
+        data = tuple(sorted(self._numeric_partials.items()))
         return hash((self._original_expression, self._point, data))
 
     def __str__(
@@ -72,12 +72,12 @@ class LocalDifferential:
         return f"LocalDifferential({self._original_expression}, {self._point})"
 
 
-def _retrieve_local_partials(
+def _retrieve_numeric_partials(
     original_expression: Expression,
     point: Point,
-    optional_local_partials: Optional[dict[str, RealNumber]]
+    optional_numeric_partials: Optional[dict[str, RealNumber]]
 ) -> dict[str, RealNumber]:
-    if optional_local_partials is not None:
-        return optional_local_partials
+    if optional_numeric_partials is not None:
+        return optional_numeric_partials
     else:
-        return original_expression._local_partials(point)
+        return original_expression._numeric_partials(point)

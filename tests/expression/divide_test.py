@@ -75,7 +75,7 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     with raises(DomainError):
         global_y_partial.at(point)
     with raises(DomainError):
-        z.local_partial(y, point)
+        z.partial_at(y, point)
 
 
 def test_Divide_with_constant_denominator_one():

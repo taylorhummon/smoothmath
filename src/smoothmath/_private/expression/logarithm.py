@@ -53,7 +53,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
 
     ## Partials ##
 
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: Logarithm,
         point: Point,
         multiplier: RealNumber

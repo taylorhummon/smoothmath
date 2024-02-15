@@ -22,7 +22,7 @@ Partials
 >>> z = x ** 2 + Constant(3)
 >>> z.evaluate(Point(x=1))
 4
->>> z.local_partial(x, Point(x=1))
+>>> z.partial_at(x, Point(x=1))
 2
 
 

@@ -6,7 +6,7 @@ import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.accumulators import (
-        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+        NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
 
 
@@ -64,15 +64,15 @@ class UnaryExpression(base.Expression):
 
     ## Partials ##
 
-    def _local_partial(
+    def _numeric_partial(
         self: UnaryExpression,
         variable_name: str,
         point: Point
     ) -> RealNumber:
         inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
-        inner_partial = self._inner._local_partial(variable_name, point)
-        return self._local_partial_formula(point, inner_partial)
+        inner_partial = self._inner._numeric_partial(variable_name, point)
+        return self._numeric_partial_formula(point, inner_partial)
 
     def _synthetic_partial(
         self: UnaryExpression,
@@ -81,16 +81,16 @@ class UnaryExpression(base.Expression):
         inner_partial = self._inner._synthetic_partial(variable_name)
         return self._synthetic_partial_formula(inner_partial)
 
-    def _compute_local_partials(
+    def _compute_numeric_partials(
         self: UnaryExpression,
-        accumulator: LocalPartialsAccumulator,
+        accumulator: NumericPartialsAccumulator,
         multiplier: RealNumber,
         point: Point
     ) -> None:
         inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
-        next_multiplier = self._local_partial_formula(point, multiplier)
-        self._inner._compute_local_partials(accumulator, next_multiplier, point)
+        next_multiplier = self._numeric_partial_formula(point, multiplier)
+        self._inner._compute_numeric_partials(accumulator, next_multiplier, point)
 
     def _compute_synthetic_partials(
         self: UnaryExpression,
@@ -101,12 +101,12 @@ class UnaryExpression(base.Expression):
         self._inner._compute_synthetic_partials(accumulator, next_multiplier)
 
     @abstractmethod
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: UnaryExpression,
         point: Point,
         multiplier: RealNumber
     ) -> RealNumber:
-        raise Exception("Concrete classes derived from UnaryExpression must implement _local_partial_formula()")
+        raise Exception("Concrete classes derived from UnaryExpression must implement _numeric_partial_formula()")
 
     @abstractmethod
     def _synthetic_partial_formula(

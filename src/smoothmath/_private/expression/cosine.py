@@ -30,7 +30,7 @@ class Cosine(base.UnaryExpression):
 
     ## Partials ##
 
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: Cosine,
         point: Point,
         multiplier: RealNumber

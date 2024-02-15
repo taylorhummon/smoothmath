@@ -56,7 +56,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     ## Partials ##
 
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: NthRoot,
         point: Point,
         multiplier: RealNumber

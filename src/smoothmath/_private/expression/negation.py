@@ -30,7 +30,7 @@ class Negation(base.UnaryExpression):
 
     ## Partials ##
 
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: Negation,
         point: Point,
         multiplier: RealNumber

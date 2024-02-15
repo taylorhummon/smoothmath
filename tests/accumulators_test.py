@@ -1,16 +1,16 @@
 from smoothmath.expression import Variable, Constant, Add, Reciprocal
-from smoothmath._private.accumulators import LocalPartialsAccumulator, SyntheticPartialsAccumulator
+from smoothmath._private.accumulators import NumericPartialsAccumulator, SyntheticPartialsAccumulator
 
 
-def test_LocalPartialsAccumulator():
+def test_NumericPartialsAccumulator():
     x = Variable("x")
     y = Variable("y")
-    accumulator = LocalPartialsAccumulator()
+    accumulator = NumericPartialsAccumulator()
     accumulator.add_to(x, 3)
     accumulator.add_to(y, 5)
     accumulator.add_to("x", 1)
-    assert accumulator.local_partials["x"] == 4
-    assert accumulator.local_partials["y"] == 5
+    assert accumulator.numeric_partials["x"] == 4
+    assert accumulator.numeric_partials["y"] == 5
 
 
 def test_SyntheticPartialsAccumulator():

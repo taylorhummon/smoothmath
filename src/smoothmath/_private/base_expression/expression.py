@@ -13,7 +13,7 @@ if TYPE_CHECKING:
         Variable, Add, Minus, Negation, Multiply, Divide, Power, NthPower
     )
     from smoothmath._private.accumulators import (
-        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+        NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
 
 
@@ -29,9 +29,9 @@ class Expression(ABC):
         >>> from smoothmath.expression import Constant, Variable
         >>> expression: Expression
         >>> expression = (Variable("x") + Constant(1)) / Variable("x")
-        >>> expression.evaluate(Point(x = 2))
+        >>> expression.evaluate(2)
         1.5
-        >>> expression.local_partial(Variable("x"), Point(x = 2))
+        >>> expression.derivative_at(2)
         -0.25
     """
 
@@ -106,30 +106,30 @@ class Expression(ABC):
         else: # where is a real number
             point = _point_on_number_line(variable_name, where)
         self._reset_evaluation_cache
-        return self._local_partial(variable_name, point)
+        return self._numeric_partial(variable_name, point)
 
-    def local_partial(
+    def partial_at(
         self: Expression,
         variable: Variable | str,
         point: Point
     ) -> RealNumber:
         """
-        Takes the partial derivative of the expression and localizes at a point.
+        The partial derivative of the expression at a point.
 
         :param variable: the partial is taken with respect to this variable
-        :param point: where to localize
+        :param point: where to evaluate the partial
         """
         variable_name = util.get_variable_name(variable)
         self._reset_evaluation_cache()
-        return self._local_partial(variable_name, point)
+        return self._numeric_partial(variable_name, point)
 
     @abstractmethod
-    def _local_partial(
+    def _numeric_partial(
         self: Expression,
         variable_name: str,
         point: Point
     ) -> RealNumber:
-        raise Exception("Concrete classes derived from Expression must implement _local_partial()")
+        raise Exception("Concrete classes derived from Expression must implement _numeric_partial()")
 
     @abstractmethod
     def _synthetic_partial(
@@ -138,23 +138,23 @@ class Expression(ABC):
     ) -> Expression:
         raise Exception("Concrete classes derived from Expression must implement _synthetic_partial()")
 
-    def _local_partials(
+    def _numeric_partials(
         self: Expression,
         point: Point
     ) -> dict[str, RealNumber]:
-        accumulator = acc.LocalPartialsAccumulator()
+        accumulator = acc.NumericPartialsAccumulator()
         self._reset_evaluation_cache()
-        self._compute_local_partials(accumulator, 1, point)
-        return accumulator.local_partials
+        self._compute_numeric_partials(accumulator, 1, point)
+        return accumulator.numeric_partials
 
     @abstractmethod
-    def _compute_local_partials(
+    def _compute_numeric_partials(
         self: Expression,
-        accumulator: LocalPartialsAccumulator,
+        accumulator: NumericPartialsAccumulator,
         multiplier: RealNumber,
         point: Point
     ) -> None: # instead of returning a value, we mutate the accumulator argument
-        raise Exception("Concrete classes derived from Expression must implement _compute_local_partials()")
+        raise Exception("Concrete classes derived from Expression must implement _compute_numeric_partials()")
 
     def _synthetic_partials(
         self: Expression

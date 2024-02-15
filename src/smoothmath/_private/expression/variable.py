@@ -6,7 +6,7 @@ import smoothmath._private.expression as ex
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.accumulators import (
-        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+        NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
 
 
@@ -50,7 +50,7 @@ class Variable(base.Expression):
 
     ## Partials ##
 
-    def _local_partial(
+    def _numeric_partial(
         self: Variable,
         variable_name: str,
         point: Point
@@ -69,9 +69,9 @@ class Variable(base.Expression):
         else:
             return ex.Constant(0)
 
-    def _compute_local_partials(
+    def _compute_numeric_partials(
         self: Variable,
-        accumulator: LocalPartialsAccumulator,
+        accumulator: NumericPartialsAccumulator,
         multiplier: RealNumber,
         point: Point
     ) -> None:

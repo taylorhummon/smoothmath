@@ -11,7 +11,7 @@ def assert_1_ary_derivatives(
     variable: Variable,
     expected: RealNumber
 ) -> None:
-    assert expression.local_partial(variable, point) == approx(expected)
+    assert expression.partial_at(variable, point) == approx(expected)
     assert GlobalPartial(expression, variable).at(point) == approx(expected)
     assert LocalDifferential(expression, point).component(variable) == approx(expected)
     assert GlobalDifferential(expression).component_at(variable, point) == approx(expected)
@@ -23,7 +23,7 @@ def assert_1_ary_derivatives_raise(
     variable: Variable
 ) -> None:
     with raises(DomainError):
-        expression.local_partial(variable, point)
+        expression.partial_at(variable, point)
     global_partial = GlobalPartial(expression, variable)
     with raises(DomainError):
         global_partial.at(point)
@@ -42,8 +42,8 @@ def assert_2_ary_derivatives(
     variable_b: Variable,
     expected_b: RealNumber
 ) -> None:
-    assert expression.local_partial(variable_a, point) == approx(expected_a)
-    assert expression.local_partial(variable_b, point) == approx(expected_b)
+    assert expression.partial_at(variable_a, point) == approx(expected_a)
+    assert expression.partial_at(variable_b, point) == approx(expected_b)
     assert GlobalPartial(expression, variable_a).at(point) == approx(expected_a)
     assert GlobalPartial(expression, variable_b).at(point) == approx(expected_b)
     local_differential = LocalDifferential(expression, point)
@@ -61,9 +61,9 @@ def assert_2_ary_derivatives_raise(
     variable_b: Variable
 ) -> None:
     with raises(DomainError):
-        expression.local_partial(variable_a, point)
+        expression.partial_at(variable_a, point)
     with raises(DomainError):
-        expression.local_partial(variable_b, point)
+        expression.partial_at(variable_b, point)
     global_partial_a = GlobalPartial(expression, variable_a)
     with raises(DomainError):
         global_partial_a.at(point)
@@ -89,9 +89,9 @@ def assert_3_ary_derivatives(
     variable_c: Variable,
     expected_c: RealNumber
 ) -> None:
-    assert expression.local_partial(variable_a, point) == approx(expected_a)
-    assert expression.local_partial(variable_b, point) == approx(expected_b)
-    assert expression.local_partial(variable_c, point) == approx(expected_c)
+    assert expression.partial_at(variable_a, point) == approx(expected_a)
+    assert expression.partial_at(variable_b, point) == approx(expected_b)
+    assert expression.partial_at(variable_c, point) == approx(expected_c)
     assert GlobalPartial(expression, variable_a).at(point) == approx(expected_a)
     assert GlobalPartial(expression, variable_b).at(point) == approx(expected_b)
     assert GlobalPartial(expression, variable_c).at(point) == approx(expected_c)

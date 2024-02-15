@@ -7,7 +7,7 @@ import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.accumulators import (
-        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+        NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
 
 
@@ -41,7 +41,7 @@ class Divide(base.BinaryExpression):
 
     ## Partials ##
 
-    def _local_partial(
+    def _numeric_partial(
         self: Divide,
         variable_name: str,
         point: Point
@@ -49,11 +49,11 @@ class Divide(base.BinaryExpression):
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         self._verify_domain_constraints(left_value, right_value)
-        left_partial = self._left._local_partial(variable_name, point)
-        right_partial = self._right._local_partial(variable_name, point)
+        left_partial = self._left._numeric_partial(variable_name, point)
+        right_partial = self._right._numeric_partial(variable_name, point)
         return mf.add(
-            self._local_partial_formula_left(point, left_partial),
-            self._local_partial_formula_right(point, right_partial)
+            self._numeric_partial_formula_left(point, left_partial),
+            self._numeric_partial_formula_right(point, right_partial)
         )
 
     def _synthetic_partial(
@@ -67,19 +67,19 @@ class Divide(base.BinaryExpression):
             self._synthetic_partial_formula_right(right_partial)
         )
 
-    def _compute_local_partials(
+    def _compute_numeric_partials(
         self: Divide,
-        accumulator: LocalPartialsAccumulator,
+        accumulator: NumericPartialsAccumulator,
         multiplier: RealNumber,
         point: Point
     ) -> None:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         self._verify_domain_constraints(left_value, right_value)
-        next_multiplier_left = self._local_partial_formula_left(point, multiplier)
-        next_multiplier_right = self._local_partial_formula_right(point, multiplier)
-        self._left._compute_local_partials(accumulator, next_multiplier_left, point)
-        self._right._compute_local_partials(accumulator, next_multiplier_right, point)
+        next_multiplier_left = self._numeric_partial_formula_left(point, multiplier)
+        next_multiplier_right = self._numeric_partial_formula_right(point, multiplier)
+        self._left._compute_numeric_partials(accumulator, next_multiplier_left, point)
+        self._right._compute_numeric_partials(accumulator, next_multiplier_right, point)
 
     def _compute_synthetic_partials(
         self: Divide,
@@ -91,7 +91,7 @@ class Divide(base.BinaryExpression):
         self._left._compute_synthetic_partials(accumulator, next_multiplier_left)
         self._right._compute_synthetic_partials(accumulator, next_multiplier_right)
 
-    def _local_partial_formula_left(
+    def _numeric_partial_formula_left(
         self: Divide,
         point: Point,
         multiplier: RealNumber
@@ -105,7 +105,7 @@ class Divide(base.BinaryExpression):
     ) -> Expression:
         return ex.Divide(multiplier, self._right)
 
-    def _local_partial_formula_right(
+    def _numeric_partial_formula_right(
         self: Divide,
         point: Point,
         multiplier: RealNumber

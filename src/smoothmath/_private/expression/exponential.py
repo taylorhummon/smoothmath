@@ -47,7 +47,7 @@ class Exponential(base.ParameterizedUnaryExpression):
 
     ## Partials ##
 
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: Exponential,
         point: Point,
         multiplier: RealNumber

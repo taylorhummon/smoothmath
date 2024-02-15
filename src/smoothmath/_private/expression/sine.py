@@ -30,7 +30,7 @@ class Sine(base.UnaryExpression):
 
     ## Partials ##
 
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: Sine,
         point: Point,
         multiplier: RealNumber

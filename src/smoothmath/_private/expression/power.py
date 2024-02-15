@@ -9,7 +9,7 @@ import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath._private.accumulators import (
-        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+        NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
 
 
@@ -47,7 +47,7 @@ class Power(base.BinaryExpression):
 
     ## Partials ##
 
-    def _local_partial(
+    def _numeric_partial(
         self: Power,
         variable_name: str,
         point: Point
@@ -59,11 +59,11 @@ class Power(base.BinaryExpression):
             left_value = self._left._evaluate(point)
             right_value = self._right._evaluate(point)
             self._verify_domain_constraints(left_value, right_value)
-            left_partial = self._left._local_partial(variable_name, point)
-            right_partial = self._right._local_partial(variable_name, point)
+            left_partial = self._left._numeric_partial(variable_name, point)
+            right_partial = self._right._numeric_partial(variable_name, point)
             return (
-                self._local_partial_formula_left(point, left_partial) +
-                self._local_partial_formula_right(point, right_partial)
+                self._numeric_partial_formula_left(point, left_partial) +
+                self._numeric_partial_formula_right(point, right_partial)
             )
 
     def _synthetic_partial(
@@ -77,9 +77,9 @@ class Power(base.BinaryExpression):
             self._synthetic_partial_formula_right(right_partial)
         )
 
-    def _compute_local_partials(
+    def _compute_numeric_partials(
         self: Power,
-        accumulator: LocalPartialsAccumulator,
+        accumulator: NumericPartialsAccumulator,
         multiplier: RealNumber,
         point: Point
     ) -> None:
@@ -90,10 +90,10 @@ class Power(base.BinaryExpression):
             left_value = self._left._evaluate(point)
             right_value = self._right._evaluate(point)
             self._verify_domain_constraints(left_value, right_value)
-            next_multiplier_left = self._local_partial_formula_left(point, multiplier)
-            next_multiplier_right = self._local_partial_formula_right(point, multiplier)
-            self._left._compute_local_partials(accumulator, next_multiplier_left, point)
-            self._right._compute_local_partials(accumulator, next_multiplier_right, point)
+            next_multiplier_left = self._numeric_partial_formula_left(point, multiplier)
+            next_multiplier_right = self._numeric_partial_formula_right(point, multiplier)
+            self._left._compute_numeric_partials(accumulator, next_multiplier_left, point)
+            self._right._compute_numeric_partials(accumulator, next_multiplier_right, point)
 
     def _compute_synthetic_partials(
         self: Power,
@@ -105,7 +105,7 @@ class Power(base.BinaryExpression):
         self._left._compute_synthetic_partials(accumulator, next_multiplier_left)
         self._right._compute_synthetic_partials(accumulator, next_multiplier_right)
 
-    def _local_partial_formula_left(
+    def _numeric_partial_formula_left(
         self: Power,
         point: Point,
         multiplier: RealNumber
@@ -134,7 +134,7 @@ class Power(base.BinaryExpression):
     ) -> Expression:
         return ex.Multiply(ex.Logarithm(self._left, base = math.e), self, multiplier)
 
-    def _local_partial_formula_right(
+    def _numeric_partial_formula_right(
         self: Power,
         point: Point,
         multiplier: RealNumber

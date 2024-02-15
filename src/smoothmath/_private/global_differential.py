@@ -60,11 +60,11 @@ class GlobalDifferential:
         :param point: where to localize
         """
         self._original_expression.evaluate(point)
-        local_partials: dict[str, RealNumber]
-        local_partials = {}
+        numeric_partials: dict[str, RealNumber]
+        numeric_partials = {}
         for variable_name, synthetic_partial in self._synthetic_partials.items():
-            local_partials[variable_name] = synthetic_partial.evaluate(point)
-        return ld.LocalDifferential(self._original_expression, point, local_partials)
+            numeric_partials[variable_name] = synthetic_partial.evaluate(point)
+        return ld.LocalDifferential(self._original_expression, point, numeric_partials)
 
     def __eq__(
         self: GlobalDifferential,

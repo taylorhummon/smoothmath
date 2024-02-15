@@ -6,21 +6,21 @@ if TYPE_CHECKING:
     from smoothmath.expression import Variable
 
 
-class LocalPartialsAccumulator:
+class NumericPartialsAccumulator:
     def __init__(
-        self: LocalPartialsAccumulator
+        self: NumericPartialsAccumulator
     ) -> None:
-        self.local_partials: dict[str, RealNumber]
-        self.local_partials = {}
+        self.numeric_partials: dict[str, RealNumber]
+        self.numeric_partials = {}
 
     def add_to(
-        self: LocalPartialsAccumulator,
+        self: NumericPartialsAccumulator,
         variable: Variable | str,
         contribution: RealNumber
     ) -> None:
         variable_name = util.get_variable_name(variable)
-        existing = self.local_partials.get(variable_name, 0)
-        self.local_partials[variable_name] = existing + contribution
+        existing = self.numeric_partials.get(variable_name, 0)
+        self.numeric_partials[variable_name] = existing + contribution
 
 
 class SyntheticPartialsAccumulator:

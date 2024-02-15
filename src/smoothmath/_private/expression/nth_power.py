@@ -53,7 +53,7 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     ## Partials ##
 
-    def _local_partial_formula(
+    def _numeric_partial_formula(
         self: NthPower,
         point: Point,
         multiplier: RealNumber

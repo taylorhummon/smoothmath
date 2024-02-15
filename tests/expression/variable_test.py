@@ -7,8 +7,8 @@ def test_Variable():
     y = Variable("y")
     point = Point(y = 3)
     assert y.evaluate(point) == 3
-    assert y.local_partial(x, point) == 0
-    assert y.local_partial(y, point) == 1
+    assert y.partial_at(x, point) == 0
+    assert y.partial_at(y, point) == 1
     assert GlobalPartial(y, x).at(point) == 0
     assert GlobalPartial(y, y).at(point) == 1
     point = Point(x = 2, y = 3)

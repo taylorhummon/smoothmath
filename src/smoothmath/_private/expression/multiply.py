@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
     from smoothmath._private.accumulators import (
-        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+        NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
 
 
@@ -35,7 +35,7 @@ class Multiply(base.NAryExpression):
 
     ## Partials ##
 
-    def _local_partial(
+    def _numeric_partial(
         self: Multiply,
         variable_name: str,
         point: Point
@@ -43,7 +43,7 @@ class Multiply(base.NAryExpression):
         inner_values = [inner._evaluate(point) for inner in self._inners]
         return mf.add(*(
             mf.multiply(
-                inner._local_partial(variable_name, point),
+                inner._numeric_partial(variable_name, point),
                 *util.list_without_entry_at(inner_values, i)
             )
             for (i, inner) in enumerate(self._inners)
@@ -61,9 +61,9 @@ class Multiply(base.NAryExpression):
             for (i, inner) in enumerate(self._inners)
         ))
 
-    def _compute_local_partials(
+    def _compute_numeric_partials(
         self: Multiply,
-        accumulator: LocalPartialsAccumulator,
+        accumulator: NumericPartialsAccumulator,
         multiplier: RealNumber,
         point: Point
     ) -> None:
@@ -73,7 +73,7 @@ class Multiply(base.NAryExpression):
                 multiplier,
                 *util.list_without_entry_at(inner_values, i)
             )
-            inner._compute_local_partials(accumulator, next_multiplier, point)
+            inner._compute_numeric_partials(accumulator, next_multiplier, point)
 
     def _compute_synthetic_partials(
         self: Multiply,

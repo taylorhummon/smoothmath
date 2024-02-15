@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Constant, Negation, Logarithm
     from smoothmath._private.accumulators import (
-        LocalPartialsAccumulator, SyntheticPartialsAccumulator
+        NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
 
 
@@ -35,13 +35,13 @@ class Add(base.NAryExpression):
 
     ## Partials ##
 
-    def _local_partial(
+    def _numeric_partial(
         self: Add,
         variable_name: str,
         point: Point
     ) -> RealNumber:
         return mf.add(*(
-            inner._local_partial(variable_name, point)
+            inner._numeric_partial(variable_name, point)
             for inner in self._inners
         ))
 
@@ -54,14 +54,14 @@ class Add(base.NAryExpression):
             for inner in self._inners
         ))
 
-    def _compute_local_partials(
+    def _compute_numeric_partials(
         self: Add,
-        accumulator: LocalPartialsAccumulator,
+        accumulator: NumericPartialsAccumulator,
         multiplier: RealNumber,
         point: Point
     ) -> None:
         for inner in self._inners:
-            inner._compute_local_partials(accumulator, multiplier, point)
+            inner._compute_numeric_partials(accumulator, multiplier, point)
 
     def _compute_synthetic_partials(
         self: Add,
