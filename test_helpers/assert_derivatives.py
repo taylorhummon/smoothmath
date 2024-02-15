@@ -1,6 +1,6 @@
 from pytest import approx, raises
 from smoothmath import (
-    DomainError, RealNumber, Point, Expression, GlobalDifferential, LocalDifferential, GlobalPartial
+    DomainError, RealNumber, Point, Expression, GlobalDifferential, LocalDifferential, Partial
 )
 from smoothmath.expression import Variable
 
@@ -12,7 +12,7 @@ def assert_1_ary_derivatives(
     expected: RealNumber
 ) -> None:
     assert expression.partial_at(variable, point) == approx(expected)
-    assert GlobalPartial(expression, variable).at(point) == approx(expected)
+    assert Partial(expression, variable).at(point) == approx(expected)
     assert LocalDifferential(expression, point).component(variable) == approx(expected)
     assert GlobalDifferential(expression).component_at(variable, point) == approx(expected)
 
@@ -24,9 +24,9 @@ def assert_1_ary_derivatives_raise(
 ) -> None:
     with raises(DomainError):
         expression.partial_at(variable, point)
-    global_partial = GlobalPartial(expression, variable)
+    partial = Partial(expression, variable)
     with raises(DomainError):
-        global_partial.at(point)
+        partial.at(point)
     with raises(DomainError):
         LocalDifferential(expression, point)
     global_differential = GlobalDifferential(expression)
@@ -44,8 +44,8 @@ def assert_2_ary_derivatives(
 ) -> None:
     assert expression.partial_at(variable_a, point) == approx(expected_a)
     assert expression.partial_at(variable_b, point) == approx(expected_b)
-    assert GlobalPartial(expression, variable_a).at(point) == approx(expected_a)
-    assert GlobalPartial(expression, variable_b).at(point) == approx(expected_b)
+    assert Partial(expression, variable_a).at(point) == approx(expected_a)
+    assert Partial(expression, variable_b).at(point) == approx(expected_b)
     local_differential = LocalDifferential(expression, point)
     assert local_differential.component(variable_a) == approx(expected_a)
     assert local_differential.component(variable_b) == approx(expected_b)
@@ -64,12 +64,12 @@ def assert_2_ary_derivatives_raise(
         expression.partial_at(variable_a, point)
     with raises(DomainError):
         expression.partial_at(variable_b, point)
-    global_partial_a = GlobalPartial(expression, variable_a)
+    partial_a = Partial(expression, variable_a)
     with raises(DomainError):
-        global_partial_a.at(point)
-    global_partial_b = GlobalPartial(expression, variable_b)
+        partial_a.at(point)
+    partial_b = Partial(expression, variable_b)
     with raises(DomainError):
-        global_partial_b.at(point)
+        partial_b.at(point)
     with raises(DomainError):
         LocalDifferential(expression, point)
     global_differential = GlobalDifferential(expression)
@@ -92,9 +92,9 @@ def assert_3_ary_derivatives(
     assert expression.partial_at(variable_a, point) == approx(expected_a)
     assert expression.partial_at(variable_b, point) == approx(expected_b)
     assert expression.partial_at(variable_c, point) == approx(expected_c)
-    assert GlobalPartial(expression, variable_a).at(point) == approx(expected_a)
-    assert GlobalPartial(expression, variable_b).at(point) == approx(expected_b)
-    assert GlobalPartial(expression, variable_c).at(point) == approx(expected_c)
+    assert Partial(expression, variable_a).at(point) == approx(expected_a)
+    assert Partial(expression, variable_b).at(point) == approx(expected_b)
+    assert Partial(expression, variable_c).at(point) == approx(expected_c)
     local_differential = LocalDifferential(expression, point)
     assert local_differential.component(variable_a) == approx(expected_a)
     assert local_differential.component(variable_b) == approx(expected_b)

@@ -1,5 +1,5 @@
 from pytest import approx, raises
-from smoothmath import DomainError, Point, GlobalDifferential, LocalDifferential, GlobalPartial
+from smoothmath import DomainError, Point, GlobalDifferential, LocalDifferential, Partial
 from smoothmath.expression import Variable, Constant, Divide, Reciprocal, Logarithm
 from assert_derivatives import ( # type: ignore
     assert_1_ary_derivatives,
@@ -71,9 +71,9 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
         global_differential.component_at(y, point)
     with raises(DomainError):
         LocalDifferential(z, point)
-    global_y_partial = GlobalPartial(z, y)
+    y_partial = Partial(z, y)
     with raises(DomainError):
-        global_y_partial.at(point)
+        y_partial.at(point)
     with raises(DomainError):
         z.partial_at(y, point)
 

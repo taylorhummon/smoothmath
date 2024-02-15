@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from smoothmath.expression import Variable
 
 
-class GlobalPartial:
+class Partial:
     """
     The partial derivative of an expression.
 
@@ -15,7 +15,7 @@ class GlobalPartial:
     """
 
     def __init__(
-        self: GlobalPartial,
+        self: Partial,
         expression: Expression,
         variable: Variable | str,
         synthetic_partial: Optional[Expression] = None
@@ -31,7 +31,7 @@ class GlobalPartial:
         )
 
     def at(
-        self: GlobalPartial,
+        self: Partial,
         point: Point
     ) -> RealNumber:
         """
@@ -44,21 +44,21 @@ class GlobalPartial:
         return self._synthetic_partial.evaluate(point)
 
     def as_expression(
-        self: GlobalPartial
+        self: Partial
     ) -> Expression:
         """
-        The global partial written as an expression.
+        The partial written as an expression.
         Sometimes referred to as the *synthetic partial*.
 
-        NOTE: The synthetic partial may be defined at more points than the global partial.
-        For example, take ``z = Logarithm(Variable("x"))`` and so the synthetic partial is
-        ``Reciprocal(Variable("x"))``. The synthetic partial is defined for negative x values,
-        but the global partial is only defined at positive x values.
+        NOTE: Writing the partial as an expression may enlargen the domain.
+        For example, take ``z = Logarithm(Variable("x"))`` and so partial as an expression is
+        ``Reciprocal(Variable("x"))``. This expression representing the parital is defined for
+        negative x values, but the honest partial is only defined at positive x values.
         """
         return self._synthetic_partial
 
     def __eq__(
-        self: GlobalPartial,
+        self: Partial,
         other: Any
     ) -> bool:
         return (
@@ -68,25 +68,25 @@ class GlobalPartial:
         )
 
     def __hash__(
-        self: GlobalPartial
+        self: Partial
     ) -> int:
         return hash((self._original_expression, self._synthetic_partial))
 
     def __str__(
-        self: GlobalPartial
+        self: Partial
     ) -> str:
         return self._to_string()
 
     def __repr__(
-        self: GlobalPartial
+        self: Partial
     ) -> str:
         return self._to_string()
 
     def _to_string(
-        self: GlobalPartial
+        self: Partial
     ) -> str:
         variable_string = f"Variable(\"{self._variable_name}\")"
-        return f"GlobalPartial({self._original_expression}, {variable_string})"
+        return f"Partial({self._original_expression}, {variable_string})"
 
 
 def _retrieve_normalized_synthetic_partial(

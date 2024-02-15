@@ -13,7 +13,7 @@ smoothmath
 .. autoclass:: Expression()
     :members:
 
-.. autoclass:: GlobalPartial(expression, variable)
+.. autoclass:: Partial(expression, variable)
     :members:
 
 .. autoclass:: LocalDifferential(expression, point)

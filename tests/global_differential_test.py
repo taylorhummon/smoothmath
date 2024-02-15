@@ -1,5 +1,5 @@
 from pytest import approx, raises
-from smoothmath import DomainError, Point, GlobalPartial, LocalDifferential, GlobalDifferential
+from smoothmath import DomainError, Point, Partial, LocalDifferential, GlobalDifferential
 from smoothmath.expression import Variable, Constant, Logarithm
 
 
@@ -18,12 +18,12 @@ def test_GlobalDifferential():
     assert global_differential.component_at("x", point) == approx(125)
     assert global_differential.component_at("y", point) == approx(300)
     # component() method
-    assert global_differential.component(w) == GlobalPartial(z, w)
-    assert global_differential.component(x) == GlobalPartial(z, x)
-    assert global_differential.component(y) == GlobalPartial(z, y)
-    assert global_differential.component("w") == GlobalPartial(z, w)
-    assert global_differential.component("x") == GlobalPartial(z, x)
-    assert global_differential.component("y") == GlobalPartial(z, y)
+    assert global_differential.component(w) == Partial(z, w)
+    assert global_differential.component(x) == Partial(z, x)
+    assert global_differential.component(y) == Partial(z, y)
+    assert global_differential.component("w") == Partial(z, w)
+    assert global_differential.component("x") == Partial(z, x)
+    assert global_differential.component("y") == Partial(z, y)
     # at() method
     assert global_differential.at(point) == LocalDifferential(z, point)
 
@@ -35,9 +35,9 @@ def test_GlobalDifferential_raises():
     point = Point(x = -1)
     with raises(DomainError):
         global_differential.component_at(x, point)
-    global_x_partial = global_differential.component(x)
+    x_partial = global_differential.component(x)
     with raises(DomainError):
-        global_x_partial.at(point)
+        x_partial.at(point)
     with raises(DomainError):
         global_differential.at(point)
 

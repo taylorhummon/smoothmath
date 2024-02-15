@@ -9,7 +9,7 @@ Derivatives
 >>> z = x ** Constant(2) + Constant(3)
 >>> z.evaluate(1)
 4
->>> z.derivative(5)
+>>> z.derivative_at(5)
 10
 
 
@@ -26,16 +26,16 @@ Partials
 2
 
 
->>> from smoothmath import Point, GlobalPartial
+>>> from smoothmath import Point, Partial
 >>> from smoothmath.expression import Variable, Constant
 >>> x = Variable("x")
 >>> z = x ** 2 + Constant(3)
->>> global_partial = GlobalPartial(z, x)
->>> global_partial.at(Point(x=1))
+>>> partial = Partial(z, x)
+>>> partial.at(Point(x=1))
 2
->>> global_partial.at(Point(x=2))
+>>> partial.at(Point(x=2))
 4
->>> global_partial.as_expression()
+>>> partial.as_expression()
 Multiply(Constant(2), Variable("x"))
 
 

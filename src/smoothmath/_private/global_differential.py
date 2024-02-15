@@ -1,10 +1,10 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import smoothmath._private.local_differential as ld
-import smoothmath._private.global_partial as gp
+import smoothmath._private.partial as pa
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression, GlobalPartial, LocalDifferential
+    from smoothmath import RealNumber, Point, Expression, Partial, LocalDifferential
     from smoothmath.expression import Variable
 
 
@@ -40,7 +40,7 @@ class GlobalDifferential:
     def component(
         self: GlobalDifferential,
         variable: Variable | str
-    ) -> GlobalPartial:
+    ) -> Partial:
         """
         The component of the differential.
 
@@ -48,7 +48,7 @@ class GlobalDifferential:
         """
         variable_name = util.get_variable_name(variable)
         synthetic_partial = self._synthetic_partials.get(variable_name, None)
-        return gp.GlobalPartial(self._original_expression, variable_name, synthetic_partial)
+        return pa.Partial(self._original_expression, variable_name, synthetic_partial)
 
     def at(
         self: GlobalDifferential,
