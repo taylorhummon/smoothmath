@@ -15,10 +15,10 @@ class Derivative:
     see the Partial, Differential, and LocatedDifferential classes.
 
     Consider setting the ``compute_eagerly`` parameter to ``True`` as an optimization if the
-    partial will be evaluated at many points.
+    derivative will be evaluated at many points.
 
     :param expression: an expression of one variable
-    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation after
+    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation afterwards
     """
 
     def __init__(

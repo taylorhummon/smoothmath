@@ -15,7 +15,7 @@ class Partial:
 
     :param expression: an expression
     :param variable: the partial is taken with respect to this variable
-    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation after
+    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation afterwards
     """
 
     def __init__(
