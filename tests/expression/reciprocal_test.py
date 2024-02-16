@@ -12,16 +12,16 @@ def test_Reciprocal():
     z = Reciprocal(x)
     # at x = 2
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(0.5)
+    assert z.at(point) == approx(0.5)
     assert_1_ary_derivatives(z, point, x, -0.25)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
-    assert z.evaluate(point) == approx(-1)
+    assert z.at(point) == approx(-1)
     assert_1_ary_derivatives(z, point, x, -1)
 
 
@@ -29,7 +29,7 @@ def test_Reciprocal_composition():
     x = Variable("x")
     z = Reciprocal(Constant(2) * x - Constant(4))
     point = Point(x = 3)
-    assert z.evaluate(point) == approx(0.5)
+    assert z.at(point) == approx(0.5)
     assert_1_ary_derivatives(z, point, x, -0.5)
 
 

@@ -12,17 +12,17 @@ def test_NthRoot_with_n_equal_two():
     z = NthRoot(x, n = 2)
     # at x = 4
     point = Point(x = 4)
-    assert z.evaluate(point) == approx(2)
+    assert z.at(point) == approx(2)
     assert_1_ary_derivatives(z, point, x, 1 / 4)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
 
 
@@ -30,7 +30,7 @@ def test_NthRoot_with_n_equal_two_composition():
     x = Variable("x")
     z = NthRoot(Constant(2) * x + Constant(7), n = 2)
     point = Point(x = 1)
-    assert z.evaluate(point) == approx(3)
+    assert z.at(point) == approx(3)
     assert_1_ary_derivatives(z, point, x, 1 / 3)
 
 
@@ -39,16 +39,16 @@ def test_NthRoot_with_n_equal_three():
     z = NthRoot(x, n = 3)
     # at x = 4
     point = Point(x = 8)
-    assert z.evaluate(point) == approx(2)
+    assert z.at(point) == approx(2)
     assert_1_ary_derivatives(z, point, x, 1 / 12)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
-    assert z.evaluate(point) == approx(-1)
+    assert z.at(point) == approx(-1)
     assert_1_ary_derivatives(z, point, x, 1 / 3)
 
 
@@ -56,7 +56,7 @@ def test_NthRoot_with_n_equal_three_composition():
     x = Variable("x")
     z = NthRoot(Constant(2) * x + Constant(25), n = 3)
     point = Point(x = 1)
-    assert z.evaluate(point) == approx(3)
+    assert z.at(point) == approx(3)
     assert_1_ary_derivatives(z, point, x, 2 / 27)
 
 
@@ -65,15 +65,15 @@ def test_NthRoot_with_n_equal_one():
     z = NthRoot(x, n = 1)
     # at x = 4
     point = Point(x = 4)
-    assert z.evaluate(point) == approx(4)
+    assert z.at(point) == approx(4)
     assert_1_ary_derivatives(z, point, x, 1)
     # at x = 0
     point = Point(x = 0)
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
     assert_1_ary_derivatives(z, point, x, 1)
     # at x = -1
     point = Point(x = -1)
-    assert z.evaluate(point) == approx(-1)
+    assert z.at(point) == approx(-1)
     assert_1_ary_derivatives(z, point, x, 1)
 
 
@@ -81,7 +81,7 @@ def test_NthRoot_with_n_equal_one_composition():
     x = Variable("x")
     z = NthRoot(Constant(2) * x + Constant(3), n = 1)
     point = Point(x = 1)
-    assert z.evaluate(point) == approx(5)
+    assert z.at(point) == approx(5)
     assert_1_ary_derivatives(z, point, x, 2)
 
 
@@ -95,7 +95,7 @@ def test_NthRoot_where_exponent_is_an_integer_represented_as_a_float():
     x = Variable("x")
     z = NthRoot(x, n = 2.0) # type: ignore
     point = Point(x = 9)
-    assert z.evaluate(point) == approx(3)
+    assert z.at(point) == approx(3)
     assert_1_ary_derivatives(z, point, x, 1 / 6)
 
 

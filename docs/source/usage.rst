@@ -8,7 +8,7 @@ Derivatives
 >>> from smoothmath.expression import Variable, Constant
 >>> x = Variable("x")
 >>> z = x ** Constant(2) + Constant(3)
->>> z.evaluate(1)
+>>> z.at(1)
 4
 >>> derivative = Derivative(z)
 >>> derivative.at(5)
@@ -24,7 +24,7 @@ Partials
 >>> from smoothmath.expression import Variable, Constant
 >>> x = Variable("x")
 >>> z = x ** 2 + Constant(3)
->>> z.evaluate(Point(x=1))
+>>> z.at(Point(x=1))
 4
 >>> partial = Partial(z, x)
 >>> partial.at(Point(x=1))

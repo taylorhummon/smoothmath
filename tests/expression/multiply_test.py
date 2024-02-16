@@ -15,7 +15,7 @@ def test_2_ary_Multiply():
     y = Variable("y")
     z = Multiply(x, y)
     point = Point(x = 2, y = 3)
-    assert z.evaluate(point) == approx(6)
+    assert z.at(point) == approx(6)
     assert_2_ary_derivatives(z, point, x, 3, y, 2)
 
 
@@ -24,7 +24,7 @@ def test_2_ary_Multiply_composition():
     y = Variable("y")
     z = Multiply(Constant(5) * x, y - Constant(1))
     point = Point(x = 2, y = 4)
-    assert z.evaluate(point) == approx(30)
+    assert z.at(point) == approx(30)
     assert_2_ary_derivatives(z, point, x, 15, y, 10)
 
 
@@ -34,7 +34,7 @@ def test_3_ary_Multiply():
     y = Variable("y")
     z = Multiply(w, x, y)
     point = Point(w = 1, x = 2, y = 3)
-    assert z.evaluate(point) == approx(6)
+    assert z.at(point) == approx(6)
     assert_3_ary_derivatives(z, point, w, 6, x, 3, y, 2)
 
 
@@ -45,7 +45,7 @@ def test_3_ary_Multiply_composition():
     z = Multiply(w, x, y)
     z = Multiply(Constant(4) * w - Constant(1), Constant(5) * x, y + Constant(1))
     point = Point(w = 1, x = 2, y = 3)
-    assert z.evaluate(point) == approx(120)
+    assert z.at(point) == approx(120)
     assert_3_ary_derivatives(z, point, w, 160, x, 60, y, 30)
 
 
@@ -53,7 +53,7 @@ def test_1_ary_Multiply():
     x = Variable("x")
     z = Multiply(x)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(2)
+    assert z.at(point) == approx(2)
     assert_1_ary_derivatives(z, point, x, 1)
 
 
@@ -61,21 +61,21 @@ def test_1_ary_Multiply_composition():
     x = Variable("x")
     z = Multiply(Constant(5) * x - Constant(1))
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(9)
+    assert z.at(point) == approx(9)
     assert_1_ary_derivatives(z, point, x, 5)
 
 
 def test_0_ary_Multiply():
     z = Multiply()
     point = Point()
-    assert z.evaluate(point) == approx(1)
+    assert z.at(point) == approx(1)
 
 
 def test_Multiply_by_zero():
     x = Variable("x")
     z = Multiply(Constant(0), x)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
     assert_1_ary_derivatives(z, point, x, 0)
 
 
@@ -83,7 +83,7 @@ def test_Multiply_by_one():
     x = Variable("x")
     z = Multiply(Constant(1), x)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(2)
+    assert z.at(point) == approx(2)
     assert_1_ary_derivatives(z, point, x, 1)
 
 

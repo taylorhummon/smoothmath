@@ -4,46 +4,46 @@ smoothmath.expression
 .. module:: smoothmath.expression
 
 .. autoclass:: Variable
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Constant
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Add
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Minus
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Negation
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Multiply
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Divide
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Reciprocal
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Power
-    :members: evaluate
+    :members: at
 
 .. autoclass:: NthPower
-    :members: evaluate
+    :members: at
 
 .. autoclass:: NthRoot
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Exponential
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Logarithm
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Cosine
-    :members: evaluate
+    :members: at
 
 .. autoclass:: Sine
-    :members: evaluate
+    :members: at

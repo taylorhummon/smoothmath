@@ -11,15 +11,15 @@ def test_NthPower_with_n_equal_two():
     z = NthPower(x, n = 2)
     # at x = 3
     point = Point(x = 3)
-    assert z.evaluate(point) == approx(9)
+    assert z.at(point) == approx(9)
     assert_1_ary_derivatives(z, point, x, 6)
     # at x = 0
     point = Point(x = 0)
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
     assert_1_ary_derivatives(z, point, x, 0)
     # at x = -5
     point = Point(x = -5)
-    assert z.evaluate(point) == approx(25)
+    assert z.at(point) == approx(25)
     assert_1_ary_derivatives(z, point, x, -10)
 
 
@@ -27,7 +27,7 @@ def test_NthPower_with_n_equal_two_composition():
     x = Variable("x")
     z = NthPower(Constant(3) * x - Constant(1), n = 2)
     point = Point(x = 1)
-    assert z.evaluate(point) == approx(4)
+    assert z.at(point) == approx(4)
     assert_1_ary_derivatives(z, point, x, 12)
 
 
@@ -36,15 +36,15 @@ def test_NthPower_with_n_equal_one():
     z = NthPower(x, n = 1)
     # at x = 3
     point = Point(x = 3)
-    assert z.evaluate(point) == approx(3)
+    assert z.at(point) == approx(3)
     assert_1_ary_derivatives(z, point, x, 1)
     # at x = 0
     point = Point(x = 0)
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
     assert_1_ary_derivatives(z, point, x, 1)
     # at x = -5
     point = Point(x = -5)
-    assert z.evaluate(point) == approx(-5)
+    assert z.at(point) == approx(-5)
     assert_1_ary_derivatives(z, point, x, 1)
 
 
@@ -52,7 +52,7 @@ def test_NthPower_with_n_equal_one_composition():
     x = Variable("x")
     z = NthPower(Constant(3) * x - Constant(1), n = 1)
     point = Point(x = 1)
-    assert z.evaluate(point) == approx(2)
+    assert z.at(point) == approx(2)
     assert_1_ary_derivatives(z, point, x, 3)
 
 

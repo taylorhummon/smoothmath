@@ -8,7 +8,7 @@ def test_Negation():
     x = Variable("x")
     z = Negation(x)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(-2)
+    assert z.at(point) == approx(-2)
     assert_1_ary_derivatives(z, point, x, -1)
 
 
@@ -16,7 +16,7 @@ def test_Negation_composition():
     x = Variable("x")
     z = Negation(Constant(2) * x + Constant(1))
     point = Point(x = 3)
-    assert z.evaluate(point) == approx(-7)
+    assert z.at(point) == approx(-7)
     assert_1_ary_derivatives(z, point, x, -2)
 
 

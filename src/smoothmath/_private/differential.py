@@ -63,11 +63,11 @@ class Differential:
 
         :param point: where to localize
         """
-        self._original_expression.evaluate(point)
+        self._original_expression.at(point)
         numeric_partials: dict[str, RealNumber]
         numeric_partials = {}
         for variable_name, synthetic_partial in self._synthetic_partials.items():
-            numeric_partials[variable_name] = synthetic_partial.evaluate(point)
+            numeric_partials[variable_name] = synthetic_partial.at(point)
         return ld.LocatedDifferential(self._original_expression, point, numeric_partials)
 
     def __eq__(

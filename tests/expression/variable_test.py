@@ -6,7 +6,7 @@ def test_Variable():
     x = Variable("x")
     y = Variable("y")
     point = Point(y = 3)
-    assert y.evaluate(point) == 3
+    assert y.at(point) == 3
     assert Partial(y, x).at(point) == 0
     assert Partial(y, y).at(point) == 1
     assert Partial(y, x, compute_eagerly = True).at(point) == 0

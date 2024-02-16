@@ -49,8 +49,8 @@ class Partial:
             return self._original_expression._numeric_partial(self._variable_name, point)
         else:
             # We evaluate the original expression to check for DomainErrors.
-            self._original_expression.evaluate(point)
-            return self._synthetic_partial.evaluate(point)
+            self._original_expression.at(point)
+            return self._synthetic_partial.at(point)
 
     def as_expression(
         self: Partial

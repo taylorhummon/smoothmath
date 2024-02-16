@@ -15,21 +15,21 @@ def test_Logarithm():
     z = Logarithm(x)
     # at x = 1
     point = Point(x = 1)
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
     assert_1_ary_derivatives(z, point, x, 1)
     # at x = e
     point = Point(x = math.e)
-    assert z.evaluate(point) == approx(1)
+    assert z.at(point) == approx(1)
     assert_1_ary_derivatives(z, point, x, 1 / math.e)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
 
 
@@ -37,7 +37,7 @@ def test_Logarithm_composition():
     x = Variable("x")
     z = Logarithm(Constant(2) * x - Constant(3))
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
     assert_1_ary_derivatives(z, point, x, 2)
 
 
@@ -46,21 +46,21 @@ def test_base_two_Logarithm():
     z = Logarithm(x, base = 2)
     # at x = 1
     point = Point(x = 1)
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
     assert_1_ary_derivatives(z, point, x, 1.442695040888)
     # at x = 2
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(1)
+    assert z.at(point) == approx(1)
     assert_1_ary_derivatives(z, point, x, 0.721347520444)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     assert_1_ary_derivatives_raise(z, point, x)
 
 
@@ -68,7 +68,7 @@ def test_base_two_Logarithm_composition():
     x = Variable("x")
     z = Logarithm(Constant(2) * x - Constant(6), base = 2)
     point = Point(x = 7)
-    assert z.evaluate(point) == approx(3)
+    assert z.at(point) == approx(3)
     assert_1_ary_derivatives(z, point, x, 0.3606737602222)
 
 

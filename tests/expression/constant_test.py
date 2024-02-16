@@ -5,7 +5,7 @@ from smoothmath.expression import Variable, Constant
 def test_Constant():
     c = Constant(7)
     point = Point()
-    assert c.evaluate(point) == 7
+    assert c.at(point) == 7
     x = Variable("x")
     point = Point(x = 2)
     assert Partial(c, x).at(point) == 0

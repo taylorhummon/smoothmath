@@ -29,7 +29,7 @@ class Expression(ABC):
         >>> from smoothmath.expression import Constant, Variable
         >>> expression: Expression
         >>> expression = (Variable("x") + Constant(1)) / Variable("x")
-        >>> expression.evaluate(2)
+        >>> expression.at(2)
         1.5
     """
 
@@ -52,7 +52,7 @@ class Expression(ABC):
 
     ## Evaluation ##
 
-    def evaluate(
+    def at(
         self: Expression,
         point: Point | RealNumber
     ) -> RealNumber:
@@ -177,7 +177,7 @@ class Expression(ABC):
         if self._evaluation_failed:
             return None
         try:
-            value = self.evaluate(pt.Point())
+            value = self.at(pt.Point())
             return ex.Constant(value)
         except er.DomainError:
             self._evaluation_failed = True

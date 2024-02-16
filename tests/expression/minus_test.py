@@ -9,7 +9,7 @@ def test_Minus():
     y = Variable("y")
     z = Minus(x, y)
     point = Point(x = 2, y = 3)
-    assert z.evaluate(point) == approx(-1)
+    assert z.at(point) == approx(-1)
     assert_2_ary_derivatives(z, point, x, 1, y, -1)
 
 
@@ -18,7 +18,7 @@ def test_Minus_composition():
     y = Variable("y")
     z = Minus(Constant(5) * x, Constant(4) * y)
     point = Point(x = 2, y = 3)
-    assert z.evaluate(point) == approx(-2)
+    assert z.at(point) == approx(-2)
     assert_2_ary_derivatives(z, point, x, 5, y, -4)
 
 

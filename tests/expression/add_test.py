@@ -13,7 +13,7 @@ def test_2_ary_Add():
     y = Variable("y")
     z = Add(x, y)
     point = Point(x = 2, y = 3)
-    assert z.evaluate(point) == approx(5)
+    assert z.at(point) == approx(5)
     assert_2_ary_derivatives(z, point, x, 1, y, 1)
 
 
@@ -22,7 +22,7 @@ def test_2_ary_Add_composition():
     y = Variable("y")
     z = Add(Constant(5) * x, Constant(4) * y)
     point = Point(x = 2, y = 3)
-    assert z.evaluate(point) == approx(22)
+    assert z.at(point) == approx(22)
     assert_2_ary_derivatives(z, point, x, 5, y, 4)
 
 
@@ -32,7 +32,7 @@ def test_3_ary_Add():
     y = Variable("y")
     z = Add(w, x, y)
     point = Point(w = 1, x = 2, y = 3)
-    assert z.evaluate(point) == approx(6)
+    assert z.at(point) == approx(6)
     assert_3_ary_derivatives(z, point, w, 1, x, 1, y, 1)
 
 
@@ -42,7 +42,7 @@ def test_3_ary_Add_composition():
     y = Variable("y")
     z = Add(Constant(6) * w, Constant(5) * x, Constant(4) * y)
     point = Point(w = 1, x = 2, y = 3)
-    assert z.evaluate(point) == approx(28)
+    assert z.at(point) == approx(28)
     assert_3_ary_derivatives(z, point, w, 6, x, 5, y, 4)
 
 
@@ -50,7 +50,7 @@ def test_1_ary_Add():
     x = Variable("x")
     z = Add(x)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(2)
+    assert z.at(point) == approx(2)
     assert_1_ary_derivatives(z, point, x, 1)
 
 
@@ -58,14 +58,14 @@ def test_1_ary_Add_composition():
     x = Variable("x")
     z = Add(Constant(5) * x)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(10)
+    assert z.at(point) == approx(10)
     assert_1_ary_derivatives(z, point, x, 5)
 
 
 def test_0_ary_Add():
     z = Add()
     point = Point()
-    assert z.evaluate(point) == approx(0)
+    assert z.at(point) == approx(0)
 
 
 def test_Add_normalization_with_flattening():

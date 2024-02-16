@@ -24,7 +24,7 @@ def test_expression_reuse():
     w = x ** 2
     z = (w + Constant(1)) / w
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(1.25)
+    assert z.at(point) == approx(1.25)
     assert Partial(z, x).at(point) == approx(-0.25)
     assert Partial(z, x, compute_eagerly = True).at(point) == approx(-0.25)
     assert Differential(z).component_at(x, point) == approx(-0.25)
@@ -53,7 +53,7 @@ def test_unrelated_variable():
     y = Variable("y")
     z = x ** 2
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(4)
+    assert z.at(point) == approx(4)
     assert Partial(z, y).at(point) == approx(0)
     assert Partial(z, y, compute_eagerly = True).at(point) == approx(0)
     assert Differential(z).component_at(y, point) == approx(0)
@@ -64,7 +64,7 @@ def test_polynomial_of_one_variable():
     x = Variable("x")
     z = x * x - Constant(6) * x + Constant(4)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(-4)
+    assert z.at(point) == approx(-4)
     assert Partial(z, x).at(point) == approx(-2)
     assert Partial(z, x, compute_eagerly = True).at(point) == approx(-2)
     assert Differential(z).component_at(x, point) == approx(-2)
@@ -76,7 +76,7 @@ def test_polynomial_of_two_variables():
     y = Variable("y")
     z = x * (x + y) - Constant(5) * y ** 2
     point = Point(x = 2, y = 3)
-    assert z.evaluate(point) == approx(-35)
+    assert z.at(point) == approx(-35)
     assert Partial(z, x).at(point) == approx(7)
     assert Partial(z, y).at(point) == approx(-28)
     assert Partial(z, x, compute_eagerly = True).at(point) == approx(7)
@@ -95,7 +95,7 @@ def test_polynomial_of_three_variables():
     y = Variable("y")
     z = w * w + Constant(5) * w * x ** 2 - w * x * y
     point = Point(w = 2, x = 3, y = 4)
-    assert z.evaluate(point) == approx(70)
+    assert z.at(point) == approx(70)
     assert Partial(z, w).at(point) == approx(37)
     assert Partial(z, x).at(point) == approx(52)
     assert Partial(z, y).at(point) == approx(-6)
@@ -116,7 +116,7 @@ def test_composite_function():
     x = Variable("x")
     z = Exponential(x ** 2)
     point = Point(x = 2)
-    assert z.evaluate(point) == approx(54.598150033)
+    assert z.at(point) == approx(54.598150033)
     assert Partial(z, x).at(point) == approx(218.392600132)
     assert Partial(z, x, compute_eagerly = True).at(point) == approx(218.392600132)
     assert Differential(z).component_at(x, point) == approx(218.392600132)
@@ -128,7 +128,7 @@ def test_indeterminate_form():
     z = (Constant(2) * t) / t
     point = Point(t = 0)
     with raises(DomainError):
-        z.evaluate(point)
+        z.at(point)
     partial = Partial(z, t)
     with raises(DomainError):
         partial.at(point)
