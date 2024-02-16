@@ -25,8 +25,8 @@ def test_expression_reuse():
     z = (w + Constant(1)) / w
     point = Point(x = 2)
     assert z.evaluate(point) == approx(1.25)
-    assert z.partial_at(x, point) == approx(-0.25)
     assert Partial(z, x).at(point) == approx(-0.25)
+    assert Partial(z, x, compute_eagerly = True).at(point) == approx(-0.25)
     assert Differential(z).component_at(x, point) == approx(-0.25)
     assert LocatedDifferential(z, point).component(x) == approx(-0.25)
 
@@ -36,14 +36,14 @@ def test_taking_partials_using_string_variable_name():
     z = x ** 2
     # at x = 3
     point = Point(x = 3)
-    assert z.partial_at("x", point) == approx(6)
     assert Partial(z, "x").at(point) == approx(6)
+    assert Partial(z, "x", compute_eagerly = True).at(point) == approx(6)
     assert Differential(z).component_at("x", point) == approx(6)
     assert LocatedDifferential(z, point).component("x") == approx(6)
     # at x = -1
     point = Point(x = -1)
-    assert z.partial_at("x", point) == approx(-2)
     assert Partial(z, "x").at(point) == approx(-2)
+    assert Partial(z, "x", compute_eagerly = True).at(point) == approx(-2)
     assert Differential(z).component_at("x", point) == approx(-2)
     assert LocatedDifferential(z, point).component("x") == approx(-2)
 
@@ -54,8 +54,8 @@ def test_unrelated_variable():
     z = x ** 2
     point = Point(x = 2)
     assert z.evaluate(point) == approx(4)
-    assert z.partial_at(y, point) == approx(0)
     assert Partial(z, y).at(point) == approx(0)
+    assert Partial(z, y, compute_eagerly = True).at(point) == approx(0)
     assert Differential(z).component_at(y, point) == approx(0)
     assert LocatedDifferential(z, point).component(y) == approx(0)
 
@@ -65,8 +65,8 @@ def test_polynomial_of_one_variable():
     z = x * x - Constant(6) * x + Constant(4)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(-4)
-    assert z.partial_at(x, point) == approx(-2)
     assert Partial(z, x).at(point) == approx(-2)
+    assert Partial(z, x, compute_eagerly = True).at(point) == approx(-2)
     assert Differential(z).component_at(x, point) == approx(-2)
     assert LocatedDifferential(z, point).component(x) == approx(-2)
 
@@ -77,10 +77,10 @@ def test_polynomial_of_two_variables():
     z = x * (x + y) - Constant(5) * y ** 2
     point = Point(x = 2, y = 3)
     assert z.evaluate(point) == approx(-35)
-    assert z.partial_at(x, point) == approx(7)
-    assert z.partial_at(y, point) == approx(-28)
     assert Partial(z, x).at(point) == approx(7)
     assert Partial(z, y).at(point) == approx(-28)
+    assert Partial(z, x, compute_eagerly = True).at(point) == approx(7)
+    assert Partial(z, y, compute_eagerly = True).at(point) == approx(-28)
     differential = Differential(z)
     assert differential.component_at(x, point) == approx(7)
     assert differential.component_at(y, point) == approx(-28)
@@ -96,12 +96,12 @@ def test_polynomial_of_three_variables():
     z = w * w + Constant(5) * w * x ** 2 - w * x * y
     point = Point(w = 2, x = 3, y = 4)
     assert z.evaluate(point) == approx(70)
-    assert z.partial_at(w, point) == approx(37)
-    assert z.partial_at(x, point) == approx(52)
-    assert z.partial_at(y, point) == approx(-6)
     assert Partial(z, w).at(point) == approx(37)
     assert Partial(z, x).at(point) == approx(52)
     assert Partial(z, y).at(point) == approx(-6)
+    assert Partial(z, w, compute_eagerly = True).at(point) == approx(37)
+    assert Partial(z, x, compute_eagerly = True).at(point) == approx(52)
+    assert Partial(z, y, compute_eagerly = True).at(point) == approx(-6)
     differential = Differential(z)
     assert differential.component_at(w, point) == approx(37)
     assert differential.component_at(x, point) == approx(52)
@@ -117,8 +117,8 @@ def test_composite_function():
     z = Exponential(x ** 2)
     point = Point(x = 2)
     assert z.evaluate(point) == approx(54.598150033)
-    assert z.partial_at(x, point) == approx(218.392600132)
     assert Partial(z, x).at(point) == approx(218.392600132)
+    assert Partial(z, x, compute_eagerly = True).at(point) == approx(218.392600132)
     assert Differential(z).component_at(x, point) == approx(218.392600132)
     assert LocatedDifferential(z, point).component(x) == approx(218.392600132)
 
@@ -129,11 +129,12 @@ def test_indeterminate_form():
     point = Point(t = 0)
     with raises(DomainError):
         z.evaluate(point)
+    partial = Partial(z, t)
     with raises(DomainError):
-        z.partial_at(t, point)
-    t_partial = Partial(z, t)
+        partial.at(point)
+    partial = Partial(z, t, compute_eagerly = True)
     with raises(DomainError):
-        t_partial.at(point)
+        partial.at(point)
     differential = Differential(z)
     with raises(DomainError):
         differential.component_at(t, point)

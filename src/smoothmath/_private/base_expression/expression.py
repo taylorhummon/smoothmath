@@ -10,7 +10,7 @@ import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point
     from smoothmath.expression import (
-        Variable, Add, Minus, Negation, Multiply, Divide, Power, NthPower
+        Add, Minus, Negation, Multiply, Divide, Power, NthPower
     )
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
@@ -106,21 +106,6 @@ class Expression(ABC):
         else: # where is a real number
             point = _point_on_number_line(variable_name, where)
         self._reset_evaluation_cache
-        return self._numeric_partial(variable_name, point)
-
-    def partial_at(
-        self: Expression,
-        variable: Variable | str,
-        point: Point
-    ) -> RealNumber:
-        """
-        The partial derivative of the expression at a point.
-
-        :param variable: the partial is taken with respect to this variable
-        :param point: where to evaluate the partial
-        """
-        variable_name = util.get_variable_name(variable)
-        self._reset_evaluation_cache()
         return self._numeric_partial(variable_name, point)
 
     @abstractmethod

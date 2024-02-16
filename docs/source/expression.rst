@@ -4,46 +4,46 @@ smoothmath.expression
 .. module:: smoothmath.expression
 
 .. autoclass:: Variable
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Constant
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Add
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Minus
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Negation
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Multiply
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Divide
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Reciprocal
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Power
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: NthPower
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: NthRoot
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Exponential
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Logarithm
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Cosine
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate
 
 .. autoclass:: Sine
-    :members: evaluate, derivative_at, partial_at
+    :members: evaluate

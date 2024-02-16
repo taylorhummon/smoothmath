@@ -13,7 +13,7 @@ smoothmath
 .. autoclass:: Expression()
     :members:
 
-.. autoclass:: Partial(expression, variable)
+.. autoclass:: Partial(expression, variable, compute_eagerly=False)
     :members:
 
 .. autoclass:: Differential(expression)

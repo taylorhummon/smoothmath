@@ -66,11 +66,12 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     point = Point(y = 0)
     with raises(DomainError):
         z.evaluate(point)
+    partial = Partial(z, y)
     with raises(DomainError):
-        z.partial_at(y, point)
-    y_partial = Partial(z, y)
+        partial.at(point)
+    partial = Partial(z, y, compute_eagerly = True)
     with raises(DomainError):
-        y_partial.at(point)
+        partial.at(point)
     differential = Differential(z)
     with raises(DomainError):
         differential.component_at(y, point)

@@ -48,7 +48,11 @@ class Differential:
         """
         variable_name = util.get_variable_name(variable)
         synthetic_partial = self._synthetic_partials.get(variable_name, None)
-        return pa.Partial(self._original_expression, variable_name, synthetic_partial)
+        return pa.Partial(
+            self._original_expression,
+            variable_name,
+            synthetic_partial = synthetic_partial
+        )
 
     def at(
         self: Differential,
