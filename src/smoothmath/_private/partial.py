@@ -15,7 +15,7 @@ class Partial:
 
     :param expression: an expression
     :param variable: the partial is taken with respect to this variable
-    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation later
+    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation after
     """
 
     def __init__(
@@ -60,7 +60,7 @@ class Partial:
         Sometimes referred to as the *synthetic partial*.
 
         NOTE: Writing the partial as an expression may enlargen the domain.
-        For example, take ``z = Logarithm(Variable("x"))`` and so partial as an expression is
+        For example, take ``z = Logarithm(Variable("x"))`` and so the partial as an expression is
         ``Reciprocal(Variable("x"))``. This expression representing the partial is defined for
         negative x values, but the honest partial is only defined at positive x values.
         """

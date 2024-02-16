@@ -13,6 +13,9 @@ smoothmath
 .. autoclass:: Expression()
     :members:
 
+.. autoclass:: Derivative(expression, compute_eagerly=False)
+    :members:
+
 .. autoclass:: Partial(expression, variable, compute_eagerly=False)
     :members:
 

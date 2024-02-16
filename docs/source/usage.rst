@@ -4,13 +4,17 @@ Usage
 Derivatives
 -----------
 
+>>> from smoothmath import Derivative
 >>> from smoothmath.expression import Variable, Constant
 >>> x = Variable("x")
 >>> z = x ** Constant(2) + Constant(3)
 >>> z.evaluate(1)
 4
->>> z.derivative_at(5)
+>>> derivative = Derivative(z)
+>>> derivative.at(5)
 10
+>>> derivative.as_expression()
+Multiply(Constant(2), Variable("x"))
 
 
 Partials

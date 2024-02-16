@@ -31,8 +31,6 @@ class Expression(ABC):
         >>> expression = (Variable("x") + Constant(1)) / Variable("x")
         >>> expression.evaluate(2)
         1.5
-        >>> expression.derivative_at(2)
-        -0.25
     """
 
     def __init__(
@@ -56,21 +54,23 @@ class Expression(ABC):
 
     def evaluate(
         self: Expression,
-        where: RealNumber | Point
+        point: Point | RealNumber
     ) -> RealNumber:
         """
-        Evaluates the expression. If ``where`` is a real number, evaluate will raise an exception
-        if the expression has more than one variable.
+        Evaluates the expression at a point.
 
-        :param where: where to evaluate
+        The expression must only have one variable in order to use a real number argument for the
+        point parameter.
+
+        :param point: where to evaluate
         """
-        if isinstance(where, pt.Point):
+        if isinstance(point, pt.Point):
             self._reset_evaluation_cache()
-            return self._evaluate(where)
-        else: # where is a real number
+            return self._evaluate(point)
+        else: # point is a real number
             exception_message = "Can only evaluate at a real number for an expression with one variable. Consider passing a point instead."
-            variable_name = _get_the_single_variable_name(self._variable_names, exception_message)
-            point = _point_on_number_line(variable_name, where)
+            variable_name = _get_the_single_variable_name(self, exception_message)
+            point = _point_on_number_line(variable_name, point)
             self._reset_evaluation_cache()
             return self._evaluate(point)
 
@@ -88,25 +88,6 @@ class Expression(ABC):
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
     ## Partials ##
-
-    def derivative_at(
-        self: Expression,
-        where: RealNumber | Point
-    ) -> RealNumber:
-        """
-        Produces the derivative of the expression at a given real number. Raises an exception if
-        the expression has more than one variable.
-
-        :param where: where to evaluate the derivative
-        """
-        exception_message = "Can only take the derivative of an expression with one variable. Consider partials or differentials instead."
-        variable_name = _get_the_single_variable_name(self._variable_names, exception_message)
-        if isinstance(where, pt.Point):
-            point = where
-        else: # where is a real number
-            point = _point_on_number_line(variable_name, where)
-        self._reset_evaluation_cache
-        return self._numeric_partial(variable_name, point)
 
     @abstractmethod
     def _numeric_partial(
@@ -260,16 +241,19 @@ class Expression(ABC):
 
 
 def _get_the_single_variable_name(
-    variable_names: set[str],
+    expression: Expression,
     exception_message: str
 ) -> str:
-    if len(variable_names) == 0:
-        return "whatever"
-    elif len(variable_names) == 1:
+    variable_names = expression._variable_names
+    variable_names_count = len(variable_names)
+    if variable_names_count == 1:
         (variable_name,) = variable_names
         return variable_name
+    elif variable_names_count == 0:
+        return "whatever"
     else:
         raise Exception(exception_message)
+
 
 def _point_on_number_line(
     variable_name: str,
