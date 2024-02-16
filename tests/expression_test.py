@@ -6,6 +6,18 @@ from smoothmath.expression import (
 from smoothmath._private.base_expression.expression import get_the_single_variable_name
 
 
+def test_expression_evaluation():
+    x = Variable("x")
+    y = Variable("y")
+    z = x ** 2 + Constant(3)
+    assert z.at(Point(x = 2)) == approx(7)
+    assert z.at(2) == 7
+    z = x ** 2 + y ** 2
+    assert z.at(Point(x = 3, y = 4)) == approx(25)
+    with raises(Exception):
+        z.at(2)
+
+
 def test_unary_expression_equality():
     x = Variable("x")
     y = Variable("y")
