@@ -2,7 +2,7 @@ from pytest import approx
 import math
 from smoothmath import Point
 from smoothmath.expression import Variable, Constant, Negation, Sine
-from assert_derivatives import assert_1_ary_derivatives # type: ignore
+from assert_partials import assert_1_ary_partials # type: ignore
 
 
 def test_Sine():
@@ -11,11 +11,11 @@ def test_Sine():
     # at theta = 0
     point = Point(theta = 0)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, theta, 1)
+    assert_1_ary_partials(z, point, theta, 1)
     # at theta = tau / 4
     point = Point(theta = math.tau / 4)
     assert z.at(point) == approx(1)
-    assert_1_ary_derivatives(z, point, theta, 0)
+    assert_1_ary_partials(z, point, theta, 0)
 
 
 def test_Sine_composition():
@@ -23,7 +23,7 @@ def test_Sine_composition():
     z = Sine(Constant(2) * theta)
     point = Point(theta = 0)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, theta, 2)
+    assert_1_ary_partials(z, point, theta, 2)
 
 
 def test_Sine_normalization():

@@ -5,7 +5,7 @@ from smoothmath import (
 from smoothmath.expression import Variable
 
 
-def assert_1_ary_derivatives(
+def assert_1_ary_partials(
     expression: Expression,
     point: Point,
     variable: Variable,
@@ -17,7 +17,7 @@ def assert_1_ary_derivatives(
     assert LocatedDifferential(expression, point).component(variable) == approx(expected)
 
 
-def assert_1_ary_derivatives_raise(
+def assert_1_ary_partials_raise(
     expression: Expression,
     point: Point,
     variable: Variable
@@ -25,7 +25,7 @@ def assert_1_ary_derivatives_raise(
     partial = Partial(expression, variable)
     with raises(DomainError):
         partial.at(point)
-    partial = Partial(expression, variable, compute_eagerly=True)
+    partial = Partial(expression, variable, compute_eagerly = True)
     with raises(DomainError):
         partial.at(point)
     differential = Differential(expression)
@@ -35,7 +35,7 @@ def assert_1_ary_derivatives_raise(
         LocatedDifferential(expression, point)
 
 
-def assert_2_ary_derivatives(
+def assert_2_ary_partials(
     expression: Expression,
     point: Point,
     variable_a: Variable,
@@ -55,7 +55,7 @@ def assert_2_ary_derivatives(
     assert located_differential.component(variable_b) == approx(expected_b)
 
 
-def assert_2_ary_derivatives_raise(
+def assert_2_ary_partials_raise(
     expression: Expression,
     point: Point,
     variable_a: Variable,
@@ -82,7 +82,7 @@ def assert_2_ary_derivatives_raise(
         LocatedDifferential(expression, point)
 
 
-def assert_3_ary_derivatives(
+def assert_3_ary_partials(
     expression: Expression,
     point: Point,
     variable_a: Variable,

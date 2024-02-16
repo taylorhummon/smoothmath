@@ -3,6 +3,9 @@ from smoothmath import Point, LocatedDifferential
 from smoothmath.expression import Variable, Constant
 
 
+# Note: intensive testing of located differentials is done in the tests for concrete expressions
+
+
 def test_LocatedDifferential():
     w = Variable("w")
     x = Variable("x")

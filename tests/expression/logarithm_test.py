@@ -4,9 +4,9 @@ from smoothmath import DomainError, Point
 from smoothmath.expression import (
     Variable, Constant, Negation, Multiply, Reciprocal, NthPower, Exponential, Logarithm
 )
-from assert_derivatives import ( # type: ignore
-    assert_1_ary_derivatives,
-    assert_1_ary_derivatives_raise
+from assert_partials import ( # type: ignore
+    assert_1_ary_partials,
+    assert_1_ary_partials_raise
 )
 
 
@@ -16,21 +16,21 @@ def test_Logarithm():
     # at x = 1
     point = Point(x = 1)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
     # at x = e
     point = Point(x = math.e)
     assert z.at(point) == approx(1)
-    assert_1_ary_derivatives(z, point, x, 1 / math.e)
+    assert_1_ary_partials(z, point, x, 1 / math.e)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
         z.at(point)
-    assert_1_ary_derivatives_raise(z, point, x)
+    assert_1_ary_partials_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
         z.at(point)
-    assert_1_ary_derivatives_raise(z, point, x)
+    assert_1_ary_partials_raise(z, point, x)
 
 
 def test_Logarithm_composition():
@@ -38,7 +38,7 @@ def test_Logarithm_composition():
     z = Logarithm(Constant(2) * x - Constant(3))
     point = Point(x = 2)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, x, 2)
+    assert_1_ary_partials(z, point, x, 2)
 
 
 def test_base_two_Logarithm():
@@ -47,21 +47,21 @@ def test_base_two_Logarithm():
     # at x = 1
     point = Point(x = 1)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, x, 1.442695040888)
+    assert_1_ary_partials(z, point, x, 1.442695040888)
     # at x = 2
     point = Point(x = 2)
     assert z.at(point) == approx(1)
-    assert_1_ary_derivatives(z, point, x, 0.721347520444)
+    assert_1_ary_partials(z, point, x, 0.721347520444)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
         z.at(point)
-    assert_1_ary_derivatives_raise(z, point, x)
+    assert_1_ary_partials_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
         z.at(point)
-    assert_1_ary_derivatives_raise(z, point, x)
+    assert_1_ary_partials_raise(z, point, x)
 
 
 def test_base_two_Logarithm_composition():
@@ -69,7 +69,7 @@ def test_base_two_Logarithm_composition():
     z = Logarithm(Constant(2) * x - Constant(6), base = 2)
     point = Point(x = 7)
     assert z.at(point) == approx(3)
-    assert_1_ary_derivatives(z, point, x, 0.3606737602222)
+    assert_1_ary_partials(z, point, x, 0.3606737602222)
 
 
 def test_Logarithm_equality():

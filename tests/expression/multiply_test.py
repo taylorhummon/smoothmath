@@ -3,10 +3,10 @@ from smoothmath import Point
 from smoothmath.expression import (
     Variable, Constant, Negation, Multiply, Divide, Reciprocal, NthPower, NthRoot, Exponential
 )
-from assert_derivatives import ( # type: ignore
-    assert_1_ary_derivatives,
-    assert_2_ary_derivatives,
-    assert_3_ary_derivatives
+from assert_partials import ( # type: ignore
+    assert_1_ary_partials,
+    assert_2_ary_partials,
+    assert_3_ary_partials
 )
 
 
@@ -16,7 +16,7 @@ def test_2_ary_Multiply():
     z = Multiply(x, y)
     point = Point(x = 2, y = 3)
     assert z.at(point) == approx(6)
-    assert_2_ary_derivatives(z, point, x, 3, y, 2)
+    assert_2_ary_partials(z, point, x, 3, y, 2)
 
 
 def test_2_ary_Multiply_composition():
@@ -25,7 +25,7 @@ def test_2_ary_Multiply_composition():
     z = Multiply(Constant(5) * x, y - Constant(1))
     point = Point(x = 2, y = 4)
     assert z.at(point) == approx(30)
-    assert_2_ary_derivatives(z, point, x, 15, y, 10)
+    assert_2_ary_partials(z, point, x, 15, y, 10)
 
 
 def test_3_ary_Multiply():
@@ -35,7 +35,7 @@ def test_3_ary_Multiply():
     z = Multiply(w, x, y)
     point = Point(w = 1, x = 2, y = 3)
     assert z.at(point) == approx(6)
-    assert_3_ary_derivatives(z, point, w, 6, x, 3, y, 2)
+    assert_3_ary_partials(z, point, w, 6, x, 3, y, 2)
 
 
 def test_3_ary_Multiply_composition():
@@ -46,7 +46,7 @@ def test_3_ary_Multiply_composition():
     z = Multiply(Constant(4) * w - Constant(1), Constant(5) * x, y + Constant(1))
     point = Point(w = 1, x = 2, y = 3)
     assert z.at(point) == approx(120)
-    assert_3_ary_derivatives(z, point, w, 160, x, 60, y, 30)
+    assert_3_ary_partials(z, point, w, 160, x, 60, y, 30)
 
 
 def test_1_ary_Multiply():
@@ -54,7 +54,7 @@ def test_1_ary_Multiply():
     z = Multiply(x)
     point = Point(x = 2)
     assert z.at(point) == approx(2)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
 
 
 def test_1_ary_Multiply_composition():
@@ -62,7 +62,7 @@ def test_1_ary_Multiply_composition():
     z = Multiply(Constant(5) * x - Constant(1))
     point = Point(x = 2)
     assert z.at(point) == approx(9)
-    assert_1_ary_derivatives(z, point, x, 5)
+    assert_1_ary_partials(z, point, x, 5)
 
 
 def test_0_ary_Multiply():
@@ -76,7 +76,7 @@ def test_Multiply_by_zero():
     z = Multiply(Constant(0), x)
     point = Point(x = 2)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, x, 0)
+    assert_1_ary_partials(z, point, x, 0)
 
 
 def test_Multiply_by_one():
@@ -84,7 +84,7 @@ def test_Multiply_by_one():
     z = Multiply(Constant(1), x)
     point = Point(x = 2)
     assert z.at(point) == approx(2)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
 
 
 def test_Multiply_normalization_with_flattening():

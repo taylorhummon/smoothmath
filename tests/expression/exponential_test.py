@@ -2,7 +2,7 @@ from pytest import approx
 import math
 from smoothmath import Point
 from smoothmath.expression import Variable, Constant, Negation, Reciprocal, Exponential, Logarithm
-from assert_derivatives import assert_1_ary_derivatives # type: ignore
+from assert_partials import assert_1_ary_partials # type: ignore
 
 
 def test_Exponential():
@@ -11,15 +11,15 @@ def test_Exponential():
     # at x = 0
     point = Point(x = 0)
     assert z.at(point) == approx(1)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
     # at x = 1
     point = Point(x = 1)
     assert z.at(point) == approx(math.e)
-    assert_1_ary_derivatives(z, point, x, math.e)
+    assert_1_ary_partials(z, point, x, math.e)
     # at x = -1
     point = Point(x = -1)
     assert z.at(point) == approx(1 / math.e)
-    assert_1_ary_derivatives(z, point, x, 1 / math.e)
+    assert_1_ary_partials(z, point, x, 1 / math.e)
 
 
 def test_Exponential_composition():
@@ -27,7 +27,7 @@ def test_Exponential_composition():
     z = Exponential(Constant(2) * x - Constant(6))
     point = Point(x = 3)
     assert z.at(point) == approx(1)
-    assert_1_ary_derivatives(z, point, x, 2)
+    assert_1_ary_partials(z, point, x, 2)
 
 
 def test_base_two_Exponential():
@@ -36,15 +36,15 @@ def test_base_two_Exponential():
     # at x = 0
     point = Point(x = 0)
     assert z.at(point) == approx(1)
-    assert_1_ary_derivatives(z, point, x, 0.693147180559)
+    assert_1_ary_partials(z, point, x, 0.693147180559)
     # at x = 1
     point = Point(x = 1)
     assert z.at(point) == approx(2)
-    assert_1_ary_derivatives(z, point, x, 1.386294361119)
+    assert_1_ary_partials(z, point, x, 1.386294361119)
     # at x = -1
     point = Point(x = -1)
     assert z.at(point) == approx(0.5)
-    assert_1_ary_derivatives(z, point, x, 0.346573590279)
+    assert_1_ary_partials(z, point, x, 0.346573590279)
 
 
 def test_base_two_Exponential_composition():
@@ -52,7 +52,7 @@ def test_base_two_Exponential_composition():
     z = Exponential(Constant(2) * x - Constant(5), base = 2)
     point = Point(x = 3)
     assert z.at(point) == approx(2)
-    assert_1_ary_derivatives(z, point, x, 2.77258872223)
+    assert_1_ary_partials(z, point, x, 2.77258872223)
 
 
 def test_Exponential_equality():

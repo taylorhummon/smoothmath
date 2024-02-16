@@ -3,7 +3,7 @@ from smoothmath import Point
 from smoothmath.expression import (
     Variable, Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
 )
-from assert_derivatives import assert_1_ary_derivatives # type: ignore
+from assert_partials import assert_1_ary_partials # type: ignore
 
 
 def test_NthPower_with_n_equal_two():
@@ -12,15 +12,15 @@ def test_NthPower_with_n_equal_two():
     # at x = 3
     point = Point(x = 3)
     assert z.at(point) == approx(9)
-    assert_1_ary_derivatives(z, point, x, 6)
+    assert_1_ary_partials(z, point, x, 6)
     # at x = 0
     point = Point(x = 0)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, x, 0)
+    assert_1_ary_partials(z, point, x, 0)
     # at x = -5
     point = Point(x = -5)
     assert z.at(point) == approx(25)
-    assert_1_ary_derivatives(z, point, x, -10)
+    assert_1_ary_partials(z, point, x, -10)
 
 
 def test_NthPower_with_n_equal_two_composition():
@@ -28,7 +28,7 @@ def test_NthPower_with_n_equal_two_composition():
     z = NthPower(Constant(3) * x - Constant(1), n = 2)
     point = Point(x = 1)
     assert z.at(point) == approx(4)
-    assert_1_ary_derivatives(z, point, x, 12)
+    assert_1_ary_partials(z, point, x, 12)
 
 
 def test_NthPower_with_n_equal_one():
@@ -37,15 +37,15 @@ def test_NthPower_with_n_equal_one():
     # at x = 3
     point = Point(x = 3)
     assert z.at(point) == approx(3)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
     # at x = 0
     point = Point(x = 0)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
     # at x = -5
     point = Point(x = -5)
     assert z.at(point) == approx(-5)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
 
 
 def test_NthPower_with_n_equal_one_composition():
@@ -53,7 +53,7 @@ def test_NthPower_with_n_equal_one_composition():
     z = NthPower(Constant(3) * x - Constant(1), n = 1)
     point = Point(x = 1)
     assert z.at(point) == approx(2)
-    assert_1_ary_derivatives(z, point, x, 3)
+    assert_1_ary_partials(z, point, x, 3)
 
 
 def test_NthPower_normalization():

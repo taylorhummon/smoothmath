@@ -1,7 +1,7 @@
 from pytest import approx
 from smoothmath import Point
 from smoothmath.expression import Variable, Constant, Negation
-from assert_derivatives import assert_1_ary_derivatives # type: ignore
+from assert_partials import assert_1_ary_partials # type: ignore
 
 
 def test_Negation():
@@ -9,7 +9,7 @@ def test_Negation():
     z = Negation(x)
     point = Point(x = 2)
     assert z.at(point) == approx(-2)
-    assert_1_ary_derivatives(z, point, x, -1)
+    assert_1_ary_partials(z, point, x, -1)
 
 
 def test_Negation_composition():
@@ -17,7 +17,7 @@ def test_Negation_composition():
     z = Negation(Constant(2) * x + Constant(1))
     point = Point(x = 3)
     assert z.at(point) == approx(-7)
-    assert_1_ary_derivatives(z, point, x, -2)
+    assert_1_ary_partials(z, point, x, -2)
 
 
 def test_Negation_normalization():

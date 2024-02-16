@@ -3,6 +3,9 @@ from smoothmath import DomainError, Point, Partial, Differential, LocatedDiffere
 from smoothmath.expression import Variable, Constant, Logarithm
 
 
+# Note: intensive testing of differentials is done in the tests for concrete expressions
+
+
 def test_Differential():
     w = Variable("w")
     x = Variable("x")

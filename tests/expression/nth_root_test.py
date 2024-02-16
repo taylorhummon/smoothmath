@@ -1,9 +1,9 @@
 from pytest import approx, raises
 from smoothmath import DomainError, Point
 from smoothmath.expression import Variable, Constant, Negation, Reciprocal, NthPower, NthRoot
-from assert_derivatives import ( # type: ignore
-    assert_1_ary_derivatives,
-    assert_1_ary_derivatives_raise
+from assert_partials import ( # type: ignore
+    assert_1_ary_partials,
+    assert_1_ary_partials_raise
 )
 
 
@@ -13,17 +13,17 @@ def test_NthRoot_with_n_equal_two():
     # at x = 4
     point = Point(x = 4)
     assert z.at(point) == approx(2)
-    assert_1_ary_derivatives(z, point, x, 1 / 4)
+    assert_1_ary_partials(z, point, x, 1 / 4)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
         z.at(point)
-    assert_1_ary_derivatives_raise(z, point, x)
+    assert_1_ary_partials_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
     with raises(DomainError):
         z.at(point)
-    assert_1_ary_derivatives_raise(z, point, x)
+    assert_1_ary_partials_raise(z, point, x)
 
 
 def test_NthRoot_with_n_equal_two_composition():
@@ -31,7 +31,7 @@ def test_NthRoot_with_n_equal_two_composition():
     z = NthRoot(Constant(2) * x + Constant(7), n = 2)
     point = Point(x = 1)
     assert z.at(point) == approx(3)
-    assert_1_ary_derivatives(z, point, x, 1 / 3)
+    assert_1_ary_partials(z, point, x, 1 / 3)
 
 
 def test_NthRoot_with_n_equal_three():
@@ -40,16 +40,16 @@ def test_NthRoot_with_n_equal_three():
     # at x = 4
     point = Point(x = 8)
     assert z.at(point) == approx(2)
-    assert_1_ary_derivatives(z, point, x, 1 / 12)
+    assert_1_ary_partials(z, point, x, 1 / 12)
     # at x = 0
     point = Point(x = 0)
     with raises(DomainError):
         z.at(point)
-    assert_1_ary_derivatives_raise(z, point, x)
+    assert_1_ary_partials_raise(z, point, x)
     # at x = -1
     point = Point(x = -1)
     assert z.at(point) == approx(-1)
-    assert_1_ary_derivatives(z, point, x, 1 / 3)
+    assert_1_ary_partials(z, point, x, 1 / 3)
 
 
 def test_NthRoot_with_n_equal_three_composition():
@@ -57,7 +57,7 @@ def test_NthRoot_with_n_equal_three_composition():
     z = NthRoot(Constant(2) * x + Constant(25), n = 3)
     point = Point(x = 1)
     assert z.at(point) == approx(3)
-    assert_1_ary_derivatives(z, point, x, 2 / 27)
+    assert_1_ary_partials(z, point, x, 2 / 27)
 
 
 def test_NthRoot_with_n_equal_one():
@@ -66,15 +66,15 @@ def test_NthRoot_with_n_equal_one():
     # at x = 4
     point = Point(x = 4)
     assert z.at(point) == approx(4)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
     # at x = 0
     point = Point(x = 0)
     assert z.at(point) == approx(0)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
     # at x = -1
     point = Point(x = -1)
     assert z.at(point) == approx(-1)
-    assert_1_ary_derivatives(z, point, x, 1)
+    assert_1_ary_partials(z, point, x, 1)
 
 
 def test_NthRoot_with_n_equal_one_composition():
@@ -82,7 +82,7 @@ def test_NthRoot_with_n_equal_one_composition():
     z = NthRoot(Constant(2) * x + Constant(3), n = 1)
     point = Point(x = 1)
     assert z.at(point) == approx(5)
-    assert_1_ary_derivatives(z, point, x, 2)
+    assert_1_ary_partials(z, point, x, 2)
 
 
 def test_NthRoot_with_n_equal_zero():
@@ -96,7 +96,7 @@ def test_NthRoot_where_exponent_is_an_integer_represented_as_a_float():
     z = NthRoot(x, n = 2.0) # type: ignore
     point = Point(x = 9)
     assert z.at(point) == approx(3)
-    assert_1_ary_derivatives(z, point, x, 1 / 6)
+    assert_1_ary_partials(z, point, x, 1 / 6)
 
 
 def test_NthRoot_normalization():
