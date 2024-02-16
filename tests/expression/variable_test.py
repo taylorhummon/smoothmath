@@ -1,4 +1,4 @@
-from smoothmath import Point, GlobalDifferential, LocalDifferential, Partial
+from smoothmath import Point, Partial, Differential, LocatedDifferential
 from smoothmath.expression import Variable, Constant
 
 
@@ -12,12 +12,12 @@ def test_Variable():
     assert Partial(y, x).at(point) == 0
     assert Partial(y, y).at(point) == 1
     point = Point(x = 2, y = 3)
-    local_differential = LocalDifferential(y, point)
-    assert local_differential.component(x) == 0
-    assert local_differential.component(y) == 1
-    global_differential = GlobalDifferential(y)
-    assert global_differential.component_at(x, point) == 0
-    assert global_differential.component_at(y, point) == 1
+    differential = Differential(y)
+    assert differential.component_at(x, point) == 0
+    assert differential.component_at(y, point) == 1
+    located_differential = LocatedDifferential(y, point)
+    assert located_differential.component(x) == 0
+    assert located_differential.component(y) == 1
 
 
 def test_Variable_equality():

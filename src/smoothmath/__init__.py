@@ -7,8 +7,8 @@ from smoothmath._private.types import RealNumber
 from smoothmath._private.point import Point
 from smoothmath._private.base_expression.expression import Expression
 from smoothmath._private.partial import Partial
-from smoothmath._private.local_differential import LocalDifferential
-from smoothmath._private.global_differential import GlobalDifferential
+from smoothmath._private.differential import Differential
+from smoothmath._private.located_differential import LocatedDifferential
 
 
 __all__ = [
@@ -17,6 +17,6 @@ __all__ = [
     "Point",
     "Expression",
     "Partial",
-    "LocalDifferential",
-    "GlobalDifferential",
+    "Differential",
+    "LocatedDifferential",
 ]

@@ -6,16 +6,16 @@ if TYPE_CHECKING:
     from smoothmath.expression import Variable
 
 
-class LocalDifferential:
+class LocatedDifferential:
     """
-    The differential of an expression localized at a point.
+    The differential of an expression located at a point.
 
     :param expression: an expression
     :param point: where to localize
     """
 
     def __init__(
-        self: LocalDifferential,
+        self: LocatedDifferential,
         expression: Expression,
         point: Point,
         numeric_partials: Optional[dict[str, RealNumber]] = None
@@ -28,7 +28,7 @@ class LocalDifferential:
         self._numeric_partials = _retrieve_numeric_partials(expression, point, numeric_partials)
 
     def component(
-        self: LocalDifferential,
+        self: LocatedDifferential,
         variable: Variable | str
     ) -> RealNumber:
         """
@@ -40,7 +40,7 @@ class LocalDifferential:
         return self._numeric_partials.get(variable_name, 0)
 
     def __eq__(
-        self: LocalDifferential,
+        self: LocatedDifferential,
         other: Any
     ) -> bool:
         return (
@@ -51,25 +51,25 @@ class LocalDifferential:
         )
 
     def __hash__(
-        self: LocalDifferential
+        self: LocatedDifferential
     ) -> int:
         data = tuple(sorted(self._numeric_partials.items()))
         return hash((self._original_expression, self._point, data))
 
     def __str__(
-        self: LocalDifferential
+        self: LocatedDifferential
     ) -> str:
         return self._to_string()
 
     def __repr__(
-        self: LocalDifferential
+        self: LocatedDifferential
     ) -> str:
         return self._to_string()
 
     def _to_string(
-        self: LocalDifferential
+        self: LocatedDifferential
     ) -> str:
-        return f"LocalDifferential({self._original_expression}, {self._point})"
+        return f"LocatedDifferential({self._original_expression}, {self._point})"
 
 
 def _retrieve_numeric_partials(

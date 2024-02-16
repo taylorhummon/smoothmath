@@ -16,8 +16,8 @@ smoothmath
 .. autoclass:: Partial(expression, variable)
     :members:
 
-.. autoclass:: LocalDifferential(expression, point)
+.. autoclass:: Differential(expression)
     :members:
 
-.. autoclass:: GlobalDifferential(expression)
+.. autoclass:: LocatedDifferential(expression, point)
     :members:

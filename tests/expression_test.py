@@ -1,5 +1,5 @@
 from pytest import approx, raises
-from smoothmath import DomainError, Point, GlobalDifferential, LocalDifferential, Partial
+from smoothmath import DomainError, Point, Partial, Differential, LocatedDifferential
 from smoothmath.expression import (
     Variable, Constant, Add, Multiply, Reciprocal, NthPower, Exponential, Logarithm
 )
@@ -27,8 +27,8 @@ def test_expression_reuse():
     assert z.evaluate(point) == approx(1.25)
     assert z.partial_at(x, point) == approx(-0.25)
     assert Partial(z, x).at(point) == approx(-0.25)
-    assert LocalDifferential(z, point).component(x) == approx(-0.25)
-    assert GlobalDifferential(z).component_at(x, point) == approx(-0.25)
+    assert Differential(z).component_at(x, point) == approx(-0.25)
+    assert LocatedDifferential(z, point).component(x) == approx(-0.25)
 
 
 def test_taking_partials_using_string_variable_name():
@@ -38,14 +38,14 @@ def test_taking_partials_using_string_variable_name():
     point = Point(x = 3)
     assert z.partial_at("x", point) == approx(6)
     assert Partial(z, "x").at(point) == approx(6)
-    assert LocalDifferential(z, point).component("x") == approx(6)
-    assert GlobalDifferential(z).component_at("x", point) == approx(6)
+    assert Differential(z).component_at("x", point) == approx(6)
+    assert LocatedDifferential(z, point).component("x") == approx(6)
     # at x = -1
     point = Point(x = -1)
     assert z.partial_at("x", point) == approx(-2)
     assert Partial(z, "x").at(point) == approx(-2)
-    assert LocalDifferential(z, point).component("x") == approx(-2)
-    assert GlobalDifferential(z).component_at("x", point) == approx(-2)
+    assert Differential(z).component_at("x", point) == approx(-2)
+    assert LocatedDifferential(z, point).component("x") == approx(-2)
 
 
 def test_unrelated_variable():
@@ -56,8 +56,8 @@ def test_unrelated_variable():
     assert z.evaluate(point) == approx(4)
     assert z.partial_at(y, point) == approx(0)
     assert Partial(z, y).at(point) == approx(0)
-    assert LocalDifferential(z, point).component(y) == approx(0)
-    assert GlobalDifferential(z).component_at(y, point) == approx(0)
+    assert Differential(z).component_at(y, point) == approx(0)
+    assert LocatedDifferential(z, point).component(y) == approx(0)
 
 
 def test_polynomial_of_one_variable():
@@ -67,8 +67,8 @@ def test_polynomial_of_one_variable():
     assert z.evaluate(point) == approx(-4)
     assert z.partial_at(x, point) == approx(-2)
     assert Partial(z, x).at(point) == approx(-2)
-    assert LocalDifferential(z, point).component(x) == approx(-2)
-    assert GlobalDifferential(z).component_at(x, point) == approx(-2)
+    assert Differential(z).component_at(x, point) == approx(-2)
+    assert LocatedDifferential(z, point).component(x) == approx(-2)
 
 
 def test_polynomial_of_two_variables():
@@ -81,12 +81,12 @@ def test_polynomial_of_two_variables():
     assert z.partial_at(y, point) == approx(-28)
     assert Partial(z, x).at(point) == approx(7)
     assert Partial(z, y).at(point) == approx(-28)
-    local_differential = LocalDifferential(z, point)
-    assert local_differential.component(x) == approx(7)
-    assert local_differential.component(y) == approx(-28)
-    global_differential = GlobalDifferential(z)
-    assert global_differential.component_at(x, point) == approx(7)
-    assert global_differential.component_at(y, point) == approx(-28)
+    differential = Differential(z)
+    assert differential.component_at(x, point) == approx(7)
+    assert differential.component_at(y, point) == approx(-28)
+    located_differential = LocatedDifferential(z, point)
+    assert located_differential.component(x) == approx(7)
+    assert located_differential.component(y) == approx(-28)
 
 
 def test_polynomial_of_three_variables():
@@ -102,14 +102,14 @@ def test_polynomial_of_three_variables():
     assert Partial(z, w).at(point) == approx(37)
     assert Partial(z, x).at(point) == approx(52)
     assert Partial(z, y).at(point) == approx(-6)
-    local_differential = LocalDifferential(z, point)
-    assert local_differential.component(w) == approx(37)
-    assert local_differential.component(x) == approx(52)
-    assert local_differential.component(y) == approx(-6)
-    global_differential = GlobalDifferential(z)
-    assert global_differential.component_at(w, point) == approx(37)
-    assert global_differential.component_at(x, point) == approx(52)
-    assert global_differential.component_at(y, point) == approx(-6)
+    differential = Differential(z)
+    assert differential.component_at(w, point) == approx(37)
+    assert differential.component_at(x, point) == approx(52)
+    assert differential.component_at(y, point) == approx(-6)
+    located_differential = LocatedDifferential(z, point)
+    assert located_differential.component(w) == approx(37)
+    assert located_differential.component(x) == approx(52)
+    assert located_differential.component(y) == approx(-6)
 
 
 def test_composite_function():
@@ -119,8 +119,8 @@ def test_composite_function():
     assert z.evaluate(point) == approx(54.598150033)
     assert z.partial_at(x, point) == approx(218.392600132)
     assert Partial(z, x).at(point) == approx(218.392600132)
-    assert LocalDifferential(z, point).component(x) == approx(218.392600132)
-    assert GlobalDifferential(z).component_at(x, point) == approx(218.392600132)
+    assert Differential(z).component_at(x, point) == approx(218.392600132)
+    assert LocatedDifferential(z, point).component(x) == approx(218.392600132)
 
 
 def test_indeterminate_form():
@@ -134,11 +134,11 @@ def test_indeterminate_form():
     t_partial = Partial(z, t)
     with raises(DomainError):
         t_partial.at(point)
+    differential = Differential(z)
     with raises(DomainError):
-        LocalDifferential(z, point)
-    global_differential = GlobalDifferential(z)
+        differential.component_at(t, point)
     with raises(DomainError):
-        global_differential.component_at(t, point)
+        LocatedDifferential(z, point)
 
 
 def test_consolidate_expression_lacking_variables():

@@ -1,14 +1,14 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
-import smoothmath._private.local_differential as ld
 import smoothmath._private.partial as pa
+import smoothmath._private.located_differential as ld
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression, Partial, LocalDifferential
+    from smoothmath import RealNumber, Point, Expression, Partial, LocatedDifferential
     from smoothmath.expression import Variable
 
 
-class GlobalDifferential:
+class Differential:
     """
     The differential of an expression.
 
@@ -16,7 +16,7 @@ class GlobalDifferential:
     """
 
     def __init__(
-        self: GlobalDifferential,
+        self: Differential,
         expression: Expression
     ) -> None:
         self._original_expression: Expression
@@ -25,7 +25,7 @@ class GlobalDifferential:
         self._synthetic_partials = _retrieve_normalized_synthetic_partials(expression)
 
     def component_at(
-        self: GlobalDifferential,
+        self: Differential,
         variable: Variable | str,
         point: Point
     ) -> RealNumber:
@@ -38,7 +38,7 @@ class GlobalDifferential:
         return self.component(variable).at(point)
 
     def component(
-        self: GlobalDifferential,
+        self: Differential,
         variable: Variable | str
     ) -> Partial:
         """
@@ -51,9 +51,9 @@ class GlobalDifferential:
         return pa.Partial(self._original_expression, variable_name, synthetic_partial)
 
     def at(
-        self: GlobalDifferential,
+        self: Differential,
         point: Point
-    ) -> LocalDifferential:
+    ) -> LocatedDifferential:
         """
         Localize the differential at a point.
 
@@ -64,10 +64,10 @@ class GlobalDifferential:
         numeric_partials = {}
         for variable_name, synthetic_partial in self._synthetic_partials.items():
             numeric_partials[variable_name] = synthetic_partial.evaluate(point)
-        return ld.LocalDifferential(self._original_expression, point, numeric_partials)
+        return ld.LocatedDifferential(self._original_expression, point, numeric_partials)
 
     def __eq__(
-        self: GlobalDifferential,
+        self: Differential,
         other: Any
     ) -> bool:
         return (
@@ -77,25 +77,25 @@ class GlobalDifferential:
         )
 
     def __hash__(
-        self: GlobalDifferential
+        self: Differential
     ) -> int:
         data = tuple(sorted(self._synthetic_partials.items()))
         return hash((self._original_expression, data))
 
     def __str__(
-        self: GlobalDifferential
+        self: Differential
     ) -> str:
         return self._to_string()
 
     def __repr__(
-        self: GlobalDifferential
+        self: Differential
     ) -> str:
         return self._to_string()
 
     def _to_string(
-        self: GlobalDifferential
+        self: Differential
     ) -> str:
-        return f"GlobalDifferential({self._original_expression})"
+        return f"Differential({self._original_expression})"
 
 
 def _retrieve_normalized_synthetic_partials(
