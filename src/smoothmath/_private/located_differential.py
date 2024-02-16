@@ -54,7 +54,7 @@ class LocatedDifferential:
         self: LocatedDifferential
     ) -> int:
         data = tuple(sorted(self._numeric_partials.items()))
-        return hash((self._original_expression, self._point, data))
+        return hash(("LocatedDifferential", self._original_expression, self._point, data))
 
     def __str__(
         self: LocatedDifferential

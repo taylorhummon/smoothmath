@@ -84,7 +84,7 @@ class Partial:
     def __hash__(
         self: Partial
     ) -> int:
-        return hash(self._original_expression)
+        return hash(("Partial", self._original_expression))
 
     def __str__(
         self: Partial

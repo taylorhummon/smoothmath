@@ -60,7 +60,7 @@ class Point:
         self: Point
     ) -> int:
         data = tuple(sorted(self._coordinates.items()))
-        return hash(data)
+        return hash(("Point", data))
 
     def __str__(
         self: Point

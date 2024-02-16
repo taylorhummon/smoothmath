@@ -84,7 +84,7 @@ class Differential:
         self: Differential
     ) -> int:
         data = tuple(sorted(self._synthetic_partials.items()))
-        return hash((self._original_expression, data))
+        return hash(("Differential", self._original_expression, data))
 
     def __str__(
         self: Differential

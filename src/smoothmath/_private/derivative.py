@@ -73,7 +73,7 @@ class Derivative:
     def __hash__(
         self: Derivative
     ) -> int:
-        return hash(self._original_expression)
+        return hash(("Derivative", self._original_expression))
 
     def __str__(
         self: Derivative
