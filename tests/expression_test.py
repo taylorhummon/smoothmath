@@ -1,8 +1,9 @@
-from pytest import approx, raises
+from pytest import approx, raises, fail
 from smoothmath import DomainError, Point, Partial, Differential, LocatedDifferential
 from smoothmath.expression import (
     Variable, Constant, Add, Multiply, Reciprocal, NthPower, Exponential, Logarithm
 )
+from smoothmath._private.base_expression.expression import get_the_single_variable_name
 
 
 def test_unary_expression_equality():
@@ -147,3 +148,19 @@ def test_consolidate_expression_lacking_variables():
     assert z._consolidate_expression_lacking_variables() == Constant(18)
     z = Logarithm(Constant(-1))
     assert z._consolidate_expression_lacking_variables() == None
+
+
+def test_get_the_single_variable_name():
+    x = Variable("x")
+    exception_message = "exception message"
+    good = x ** 2 + Constant(3)
+    assert get_the_single_variable_name(good, exception_message) == "x"
+    lacking_variables = Constant(3) ** 2
+    try:
+        assert get_the_single_variable_name(lacking_variables, exception_message) == "whatever"
+    except Exception:
+        fail("getting the variable name of an expression lacking variables shouldnt fail")
+    y = Variable("y")
+    bad = x ** 2 + y ** 2
+    with raises(Exception):
+        get_the_single_variable_name(bad, exception_message)

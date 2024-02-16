@@ -1,5 +1,6 @@
 from smoothmath import Point, Partial, Differential, LocatedDifferential
 from smoothmath.expression import Variable, Constant
+from smoothmath._private.expression.variable import get_variable_name
 
 
 def test_Variable():
@@ -25,3 +26,8 @@ def test_Variable_equality():
     assert Variable("x") != Variable("y")
     assert Variable("x") != Variable("X")
     assert Variable("x") != Constant(3)
+
+
+def test_get_variable_name():
+    assert get_variable_name(Variable("x")) == "x"
+    assert get_variable_name("y") == "y"

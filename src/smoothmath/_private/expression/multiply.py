@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath._private.base_expression as base
+import smoothmath._private.base_expression.expression as be
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
@@ -107,7 +108,7 @@ class Multiply(base.NAryExpression):
     def _reduce_by_flattening_nested_products(
         self: Multiply
     ) -> Optional[Expression]:
-        pair_or_none = util.first_of_given_type(self._inners, Multiply)
+        pair_or_none = be.first_of_given_type(self._inners, Multiply)
         if pair_or_none is None:
             return None
         i, inner_multiply = pair_or_none
@@ -144,7 +145,7 @@ class Multiply(base.NAryExpression):
         self: Multiply
     ) -> Optional[Expression]:
         negations: list[Negation]; non_negations: list[Expression]
-        negations, non_negations = util.partition_by_given_type(self._inners, ex.Negation)
+        negations, non_negations = be.partition_by_given_type(self._inners, ex.Negation)
         negations_count = len(negations)
         if negations_count == 0:
             return None
@@ -158,7 +159,7 @@ class Multiply(base.NAryExpression):
         self: Multiply
     ) -> Optional[Expression]:
         nth_powers: list[NthPower]; non_nth_powers: list[Expression]
-        nth_powers, non_nth_powers = util.partition_by_given_type(self._inners, ex.NthPower)
+        nth_powers, non_nth_powers = be.partition_by_given_type(self._inners, ex.NthPower)
         if len(nth_powers) <= 1:
             return None
         nth_powers_by_n = util.group_by_key(nth_powers, lambda nth_power: nth_power.n)
@@ -178,7 +179,7 @@ class Multiply(base.NAryExpression):
         self: Multiply
     ) -> Optional[Expression]:
         nth_roots: list[NthRoot]; non_nth_roots: list[Expression]
-        nth_roots, non_nth_roots = util.partition_by_given_type(self._inners, ex.NthRoot)
+        nth_roots, non_nth_roots = be.partition_by_given_type(self._inners, ex.NthRoot)
         if len(nth_roots) <= 1:
             return None
         nth_roots_by_n = util.group_by_key(nth_roots, lambda nth_root: nth_root.n)
@@ -198,7 +199,7 @@ class Multiply(base.NAryExpression):
         self: Multiply
     ) -> Optional[Expression]:
         exponentials: list[Exponential]; non_exponentials: list[Expression]
-        exponentials, non_exponentials = util.partition_by_given_type(self._inners, ex.Exponential)
+        exponentials, non_exponentials = be.partition_by_given_type(self._inners, ex.Exponential)
         if len(exponentials) <= 1:
             return None
         exponentials_by_base = util.group_by_key(exponentials, lambda exponential: exponential.base)
@@ -218,7 +219,7 @@ class Multiply(base.NAryExpression):
         self: Multiply
     ) -> Optional[Expression]:
         constants: list[Constant]; non_constants: list[Expression]
-        constants, non_constants = util.partition_by_given_type(self._inners, ex.Constant)
+        constants, non_constants = be.partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:
             return None
         product = mf.multiply(*(constant.value for constant in constants))
@@ -228,7 +229,7 @@ class Multiply(base.NAryExpression):
         self: Multiply
     ) -> Expression:
         reciprocals: list[Reciprocal]; non_reciprocals: list[Expression]
-        reciprocals, non_reciprocals = util.partition_by_given_type(self._inners, ex.Reciprocal)
+        reciprocals, non_reciprocals = be.partition_by_given_type(self._inners, ex.Reciprocal)
         numerator_terms = [non_reciprocal._normalize() for non_reciprocal in non_reciprocals]
         denominator_terms = [reciprocal._inner._normalize() for reciprocal in reciprocals]
         numerator_count = len(numerator_terms)

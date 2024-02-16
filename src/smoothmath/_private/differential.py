@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import smoothmath._private.partial as pa
 import smoothmath._private.located_differential as ld
+import smoothmath._private.expression.variable as va
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression, Partial, LocatedDifferential
@@ -46,7 +47,7 @@ class Differential:
 
         :param variable: selects which component
         """
-        variable_name = util.get_variable_name(variable)
+        variable_name = va.get_variable_name(variable)
         synthetic_partial = self._synthetic_partials.get(variable_name, None)
         return pa.Partial(
             self._original_expression,

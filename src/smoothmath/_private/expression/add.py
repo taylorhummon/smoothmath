@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, Optional
 import smoothmath._private.base_expression as base
+import smoothmath._private.base_expression.expression as be
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
@@ -87,7 +88,7 @@ class Add(base.NAryExpression):
     def _reduce_by_flattening_nested_sums(
         self: Add
     ) -> Optional[Expression]:
-        pair_or_none = util.first_of_given_type(self._inners, Add)
+        pair_or_none = be.first_of_given_type(self._inners, Add)
         if pair_or_none is None:
             return None
         i, inner_add = pair_or_none
@@ -113,7 +114,7 @@ class Add(base.NAryExpression):
         self: Add
     ) -> Optional[Expression]:
         logarithms: list[Logarithm]; non_logarithms: list[Expression]
-        logarithms, non_logarithms = util.partition_by_given_type(self._inners, ex.Logarithm)
+        logarithms, non_logarithms = be.partition_by_given_type(self._inners, ex.Logarithm)
         if len(logarithms) <= 1:
             return None
         logarithms_by_base = util.group_by_key(logarithms, lambda logarithm: logarithm.base)
@@ -133,7 +134,7 @@ class Add(base.NAryExpression):
         self: Add
     ) -> Optional[Expression]:
         constants: list[Constant]; non_constants: list[Expression]
-        constants, non_constants = util.partition_by_given_type(self._inners, ex.Constant)
+        constants, non_constants = be.partition_by_given_type(self._inners, ex.Constant)
         if len(constants) <= 1:
             return None
         summed = mf.add(*(constant.value for constant in constants))
@@ -143,7 +144,7 @@ class Add(base.NAryExpression):
         self: Add
     ) -> Expression:
         negations: list[Negation]; non_negations: list[Expression]
-        negations, non_negations = util.partition_by_given_type(self._inners, ex.Negation)
+        negations, non_negations = be.partition_by_given_type(self._inners, ex.Negation)
         type_i_terms = [term._normalize() for term in non_negations]
         type_ii_terms = [negation._inner._normalize() for negation in negations]
         type_i_count = len(type_i_terms)

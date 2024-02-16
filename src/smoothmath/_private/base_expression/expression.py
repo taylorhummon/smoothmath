@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 from abc import ABC, abstractmethod
 import logging
 import smoothmath._private.errors as er
@@ -69,8 +69,8 @@ class Expression(ABC):
             return self._evaluate(point)
         else: # point is a real number
             exception_message = "Can only evaluate at a real number for an expression with one variable. Consider passing a point instead."
-            variable_name = _get_the_single_variable_name(self, exception_message)
-            point = _point_on_number_line(variable_name, point)
+            variable_name = get_the_single_variable_name(self, exception_message)
+            point = pt.point_on_number_line(variable_name, point)
             self._reset_evaluation_cache()
             return self._evaluate(point)
 
@@ -240,7 +240,7 @@ class Expression(ABC):
         raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")
 
 
-def _get_the_single_variable_name(
+def get_the_single_variable_name(
     expression: Expression,
     exception_message: str
 ) -> str:
@@ -255,8 +255,19 @@ def _get_the_single_variable_name(
         raise Exception(exception_message)
 
 
-def _point_on_number_line(
-    variable_name: str,
-    value: RealNumber
-) -> Point:
-    return pt.Point(**({variable_name: value}))
+# The right slot of the returned tuple will have type expression_type
+def first_of_given_type(
+    expressions: list[Expression],
+    expression_type: type
+) -> Optional[tuple[int, Any]]:
+    predicate = lambda expression: isinstance(expression, expression_type)
+    return util.first_match_by_predicate(expressions, predicate)
+
+
+# The left slot of the returned tuple will be all expressions with type expression_type
+def partition_by_given_type(
+    expressions: list[Expression],
+    expression_type: type
+) -> tuple[list[Any], list[Expression]]:
+    predicate = lambda expression: isinstance(expression, expression_type)
+    return util.partition_by_predicate(expressions, predicate)

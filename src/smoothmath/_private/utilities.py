@@ -1,8 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, TypeVar, Any, Callable, Optional
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression
-    from smoothmath.expression import Variable
+    from smoothmath import RealNumber
 
 
 U = TypeVar("U")
@@ -133,33 +132,3 @@ def map_dictionary_values(
     for key, value in dictionary.items():
         result[key] = update_value(key, value)
     return result
-
-
-### Expression utility functions ###
-
-
-def get_variable_name(
-    variable_or_name: Variable | str
-) -> str:
-    if isinstance(variable_or_name, str):
-        return variable_or_name
-    else:
-        return variable_or_name.name
-
-
-# The right slot of the returned tuple will have type expression_type
-def first_of_given_type(
-    expressions: list[Expression],
-    expression_type: type
-) -> Optional[tuple[int, Any]]:
-    predicate = lambda expression: isinstance(expression, expression_type)
-    return first_match_by_predicate(expressions, predicate)
-
-
-# The left slot of the returned tuple will be all expressions with type expression_type
-def partition_by_given_type(
-    expressions: list[Expression],
-    expression_type: type
-) -> tuple[list[Any], list[Expression]]:
-    predicate = lambda expression: isinstance(expression, expression_type)
-    return partition_by_predicate(expressions, predicate)

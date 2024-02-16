@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 import smoothmath._private.partial as pa
 import smoothmath._private.point as pt
+import smoothmath._private.base_expression.expression as be
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression, Partial
 
@@ -26,7 +27,7 @@ class Derivative:
         compute_eagerly: bool = False
     ) -> None:
         exception_message = "Can only take the derivative of an expression with one variable. Consider a Partial, Differential, or LocatedDifferential instead."
-        variable_name = _get_the_single_variable_name(expression, exception_message)
+        variable_name = be.get_the_single_variable_name(expression, exception_message)
         self._original_expression: Expression
         self._original_expression = expression
         self._variable_name: str
@@ -44,7 +45,7 @@ class Derivative:
         :param point: where to evaluate the partial
         """
         if not isinstance(point, pt.Point):
-            point = _point_on_number_line(self._variable_name, point)
+            point = pt.point_on_number_line(self._variable_name, point)
         return self._partial.at(point)
 
     def as_expression(
@@ -89,25 +90,3 @@ class Derivative:
         self: Derivative
     ) -> str:
         return f"Derivative({self._original_expression})"
-
-
-def _get_the_single_variable_name( # !!! DRY?
-    expression: Expression,
-    exception_message: str
-) -> str:
-    variable_names = expression._variable_names
-    variable_names_count = len(variable_names)
-    if variable_names_count == 1:
-        (variable_name,) = variable_names
-        return variable_name
-    elif variable_names_count == 0:
-        return "whatever"
-    else:
-        raise Exception(exception_message)
-
-
-def _point_on_number_line( # !!! DRY?
-    variable_name: str,
-    value: RealNumber
-) -> Point:
-    return pt.Point(**({variable_name: value}))

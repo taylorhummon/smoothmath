@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Optional
-import smoothmath._private.utilities as util
+import smoothmath._private.expression.variable as va
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Variable
@@ -36,7 +36,7 @@ class LocatedDifferential:
 
         :param variable: selects which component
         """
-        variable_name = util.get_variable_name(variable)
+        variable_name = va.get_variable_name(variable)
         return self._numeric_partials.get(variable_name, 0)
 
     def __eq__(

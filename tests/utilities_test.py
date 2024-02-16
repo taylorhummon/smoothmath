@@ -11,8 +11,7 @@ from smoothmath._private.utilities import (
     first_match_by_predicate,
     partition_by_predicate,
     group_by_key,
-    map_dictionary_values,
-    get_variable_name
+    map_dictionary_values
 )
 
 
@@ -146,8 +145,3 @@ def test_map_dictionary_values():
     assert map_dictionary_values(dictionary, lambda key, _: key.upper()) == {"a": "A", "b": "B", "c": "C"}
     dictionary = {}
     assert map_dictionary_values(dictionary, lambda _, value: value) == {}
-
-
-def test_get_variable_name():
-    assert get_variable_name(Variable("x")) == "x"
-    assert get_variable_name("y") == "y"

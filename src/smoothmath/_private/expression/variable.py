@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     )
 
 
-alphanumeric_pattern = re.compile(r"\A\w*\Z")
+ALPHANUMERIC_PATTERN = re.compile(r"\A\w*\Z")
 
 
 class Variable(base.Expression):
@@ -25,7 +25,7 @@ class Variable(base.Expression):
         name: str
     ) -> None:
         super().__init__(variable_names = {name})
-        if (not name) or (alphanumeric_pattern.match(name) is None):
+        if (not name) or (ALPHANUMERIC_PATTERN.match(name) is None):
             raise Exception(f"Illegal variable name: {name}")
         self.name: str
         self.name = name
@@ -119,3 +119,12 @@ class Variable(base.Expression):
         self: Variable
     ) -> str:
         return f"Variable(\"{self.name}\")"
+
+
+def get_variable_name(
+    variable_or_name: Variable | str
+) -> str:
+    if isinstance(variable_or_name, str):
+        return variable_or_name
+    else:
+        return variable_or_name.name

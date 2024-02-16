@@ -1,6 +1,7 @@
 from pytest import raises, fail
 from smoothmath import Point
 from smoothmath.expression import Variable
+from smoothmath._private.point import point_on_number_line
 
 
 def test_Point():
@@ -41,3 +42,7 @@ def test_Point_equality():
 def test_Point_hashing():
     assert hash(Point(x = 3, y = 4)) == hash(Point(x = 3, y = 4))
     assert hash(Point(x = 3, y = 4)) == hash(Point(y = 4, x = 3))
+
+
+def test_point_on_number_line():
+    assert point_on_number_line("x", 3) == Point(x = 3)

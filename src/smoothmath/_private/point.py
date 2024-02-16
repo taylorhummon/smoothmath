@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Mapping
-import smoothmath._private.utilities as util
+import smoothmath._private.expression.variable as va
 if TYPE_CHECKING:
     from smoothmath import RealNumber
     from smoothmath.expression import Variable
@@ -41,7 +41,7 @@ class Point:
 
         :param variable: selects which coordinate
         """
-        variable_name = util.get_variable_name(variable)
+        variable_name = va.get_variable_name(variable)
         value = self._coordinates.get(variable_name, None)
         if value is None:
             raise Exception(f"No value provided for variable: {variable_name}")
@@ -80,3 +80,10 @@ class Point:
             for variable_name, value in self._coordinates.items()
         )
         return f"Point({equations_string})"
+
+
+def point_on_number_line(
+    variable_name: str,
+    value: RealNumber
+) -> Point:
+    return Point(**({variable_name: value}))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Optional
-import smoothmath._private.utilities as util
+import smoothmath._private.expression.variable as va
 if TYPE_CHECKING:
     from smoothmath import RealNumber, Point, Expression
     from smoothmath.expression import Variable
@@ -25,7 +25,7 @@ class Partial:
         compute_eagerly: bool = False,
         synthetic_partial: Optional[Expression] = None
     ) -> None:
-        variable_name = util.get_variable_name(variable)
+        variable_name = va.get_variable_name(variable)
         self._original_expression: Expression
         self._original_expression = expression
         self._variable_name: str
