@@ -8,14 +8,17 @@ def test_Variable():
     y = Variable("y")
     point = Point(y = 3)
     assert y.at(point) == 3
-    assert Partial(y, x).at(point) == 0
-    assert Partial(y, y).at(point) == 1
-    assert Partial(y, x, compute_eagerly = True).at(point) == 0
-    assert Partial(y, y, compute_eagerly = True).at(point) == 1
+    late_differential = Differential(y, compute_early = False)
+    assert late_differential.part_at(x, point) == 0
+    assert late_differential.part_at(y, point) == 1
+    early_differential = Differential(y, compute_early = True)
+    assert early_differential.part_at(x, point) == 0
+    assert early_differential.part_at(y, point) == 1
+    assert Partial(y, x, compute_early = False).at(point) == 0
+    assert Partial(y, y, compute_early = False).at(point) == 1
+    assert Partial(y, x, compute_early = True).at(point) == 0
+    assert Partial(y, y, compute_early = True).at(point) == 1
     point = Point(x = 2, y = 3)
-    differential = Differential(y)
-    assert differential.part_at(x, point) == 0
-    assert differential.part_at(y, point) == 1
     located_differential = LocatedDifferential(y, point)
     assert located_differential.part(x) == 0
     assert located_differential.part(y) == 1

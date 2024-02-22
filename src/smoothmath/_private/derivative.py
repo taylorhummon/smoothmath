@@ -15,13 +15,13 @@ class Derivative:
     see the Differential, Partial, and LocatedDifferential classes.
 
     :param expression: an expression with one variable
-    :param compute_eagerly: whether to do extra work on initialization to have faster evaluation afterwards
+    :param compute_early: whether to do extra work on initialization to have faster evaluation afterwards
     """
 
     def __init__(
         self: Derivative,
         expression: Expression,
-        compute_eagerly: bool = False
+        compute_early: bool = False
     ) -> None:
         exception_message = "Can only take the derivative of an expression with one variable. Consider a Differential, Partial, or LocatedDifferential instead."
         variable_name = be.get_the_single_variable_name(expression, exception_message)
@@ -30,7 +30,7 @@ class Derivative:
         self._variable_name: str
         self._variable_name = variable_name
         self._partial: Partial
-        self._partial = pa.Partial(expression, variable_name, compute_eagerly = compute_eagerly)
+        self._partial = pa.Partial(expression, variable_name, compute_early = compute_early)
 
     def at(
         self: Derivative,

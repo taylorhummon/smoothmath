@@ -14,18 +14,18 @@ class Differential:
     The differential of an expression.
 
     :param expression: an expression
-    :param compute_eagerly: whether to do extra work on initialization to have faster evaluation afterwards
+    :param compute_early: whether to do extra work on initialization to have faster evaluation afterwards
     """
 
     def __init__(
         self: Differential,
         expression: Expression,
-        compute_eagerly: bool = False
+        compute_early: bool = False
     ) -> None:
         self._original_expression: Expression
         self._original_expression = expression
         self._synthetic_partials: Optional[dict[str, Expression]]
-        self._synthetic_partials = _initial_synthetic_partials(expression, compute_eagerly)
+        self._synthetic_partials = _initial_synthetic_partials(expression, compute_early)
 
     def part(
         self: Differential,
@@ -40,11 +40,12 @@ class Differential:
         """
         if self._synthetic_partials is None:
             return pa.Partial(self._original_expression, variable)
-        else:
-            variable_name = va.get_variable_name(variable)
-            synthetic_partial = self._synthetic_partials[variable_name]
-            _private = { "synthetic_partial": synthetic_partial }
-            return pa.Partial(self._original_expression, variable, _private = _private)
+        variable_name = va.get_variable_name(variable)
+        synthetic_partial = self._synthetic_partials.get(variable_name, None)
+        if synthetic_partial is None:
+            return pa.Partial(self._original_expression, variable)
+        _private = { "synthetic_partial": synthetic_partial }
+        return pa.Partial(self._original_expression, variable, _private = _private)
 
     def at(
         self: Differential,
@@ -58,13 +59,12 @@ class Differential:
         self._original_expression.at(point)
         if self._synthetic_partials is None:
             return ld.LocatedDifferential(self._original_expression, point)
-        else:
-            numeric_partials = util.map_dictionary_values(
-                self._synthetic_partials,
-                lambda _, synthetic_partial: synthetic_partial.at(point)
-            )
-            _private = { "numeric_partials": numeric_partials }
-            return ld.LocatedDifferential(self._original_expression, point, _private = _private)
+        numeric_partials = util.map_dictionary_values(
+            self._synthetic_partials,
+            lambda _, synthetic_partial: synthetic_partial.at(point)
+        )
+        _private = { "numeric_partials": numeric_partials }
+        return ld.LocatedDifferential(self._original_expression, point, _private = _private)
 
     def part_at(
         self: Differential,
@@ -72,7 +72,7 @@ class Differential:
         point: Point
     ) -> RealNumber:
         """
-        Retrievs a part of the differential and evaluates it at a point.
+        Retrieves a part of the differential and evaluates it at a point.
 
         :param variable: selects which part
         :param point: where to evaluate
@@ -111,9 +111,9 @@ class Differential:
 
 def _initial_synthetic_partials(
     original_expression: Expression,
-    compute_eagerly: bool
+    compute_early: bool
 ) -> Optional[dict[str, Expression]]:
-    if compute_eagerly:
+    if compute_early:
         synthetic_partials = original_expression._synthetic_partials()
         return util.map_dictionary_values(
             synthetic_partials,
@@ -121,14 +121,3 @@ def _initial_synthetic_partials(
         )
     else:
         return None
-
-
-def _synthetic_partial_from(
-    synthetic_partials: Optional[dict[str, Expression]],
-    variable: Variable | str
-) -> Optional[Expression]:
-    if synthetic_partials is None:
-        return None
-    else:
-        variable_name = va.get_variable_name(variable)
-        return synthetic_partials.get(variable_name, None)

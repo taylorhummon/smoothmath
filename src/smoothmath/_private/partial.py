@@ -12,14 +12,14 @@ class Partial:
 
     :param expression: an expression
     :param variable: the partial is taken with respect to this variable
-    :param compute_eagerly: whether to do extra work on initialization to have faster evaluation afterwards
+    :param compute_early: whether to do extra work on initialization to have faster evaluation afterwards
     """
 
     def __init__(
         self: Partial,
         expression: Expression,
         variable: Variable | str,
-        compute_eagerly: bool = False,
+        compute_early: bool = False,
         _private: Optional[dict[str, Expression]] = None
     ) -> None:
         variable_name = va.get_variable_name(variable)
@@ -29,7 +29,7 @@ class Partial:
         self._variable_name = variable_name
         self._synthetic_partial: Optional[Expression]
         self._synthetic_partial = _initial_synthetic_partial(
-            expression, variable_name, compute_eagerly, _private
+            expression, variable_name, compute_early, _private
         )
 
     def at(
@@ -103,14 +103,14 @@ class Partial:
 def _initial_synthetic_partial(
     original_expression: Expression,
     variable_name: str,
-    compute_eagerly: bool,
+    compute_eagly: bool,
     _private: Optional[dict[str, Expression]]
 ) -> Optional[Expression]:
     if _private is not None and "synthetic_partial" in _private:
         # We'll assume that if a synthetic partial was passed in to the constructor,
         # we don't need to normalize it.
         return _private["synthetic_partial"]
-    elif compute_eagerly:
+    elif compute_eagly:
         return _retrieve_synthetic_partial(original_expression, variable_name)
     else:
         return None

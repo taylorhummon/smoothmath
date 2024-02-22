@@ -13,13 +13,13 @@ smoothmath
 .. autoclass:: Expression()
     :members:
 
-.. autoclass:: Derivative(expression, compute_eagerly=False)
+.. autoclass:: Derivative(expression, compute_early=False)
     :members:
 
-.. autoclass:: Differential(expression, compute_eagerly=False)
+.. autoclass:: Differential(expression, compute_early=False)
     :members:
 
-.. autoclass:: Partial(expression, variable, compute_eagerly=False)
+.. autoclass:: Partial(expression, variable, compute_early=False)
     :members:
 
 .. autoclass:: LocatedDifferential(expression, point)

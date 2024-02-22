@@ -86,13 +86,13 @@ order to evaluate the derivative at ``x`` values. So we have a choice to make:
 >>> from smoothmath import Derivative
 >>> from smoothmath.expression import Variable, Constant
 >>> z = Variable("x") ** Constant(2) - Constant(1)
->>> d_numeric = Derivative(z)
->>> d_synthetic = Derivative(z, compute_eagerly=True)
+>>> d_late = Derivative(z)
+>>> d_early = Derivative(z, compute_early=True)
 
-The lazy derivative ``d_numeric`` and the eager derivative ``d_synthetic`` behave identically:
+The "late derivative" ``d_late`` and the "early derivative" ``d_early`` behave identically:
 they give all the same answers when calling their methods. But they have different performance
-characteristics. If you only need to evaluate your derivative at a few ``x`` values, ``d_numeric``
-will be fast. But if you need to evaluate your derivative at many ``x`` vaules, ``d_synthetic`` can
+characteristics. If you only need to evaluate your derivative at a few ``x`` values, ``d_late``
+will be fast. But if you need to evaluate your derivative at many ``x`` vaules, ``d_early`` can
 give a performance boost by internally calculating the derivative as an expression.
 
 

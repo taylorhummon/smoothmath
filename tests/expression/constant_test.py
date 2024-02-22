@@ -8,9 +8,10 @@ def test_Constant():
     assert c.at(point) == 7
     x = Variable("x")
     point = Point(x = 2)
-    assert Partial(c, x).at(point) == 0
-    assert Partial(c, x, compute_eagerly = True).at(point) == 0
-    assert Differential(c).part_at(x, point) == 0
+    assert Differential(c, compute_early = False).part_at(x, point) == 0
+    assert Differential(c, compute_early = True).part_at(x, point) == 0
+    assert Partial(c, x, compute_early = False).at(point) == 0
+    assert Partial(c, x, compute_early = True).at(point) == 0
     assert LocatedDifferential(c, point).part(x) == 0
 
 

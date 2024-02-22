@@ -66,15 +66,18 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
     point = Point(y = 0)
     with raises(DomainError):
         z.at(point)
-    partial = Partial(z, y)
+    late_differential = Differential(z, compute_early = False)
     with raises(DomainError):
-        partial.at(point)
-    partial = Partial(z, y, compute_eagerly = True)
+        late_differential.part_at(y, point)
+    early_differential = Differential(z, compute_early = True)
     with raises(DomainError):
-        partial.at(point)
-    differential = Differential(z)
+        early_differential.part_at(y, point)
+    late_partial = Partial(z, y, compute_early = False)
     with raises(DomainError):
-        differential.part_at(y, point)
+        late_partial.at(point)
+    early_partial = Partial(z, y, compute_early = True)
+    with raises(DomainError):
+        early_partial.at(point)
     with raises(DomainError):
         LocatedDifferential(z, point)
 
