@@ -61,7 +61,7 @@ The simplest thing we can do is evaluate it using the ``at()`` method!
 Taking the derivative of an expression with one variable
 --------------------------------------------------------
 
-We can take derivatives of a smoothmath expression. Here's how:
+We can take the derivative of a smoothmath expression. Here's how:
 
 >>> from smoothmath import Derivative
 >>> from smoothmath.expression import Variable, Constant

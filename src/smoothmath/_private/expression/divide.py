@@ -20,6 +20,8 @@ class Divide(base.BinaryExpression):
     >>> Divide(Variable("x"), Variable("y")).at(Point(x=1, y=2))
     0.5
 
+    Dividing by zero will raise a DomainError.
+
     :param left: the numerator
     :param right: the denominator
     """

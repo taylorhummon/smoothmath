@@ -22,6 +22,9 @@ class Power(base.BinaryExpression):
     >>> Power(Variable("x"), Variable("y")).at(Point(x=2, y=5))
     32
 
+    Will raise a DomainError if the base is zero or negative. For an alternative that
+    allows a negative base, see NthPower.
+
     :param left: the base
     :param right: the exponent
     """

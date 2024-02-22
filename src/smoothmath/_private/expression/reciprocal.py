@@ -16,6 +16,8 @@ class Reciprocal(base.UnaryExpression):
     >>> Reciprocal(Variable("x")).at(10)
     0.1
 
+    Taking the reciprocal of zero will raise a DomainError.
+
     :param inner: the expression we are taking the reciprocal of
     """
 

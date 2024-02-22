@@ -18,8 +18,10 @@ class Logarithm(base.ParameterizedUnaryExpression):
     >>> Logarithm(Variable("x"), base=2).at(64)
     6.0
 
+    Will raise a DomainError at zero or negative values.
+
     :param inner: the expression to take the logarithm of
-    :param base: the base, *as a positive real number*
+    :param base: the base, *as a positive real number other than one*
     """
     def __init__(
         self: Logarithm,
