@@ -74,7 +74,7 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
         partial.at(point)
     differential = Differential(z)
     with raises(DomainError):
-        differential.component_at(y, point)
+        differential.part_at(y, point)
     with raises(DomainError):
         LocatedDifferential(z, point)
 

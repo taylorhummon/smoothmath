@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 import smoothmath._private.partial as pa
 import smoothmath._private.located_differential as ld
 import smoothmath._private.expression.variable as va
@@ -14,45 +14,34 @@ class Differential:
     The differential of an expression.
 
     :param expression: an expression
+    :param compute_eagerly: whether to do extra work on initialization to have faster evaluation afterwards
     """
 
     def __init__(
         self: Differential,
-        expression: Expression
+        expression: Expression,
+        compute_eagerly: bool = False
     ) -> None:
         self._original_expression: Expression
         self._original_expression = expression
-        self._synthetic_partials: dict[str, Expression]
-        self._synthetic_partials = _retrieve_normalized_synthetic_partials(expression)
+        self._synthetic_partials: Optional[dict[str, Expression]]
+        self._synthetic_partials = _initial_synthetic_partials(expression, compute_eagerly)
 
-    def component_at(
-        self: Differential,
-        variable: Variable | str,
-        point: Point
-    ) -> RealNumber:
-        """
-        The component of the differential localized at a point.
-
-        :param point: where to localize
-        :param variable: selects which component
-        """
-        return self.component(variable).at(point)
-
-    def component(
+    def part(
         self: Differential,
         variable: Variable | str
     ) -> Partial:
         """
-        The component of the differential.
+        Retrieves a part of the differential.
 
-        :param variable: selects which component
+        NOTE: The parts of the differential are the partials of the original expression.
+
+        :param variable: selects which part
         """
-        variable_name = va.get_variable_name(variable)
-        synthetic_partial = self._synthetic_partials.get(variable_name, None)
         return pa.Partial(
             self._original_expression,
-            variable_name,
-            synthetic_partial = synthetic_partial
+            variable,
+            synthetic_partial = _synthetic_partial_from(self._synthetic_partials, variable)
         )
 
     def at(
@@ -60,16 +49,29 @@ class Differential:
         point: Point
     ) -> LocatedDifferential:
         """
-        Localize the differential at a point.
+        Evaluates the differential at a point.
 
-        :param point: where to localize
+        :param point: where to evaluate
         """
         self._original_expression.at(point)
-        numeric_partials: dict[str, RealNumber]
-        numeric_partials = {}
-        for variable_name, synthetic_partial in self._synthetic_partials.items():
-            numeric_partials[variable_name] = synthetic_partial.at(point)
-        return ld.LocatedDifferential(self._original_expression, point, numeric_partials)
+        return ld.LocatedDifferential(
+            self._original_expression,
+            point,
+            numeric_partials = _numeric_partials_from(self._synthetic_partials, point)
+        )
+
+    def part_at(
+        self: Differential,
+        variable: Variable | str,
+        point: Point
+    ) -> RealNumber:
+        """
+        Retrievs a part of the differential and evaluates it at a point.
+
+        :param variable: selects which part
+        :param point: where to evaluate
+        """
+        return self.part(variable).at(point)
 
     def __eq__(
         self: Differential,
@@ -77,15 +79,13 @@ class Differential:
     ) -> bool:
         return (
             (other.__class__ == self.__class__) and
-            (self._original_expression == other._original_expression) and
-            (self._synthetic_partials == other._synthetic_partials)
+            (self._original_expression == other._original_expression)
         )
 
     def __hash__(
         self: Differential
     ) -> int:
-        data = tuple(sorted(self._synthetic_partials.items()))
-        return hash(("Differential", self._original_expression, data))
+        return hash(("Differential", self._original_expression))
 
     def __str__(
         self: Differential
@@ -103,10 +103,39 @@ class Differential:
         return f"Differential({self._original_expression})"
 
 
-def _retrieve_normalized_synthetic_partials(
-    original_expression: Expression
-) -> dict[str, Expression]:
-    return util.map_dictionary_values(
-        original_expression._synthetic_partials(),
-        lambda _, synthetic_partial: synthetic_partial._normalize()
-    )
+def _initial_synthetic_partials(
+    original_expression: Expression,
+    compute_eagerly: bool
+) -> Optional[dict[str, Expression]]:
+    if compute_eagerly:
+        synthetic_partials = original_expression._synthetic_partials()
+        return util.map_dictionary_values(
+            synthetic_partials,
+            lambda _, synthetic_partial: synthetic_partial._normalize()
+        )
+    else:
+        return None
+
+
+def _synthetic_partial_from(
+    synthetic_partials: Optional[dict[str, Expression]],
+    variable: Variable | str
+) -> Optional[Expression]:
+    if synthetic_partials is None:
+        return None
+    else:
+        variable_name = va.get_variable_name(variable)
+        return synthetic_partials.get(variable_name, None)
+
+
+def _numeric_partials_from(
+    synthetic_partials: Optional[dict[str, Expression]],
+    point: Point
+) -> Optional[dict[str, RealNumber]]:
+    if synthetic_partials is None:
+        return None
+    else:
+        return util.map_dictionary_values(
+            synthetic_partials,
+            lambda _, synthetic_partial: synthetic_partial.at(point)
+        )

@@ -11,7 +11,7 @@ class LocatedDifferential:
     The differential of an expression located at a point.
 
     :param expression: an expression
-    :param point: where to localize
+    :param point: where to locate the differential
     """
 
     def __init__(
@@ -25,16 +25,18 @@ class LocatedDifferential:
         self._point: Point
         self._point = point
         self._numeric_partials: dict[str, RealNumber]
-        self._numeric_partials = _retrieve_numeric_partials(expression, point, numeric_partials)
+        self._numeric_partials = _initial_numeric_partials(expression, point, numeric_partials)
 
-    def component(
+    def part(
         self: LocatedDifferential,
         variable: Variable | str
     ) -> RealNumber:
         """
-        The component of the differential.
+        Retrieves a part of the differential.
 
-        :param variable: selects which component
+        NOTE: The parts of the differential are the partials of the original expression.
+
+        :param variable: selects which part
         """
         variable_name = va.get_variable_name(variable)
         return self._numeric_partials.get(variable_name, 0)
@@ -46,15 +48,13 @@ class LocatedDifferential:
         return (
             (other.__class__ == self.__class__) and
             (self._original_expression == other._original_expression) and
-            (self._point == other._point) and
-            (self._numeric_partials == other._numeric_partials)
+            (self._point == other._point)
         )
 
     def __hash__(
         self: LocatedDifferential
     ) -> int:
-        data = tuple(sorted(self._numeric_partials.items()))
-        return hash(("LocatedDifferential", self._original_expression, self._point, data))
+        return hash(("LocatedDifferential", self._original_expression, self._point))
 
     def __str__(
         self: LocatedDifferential
@@ -72,7 +72,7 @@ class LocatedDifferential:
         return f"LocatedDifferential({self._original_expression}, {self._point})"
 
 
-def _retrieve_numeric_partials(
+def _initial_numeric_partials(
     original_expression: Expression,
     point: Point,
     optional_numeric_partials: Optional[dict[str, RealNumber]]

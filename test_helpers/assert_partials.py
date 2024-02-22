@@ -1,8 +1,7 @@
 from pytest import approx, raises
-from smoothmath import (
-    DomainError, RealNumber, Point, Expression, Partial, Differential, LocatedDifferential
-)
+from smoothmath import DomainError, RealNumber, Point, Expression
 from smoothmath.expression import Variable
+import smoothmath._private.expression.variable as va
 
 
 def assert_1_ary_partials(
@@ -11,10 +10,11 @@ def assert_1_ary_partials(
     variable: Variable,
     expected: RealNumber
 ) -> None:
-    assert Partial(expression, variable).at(point) == approx(expected)
-    assert Partial(expression, variable, compute_eagerly = True).at(point) == approx(expected)
-    assert Differential(expression).component_at(variable, point) == approx(expected)
-    assert LocatedDifferential(expression, point).component(variable) == approx(expected)
+    variable_name = va.get_variable_name(variable)
+    assert expression._numeric_partial(variable_name, point) == approx(expected)
+    assert expression._synthetic_partial(variable_name).at(point) == approx(expected)
+    assert expression._numeric_partials(point)[variable_name] == approx(expected)
+    assert expression._synthetic_partials()[variable_name].at(point) == approx(expected)
 
 
 def assert_1_ary_partials_raise(
@@ -22,17 +22,11 @@ def assert_1_ary_partials_raise(
     point: Point,
     variable: Variable
 ) -> None:
-    partial = Partial(expression, variable)
+    variable_name = va.get_variable_name(variable)
     with raises(DomainError):
-        partial.at(point)
-    partial = Partial(expression, variable, compute_eagerly = True)
+        expression._numeric_partial(variable_name, point)
     with raises(DomainError):
-        partial.at(point)
-    differential = Differential(expression)
-    with raises(DomainError):
-        differential.component_at(variable, point)
-    with raises(DomainError):
-        LocatedDifferential(expression, point)
+        expression._numeric_partials(point)
 
 
 def assert_2_ary_partials(
@@ -43,16 +37,18 @@ def assert_2_ary_partials(
     variable_b: Variable,
     expected_b: RealNumber
 ) -> None:
-    assert Partial(expression, variable_a).at(point) == approx(expected_a)
-    assert Partial(expression, variable_b).at(point) == approx(expected_b)
-    assert Partial(expression, variable_a, compute_eagerly = True).at(point) == approx(expected_a)
-    assert Partial(expression, variable_b, compute_eagerly = True).at(point) == approx(expected_b)
-    differential = Differential(expression)
-    assert differential.component_at(variable_a, point) == approx(expected_a)
-    assert differential.component_at(variable_b, point) == approx(expected_b)
-    located_differential = LocatedDifferential(expression, point)
-    assert located_differential.component(variable_a) == approx(expected_a)
-    assert located_differential.component(variable_b) == approx(expected_b)
+    variable_name_a = va.get_variable_name(variable_a)
+    variable_name_b = va.get_variable_name(variable_b)
+    assert expression._numeric_partial(variable_name_a, point) == approx(expected_a)
+    assert expression._numeric_partial(variable_name_b, point) == approx(expected_b)
+    assert expression._synthetic_partial(variable_name_a).at(point) == approx(expected_a)
+    assert expression._synthetic_partial(variable_name_b).at(point) == approx(expected_b)
+    numeric_partials = expression._numeric_partials(point)
+    assert numeric_partials[variable_name_a] == approx(expected_a)
+    assert numeric_partials[variable_name_b] == approx(expected_b)
+    synthetic_partials = expression._synthetic_partials()
+    assert synthetic_partials[variable_name_a].at(point) == approx(expected_a)
+    assert synthetic_partials[variable_name_b].at(point) == approx(expected_b)
 
 
 def assert_2_ary_partials_raise(
@@ -61,25 +57,14 @@ def assert_2_ary_partials_raise(
     variable_a: Variable,
     variable_b: Variable
 ) -> None:
-    partial_a = Partial(expression, variable_a)
+    variable_name_a = va.get_variable_name(variable_a)
+    variable_name_b = va.get_variable_name(variable_b)
     with raises(DomainError):
-        partial_a.at(point)
-    partial_b = Partial(expression, variable_b)
+        expression._numeric_partial(variable_name_a, point)
     with raises(DomainError):
-        partial_b.at(point)
-    partial_a = Partial(expression, variable_a, compute_eagerly = True)
+        expression._numeric_partial(variable_name_b, point)
     with raises(DomainError):
-        partial_a.at(point)
-    partial_b = Partial(expression, variable_b, compute_eagerly = True)
-    with raises(DomainError):
-        partial_b.at(point)
-    differential = Differential(expression)
-    with raises(DomainError):
-        differential.component_at(variable_a, point)
-    with raises(DomainError):
-        differential.component_at(variable_b, point)
-    with raises(DomainError):
-        LocatedDifferential(expression, point)
+        expression._numeric_partials(point)
 
 
 def assert_3_ary_partials(
@@ -92,17 +77,20 @@ def assert_3_ary_partials(
     variable_c: Variable,
     expected_c: RealNumber
 ) -> None:
-    assert Partial(expression, variable_a).at(point) == approx(expected_a)
-    assert Partial(expression, variable_b).at(point) == approx(expected_b)
-    assert Partial(expression, variable_c).at(point) == approx(expected_c)
-    assert Partial(expression, variable_a, compute_eagerly = True).at(point) == approx(expected_a)
-    assert Partial(expression, variable_b, compute_eagerly = True).at(point) == approx(expected_b)
-    assert Partial(expression, variable_c, compute_eagerly = True).at(point) == approx(expected_c)
-    differential = Differential(expression)
-    assert differential.component_at(variable_a, point) == approx(expected_a)
-    assert differential.component_at(variable_b, point) == approx(expected_b)
-    assert differential.component_at(variable_c, point) == approx(expected_c)
-    located_differential = LocatedDifferential(expression, point)
-    assert located_differential.component(variable_a) == approx(expected_a)
-    assert located_differential.component(variable_b) == approx(expected_b)
-    assert located_differential.component(variable_c) == approx(expected_c)
+    variable_name_a = va.get_variable_name(variable_a)
+    variable_name_b = va.get_variable_name(variable_b)
+    variable_name_c = va.get_variable_name(variable_c)
+    assert expression._numeric_partial(variable_name_a, point) == approx(expected_a)
+    assert expression._numeric_partial(variable_name_b, point) == approx(expected_b)
+    assert expression._numeric_partial(variable_name_c, point) == approx(expected_c)
+    assert expression._synthetic_partial(variable_name_a).at(point) == approx(expected_a)
+    assert expression._synthetic_partial(variable_name_b).at(point) == approx(expected_b)
+    assert expression._synthetic_partial(variable_name_c).at(point) == approx(expected_c)
+    numeric_partials = expression._numeric_partials(point)
+    assert numeric_partials[variable_name_a] == approx(expected_a)
+    assert numeric_partials[variable_name_b] == approx(expected_b)
+    assert numeric_partials[variable_name_c] == approx(expected_c)
+    synthetic_partials = expression._synthetic_partials()
+    assert synthetic_partials[variable_name_a].at(point) == approx(expected_a)
+    assert synthetic_partials[variable_name_b].at(point) == approx(expected_b)
+    assert synthetic_partials[variable_name_c].at(point) == approx(expected_c)

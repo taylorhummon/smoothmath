@@ -10,12 +10,9 @@ class Partial:
     """
     The partial derivative of an expression.
 
-    Consider setting the ``compute_eagerly`` parameter to ``True`` as an optimization if the
-    partial will be evaluated at many points.
-
     :param expression: an expression
     :param variable: the partial is taken with respect to this variable
-    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation afterwards
+    :param compute_eagerly: whether to do extra work on initialization to have faster evaluation afterwards
     """
 
     def __init__(

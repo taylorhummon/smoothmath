@@ -1,9 +1,9 @@
-from pytest import approx
-from smoothmath import Point, LocatedDifferential
-from smoothmath.expression import Variable, Constant
+from pytest import approx, raises
+from smoothmath import DomainError, Point, LocatedDifferential
+from smoothmath.expression import Variable, Constant, Logarithm
 
 
-# Note: intensive testing of located differentials is done in the tests for concrete expressions
+# Note: numeric partials testing is done in the tests for concrete expressions
 
 
 def test_LocatedDifferential():
@@ -13,12 +13,21 @@ def test_LocatedDifferential():
     z = Constant(4) * w + x * y ** 3
     point = Point(w = 7, x = 4, y = 5)
     located_differential = LocatedDifferential(z, point)
-    assert located_differential.component(w) == approx(4)
-    assert located_differential.component(x) == approx(125)
-    assert located_differential.component(y) == approx(300)
-    assert located_differential.component("w") == approx(4)
-    assert located_differential.component("x") == approx(125)
-    assert located_differential.component("y") == approx(300)
+    assert located_differential.part(w) == approx(4)
+    assert located_differential.part(x) == approx(125)
+    assert located_differential.part(y) == approx(300)
+    assert located_differential.part("w") == approx(4)
+    assert located_differential.part("x") == approx(125)
+    assert located_differential.part("y") == approx(300)
+
+
+def test_LocatedDifferential_raises():
+    x = Variable("x")
+    y = Variable("y")
+    z = Logarithm(x) * y
+    point = Point(x = -1, y = 1)
+    with raises(DomainError):
+        LocatedDifferential(z, point)
 
 
 def test_LocatedDifferential_equality():

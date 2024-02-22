@@ -10,11 +10,15 @@ def test_Derivative():
     derivative = Derivative(z)
     assert derivative.at(3) == approx(32)
     assert derivative.at(point) == approx(32)
-    assert derivative.as_expression() == Constant(5) + Constant(3) * NthPower(Variable("x"), 2)
+    derivative_expression = derivative.as_expression()
+    assert derivative_expression.at(point) == approx(32)
+    assert derivative_expression == Constant(5) + Constant(3) * NthPower(Variable("x"), 2)
     eager_derivative = Derivative(z, compute_eagerly = True)
     assert eager_derivative.at(3) == approx(32)
     assert eager_derivative.at(point) == approx(32)
-    assert eager_derivative.as_expression() == Constant(5) + Constant(3) * NthPower(Variable("x"), 2)
+    eager_derivative_expression = derivative.as_expression()
+    assert eager_derivative_expression.at(point) == approx(32)
+    assert eager_derivative_expression == Constant(5) + Constant(3) * NthPower(Variable("x"), 2)
 
 
 def test_Derivative_raises():
@@ -33,11 +37,15 @@ def test_Derivative_at_raises():
     derivative = Derivative(z)
     with raises(DomainError):
         derivative.at(Point(x = -1))
+    eager_derivative = Derivative(z, compute_eagerly = True)
+    with raises(DomainError):
+        eager_derivative.at(Point(x = -1))
 
 
 def test_Derivative_equality():
     x = Variable("x")
     assert Derivative(x ** 2) == Derivative(x ** 2)
+    assert Derivative(x ** 2) == Derivative(x ** 2, compute_eagerly = True)
     y = Variable("y")
     assert Derivative(x ** 2) != Derivative(y ** 2)
 
@@ -46,3 +54,4 @@ def test_Derivative_hashing():
     x = Variable("x")
     z = x ** 2
     assert hash(Derivative(z)) == hash(Derivative(z))
+    assert hash(Derivative(z)) == hash(Derivative(z, compute_eagerly = True))

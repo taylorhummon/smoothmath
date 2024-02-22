@@ -24,13 +24,6 @@ class Expression(ABC):
     """
     An abstract base class for all expresssions.
     See the :doc:`expression` module for concrete expression classes.
-
-        >>> from smoothmath import Expression, Point
-        >>> from smoothmath.expression import Constant, Variable
-        >>> expression: Expression
-        >>> expression = (Variable("x") + Constant(1)) / Variable("x")
-        >>> expression.at(2)
-        1.5
     """
 
     def __init__(
@@ -59,8 +52,8 @@ class Expression(ABC):
         """
         Evaluates the expression at a point.
 
-        The expression must only have one variable in order to use a real number argument for the
-        point parameter.
+        In order to use a real number for the point parameter, the expression must only have a
+        single variable.
 
         :param point: where to evaluate
         """
@@ -111,7 +104,7 @@ class Expression(ABC):
         accumulator = acc.NumericPartialsAccumulator()
         self._reset_evaluation_cache()
         self._compute_numeric_partials(accumulator, 1, point)
-        return accumulator.numeric_partials
+        return accumulator.numeric_partials_for(self._variable_names)
 
     @abstractmethod
     def _compute_numeric_partials(
@@ -127,7 +120,7 @@ class Expression(ABC):
     ) -> dict[str, Expression]:
         accumulator = acc.SyntheticPartialsAccumulator()
         self._compute_synthetic_partials(accumulator, ex.Constant(1))
-        return accumulator.synthetic_partials
+        return accumulator.synthetic_partials_for(self._variable_names)
 
     @abstractmethod
     def _compute_synthetic_partials(

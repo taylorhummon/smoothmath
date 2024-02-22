@@ -11,14 +11,11 @@ class Derivative:
     """
     The derivative of an expression.
 
-    The expression must have only one variable. For alternatives without this limitation,
-    see the Partial, Differential, and LocatedDifferential classes.
+    The expression must have only one variable. For alternatives that support multiple variables,
+    see the Differential, Partial, and LocatedDifferential classes.
 
-    Consider setting the ``compute_eagerly`` parameter to ``True`` as an optimization if the
-    derivative will be evaluated at many points.
-
-    :param expression: an expression of one variable
-    :param compute_eagerly: whether to do extra work on initialization to have faster ``at()`` evaluation afterwards
+    :param expression: an expression with one variable
+    :param compute_eagerly: whether to do extra work on initialization to have faster evaluation afterwards
     """
 
     def __init__(
@@ -26,7 +23,7 @@ class Derivative:
         expression: Expression,
         compute_eagerly: bool = False
     ) -> None:
-        exception_message = "Can only take the derivative of an expression with one variable. Consider a Partial, Differential, or LocatedDifferential instead."
+        exception_message = "Can only take the derivative of an expression with one variable. Consider a Differential, Partial, or LocatedDifferential instead."
         variable_name = be.get_the_single_variable_name(expression, exception_message)
         self._original_expression: Expression
         self._original_expression = expression
@@ -42,7 +39,7 @@ class Derivative:
         """
         Evaluate the derivative.
 
-        :param point: where to evaluate the partial
+        :param point: where to evaluate the derivative
         """
         if not isinstance(point, pt.Point):
             point = pt.point_on_number_line(self._variable_name, point)

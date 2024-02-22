@@ -14,11 +14,11 @@ def test_Variable():
     assert Partial(y, y, compute_eagerly = True).at(point) == 1
     point = Point(x = 2, y = 3)
     differential = Differential(y)
-    assert differential.component_at(x, point) == 0
-    assert differential.component_at(y, point) == 1
+    assert differential.part_at(x, point) == 0
+    assert differential.part_at(y, point) == 1
     located_differential = LocatedDifferential(y, point)
-    assert located_differential.component(x) == 0
-    assert located_differential.component(y) == 1
+    assert located_differential.part(x) == 0
+    assert located_differential.part(y) == 1
 
 
 def test_Variable_equality():

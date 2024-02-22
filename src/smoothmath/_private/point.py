@@ -12,6 +12,8 @@ class Point:
     keyword argument is a real number. The order of keyword parameters is ignored.
 
     >>> from smoothmath import Point
+    >>> Point(x=3, y=4.5)
+    Point(x=3, y=4.5)
     >>> Point(x=3, y=4.5) == Point(y=4.5, x=3)
     True
 
@@ -33,10 +35,10 @@ class Point:
         A coordinate. Raises an ``Exception`` if the variable is not present in the point.
 
         >>> from smoothmath import Point
-        >>> p = Point(x=3, y=4.5)
-        >>> p.coordinate("x")
+        >>> point = Point(x=3, y=4.5)
+        >>> point.coordinate("x")
         3
-        >>> p.coordinate("y")
+        >>> point.coordinate("y")
         4.5
 
         :param variable: selects which coordinate
