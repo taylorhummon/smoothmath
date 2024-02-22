@@ -38,11 +38,13 @@ class Differential:
 
         :param variable: selects which part
         """
-        return pa.Partial(
-            self._original_expression,
-            variable,
-            synthetic_partial = _synthetic_partial_from(self._synthetic_partials, variable)
-        )
+        if self._synthetic_partials is None:
+            return pa.Partial(self._original_expression, variable)
+        else:
+            variable_name = va.get_variable_name(variable)
+            synthetic_partial = self._synthetic_partials[variable_name]
+            _private = { "synthetic_partial": synthetic_partial }
+            return pa.Partial(self._original_expression, variable, _private = _private)
 
     def at(
         self: Differential,
@@ -54,11 +56,15 @@ class Differential:
         :param point: where to evaluate
         """
         self._original_expression.at(point)
-        return ld.LocatedDifferential(
-            self._original_expression,
-            point,
-            numeric_partials = _numeric_partials_from(self._synthetic_partials, point)
-        )
+        if self._synthetic_partials is None:
+            return ld.LocatedDifferential(self._original_expression, point)
+        else:
+            numeric_partials = util.map_dictionary_values(
+                self._synthetic_partials,
+                lambda _, synthetic_partial: synthetic_partial.at(point)
+            )
+            _private = { "numeric_partials": numeric_partials }
+            return ld.LocatedDifferential(self._original_expression, point, _private = _private)
 
     def part_at(
         self: Differential,
@@ -126,16 +132,3 @@ def _synthetic_partial_from(
     else:
         variable_name = va.get_variable_name(variable)
         return synthetic_partials.get(variable_name, None)
-
-
-def _numeric_partials_from(
-    synthetic_partials: Optional[dict[str, Expression]],
-    point: Point
-) -> Optional[dict[str, RealNumber]]:
-    if synthetic_partials is None:
-        return None
-    else:
-        return util.map_dictionary_values(
-            synthetic_partials,
-            lambda _, synthetic_partial: synthetic_partial.at(point)
-        )

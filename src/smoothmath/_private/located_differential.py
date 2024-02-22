@@ -18,14 +18,14 @@ class LocatedDifferential:
         self: LocatedDifferential,
         expression: Expression,
         point: Point,
-        numeric_partials: Optional[dict[str, RealNumber]] = None
+        _private: Optional[dict[str, dict[str, RealNumber]]] = None
     ) -> None:
         self._original_expression: Expression
         self._original_expression = expression
         self._point: Point
         self._point = point
         self._numeric_partials: dict[str, RealNumber]
-        self._numeric_partials = _initial_numeric_partials(expression, point, numeric_partials)
+        self._numeric_partials = _initial_numeric_partials(expression, point, _private)
 
     def part(
         self: LocatedDifferential,
@@ -75,9 +75,9 @@ class LocatedDifferential:
 def _initial_numeric_partials(
     original_expression: Expression,
     point: Point,
-    optional_numeric_partials: Optional[dict[str, RealNumber]]
+    _private: Optional[dict[str, dict[str, RealNumber]]]
 ) -> dict[str, RealNumber]:
-    if optional_numeric_partials is not None:
-        return optional_numeric_partials
+    if _private is not None and 'numeric_partials' in _private:
+        return _private['numeric_partials']
     else:
         return original_expression._numeric_partials(point)
