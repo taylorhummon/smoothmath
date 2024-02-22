@@ -12,8 +12,12 @@ class Exponential(base.ParameterizedUnaryExpression):
     """
     An exponential expression.
 
+    >>> from smoothmath.expression import Variable, Exponential
+    >>> Exponential(Variable("x"), base=2).at(3)
+    8
+
     :param inner: the exponent
-    :param base: the base, *as a real number*
+    :param base: the base, *as a positive real number*
     """
 
     def __init__(

@@ -14,8 +14,12 @@ class Logarithm(base.ParameterizedUnaryExpression):
     """
     A logarithmic expression.
 
+    >>> from smoothmath.expression import Variable, Logarithm
+    >>> Logarithm(Variable("x"), base=2).at(64)
+    6.0
+
     :param inner: the expression to take the logarithm of
-    :param base: the base, *as a real number*
+    :param base: the base, *as a positive real number*
     """
     def __init__(
         self: Logarithm,

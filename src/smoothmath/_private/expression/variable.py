@@ -17,6 +17,10 @@ class Variable(base.Expression):
     """
     A variable.
 
+    >>> from smoothmath.expression import Variable
+    >>> Variable("x")
+    Variable("x")
+
     :param name: the variable's name
     """
 

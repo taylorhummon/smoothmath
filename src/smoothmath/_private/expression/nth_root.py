@@ -13,8 +13,12 @@ class NthRoot(base.ParameterizedUnaryExpression):
     """
     The nth root of an expression.
 
+    >>> from smoothmath.expression import Variable, NthRoot
+    >>> NthRoot(Variable("x"), n=2).at(25)
+    5.0
+
     :param inner: the expression we are taking the nth root of
-    :param n: *must be an integer greater or equal to 1*; use n = 2 for square root
+    :param n: *must be an integer greater or equal to 1*
     """
 
     def __init__(

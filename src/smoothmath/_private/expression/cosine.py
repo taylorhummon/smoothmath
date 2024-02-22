@@ -11,6 +11,10 @@ class Cosine(base.UnaryExpression):
     """
     The cosine of an expression.
 
+    >>> from smoothmath.expression import Variable, Cosine
+    >>> Cosine(Variable("theta")).at(0)
+    1.0
+
     :param inner: an expression representing an angle in radians
     """
 

@@ -15,6 +15,11 @@ class Divide(base.BinaryExpression):
     """
     Division.
 
+    >>> from smoothmath import Point
+    >>> from smoothmath.expression import Variable, Divide
+    >>> Divide(Variable("x"), Variable("y")).at(Point(x=1, y=2))
+    0.5
+
     :param left: the numerator
     :param right: the denominator
     """

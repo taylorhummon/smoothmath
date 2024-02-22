@@ -14,6 +14,11 @@ class Minus(base.BinaryExpression):
     """
     Subtraction.
 
+    >>> from smoothmath import Point
+    >>> from smoothmath.expression import Variable, Minus
+    >>> Minus(Variable("x"), Variable("y")).at(Point(x=7, y=2))
+    5
+
     :param left: the expression being subtracted from
     :param right: the expression being subtracted
     """

@@ -12,6 +12,10 @@ class Reciprocal(base.UnaryExpression):
     """
     The reciprocal of an expression.
 
+    >>> from smoothmath.expression import Variable, Reciprocal
+    >>> Reciprocal(Variable("x")).at(10)
+    0.1
+
     :param inner: the expression we are taking the reciprocal of
     """
 

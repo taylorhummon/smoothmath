@@ -13,6 +13,10 @@ class Constant(base.Expression):
     """
     A constant expression.
 
+    >>> from smoothmath.expression import Constant
+    >>> Constant(11)
+    Constant(11)
+
     :param value: the real number value of the constant
     """
     def __init__(

@@ -17,6 +17,11 @@ class Power(base.BinaryExpression):
     """
     A power expression.
 
+    >>> from smoothmath import Point
+    >>> from smoothmath.expression import Variable, Power
+    >>> Power(Variable("x"), Variable("y")).at(Point(x=2, y=5))
+    32
+
     :param left: the base
     :param right: the exponent
     """
