@@ -13,12 +13,12 @@ def test_LocatedDifferential():
     z = Constant(4) * w + x * y ** 3
     point = Point(w = 7, x = 4, y = 5)
     located_differential = LocatedDifferential(z, point)
-    assert located_differential.part(w) == approx(4)
-    assert located_differential.part(x) == approx(125)
-    assert located_differential.part(y) == approx(300)
-    assert located_differential.part("w") == approx(4)
-    assert located_differential.part("x") == approx(125)
-    assert located_differential.part("y") == approx(300)
+    assert located_differential.component(w) == approx(4)
+    assert located_differential.component(x) == approx(125)
+    assert located_differential.component(y) == approx(300)
+    assert located_differential.component("w") == approx(4)
+    assert located_differential.component("x") == approx(125)
+    assert located_differential.component("y") == approx(300)
 
 
 def test_LocatedDifferential_raises():

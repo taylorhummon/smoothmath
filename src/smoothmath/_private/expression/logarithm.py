@@ -40,6 +40,11 @@ class Logarithm(base.ParameterizedUnaryExpression):
     ) -> float:
         return self._parameter
 
+    def _to_string(
+        self: Logarithm
+    ) -> str:
+        return f"Logarithm({self._inner}, base={self.base})"
+
     ## Evaluation ##
 
     def _verify_domain_constraints(

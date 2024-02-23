@@ -68,10 +68,10 @@ def test_Divide_with_constant_numerator_zero_doesnt_short_circuit():
         z.at(point)
     late_differential = Differential(z, compute_early = False)
     with raises(DomainError):
-        late_differential.part_at(y, point)
+        late_differential.component_at(y, point)
     early_differential = Differential(z, compute_early = True)
     with raises(DomainError):
-        early_differential.part_at(y, point)
+        early_differential.component_at(y, point)
     late_partial = Partial(z, y, compute_early = False)
     with raises(DomainError):
         late_partial.at(point)

@@ -42,6 +42,11 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> int:
         return self._parameter
 
+    def _to_string(
+        self: NthPower
+    ) -> str:
+        return f"NthPower({self._inner}, n={self.n})"
+
     ## Evaluation ##
 
     def _verify_domain_constraints(

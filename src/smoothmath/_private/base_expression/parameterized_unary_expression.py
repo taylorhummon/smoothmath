@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
+from abc import abstractmethod
 import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
@@ -38,9 +39,15 @@ class ParameterizedUnaryExpression(base.UnaryExpression):
     def __str__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{util.get_class_name(self)}({self._inner}, {self._parameter})"
+        return self._to_string()
 
     def __repr__(
         self: ParameterizedUnaryExpression
     ) -> str:
-        return f"{util.get_class_name(self)}({self._inner}, {self._parameter})"
+        return self._to_string()
+
+    @abstractmethod
+    def _to_string(
+        self: ParameterizedUnaryExpression
+    ) -> str:
+        raise Exception("Concrete classes derived from ParameterizedUnaryExpression must implement _to_string()")

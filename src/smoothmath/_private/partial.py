@@ -10,6 +10,11 @@ class Partial:
     """
     The partial derivative of an expression.
 
+    >>> from smoothmath import Partial
+    >>> from smoothmath.expression import Variable, Multiply
+    >>> Partial(Multiply(Variable("x"), Variable("y")), Variable("x"))
+    Partial(Multiply(Variable("x"), Variable("y")), Variable("x"))
+
     :param expression: an expression
     :param variable: the partial is taken with respect to this variable
     :param compute_early: whether to do extra work on initialization to have faster evaluation afterwards
@@ -37,7 +42,7 @@ class Partial:
         point: Point
     ) -> float:
         """
-        Evaluate the partial at a point.
+        Evaluates the partial at a point.
 
         :param point: where to evaluate the partial
         """
@@ -53,13 +58,11 @@ class Partial:
         self: Partial
     ) -> Expression:
         """
-        The partial written as an expression.
-        Sometimes referred to as the *synthetic partial*.
+        Writes the partial as an expression.
 
-        NOTE: Writing the partial as an expression may enlargen the domain.
-        For example, take ``z = Logarithm(Variable("x"))`` and so the partial as an expression is
-        ``Reciprocal(Variable("x"))``. This expression representing the partial is defined for
-        negative x values, but the honest partial is only defined at positive x values.
+        NOTE: Writing the partial as an expression may enlargen the domain. For example,
+        ``Partial(Logarithm(Variable("x")), Variable("x"))`` is not defined at negative numbers,
+        but as an expression, ``Reciprocal(Variable("x"))`` is defined at negative numbers.
         """
         if self._synthetic_partial is None:
             self._synthetic_partial = _retrieve_synthetic_partial(

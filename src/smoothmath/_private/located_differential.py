@@ -10,6 +10,11 @@ class LocatedDifferential:
     """
     The differential of an expression located at a point.
 
+    >>> from smoothmath import Point, LocatedDifferential
+    >>> from smoothmath.expression import Variable, Multiply
+    >>> LocatedDifferential(Multiply(Variable("x"), Variable("y")), Point(x=2, y=4))
+    LocatedDifferential(Multiply(Variable("x"), Variable("y")), Point(x=2, y=4))
+
     :param expression: an expression
     :param point: where to locate the differential
     """
@@ -27,16 +32,16 @@ class LocatedDifferential:
         self._numeric_partials: dict[str, float]
         self._numeric_partials = _initial_numeric_partials(expression, point, _private)
 
-    def part(
+    def component(
         self: LocatedDifferential,
         variable: Variable | str
     ) -> float:
         """
-        Retrieves a part of the differential.
+        Retrieves a component of the differential.
 
-        NOTE: The parts of the differential are the partials of the original expression.
+        NOTE: The components of the differential are the partials of the original expression.
 
-        :param variable: selects which part
+        :param variable: selects which component
         """
         variable_name = va.get_variable_name(variable)
         return self._numeric_partials.get(variable_name, 0)

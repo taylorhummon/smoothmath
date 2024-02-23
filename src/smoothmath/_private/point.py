@@ -8,16 +8,13 @@ if TYPE_CHECKING:
 
 class Point:
     """
-    A point. When constructing a point each keyword parameter is a variable name, and each
-    keyword argument is a real number. The order of parameters is ignored.
+    A point. Can have any number of coordinates.
 
     >>> from smoothmath import Point
     >>> Point(x=3, y=4.5)
     Point(x=3, y=4.5)
-    >>> Point(x=3, y=4.5) == Point(y=4.5, x=3)
-    True
 
-    :param \\*\\*kwargs: a real number for each variable name
+    :param \\*\\*kwargs: a real number for each coordinate name
     """
 
     def __init__(
@@ -32,9 +29,10 @@ class Point:
         variable: Variable | str
     ) -> float:
         """
-        A coordinate.
+        Retrieves a coordinate.
 
-        Raises :exc:`~smoothmath.CoordinateMissing` if the point has no entry for the variable.
+        Raises :exc:`~smoothmath.CoordinateMissing` if the point has no entry for
+        the coordinate name.
 
         >>> from smoothmath import Point
         >>> point = Point(x=3, y=4.5)

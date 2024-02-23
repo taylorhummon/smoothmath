@@ -52,8 +52,8 @@ class Expression(ABC):
         """
         Evaluates the expression at a point.
 
-        In order to use a float for the point parameter, the expression must only have a
-        single variable.
+        Will raise an exception if the point parameter is a float and the expression has more
+        than one variable.
 
         :param point: where to evaluate
         """

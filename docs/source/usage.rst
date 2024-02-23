@@ -137,8 +137,8 @@ Let's use a point to evaluate an expression that has two variables.
 
 Great! While we can only take the derivative when an expression has a single
 variable, we can take the :class:`~smoothmath.Differential` of an expression that
-has multiple variables. The differential has several *parts*, one for each variable.
-Each part of the differential is referred to as a *partial*.
+has multiple variables. The differential has several *components*, one for each
+variable. Each component of the differential is referred to as a *partial*.
 
 >>> from smoothmath import Differential, Point
 >>> from smoothmath.expression import Variable
@@ -146,12 +146,12 @@ Each part of the differential is referred to as a *partial*.
 >>> y = Variable("y")
 >>> z = x ** 2 + x * y - y ** 2
 >>> differential = Differential(z)
->>> x_partial = differential.part(x)
+>>> x_partial = differential.component(x)
 >>> x_partial.as_expression()
 Add(Multiply(Constant(2), Variable("x")), Variable("y"))
 >>> x_partial.at(Point(x=1, y=2))
 4.0
->>> y_partial = differential.part(y)
+>>> y_partial = differential.component(y)
 >>> y_partial.as_expression()
 Minus(Variable("x"), Multiply(Constant(2), Variable("y")))
 >>> y_partial.at(Point(x=1, y=2))
@@ -167,9 +167,9 @@ If we only need the differential at a single point, we can use a
 >>> z = x ** 2 + x * y - y ** 2
 >>> differential = Differential(z)
 >>> located_differential = differential.at(Point(x=1, y=2))
->>> located_differential.part(x)
+>>> located_differential.component(x)
 4.0
->>> located_differential.part(y)
+>>> located_differential.component(y)
 -3.0
 
 Taking a located differential is a fast way to compute partials for every variable all in one go.

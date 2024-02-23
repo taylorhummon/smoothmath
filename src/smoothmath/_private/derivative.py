@@ -11,8 +11,14 @@ class Derivative:
     """
     The derivative of an expression.
 
-    The expression must have only one variable. For alternatives that support multiple variables,
-    see the :class:`Differential`, :class:`Partial`, and :class:`LocatedDifferential` classes.
+    >>> from smoothmath import Derivative
+    >>> from smoothmath.expression import Variable, NthPower
+    >>> Derivative(NthPower(Variable("x"), n=2))
+    Derivative(NthPower(Variable("x"), n=2))
+
+    NOTE: The expression must have only one variable. For alternatives that support
+    expressions with multiple variables, see the :class:`Differential`, :class:`Partial`,
+    and :class:`LocatedDifferential` classes.
 
     :param expression: an expression with one variable
     :param compute_early: whether to do extra work on initialization to have faster evaluation afterwards
@@ -23,7 +29,10 @@ class Derivative:
         expression: Expression,
         compute_early: bool = False
     ) -> None:
-        exception_message = "Can only take the derivative of an expression with one variable. Consider a Differential, Partial, or LocatedDifferential instead."
+        exception_message = (
+            "Can only take the derivative of an expression with one variable. " +
+            "Consider a Differential, Partial, or LocatedDifferential instead."
+        )
         variable_name = be.get_the_single_variable_name(expression, exception_message)
         self._original_expression: Expression
         self._original_expression = expression
@@ -37,7 +46,7 @@ class Derivative:
         point: Point | float
     ) -> float:
         """
-        Evaluate the derivative.
+        Evaluates the derivative.
 
         :param point: where to evaluate the derivative
         """
@@ -49,13 +58,11 @@ class Derivative:
         self: Derivative
     ) -> Expression:
         """
-        The derivative written as an expression.
-        Sometimes referred to as the *synthetic derivative*.
+        Writes the derivative as an expression.
 
         NOTE: Writing the derivative as an expression may enlargen the domain.
-        For example, take ``z = Logarithm(Variable("x"))`` and so the derivative as an expression is
-        ``Reciprocal(Variable("x"))``. This expression representing the derivative is defined for
-        negative x values, but the honest derivative is only defined at positive x values.
+        For example, ``Derivative(Logarithm(Variable("x")))`` is not defined at negative numbers,
+        but as an expression, ``Reciprocal(Variable("x"))`` is defined at negative numbers.
         """
         return self._partial.as_expression()
 

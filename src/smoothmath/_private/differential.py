@@ -13,6 +13,11 @@ class Differential:
     """
     The differential of an expression.
 
+    >>> from smoothmath import Differential
+    >>> from smoothmath.expression import Variable, Multiply
+    >>> Differential(Multiply(Variable("x"), Variable("y")))
+    Differential(Multiply(Variable("x"), Variable("y")))
+
     :param expression: an expression
     :param compute_early: whether to do extra work on initialization to have faster evaluation afterwards
     """
@@ -27,16 +32,16 @@ class Differential:
         self._synthetic_partials: Optional[dict[str, Expression]]
         self._synthetic_partials = _initial_synthetic_partials(expression, compute_early)
 
-    def part(
+    def component(
         self: Differential,
         variable: Variable | str
     ) -> Partial:
         """
-        Retrieves a part of the differential.
+        Retrieves a component of the differential.
 
-        NOTE: The parts of the differential are the partials of the original expression.
+        NOTE: The components of the differential are the partials of the original expression.
 
-        :param variable: selects which part
+        :param variable: selects which component
         """
         if self._synthetic_partials is None:
             return pa.Partial(self._original_expression, variable)
@@ -66,18 +71,18 @@ class Differential:
         _private = { "numeric_partials": numeric_partials }
         return ld.LocatedDifferential(self._original_expression, point, _private = _private)
 
-    def part_at(
+    def component_at(
         self: Differential,
         variable: Variable | str,
         point: Point
     ) -> float:
         """
-        Retrieves a part of the differential and evaluates it at a point.
+        Retrieves a component of the differential and evaluates it at a point.
 
-        :param variable: selects which part
+        :param variable: selects which component
         :param point: where to evaluate
         """
-        return self.part(variable).at(point)
+        return self.component(variable).at(point)
 
     def __eq__(
         self: Differential,
