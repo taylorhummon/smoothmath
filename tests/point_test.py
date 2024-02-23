@@ -1,5 +1,5 @@
 from pytest import raises, fail
-from smoothmath import Point
+from smoothmath import CoordinateMissing, Point
 from smoothmath.expression import Variable
 from smoothmath._private.point import point_on_number_line
 
@@ -21,7 +21,7 @@ def test_Point():
 
 def test_Point_when_missing_a_variable():
     point = Point(x = 3)
-    with raises(Exception):
+    with raises(CoordinateMissing):
         point.coordinate(Variable("y"))
 
 

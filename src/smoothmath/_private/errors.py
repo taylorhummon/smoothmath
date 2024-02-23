@@ -7,3 +7,11 @@ class DomainError(Exception):
     """
 
     pass
+
+
+class CoordinateMissing(Exception):
+    """
+    Raised when a :class:`~smoothmath.Point` does not have a required coordinate.
+    """
+
+    pass

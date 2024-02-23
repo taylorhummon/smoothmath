@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Mapping
 import smoothmath._private.expression.variable as va
+import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath.expression import Variable
 
@@ -31,7 +32,9 @@ class Point:
         variable: Variable | str
     ) -> float:
         """
-        A coordinate. Raises an ``Exception`` if the variable is not present in the point.
+        A coordinate.
+
+        Raises :exc:`~smoothmath.CoordinateMissing` if the point has no entry for the variable.
 
         >>> from smoothmath import Point
         >>> point = Point(x=3, y=4.5)
@@ -45,7 +48,7 @@ class Point:
         variable_name = va.get_variable_name(variable)
         value = self._coordinates.get(variable_name, None)
         if value is None:
-            raise Exception(f"No value provided for variable: {variable_name}")
+            raise er.CoordinateMissing(f"Point has no coordinate for variable: {variable_name}")
         return value
 
     def __eq__(

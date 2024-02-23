@@ -5,6 +5,8 @@ smoothmath
 
 .. autoexception:: DomainError
 
+.. autoexception:: CoordinateMissing
+
 .. autoclass:: Point
     :members:
 
