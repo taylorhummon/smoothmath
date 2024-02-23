@@ -5,6 +5,7 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
+import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import Point, Expression
 
@@ -30,9 +31,9 @@ class NthPower(base.ParameterizedUnaryExpression):
         # even though that wouldn't pass type checking.
         i = util.integer_from_integral_float(n)
         if i is None:
-            raise Exception(f"NthPower() requires parameter n to be an int, found: {n}")
+            raise er.DomainError(f"NthPower() requires parameter n to be an int, found: {n}")
         elif i <= 0:
-            raise Exception(f"NthPower() requires parameter n to be positive, found: {i}")
+            raise er.DomainError(f"NthPower() requires parameter n to be positive, found: {i}")
         super().__init__(inner, i)
 
     @property

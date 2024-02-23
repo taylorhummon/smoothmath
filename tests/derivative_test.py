@@ -26,7 +26,7 @@ def test_Derivative_raises():
     y = Variable("y")
     z = x ** 2 + y ** 2
     with raises(Exception):
-        Derivative(z)
+        Derivative(z, compute_early = False)
     with raises(Exception):
         Derivative(z, compute_early = True)
 

@@ -87,7 +87,7 @@ def test_NthRoot_with_n_equal_one_composition():
 
 def test_NthRoot_with_n_equal_zero():
     x = Variable("x")
-    with raises(Exception):
+    with raises(DomainError):
         NthRoot(x, n = 0)
 
 

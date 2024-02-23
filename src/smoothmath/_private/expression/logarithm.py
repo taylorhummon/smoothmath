@@ -30,9 +30,9 @@ class Logarithm(base.ParameterizedUnaryExpression):
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
-            raise Exception("Logarithm(x) must have a positive base")
+            raise er.DomainError("Logarithm(x) must have a positive base")
         elif base == 1:
-            raise Exception("Logarithm(x) cannot have base = 1")
+            raise er.DomainError("Logarithm(x) cannot have base = 1")
 
     @property
     def base(

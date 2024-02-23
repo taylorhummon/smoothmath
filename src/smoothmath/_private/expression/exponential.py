@@ -4,6 +4,7 @@ import math
 import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
+import smoothmath._private.errors as er
 if TYPE_CHECKING:
     from smoothmath import Point, Expression
 
@@ -27,7 +28,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
-            raise Exception(f"Exponential(x) must have a positive base, found: {base}")
+            raise er.DomainError(f"Exponential(x) must have a positive base, found: {base}")
 
     @property
     def base(
