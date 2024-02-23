@@ -15,7 +15,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
     A logarithmic expression.
 
     >>> from smoothmath.expression import Variable, Logarithm
-    >>> Logarithm(Variable("x"), base=2).at(64)
+    >>> z = Logarithm(Variable("x"), base=2)
+    >>> z.at(64)
     6.0
 
     Will raise a :exc:`~smoothmath.DomainError` at zero or negative values.

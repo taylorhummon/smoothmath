@@ -14,7 +14,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
     The nth root of an expression.
 
     >>> from smoothmath.expression import Variable, NthRoot
-    >>> NthRoot(Variable("x"), n=2).at(25)
+    >>> z = NthRoot(Variable("x"), n=2)
+    >>> z.at(25)
     5.0
 
     Will raise a :exc:`~smoothmath.DomainError` at zero unless n is one.

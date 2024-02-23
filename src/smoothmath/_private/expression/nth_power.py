@@ -15,7 +15,8 @@ class NthPower(base.ParameterizedUnaryExpression):
     The nth power of an expression.
 
     >>> from smoothmath.expression import Variable, NthPower
-    >>> NthPower(Variable("x"), n=2).at(3)
+    >>> z = NthPower(Variable("x"), n=2)
+    >>> z.at(3)
     9.0
 
     :param inner: the expression being raised to the nth power

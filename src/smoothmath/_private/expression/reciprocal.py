@@ -13,7 +13,8 @@ class Reciprocal(base.UnaryExpression):
     The reciprocal of an expression.
 
     >>> from smoothmath.expression import Variable, Reciprocal
-    >>> Reciprocal(Variable("x")).at(10)
+    >>> z = Reciprocal(Variable("x"))
+    >>> z.at(10)
     0.1
 
     Taking the reciprocal of zero will raise a :exc:`~smoothmath.DomainError`.

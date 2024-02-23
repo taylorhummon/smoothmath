@@ -19,7 +19,8 @@ class Power(base.BinaryExpression):
 
     >>> from smoothmath import Point
     >>> from smoothmath.expression import Variable, Power
-    >>> Power(Variable("x"), Variable("y")).at(Point(x=2, y=5))
+    >>> z = Power(Variable("x"), Variable("y"))
+    >>> z.at(Point(x=2, y=5))
     32.0
 
     Will raise a :exc:`~smoothmath.DomainError` if the base is zero or negative.

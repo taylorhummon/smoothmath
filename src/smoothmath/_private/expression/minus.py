@@ -16,7 +16,8 @@ class Minus(base.BinaryExpression):
 
     >>> from smoothmath import Point
     >>> from smoothmath.expression import Variable, Minus
-    >>> Minus(Variable("x"), Variable("y")).at(Point(x=7, y=2))
+    >>> z = Minus(Variable("x"), Variable("y"))
+    >>> z.at(Point(x=7, y=2))
     5.0
 
     :param left: the expression being subtracted from

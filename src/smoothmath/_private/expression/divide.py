@@ -17,7 +17,8 @@ class Divide(base.BinaryExpression):
 
     >>> from smoothmath import Point
     >>> from smoothmath.expression import Variable, Divide
-    >>> Divide(Variable("x"), Variable("y")).at(Point(x=1, y=2))
+    >>> z = Divide(Variable("x"), Variable("y"))
+    >>> z.at(Point(x=1, y=2))
     0.5
 
     Dividing by zero will raise a :exc:`~smoothmath.DomainError`.

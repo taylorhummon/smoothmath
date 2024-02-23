@@ -12,7 +12,8 @@ class Sine(base.UnaryExpression):
     The sine of an expression.
 
     >>> from smoothmath.expression import Variable, Sine
-    >>> Sine(Variable("theta")).at(0)
+    >>> z = Sine(Variable("theta"))
+    >>> z.at(0)
     0.0
 
     :param inner: an expression representing an angle in radians

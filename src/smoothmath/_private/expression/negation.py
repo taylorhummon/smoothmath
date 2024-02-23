@@ -12,7 +12,8 @@ class Negation(base.UnaryExpression):
     The opposite (negative) of an expression.
 
     >>> from smoothmath.expression import Variable, Negation
-    >>> Negation(Variable("x")).at(7)
+    >>> z = Negation(Variable("x"))
+    >>> z.at(7)
     -7.0
 
     :param inner: the inner expression

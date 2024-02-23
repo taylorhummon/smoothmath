@@ -19,7 +19,8 @@ class Multiply(base.NAryExpression):
 
     >>> from smoothmath import Point
     >>> from smoothmath.expression import Variable, Multiply
-    >>> Multiply(Variable("w"), Variable("x"), Variable("y")).at(Point(w=1, x=2, y=3))
+    >>> z = Multiply(Variable("w"), Variable("x"), Variable("y"))
+    >>> z.at(Point(w=1, x=2, y=3))
     6.0
 
     :param \\*args: the expressions being multiplied together

@@ -14,7 +14,8 @@ class Exponential(base.ParameterizedUnaryExpression):
     An exponential expression.
 
     >>> from smoothmath.expression import Variable, Exponential
-    >>> Exponential(Variable("x"), base=2).at(3)
+    >>> z = Exponential(Variable("x"), base=2)
+    >>> z.at(3)
     8.0
 
     :param inner: the exponent
