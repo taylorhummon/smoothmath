@@ -13,7 +13,7 @@ class Negation(base.UnaryExpression):
 
     >>> from smoothmath.expression import Variable, Negation
     >>> Negation(Variable("x")).at(7)
-    -7
+    -7.0
 
     :param inner: the inner expression
     """

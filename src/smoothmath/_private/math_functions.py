@@ -10,26 +10,26 @@ if TYPE_CHECKING:
 def add(
     *args: RealNumber
 ) -> RealNumber:
-    return sum(args)
+    return float(sum(args))
 
 
 def minus(
     x: RealNumber,
     y: RealNumber
 ) -> RealNumber:
-    return x - y
+    return float(x - y)
 
 
 def negation(
     x: RealNumber
 ) -> RealNumber:
-    return - x
+    return float(- x)
 
 
 def multiply(
     *args: RealNumber
 ) -> RealNumber:
-    product = 1
+    product = 1.0
     for arg in args:
         if arg == 0:
             return 0
@@ -73,7 +73,7 @@ def power(
     elif x < 0:
         raise er.DomainError("power(x, y) is undefined for x < 0")
     else: # x > 0
-        return x ** y
+        return float(x ** y)
 
 
 def nth_power(
@@ -83,7 +83,7 @@ def nth_power(
     if n <= 0:
         raise er.DomainError(f"nth_power(x, n) is not defined for n = {n}")
     else:
-        return x ** n
+        return float(x ** n)
 
 
 def nth_root(
@@ -93,7 +93,7 @@ def nth_root(
     if n <= 0:
         raise er.DomainError(f"nth_root(x, n) is not defined for n = {n}")
     elif n == 1:
-        return x
+        return float(x)
     elif n == 2:
         if x > 0:
             return math.sqrt(x)
@@ -133,7 +133,7 @@ def exponential(
     if base <= 0:
         raise er.DomainError(f"exponential(x) must have a positive base, found: {base}")
     else:
-        return base ** x
+        return float(base ** x)
 
 
 def logarithm(

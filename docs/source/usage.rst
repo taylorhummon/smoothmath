@@ -55,9 +55,9 @@ expression? The simplest thing we can do is evaluate it using the
 >>> from smoothmath.expression import Variable, Constant
 >>> z = Constant(2) * Variable("x") + Constant(4)
 >>> z.at(3)
-10
+10.0
 >>> z.at(-2)
-0
+0.0
 
 
 Taking the derivative of an expression with one variable
@@ -74,9 +74,9 @@ Derivative(Minus(Power(Variable("x"), Constant(2)), Constant(1)))
 >>> d.as_expression()
 Multiply(Constant(2), Variable("x"))
 >>> d.at(1)
-2
+2.0
 >>> d.at(3)
-6
+6.0
 
 Just as before, smoothmath doesn't reduce by default. Instead, to reduce the
 derivative, we call the :meth:`~smoothmath.Derivative.as_expression` method.
@@ -133,7 +133,7 @@ Let's use a point to evaluate an expression that has two variables.
 >>> y = Variable("y")
 >>> z = x ** 2 + x * y - y ** 2
 >>> z.at(Point(x=3, y=2))
-11
+11.0
 
 Great! While we can only take the derivative when an expression has a single
 variable, we can take the :class:`~smoothmath.Differential` of an expression that
@@ -150,12 +150,12 @@ Each part of the differential is referred to as a *partial*.
 >>> x_partial.as_expression()
 Add(Multiply(Constant(2), Variable("x")), Variable("y"))
 >>> x_partial.at(Point(x=1, y=2))
-4
+4.0
 >>> y_partial = differential.part(y)
 >>> y_partial.as_expression()
 Minus(Variable("x"), Multiply(Constant(2), Variable("y")))
 >>> y_partial.at(Point(x=1, y=2))
--3
+-3.0
 
 If we only need the differential at a single point, we can use a
 :class:`~smoothmath.LocatedDifferential`.
@@ -168,8 +168,8 @@ If we only need the differential at a single point, we can use a
 >>> differential = Differential(z)
 >>> located_differential = differential.at(Point(x=1, y=2))
 >>> located_differential.part(x)
-4
+4.0
 >>> located_differential.part(y)
--3
+-3.0
 
 Taking a located differential is a fast way to compute partials for every variable all in one go.

@@ -15,7 +15,7 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     >>> from smoothmath.expression import Variable, NthPower
     >>> NthPower(Variable("x"), n=2).at(3)
-    9
+    9.0
 
     :param inner: the expression being raised to the nth power
     :param n: the exponent, *which must be an integer greater or equal to 1*

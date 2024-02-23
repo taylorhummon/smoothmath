@@ -10,6 +10,7 @@ from smoothmath._private.math_functions import (
 
 
 def test_add():
+    assert isinstance(add(4, 5), float)
     assert add(4, 5) == approx(9)
     assert add(4, 5, 6) == approx(15)
     assert add(4) == approx(4)
@@ -17,16 +18,19 @@ def test_add():
 
 
 def test_minus():
+    assert isinstance(minus(5, 2), float)
     assert minus(5, 2) == approx(3)
 
 
 def test_negation():
+    assert isinstance(negation(5), float)
     assert negation(5) == approx(-5)
     assert negation(-5) == approx(5)
     assert negation(0) == approx(0)
 
 
 def test_multiply():
+    assert isinstance(multiply(4, 5), float)
     assert multiply(4, 5) == approx(20)
     assert multiply(4, 5, 6) == approx(120)
     assert multiply(4, 0, 6) == approx(0)
@@ -35,6 +39,7 @@ def test_multiply():
 
 
 def test_divide():
+    assert isinstance(divide(6, 3), float)
     assert divide(6, 3) == approx(2)
     assert divide(1, 2) == approx(0.5)
     assert divide(0, 2) == approx(0)
@@ -45,6 +50,8 @@ def test_divide():
 
 
 def test_reciprocal():
+    assert isinstance(reciprocal(1), float)
+    assert reciprocal(1) == approx(1)
     assert reciprocal(2) == approx(0.5)
     assert reciprocal(0.5) == approx(2)
     assert reciprocal(-5) == approx(-0.2)
@@ -53,6 +60,7 @@ def test_reciprocal():
 
 
 def test_power():
+    assert isinstance(power(2, 3), float)
     assert power(2, 3) == approx(8)
     assert power(3, 2) == approx(9)
     assert power(9, 0.5) == approx(3)
@@ -68,6 +76,7 @@ def test_power():
 
 
 def test_nth_power():
+    assert isinstance(nth_power(3, 2), float)
     # n = -1
     with raises(DomainError):
         nth_power(3, -1)
@@ -92,6 +101,7 @@ def test_nth_power():
 
 
 def test_nth_root():
+    assert isinstance(nth_root(9, 2), float)
     # n = -1
     with raises(DomainError):
         nth_root(12, -1)
@@ -151,6 +161,7 @@ def test_nth_root():
 
 
 def test_exponential():
+    assert isinstance(exponential(3, base = 2), float)
     # base = -1
     with raises(DomainError):
         exponential(3, base = -1)
@@ -172,6 +183,7 @@ def test_exponential():
 
 
 def test_logarithm():
+    assert isinstance(logarithm(8, base = 2), float)
     # base = -1
     with raises(DomainError):
         logarithm(1, base = -1)
@@ -194,6 +206,7 @@ def test_logarithm():
 
 
 def test_cosine():
+    assert isinstance(cosine(0), float)
     assert cosine(math.tau) == approx(1)
     assert cosine(math.tau / 2) == approx(-1)
     assert cosine(math.tau / 4) == approx(0)
@@ -204,6 +217,7 @@ def test_cosine():
 
 
 def test_sine():
+    assert isinstance(sine(0), float)
     assert sine(math.tau) == approx(0)
     assert sine(math.tau / 2) == approx(0)
     assert sine(math.tau / 4) == approx(1)

@@ -20,7 +20,7 @@ class Add(base.NAryExpression):
     >>> from smoothmath import Point
     >>> from smoothmath.expression import Variable, Add
     >>> Add(Variable("w"), Variable("x"), Variable("y")).at(Point(w=1, x=2, y=3))
-    6
+    6.0
 
     :param \\*args: the expressions being added together
     """
