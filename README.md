@@ -13,8 +13,8 @@ pip install .
 
 ## Documentation ##
 
-Documentation on how to use smoothmath can be found at this project's github page.
-There you'll also find an API reference.
+You can see how to use smoothmath aand find an API reference at
+<a href="https://taylorhummon.github.io/smoothmath/">https://taylorhummon.github.io/smoothmath/</a>.
 
 
 ## Contributing ##
