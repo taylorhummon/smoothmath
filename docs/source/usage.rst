@@ -9,9 +9,10 @@ Basics of smoothmath expressions
 --------------------------------
 
 We use smoothmath expressions to represent numbers and mathematical functions.
-Let's start with something easy: adding two numbers. We can use the ``Constant``
-class to represent a number as an expression, and we represent addition using
-the ``Add`` class.
+Let's start with something easy: adding two numbers. We can use the
+:class:`~smoothmath.expression.Constant` class to represent a number as an
+expression, and we represent addition using the
+:class:`~smoothmath.expression.Add` class.
 
 >>> from smoothmath.expression import Constant, Add
 >>> Add(Constant(2), Constant(3))
@@ -19,10 +20,10 @@ Add(Constant(2), Constant(3))
 
 Notice that python just echoed back the expression we entered! Unlike the usual
 math operations built in to python, smoothmath expressions don't automatically
-reduce to numbers during program evaluation. It would get tiring to write ``Add``
-on the left all of the time, so smoothmath supports using the standard infix
-operators like the plus symbol. Under the hood, however, smoothmath always works with operators written like
-functions on the left.
+reduce to numbers during program evaluation. It would get tiring to write
+``Add()`` as a function on the left all of the time, so smoothmath supports using
+the standard infix operators like the plus symbol. Under the hood, however,
+smoothmath always works with operators written on the left.
 
 >>> from smoothmath.expression import Constant
 >>> Constant(2) + Constant(3)
@@ -35,8 +36,8 @@ Multiply(Constant(4), Constant(5))
 Power(Constant(2), Constant(5))
 
 Because smoothmath doesn't try to reduce expressions automatically, we can write
-expressions that have variables representing unknown values. Notice how differently
-this works from using the stardard python math operators.
+expressions that have variables representing unknown values. Notice how
+differently this works from using the stardard python math operators.
 
 >>> x + 4  # python gets upset because it doesn't have a value for x
 Traceback (most recent call last):
@@ -47,8 +48,9 @@ NameError: name 'x' is not defined
 Add(Variable("x"), Constant(4))
 
 You can get a full list of building blocks for making expressions from the
-smoothmath.expression module. But what can we do once the have an expression?
-The simplest thing we can do is evaluate it using the ``at()`` method!
+:mod:`smoothmath.expression` module. But what can we do once the have an
+expression? The simplest thing we can do is evaluate it using the
+:meth:`~smoothmath.Expression.at` method!
 
 >>> from smoothmath.expression import Variable, Constant
 >>> z = Constant(2) * Variable("x") + Constant(4)
@@ -76,40 +78,44 @@ Multiply(Constant(2), Variable("x"))
 >>> d.at(3)
 6
 
-Just as before, smoothmath doesn't reduce by default. Instead, to reduce the derivative,
-we call the ``as_expression()`` method. And we can call the ``at()`` method to evaulate
-the derivative for different ``x`` values.
+Just as before, smoothmath doesn't reduce by default. Instead, to reduce the
+derivative, we call the :meth:`~smoothmath.Derivative.as_expression` method.
+And we can call the :meth:`~smoothmath.Derivative.at` method to evaulate the
+derivative for different x values.
 
-Curiously, smoothmath does not actually need to compute the derivative as an expression in
-order to evaluate the derivative at ``x`` values. So we have a choice to make:
+Curiously, smoothmath does not actually need to compute the derivative as an
+expression in order to evaluate the derivative at x values. So we have a
+choice to make:
 
 >>> from smoothmath import Derivative
 >>> from smoothmath.expression import Variable, Constant
 >>> z = Variable("x") ** Constant(2) - Constant(1)
->>> d_late = Derivative(z)
+>>> d_late = Derivative(z, compute_early=False)
 >>> d_early = Derivative(z, compute_early=True)
 
-The "late derivative" ``d_late`` and the "early derivative" ``d_early`` behave identically:
-they give all the same answers when calling their methods. But they have different performance
-characteristics. If you only need to evaluate your derivative at a few ``x`` values, ``d_late``
-will be fast. But if you need to evaluate your derivative at many ``x`` vaules, ``d_early`` can
-give a performance boost by internally calculating the derivative as an expression.
+The "late derivative" ``d_late`` and the "early derivative" ``d_early`` behave
+identically: they give all the same answers when calling their methods. But
+they have different performance characteristics. If you only need to evaluate
+your derivative at a few x values, ``d_late`` will be fast. But if you need
+to evaluate your derivative at many x values, ``d_early`` can give a
+performance boost by internally calculating the derivative as an expression.
 
 
 Taking the differential of an expression with several variables
 ---------------------------------------------------------------
 
-Up until now, our expressions have only used a single variable, ``Variable("x")``. This makes
-things simple: we can evaluate and differentiate without needing to specify which variable
-we have in mind. To work with expressions with multiple variables, we'll need to be a little more
-careful, and we'll need to work with points.
+Up until now, our expressions have only used a single variable,
+``Variable("x")``. This makes things simple: we can evaluate and differentiate
+without needing to specify which variable we have in mind. To work with
+expressions with multiple variables, we'll need to be a little more careful,
+and we'll need to work with points.
 
 >>> from smoothmath import Point
 >>> Point(x=7, y=-2)
 Point(x=7, y=-2)
 
-When specifying a point, we use keyword arguments that name our variables. The order of the
-arguments does not matter, but the variable names do!
+When specifying a point, we use keyword arguments that name our variables. The
+order of the arguments does not matter, but the variable names do!
 
 >>> from smoothmath import Point
 >>> Point(x=7, y=-2) == Point(x=7, y=-2)
@@ -129,10 +135,10 @@ Let's use a point to evaluate an expression that has two variables.
 >>> z.at(Point(x=3, y=2))
 11
 
-Great! While we can only take the derivative when an expression has a single variable,
-we can take the *differential* of an expression that has multiple variables. The differential
-has several *parts*, one for each variable. Each part of the differential is referred to as a
-*partial*.
+Great! While we can only take the derivative when an expression has a single
+variable, we can take the :class:`~smoothmath.Differential` of an expression that
+has multiple variables. The differential has several *parts*, one for each variable.
+Each part of the differential is referred to as a *partial*.
 
 >>> from smoothmath import Differential, Point
 >>> from smoothmath.expression import Variable
@@ -151,7 +157,8 @@ Minus(Variable("x"), Multiply(Constant(2), Variable("y")))
 >>> y_partial.at(Point(x=1, y=2))
 -3
 
-If we only need the differential at a single point, we can use a *located differential*.
+If we only need the differential at a single point, we can use a
+:class:`~smoothmath.LocatedDifferential`.
 
 >>> from smoothmath import Differential, Point
 >>> from smoothmath.expression import Variable

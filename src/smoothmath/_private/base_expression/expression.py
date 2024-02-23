@@ -23,7 +23,7 @@ REDUCTION_STEPS_BOUND = 1000
 class Expression(ABC):
     """
     An abstract base class for all expresssions.
-    See the :doc:`expression` module for concrete expression classes.
+    See the :mod:`smoothmath.expression` module for concrete expression classes.
     """
 
     def __init__(

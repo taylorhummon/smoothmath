@@ -12,7 +12,7 @@ class Derivative:
     The derivative of an expression.
 
     The expression must have only one variable. For alternatives that support multiple variables,
-    see the Differential, Partial, and LocatedDifferential classes.
+    see the :class:`Differential`, :class:`Partial`, and :class:`LocatedDifferential` classes.
 
     :param expression: an expression with one variable
     :param compute_early: whether to do extra work on initialization to have faster evaluation afterwards

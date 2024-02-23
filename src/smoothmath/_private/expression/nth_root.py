@@ -17,8 +17,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
     >>> NthRoot(Variable("x"), n=2).at(25)
     5.0
 
-    Will raise a DomainError at zero unless n is one.
-    Will raise a DomainError for negative values if n is even.
+    Will raise a :exc:`~smoothmath.DomainError` at zero unless n is one.
+    Will raise a :exc:`~smoothmath.DomainError` for negative values if n is even.
 
     :param inner: the expression we are taking the nth root of
     :param n: *must be an integer greater or equal to 1*
