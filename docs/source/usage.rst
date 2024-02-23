@@ -66,39 +66,39 @@ Taking the derivative of an expression with one variable
 We can take the derivative of a smoothmath expression. Here's how:
 
 >>> from smoothmath import Derivative
->>> from smoothmath.expression import Variable, Constant
->>> z = Variable("x") ** Constant(2) - Constant(1)
->>> d = Derivative(z)
->>> d
-Derivative(Minus(Power(Variable("x"), Constant(2)), Constant(1)))
->>> d.as_expression()
-Multiply(Constant(2), Variable("x"))
->>> d.at(1)
-2.0
->>> d.at(3)
-6.0
+>>> from smoothmath.expression import Variable, NthPower
+>>> z = NthPower(Variable("x"), n=2) + Variable("x")
+>>> derivative = Derivative(z)
+>>> derivative
+Derivative(Add(NthPower(Variable("x"), n=2), Variable("x")))
+>>> derivative.as_expression()
+Add(Multiply(Constant(2), Variable("x")), Constant(1))
+>>> derivative.at(1)
+3.0
+>>> derivative.at(5)
+11.0
 
 Just as before, smoothmath doesn't reduce by default. Instead, to reduce the
 derivative, we call the :meth:`~smoothmath.Derivative.as_expression` method.
 And we can call the :meth:`~smoothmath.Derivative.at` method to evaulate the
 derivative for different x values.
 
-Curiously, smoothmath does not actually need to compute the derivative as an
-expression in order to evaluate the derivative at x values. So we have a
-choice to make:
+Curiously, while smoothmath can compute the derivative as an expression, it
+does not have to in order to evaluate the derivative at x values.
 
 >>> from smoothmath import Derivative
 >>> from smoothmath.expression import Variable, Constant
->>> z = Variable("x") ** Constant(2) - Constant(1)
->>> d_late = Derivative(z, compute_early=False)
->>> d_early = Derivative(z, compute_early=True)
+>>> z = NthPower(Variable("x"), n=2) + Variable("x")
+>>> early_derivative = Derivative(z, compute_early=True)
+>>> late_derivative = Derivative(z, compute_early=False)
 
-The "late derivative" ``d_late`` and the "early derivative" ``d_early`` behave
-identically: they give all the same answers when calling their methods. But
-they have different performance characteristics. If you only need to evaluate
-your derivative at a few x values, ``d_late`` will be fast. But if you need
-to evaluate your derivative at many x values, ``d_early`` can give a
-performance boost by internally calculating the derivative as an expression.
+The "early derivative" and "late derivative" behave identically: they give
+all the same answers when calling their methods. But they have different
+performance characteristics. If you only need to evaluate your derivative
+at a few x values, the late derivative will be fast. But if you need
+to evaluate your derivative at many x values, the early derivative can give a
+performance boost. By default, the derivative (and other ways of differentiating)
+do not compute early.
 
 
 Taking the differential of an expression with several variables
