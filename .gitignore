@@ -2,4 +2,5 @@
 **/.pytest_cache
 dist/**
 main.py
+ideas.txt
 docs/build/**
