@@ -3,10 +3,15 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import pathlib
+import sys
+sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 
 ### Project information
 
 project = 'smoothmath'
+version = '0.0.1'
+release = '0.0.1'
 copyright = '2024, Taylor Hummon'
 author = 'Taylor Hummon'
 
