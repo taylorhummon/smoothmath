@@ -4,7 +4,7 @@ import re
 import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
@@ -49,7 +49,7 @@ class Variable(base.Expression):
     def _evaluate(
         self: Variable,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         return point.coordinate(self.name)
 
     ## Partials ##
@@ -58,7 +58,7 @@ class Variable(base.Expression):
         self: Variable,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         if self.name == variable_name:
             return 1
         else:
@@ -76,7 +76,7 @@ class Variable(base.Expression):
     def _compute_numeric_partials(
         self: Variable,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         accumulator.add_to(self, multiplier)

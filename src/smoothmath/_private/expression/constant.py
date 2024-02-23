@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
@@ -21,10 +21,10 @@ class Constant(base.Expression):
     """
     def __init__(
         self: Constant,
-        value: RealNumber
+        value: float
     ) -> None:
         super().__init__(variable_names = set())
-        self.value: RealNumber
+        self.value: float
         self.value = value
 
     def _rebuild(
@@ -42,7 +42,7 @@ class Constant(base.Expression):
     def _evaluate(
         self: Constant,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         return self.value
 
     ## Partials ##
@@ -51,7 +51,7 @@ class Constant(base.Expression):
         self: Constant,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         return 0
 
     def _synthetic_partial(
@@ -63,7 +63,7 @@ class Constant(base.Expression):
     def _compute_numeric_partials(
         self: Constant,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         pass

@@ -4,7 +4,7 @@ import smoothmath._private.partial as pa
 import smoothmath._private.point as pt
 import smoothmath._private.base_expression.expression as be
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression, Partial
+    from smoothmath import Point, Expression, Partial
 
 
 class Derivative:
@@ -34,8 +34,8 @@ class Derivative:
 
     def at(
         self: Derivative,
-        point: Point | RealNumber
-    ) -> RealNumber:
+        point: Point | float
+    ) -> float:
         """
         Evaluate the derivative.
 

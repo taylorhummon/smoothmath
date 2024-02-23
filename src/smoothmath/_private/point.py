@@ -2,14 +2,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Mapping
 import smoothmath._private.expression.variable as va
 if TYPE_CHECKING:
-    from smoothmath import RealNumber
     from smoothmath.expression import Variable
 
 
 class Point:
     """
     A point. When constructing a point each keyword parameter is a variable name, and each
-    keyword argument is a real number. The order of keyword parameters is ignored.
+    keyword argument is a real number. The order of parameters is ignored.
 
     >>> from smoothmath import Point
     >>> Point(x=3, y=4.5)
@@ -22,15 +21,15 @@ class Point:
 
     def __init__(
         self: Point,
-        **kwargs: RealNumber
+        **kwargs: float
     ) -> None:
-        self._coordinates: Mapping[str, RealNumber]
+        self._coordinates: Mapping[str, float]
         self._coordinates = kwargs
 
     def coordinate(
         self: Point,
         variable: Variable | str
-    ) -> RealNumber:
+    ) -> float:
         """
         A coordinate. Raises an ``Exception`` if the variable is not present in the point.
 
@@ -86,6 +85,6 @@ class Point:
 
 def point_on_number_line(
     variable_name: str,
-    value: RealNumber
+    value: float
 ) -> Point:
     return Point(**({variable_name: value}))

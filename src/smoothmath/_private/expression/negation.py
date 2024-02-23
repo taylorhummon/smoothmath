@@ -4,7 +4,7 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class Negation(base.UnaryExpression):
@@ -22,14 +22,14 @@ class Negation(base.UnaryExpression):
 
     def _verify_domain_constraints(
         self: Negation,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         pass
 
     def _value_formula(
         self: Negation,
-        inner_value: RealNumber
-    ) -> RealNumber:
+        inner_value: float
+    ) -> float:
         return mf.negation(inner_value)
 
     ## Partials ##
@@ -37,8 +37,8 @@ class Negation(base.UnaryExpression):
     def _numeric_partial_formula(
         self: Negation,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         return mf.negation(multiplier)
 
     def _synthetic_partial_formula(

@@ -6,7 +6,7 @@ import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath.expression import Constant, Negation, Reciprocal, NthPower, NthRoot, Exponential
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
@@ -29,14 +29,14 @@ class Multiply(base.NAryExpression):
 
     def _verify_domain_constraints(
         self: Multiply,
-        *inner_values: RealNumber
+        *inner_values: float
     ) -> None:
         pass
 
     def _value_formula(
         self: Multiply,
-        *inner_values: RealNumber
-    ) -> RealNumber:
+        *inner_values: float
+    ) -> float:
         return mf.multiply(*inner_values)
 
     ## Partials ##
@@ -45,7 +45,7 @@ class Multiply(base.NAryExpression):
         self: Multiply,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         inner_values = [inner._evaluate(point) for inner in self._inners]
         return mf.add(*(
             mf.multiply(
@@ -70,7 +70,7 @@ class Multiply(base.NAryExpression):
     def _compute_numeric_partials(
         self: Multiply,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         inner_values = [inner._evaluate(point) for inner in self._inners]

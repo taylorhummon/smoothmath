@@ -5,7 +5,7 @@ import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.errors as er
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
@@ -30,8 +30,8 @@ class Divide(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Divide,
-        left_value: RealNumber,
-        right_value: RealNumber
+        left_value: float,
+        right_value: float
     ) -> None:
         if right_value == 0:
             if left_value == 0:
@@ -41,9 +41,9 @@ class Divide(base.BinaryExpression):
 
     def _value_formula(
         self: Divide,
-        left_value: RealNumber,
-        right_value: RealNumber
-    ) -> RealNumber:
+        left_value: float,
+        right_value: float
+    ) -> float:
         return mf.divide(left_value, right_value)
 
     ## Partials ##
@@ -52,7 +52,7 @@ class Divide(base.BinaryExpression):
         self: Divide,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         self._verify_domain_constraints(left_value, right_value)
@@ -77,7 +77,7 @@ class Divide(base.BinaryExpression):
     def _compute_numeric_partials(
         self: Divide,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         left_value = self._left._evaluate(point)
@@ -101,8 +101,8 @@ class Divide(base.BinaryExpression):
     def _numeric_partial_formula_left(
         self: Divide,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         right_value = self._right._evaluate(point)
         return mf.divide(multiplier, right_value)
 
@@ -115,8 +115,8 @@ class Divide(base.BinaryExpression):
     def _numeric_partial_formula_right(
         self: Divide,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         return mf.multiply(

@@ -3,7 +3,7 @@ from smoothmath.expression import Variable, Constant
 from smoothmath._private.utilities import (
     get_class_name,
     is_integer,
-    integer_from_integral_real_number,
+    integer_from_integral_float,
     is_even,
     is_odd,
     list_without_entry_at,
@@ -33,16 +33,16 @@ def test_is_integer():
     assert is_integer(math.nan) == False
 
 
-def test_integer_from_integral_real_number():
-    assert integer_from_integral_real_number(3) == 3
-    assert integer_from_integral_real_number(3.0) == 3
-    assert integer_from_integral_real_number(3.7) == None
-    assert integer_from_integral_real_number("3") == None # type: ignore
-    assert integer_from_integral_real_number(0.0) == 0
-    assert integer_from_integral_real_number(-0.0) == 0
-    assert integer_from_integral_real_number(math.inf) == None
-    assert integer_from_integral_real_number(-math.inf) == None
-    assert integer_from_integral_real_number(math.nan) == None
+def test_integer_from_integral_float():
+    assert integer_from_integral_float(3) == 3
+    assert integer_from_integral_float(3.0) == 3
+    assert integer_from_integral_float(3.7) == None
+    assert integer_from_integral_float("3") == None # type: ignore
+    assert integer_from_integral_float(0.0) == 0
+    assert integer_from_integral_float(-0.0) == 0
+    assert integer_from_integral_float(math.inf) == None
+    assert integer_from_integral_float(-math.inf) == None
+    assert integer_from_integral_float(math.nan) == None
 
 
 def test_is_even():

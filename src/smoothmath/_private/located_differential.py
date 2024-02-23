@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Optional
 import smoothmath._private.expression.variable as va
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath.expression import Variable
 
 
@@ -18,19 +18,19 @@ class LocatedDifferential:
         self: LocatedDifferential,
         expression: Expression,
         point: Point,
-        _private: Optional[dict[str, dict[str, RealNumber]]] = None
+        _private: Optional[dict[str, dict[str, float]]] = None
     ) -> None:
         self._original_expression: Expression
         self._original_expression = expression
         self._point: Point
         self._point = point
-        self._numeric_partials: dict[str, RealNumber]
+        self._numeric_partials: dict[str, float]
         self._numeric_partials = _initial_numeric_partials(expression, point, _private)
 
     def part(
         self: LocatedDifferential,
         variable: Variable | str
-    ) -> RealNumber:
+    ) -> float:
         """
         Retrieves a part of the differential.
 
@@ -75,8 +75,8 @@ class LocatedDifferential:
 def _initial_numeric_partials(
     original_expression: Expression,
     point: Point,
-    _private: Optional[dict[str, dict[str, RealNumber]]]
-) -> dict[str, RealNumber]:
+    _private: Optional[dict[str, dict[str, float]]]
+) -> dict[str, float]:
     if _private is not None and 'numeric_partials' in _private:
         return _private['numeric_partials']
     else:

@@ -4,7 +4,7 @@ from abc import abstractmethod
 import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
@@ -20,7 +20,7 @@ class UnaryExpression(base.Expression):
         super().__init__(inner._variable_names)
         self._inner: Expression
         self._inner = inner
-        self._value: Optional[RealNumber]
+        self._value: Optional[float]
         self._value = None
 
     def _rebuild(
@@ -40,7 +40,7 @@ class UnaryExpression(base.Expression):
     def _evaluate(
         self: UnaryExpression,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         if self._value is not None:
             return self._value
         inner_value = self._inner._evaluate(point)
@@ -51,15 +51,15 @@ class UnaryExpression(base.Expression):
     @abstractmethod
     def _verify_domain_constraints(
         self: UnaryExpression,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         raise Exception("Concrete classes derived from UnaryExpression must implement _verify_domain_constraints()")
 
     @abstractmethod
     def _value_formula(
         self: UnaryExpression,
-        inner_value: RealNumber
-    ) -> RealNumber:
+        inner_value: float
+    ) -> float:
         raise Exception("Concrete classes derived from UnaryExpression must implement _value_formula()")
 
     ## Partials ##
@@ -68,7 +68,7 @@ class UnaryExpression(base.Expression):
         self: UnaryExpression,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         inner_value = self._inner._evaluate(point)
         self._verify_domain_constraints(inner_value)
         inner_partial = self._inner._numeric_partial(variable_name, point)
@@ -84,7 +84,7 @@ class UnaryExpression(base.Expression):
     def _compute_numeric_partials(
         self: UnaryExpression,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         inner_value = self._inner._evaluate(point)
@@ -104,8 +104,8 @@ class UnaryExpression(base.Expression):
     def _numeric_partial_formula(
         self: UnaryExpression,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         raise Exception("Concrete classes derived from UnaryExpression must implement _numeric_partial_formula()")
 
     @abstractmethod

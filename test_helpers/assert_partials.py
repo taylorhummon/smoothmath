@@ -1,5 +1,5 @@
 from pytest import approx, raises
-from smoothmath import DomainError, RealNumber, Point, Expression
+from smoothmath import DomainError, Point, Expression
 from smoothmath.expression import Variable
 import smoothmath._private.expression.variable as va
 
@@ -8,7 +8,7 @@ def assert_1_ary_partials(
     expression: Expression,
     point: Point,
     variable: Variable,
-    expected: RealNumber
+    expected: float
 ) -> None:
     variable_name = va.get_variable_name(variable)
     assert expression._numeric_partial(variable_name, point) == approx(expected)
@@ -33,9 +33,9 @@ def assert_2_ary_partials(
     expression: Expression,
     point: Point,
     variable_a: Variable,
-    expected_a: RealNumber,
+    expected_a: float,
     variable_b: Variable,
-    expected_b: RealNumber
+    expected_b: float
 ) -> None:
     variable_name_a = va.get_variable_name(variable_a)
     variable_name_b = va.get_variable_name(variable_b)
@@ -71,11 +71,11 @@ def assert_3_ary_partials(
     expression: Expression,
     point: Point,
     variable_a: Variable,
-    expected_a: RealNumber,
+    expected_a: float,
     variable_b: Variable,
-    expected_b: RealNumber,
+    expected_b: float,
     variable_c: Variable,
-    expected_c: RealNumber
+    expected_c: float
 ) -> None:
     variable_name_a = va.get_variable_name(variable_a)
     variable_name_b = va.get_variable_name(variable_b)

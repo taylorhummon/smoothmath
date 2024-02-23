@@ -7,7 +7,7 @@ import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
 import smoothmath._private.errors as er
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class Logarithm(base.ParameterizedUnaryExpression):
@@ -26,7 +26,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
     def __init__(
         self: Logarithm,
         inner: Expression,
-        base: RealNumber = math.e
+        base: float = math.e
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
@@ -37,14 +37,14 @@ class Logarithm(base.ParameterizedUnaryExpression):
     @property
     def base(
         self: Logarithm
-    ) -> RealNumber:
+    ) -> float:
         return self._parameter
 
     ## Evaluation ##
 
     def _verify_domain_constraints(
         self: Logarithm,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         if inner_value == 0:
             raise er.DomainError("Logarithm(x) blows up around x = 0")
@@ -53,7 +53,7 @@ class Logarithm(base.ParameterizedUnaryExpression):
 
     def _value_formula(
         self: Logarithm,
-        inner_value: RealNumber
+        inner_value: float
     ):
         return mf.logarithm(inner_value, base = self.base)
 
@@ -62,8 +62,8 @@ class Logarithm(base.ParameterizedUnaryExpression):
     def _numeric_partial_formula(
         self: Logarithm,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         inner_value = self._inner._evaluate(point)
         if self.base == math.e:
             return mf.divide(multiplier, inner_value)

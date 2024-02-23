@@ -5,7 +5,7 @@ import smoothmath._private.located_differential as ld
 import smoothmath._private.expression.variable as va
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression, Partial, LocatedDifferential
+    from smoothmath import Point, Expression, Partial, LocatedDifferential
     from smoothmath.expression import Variable
 
 
@@ -70,7 +70,7 @@ class Differential:
         self: Differential,
         variable: Variable | str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         """
         Retrieves a part of the differential and evaluates it at a point.
 

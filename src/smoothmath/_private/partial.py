@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Optional
 import smoothmath._private.expression.variable as va
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath.expression import Variable
 
 
@@ -35,7 +35,7 @@ class Partial:
     def at(
         self: Partial,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         """
         Evaluate the partial at a point.
 

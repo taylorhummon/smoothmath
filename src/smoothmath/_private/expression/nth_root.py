@@ -6,7 +6,7 @@ import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
 import smoothmath._private.errors as er
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class NthRoot(base.ParameterizedUnaryExpression):
@@ -31,7 +31,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
     ) -> None:
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
         # even though that wouldn't pass type checking.
-        i = util.integer_from_integral_real_number(n)
+        i = util.integer_from_integral_float(n)
         if i is None:
             raise Exception(f"NthRoot() requires parameter n to be an int, found: {n}")
         elif i <= 0:
@@ -48,7 +48,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: NthRoot,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         if self.n >= 2 and inner_value == 0:
             raise er.DomainError(f"NthRoot(x, n) is not defined at x = 0 when n = {self.n}")
@@ -57,7 +57,7 @@ class NthRoot(base.ParameterizedUnaryExpression):
 
     def _value_formula(
         self: NthRoot,
-        inner_value: RealNumber
+        inner_value: float
     ):
         return mf.nth_root(inner_value, self.n)
 
@@ -66,8 +66,8 @@ class NthRoot(base.ParameterizedUnaryExpression):
     def _numeric_partial_formula(
         self: NthRoot,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         n = self.n
         if n == 1:
             return multiplier

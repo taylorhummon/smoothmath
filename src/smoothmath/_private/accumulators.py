@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Iterable
 import smoothmath._private.expression.variable as va
 import smoothmath._private.expression as ex
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Expression
+    from smoothmath import Expression
     from smoothmath.expression import Variable
 
 
@@ -11,13 +11,13 @@ class NumericPartialsAccumulator:
     def __init__(
         self: NumericPartialsAccumulator
     ) -> None:
-        self._numeric_partials: dict[str, RealNumber]
+        self._numeric_partials: dict[str, float]
         self._numeric_partials = {}
 
     def add_to(
         self: NumericPartialsAccumulator,
         variable: Variable | str,
-        contribution: RealNumber
+        contribution: float
     ) -> None:
         variable_name = va.get_variable_name(variable)
         existing = self._numeric_partials.get(variable_name, 0)
@@ -26,8 +26,8 @@ class NumericPartialsAccumulator:
     def numeric_partials_for(
         self: NumericPartialsAccumulator,
         variable_names: Iterable[str]
-    ) -> dict[str, RealNumber]:
-        results: dict[str, RealNumber]
+    ) -> dict[str, float]:
+        results: dict[str, float]
         results = {}
         for variable_name in variable_names:
             results[variable_name] = self._numeric_partials.get(variable_name, 0)

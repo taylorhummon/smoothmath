@@ -5,8 +5,6 @@ smoothmath
 
 .. autoexception:: DomainError
 
-.. autodata:: RealNumber
-
 .. autoclass:: Point
     :members:
 

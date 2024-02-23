@@ -4,7 +4,7 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class Sine(base.UnaryExpression):
@@ -22,14 +22,14 @@ class Sine(base.UnaryExpression):
 
     def _verify_domain_constraints(
         self: Sine,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         pass
 
     def _value_formula(
         self: Sine,
-        inner_value: RealNumber
-    ) -> RealNumber:
+        inner_value: float
+    ) -> float:
         return mf.sine(inner_value)
 
     ## Partials ##
@@ -37,8 +37,8 @@ class Sine(base.UnaryExpression):
     def _numeric_partial_formula(
         self: Sine,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         inner_value = self._inner._evaluate(point)
         return mf.multiply(mf.cosine(inner_value), multiplier)
 

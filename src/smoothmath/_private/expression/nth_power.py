@@ -6,7 +6,7 @@ import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class NthPower(base.ParameterizedUnaryExpression):
@@ -28,7 +28,7 @@ class NthPower(base.ParameterizedUnaryExpression):
     ) -> None:
         # We want to allow a user to pass a float representation of an integer (e.g. 3.0)
         # even though that wouldn't pass type checking.
-        i = util.integer_from_integral_real_number(n)
+        i = util.integer_from_integral_float(n)
         if i is None:
             raise Exception(f"NthPower() requires parameter n to be an int, found: {n}")
         elif i <= 0:
@@ -45,13 +45,13 @@ class NthPower(base.ParameterizedUnaryExpression):
 
     def _verify_domain_constraints(
         self: NthPower,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         pass
 
     def _value_formula(
         self: NthPower,
-        inner_value: RealNumber
+        inner_value: float
     ):
         return mf.nth_power(inner_value, self.n)
 
@@ -60,8 +60,8 @@ class NthPower(base.ParameterizedUnaryExpression):
     def _numeric_partial_formula(
         self: NthPower,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         n = self.n
         if n == 1:
             return multiplier

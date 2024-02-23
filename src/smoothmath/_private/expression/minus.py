@@ -4,7 +4,7 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
@@ -27,16 +27,16 @@ class Minus(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Minus,
-        left_value: RealNumber,
-        right_value: RealNumber
+        left_value: float,
+        right_value: float
     ) -> None:
         pass
 
     def _value_formula(
         self: Minus,
-        left_value: RealNumber,
-        right_value: RealNumber
-    ) -> RealNumber:
+        left_value: float,
+        right_value: float
+    ) -> float:
         return mf.minus(left_value, right_value)
 
     ## Partials ##
@@ -45,7 +45,7 @@ class Minus(base.BinaryExpression):
         self: Minus,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         left_partial = self._left._numeric_partial(variable_name, point)
         right_partial = self._right._numeric_partial(variable_name, point)
         return mf.minus(left_partial, right_partial)
@@ -61,7 +61,7 @@ class Minus(base.BinaryExpression):
     def _compute_numeric_partials(
         self: Minus,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         self._left._compute_numeric_partials(accumulator, multiplier, point)

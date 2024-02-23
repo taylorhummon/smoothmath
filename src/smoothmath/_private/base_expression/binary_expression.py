@@ -4,7 +4,7 @@ from abc import abstractmethod
 import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class BinaryExpression(base.Expression):
@@ -23,7 +23,7 @@ class BinaryExpression(base.Expression):
         self._left = left
         self._right: Expression
         self._right = right
-        self._value: Optional[RealNumber]
+        self._value: Optional[float]
         self._value = None
 
     def _rebuild(
@@ -45,7 +45,7 @@ class BinaryExpression(base.Expression):
     def _evaluate(
         self: BinaryExpression,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         if self._value is not None:
             return self._value
         left_value = self._left._evaluate(point)
@@ -57,17 +57,17 @@ class BinaryExpression(base.Expression):
     @abstractmethod
     def _verify_domain_constraints(
         self: BinaryExpression,
-        left_value: RealNumber,
-        right_value: RealNumber
+        left_value: float,
+        right_value: float
     ) -> None:
         raise Exception("Concrete classes derived from BinaryExpression must implement _verify_domain_constraints()")
 
     @abstractmethod
     def _value_formula(
         self: BinaryExpression,
-        left_value: RealNumber,
-        right_value: RealNumber
-    ) -> RealNumber:
+        left_value: float,
+        right_value: float
+    ) -> float:
         raise Exception("Concrete classes derived from BinaryExpression must implement _value_formula()")
 
     ## Normalization and Reduction ##

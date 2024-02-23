@@ -5,7 +5,7 @@ import smoothmath._private.base_expression as base
 import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class Exponential(base.ParameterizedUnaryExpression):
@@ -23,7 +23,7 @@ class Exponential(base.ParameterizedUnaryExpression):
     def __init__(
         self: Exponential,
         inner: Expression,
-        base: RealNumber = math.e
+        base: float = math.e
     ) -> None:
         super().__init__(inner, base)
         if base <= 0:
@@ -32,20 +32,20 @@ class Exponential(base.ParameterizedUnaryExpression):
     @property
     def base(
         self: Exponential
-    ) -> RealNumber:
+    ) -> float:
         return self._parameter
 
     ## Evaluation ##
 
     def _verify_domain_constraints(
         self: Exponential,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         pass
 
     def _value_formula(
         self: Exponential,
-        inner_value: RealNumber
+        inner_value: float
     ):
         return mf.exponential(inner_value, base = self.base)
 
@@ -54,8 +54,8 @@ class Exponential(base.ParameterizedUnaryExpression):
     def _numeric_partial_formula(
         self: Exponential,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         if self.base == 1:
             return 0
         self_value = self._evaluate(point)

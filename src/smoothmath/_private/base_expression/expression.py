@@ -8,7 +8,7 @@ import smoothmath._private.expression as ex
 import smoothmath._private.accumulators as acc
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point
+    from smoothmath import Point
     from smoothmath.expression import (
         Add, Minus, Negation, Multiply, Divide, Power, NthPower
     )
@@ -47,12 +47,12 @@ class Expression(ABC):
 
     def at(
         self: Expression,
-        point: Point | RealNumber
-    ) -> RealNumber:
+        point: Point | float
+    ) -> float:
         """
         Evaluates the expression at a point.
 
-        In order to use a real number for the point parameter, the expression must only have a
+        In order to use a float for the point parameter, the expression must only have a
         single variable.
 
         :param point: where to evaluate
@@ -60,8 +60,8 @@ class Expression(ABC):
         if isinstance(point, pt.Point):
             self._reset_evaluation_cache()
             return self._evaluate(point)
-        else: # point is a real number
-            exception_message = "Can only evaluate at a real number for an expression with one variable. Consider passing a point instead."
+        else: # point is a float
+            exception_message = "Can only evaluate using a number for an expression with one variable. Consider passing a Point() instead."
             variable_name = get_the_single_variable_name(self, exception_message)
             point = pt.point_on_number_line(variable_name, point)
             self._reset_evaluation_cache()
@@ -77,7 +77,7 @@ class Expression(ABC):
     def _evaluate(
         self: Expression,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         raise Exception("Concrete classes derived from Expression must implement _evaluate()")
 
     ## Partials ##
@@ -87,7 +87,7 @@ class Expression(ABC):
         self: Expression,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         raise Exception("Concrete classes derived from Expression must implement _numeric_partial()")
 
     @abstractmethod
@@ -100,7 +100,7 @@ class Expression(ABC):
     def _numeric_partials(
         self: Expression,
         point: Point
-    ) -> dict[str, RealNumber]:
+    ) -> dict[str, float]:
         accumulator = acc.NumericPartialsAccumulator()
         self._reset_evaluation_cache()
         self._compute_numeric_partials(accumulator, 1, point)
@@ -110,7 +110,7 @@ class Expression(ABC):
     def _compute_numeric_partials(
         self: Expression,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None: # instead of returning a value, we mutate the accumulator argument
         raise Exception("Concrete classes derived from Expression must implement _compute_numeric_partials()")
@@ -227,7 +227,7 @@ class Expression(ABC):
             return ex.Power(self, exponent)
         # We want to accept a float representation of an integer (e.g. 3.0) even though
         # that wouldn't pass type checking.
-        n = util.integer_from_integral_real_number(exponent)
+        n = util.integer_from_integral_float(exponent)
         if isinstance(n, int):
             return ex.NthPower(self, n)
         raise Exception(f"Expected exponent to be an Expression or int, found: {exponent}")

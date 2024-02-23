@@ -6,7 +6,7 @@ import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath.expression import Constant, Negation, Logarithm
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
@@ -29,14 +29,14 @@ class Add(base.NAryExpression):
 
     def _verify_domain_constraints(
         self: Add,
-        *inner_values: RealNumber
+        *inner_values: float
     ) -> None:
         pass
 
     def _value_formula(
         self: Add,
-        *inner_values: RealNumber
-    ) -> RealNumber:
+        *inner_values: float
+    ) -> float:
         return mf.add(*inner_values)
 
     ## Partials ##
@@ -45,7 +45,7 @@ class Add(base.NAryExpression):
         self: Add,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         return mf.add(*(
             inner._numeric_partial(variable_name, point)
             for inner in self._inners
@@ -63,7 +63,7 @@ class Add(base.NAryExpression):
     def _compute_numeric_partials(
         self: Add,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         for inner in self._inners:

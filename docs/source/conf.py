@@ -35,6 +35,3 @@ html_theme_options = {
 autodoc_member_order = 'bysource'
 autodoc_typehints = 'description'
 autodoc_typehints_description_target = 'documented_params'
-autodoc_type_aliases = {
-    'RealNumber': 'smoothmath.RealNumber',
-}

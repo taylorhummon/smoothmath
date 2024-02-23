@@ -7,7 +7,7 @@ import smoothmath._private.utilities as util
 import smoothmath._private.math_functions as mf
 import smoothmath._private.errors as er
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
     from smoothmath._private.accumulators import (
         NumericPartialsAccumulator, SyntheticPartialsAccumulator
     )
@@ -33,8 +33,8 @@ class Power(base.BinaryExpression):
 
     def _verify_domain_constraints(
         self: Power,
-        left_value: RealNumber,
-        right_value: RealNumber
+        left_value: float,
+        right_value: float
     ) -> None:
         if left_value == 0:
             if right_value > 0:
@@ -48,9 +48,9 @@ class Power(base.BinaryExpression):
 
     def _value_formula(
         self: Power,
-        left_value: RealNumber,
-        right_value: RealNumber
-    ) -> RealNumber:
+        left_value: float,
+        right_value: float
+    ) -> float:
         return mf.power(left_value, right_value)
 
     ## Partials ##
@@ -59,7 +59,7 @@ class Power(base.BinaryExpression):
         self: Power,
         variable_name: str,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         if (not self._left._variable_names) and self._left._evaluate(point) == 1:
             # If we find something like `Constant(1) ** Whatever`, we can short-circuit.
             return 0
@@ -88,7 +88,7 @@ class Power(base.BinaryExpression):
     def _compute_numeric_partials(
         self: Power,
         accumulator: NumericPartialsAccumulator,
-        multiplier: RealNumber,
+        multiplier: float,
         point: Point
     ) -> None:
         if (not self._left._variable_names) and self._left._evaluate(point) == 1:
@@ -116,8 +116,8 @@ class Power(base.BinaryExpression):
     def _numeric_partial_formula_left(
         self: Power,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         left_value = self._left._evaluate(point)
         right_value = self._right._evaluate(point)
         return mf.multiply(
@@ -145,8 +145,8 @@ class Power(base.BinaryExpression):
     def _numeric_partial_formula_right(
         self: Power,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         left_value = self._left._evaluate(point)
         self_value = self._evaluate(point)
         return mf.multiply(mf.logarithm(left_value, base = math.e), self_value, multiplier)
@@ -210,7 +210,7 @@ class Power(base.BinaryExpression):
         self: Power
     ) -> Optional[Expression]:
         if isinstance(self._right, ex.Constant):
-            n = util.integer_from_integral_real_number(self._right.value)
+            n = util.integer_from_integral_float(self._right.value)
             if n is not None and n >= 2:
                 return ex.NthPower(self._left, n)
         return None

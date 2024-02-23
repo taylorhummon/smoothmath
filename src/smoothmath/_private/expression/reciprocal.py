@@ -5,7 +5,7 @@ import smoothmath._private.expression as ex
 import smoothmath._private.math_functions as mf
 import smoothmath._private.errors as er
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class Reciprocal(base.UnaryExpression):
@@ -25,14 +25,14 @@ class Reciprocal(base.UnaryExpression):
 
     def _verify_domain_constraints(
         self: Reciprocal,
-        inner_value: RealNumber
+        inner_value: float
     ) -> None:
         if inner_value == 0:
             raise er.DomainError("Reciprocal(x) blows up around x = 0")
 
     def _value_formula(
         self: Reciprocal,
-        inner_value: RealNumber
+        inner_value: float
     ):
         return mf.reciprocal(inner_value)
 
@@ -41,8 +41,8 @@ class Reciprocal(base.UnaryExpression):
     def _numeric_partial_formula(
         self: Reciprocal,
         point: Point,
-        multiplier: RealNumber
-    ) -> RealNumber:
+        multiplier: float
+    ) -> float:
         inner_value = self._inner._evaluate(point)
         return mf.negation(mf.divide(multiplier, mf.nth_power(inner_value, n = 2)))
 

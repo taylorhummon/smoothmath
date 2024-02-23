@@ -4,7 +4,7 @@ from abc import abstractmethod
 import smoothmath._private.base_expression as base
 import smoothmath._private.utilities as util
 if TYPE_CHECKING:
-    from smoothmath import RealNumber, Point, Expression
+    from smoothmath import Point, Expression
 
 
 class NAryExpression(base.Expression):
@@ -19,7 +19,7 @@ class NAryExpression(base.Expression):
         super().__init__(variable_names)
         self._inners: list[Expression]
         self._inners = list(args)
-        self._value: Optional[RealNumber]
+        self._value: Optional[float]
         self._value = None
 
     def _rebuild(
@@ -40,7 +40,7 @@ class NAryExpression(base.Expression):
     def _evaluate(
         self: NAryExpression,
         point: Point
-    ) -> RealNumber:
+    ) -> float:
         if self._value is not None:
             return self._value
         inner_values = [inner._evaluate(point) for inner in self._inners]
@@ -51,15 +51,15 @@ class NAryExpression(base.Expression):
     @abstractmethod
     def _verify_domain_constraints(
         self: NAryExpression,
-        *inner_values: RealNumber
+        *inner_values: float
     ) -> None:
         raise Exception("Concrete classes derived from NAryExpression must implement _verify_domain_constraints()")
 
     @abstractmethod
     def _value_formula(
         self: NAryExpression,
-        *inner_values: RealNumber
-    ) -> RealNumber:
+        *inner_values: float
+    ) -> float:
         raise Exception("Concrete classes derived from NAryExpression must implement _value_formula()")
 
     ## Normalization and Reduction ##
