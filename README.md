@@ -3,20 +3,12 @@
 Differentiate smooth expressions!
 
 
-## Installation ##
-
-Installing smoothmath is easy. From the top project directory run:
-```
-pip install .
-```
-
-
 ## Documentation ##
 
-You can see how to use smoothmath and find an API reference at
-<a href="https://taylorhummon.github.io/smoothmath/">https://taylorhummon.github.io/smoothmath/</a>.
+Find the official documentation for smoothmath at 
+<a href="https://smoothmath.readthedocs.io/">https://smoothmath.readthedocs.io/</a>.
 
 
 ## Contributing ##
 
-See `DEVELOPMENT.md` for instructions on developing smoothmath.
+See `DEVELOPMENT.md` to learn about smoothmath development.
