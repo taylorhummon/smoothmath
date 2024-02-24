@@ -1,7 +1,10 @@
 Installation
 ------------
 
-Installing smoothmath is easy. From the top project directory run:
+Installing smoothmath is easy. Get a copy of the project from github:
+https://github.com/taylorhummon/smoothmath.
+
+Then from the top project directory run:
 
 .. code-block:: console
 
