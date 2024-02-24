@@ -4,7 +4,7 @@ version = "0.0.1"
 authors = [
   { name="Taylor Hummon", email="taylor.hummon@gmail.com" },
 ]
-description = "Evaluate and differentiate smooth functions"
+description = "Evaluate and differentiate smooth expressions!"
 readme = "README.md"
 requires-python = ">=3.12"
 classifiers = [
