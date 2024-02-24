@@ -1,5 +1,5 @@
-smoothmath.expression
-=====================
+API: smoothmath.expression
+==========================
 
 .. module:: smoothmath.expression
 

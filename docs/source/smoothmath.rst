@@ -1,5 +1,5 @@
-smoothmath
-==========
+API: smoothmath
+===============
 
 .. module:: smoothmath
 

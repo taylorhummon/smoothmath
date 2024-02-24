@@ -5,16 +5,6 @@ In this section we'll take a quick tour of smoothmath. We'll see how to write
 smoothmath expressions, how to evaluate them, and how to differentiate them.
 
 
-Installation
-------------
-
-Installing smoothmath is easy. From the top project directory run:
-
-.. code-block:: console
-
-    $ pip install .
-
-
 Basics of smoothmath expressions
 --------------------------------
 

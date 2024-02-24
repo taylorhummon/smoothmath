@@ -1,13 +1,16 @@
 Welcome to smoothmath's documentation!
 ======================================
 
-Here you'll find an introduction to using smoothmath and the package's
-API reference.
+Here you'll find the official documentation for smoothmath. The smoothmath package
+provides differentiation capabilities for common mathematical expressions.
+To get started, take a look at :doc:`how to install <install>` or
+`how to use <usage>` smoothmath.
 
 .. toctree::
     :maxdepth: 2
     :caption: Contents:
 
+    install
     usage
     smoothmath
     expression
