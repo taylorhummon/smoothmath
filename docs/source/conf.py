@@ -20,7 +20,6 @@ author = 'Taylor Hummon'
 extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
     'sphinx_rtd_theme',
 ]
 
