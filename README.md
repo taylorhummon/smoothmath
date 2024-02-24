@@ -1,6 +1,6 @@
 # smoothmath #
 
-Evaluate and differentiate smooth expressions!
+Differentiate smooth expressions!
 
 
 ## Installation ##
@@ -13,7 +13,7 @@ pip install .
 
 ## Documentation ##
 
-You can see how to use smoothmath aand find an API reference at
+You can see how to use smoothmath and find an API reference at
 <a href="https://taylorhummon.github.io/smoothmath/">https://taylorhummon.github.io/smoothmath/</a>.
 
 
