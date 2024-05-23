@@ -17,7 +17,7 @@ pipenv shell
 ```
 
 We can use pip to install our package in our virtual environment using "editable mode", 
-which allows our isntalled packge to automatically reflect code changes:
+which allows our installed packge to automatically reflect code changes:
 ```
 pip install --editable .
 ```
